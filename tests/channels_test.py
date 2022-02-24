@@ -1,1 +1,1 @@
-# for channels tests.
+# for current channels tests.
