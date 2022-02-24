@@ -46,8 +46,7 @@ def test_register_invalid_email():
         auth_register_v1('abc@def.123', 'password', 'first', 'last')
 
 # based on code Haydon wrote in project starter video
-def test_register_duplicate_email():
-    clear_and_register()
+def test_register_duplicate_email(clear_and_register):
     with pytest.raises(InputError):
         auth_register_v1('abc@def.com', 'password', 'first', 'last')
     clear_v1()
@@ -108,9 +107,7 @@ def test_register_works():
     
     assert auth_user_id1 == auth_user_id2
 
-def test_login_invalid():
-    clear_and_register()
-
+def test_login_invalid(clear_and_register):
     # incorrect password
     with pytest.raises(InputError):
         auth_login_v1('abc@def.com', 'wordpass')
