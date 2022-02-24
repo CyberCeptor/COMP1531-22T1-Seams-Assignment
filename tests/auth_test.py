@@ -1,0 +1,1 @@
+# program for all user authorization tests
