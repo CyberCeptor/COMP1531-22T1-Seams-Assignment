@@ -58,7 +58,7 @@ def auth_register_v1(email, password, name_first, name_last):
         raise InputError("Invalid last name")
 
     # create a handle
-    
+    handle = ""
 
     # append user data as a dictionary if everything is valid
     store['users'] = []
