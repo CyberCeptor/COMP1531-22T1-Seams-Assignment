@@ -46,8 +46,6 @@ def auth_register_v1(email, password, name_first, name_last):
     # check for invalid password
     if len(password) < 6:
         raise InputError("Password is too short")
-    elif ' ' in password:
-        raise InputError("Password contains a space")
 
     # check for invalid first name
     if not re.fullmatch(valid_name_regex, name_first):

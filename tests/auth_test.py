@@ -57,11 +57,6 @@ def test_register_invalid_password():
         auth_register_v1('abc@def.com', 'pass', 'first', 'last')
     clear_v1()
 
-    # space in password
-    with pytest.raises(InputError):
-        auth_register_v1('abc@def.com', 'pass word', 'first', 'last')
-    clear_v1()
-
 def test_register_invalid_name():
     # first name too long
     with pytest.raises(InputError):
