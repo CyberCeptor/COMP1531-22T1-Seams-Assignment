@@ -108,10 +108,10 @@ def test_register_works():
     assert auth_user_id1 == auth_user_id2
 
 def test_login_invalid(clear_and_register):
-    # incorrect password
-    with pytest.raises(InputError):
-        auth_login_v1('abc@def.com', 'wordpass')
-
     # email does not belong to a user
     with pytest.raises(InputError):
         auth_login_v1('ghi@jkl.com', 'password')
+    
+    # incorrect password
+    with pytest.raises(InputError):
+        auth_login_v1('abc@def.com', 'wordpass')
