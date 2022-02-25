@@ -76,7 +76,7 @@ def test_register_invalid_name():
                         'abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz')
     clear_v1()
 
-    # first name has symbols other than - and '
+    # first name has symbols other than - and ' and spaces
     with pytest.raises(InputError):
         auth_register_v1('abc@def.com', 'password', 'first@', 'last')
     clear_v1()
@@ -86,7 +86,7 @@ def test_register_invalid_name():
         auth_register_v1('abc@def.com', 'password', 'first1', 'last')
     clear_v1()
 
-    # last name has symbols other than - and '
+    # last name has symbols other than - and ' and spaces
     with pytest.raises(InputError):
         auth_register_v1('abc@def.com', 'password', 'first', 'last@')
     clear_v1()
@@ -108,10 +108,10 @@ def test_register_works():
     assert auth_user_id1 == auth_user_id2
 
 def test_login_invalid(clear_and_register):
-    # incorrect password
-    with pytest.raises(InputError):
-        auth_login_v1('abc@def.com', 'wordpass')
-
     # email does not belong to a user
     with pytest.raises(InputError):
         auth_login_v1('ghi@jkl.com', 'password')
+    
+    # incorrect password
+    with pytest.raises(InputError):
+        auth_login_v1('abc@def.com', 'wordpass')
