@@ -12,10 +12,12 @@ def auth_login_v1(email, password):
     store = data_store.get()
     u_id = -1
     for user in store['users']:
-        if user[1] == email:
+        stored_email = user["email"]
+        stored_pw = user["pw"]
+        if stored_email == email:
             # correct email and password
-            if user[2] == password:
-                u_id = user[0]
+            if stored_pw == password:
+                u_id = user["id"]
             else: # email belongs to a user but incorrect password
                 raise InputError("Incorrect password")
 
@@ -38,7 +40,7 @@ def auth_register_v1(email, password, name_first, name_last):
 
     # check for duplicate email
     for user in store['users']:
-        if user[1] == email:
+        if user["email"] == email:
             raise InputError("Email has already been taken")
 
     # check for invalid password
@@ -56,12 +58,14 @@ def auth_register_v1(email, password, name_first, name_last):
         raise InputError("Invalid last name")
 
     # create a handle
-    
+    handle = ""
 
-    # append user data if everything is valid
+    # append user data as a dictionary if everything is valid
     store['users'] = []
-    store['users'].append((u_id, email, password, name_first, name_last))
-
+    user_dict = {"id": u_id, "email": email, "pw": password, 
+                "first": name_first, "last": name_last, "handle": handle}
+    store['users'].append(user_dict)
+    
     return {
         'auth_user_id': u_id,
     }
