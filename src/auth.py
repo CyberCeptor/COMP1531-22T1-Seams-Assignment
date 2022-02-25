@@ -58,9 +58,11 @@ def auth_register_v1(email, password, name_first, name_last):
     # create a handle
     
 
-    # append user data if everything is valid
+    # append user data as a dictionary if everything is valid
     store['users'] = []
-    store['users'].append((u_id, email, password, name_first, name_last))
+    user_dict = {"id": u_id, "email": email, "pw": password, 
+                "first": name_first, "last": name_last, "handle": handle}
+    store['users'].append(user_dict)
 
     return {
         'auth_user_id': u_id,
