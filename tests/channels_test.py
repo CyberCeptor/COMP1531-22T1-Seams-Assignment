@@ -23,17 +23,6 @@ Return Type:
     {channel_id}    (int)
 '''
 
-# A Dictionary for auth_register_v1 input
-generic_user = {
-    "email": "abc@def.com",
-    "password": "password",
-    "first_name": "first",
-    "last_name": "last",
-}
-
-
-
-
 ### auth['auth_user_id'] is accessing the item in the Dictionary of User.
 ### is_public is True and False, so need to test for both public and private channels.
 
