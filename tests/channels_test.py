@@ -32,6 +32,8 @@ generic_user = {
 }
 
 
+
+
 ### auth['auth_user_id'] is accessing the item in the Dictionary of User.
 ### is_public is True and False, so need to test for both public and private channels.
 
@@ -46,14 +48,14 @@ def test_channels_create_valid_auth_id():
 def test_channels_create_too_short():
     clear_v1()
     #return auth_user_id
-    auth = auth_register_v1(generic_user)
+    auth = auth_register_v1('abc@def.com', 'password', 'first', 'last')
     assert channels_create_v1(auth['auth_user_id'], "", True)
     assert channels_create_v1(auth['auth_user_id'], "", False)
 
 # Testing for channel name longer than 20 characters for both public and private channels. InputError.
 def test_channels_create_channel_name_too_long():
     clear_v1()
-    auth = auth_register_v1(generic_user)
+    auth = auth_register_v1('abc@def.com', 'password', 'first', 'last')
     with pytest.raises(InputError):
         assert channels_create_v1(auth['auth_user_id'], 'MoreThan20CharPublic!', True)
         assert channels_create_v1(auth['auth_user_id'], 'MoreThan20CharPrivate', False)
@@ -61,7 +63,7 @@ def test_channels_create_channel_name_too_long():
 # Testing that the is_public argument is a boolean. Input Error
 def test_channels_create_boolean():
     clear_v1()
-    auth = auth_register_v1(generic_user)
+    auth = auth_register_v1('abc@def.com', 'password', 'first', 'last')
     with pytest.raises(InputError):
         assert channels_create_v1(auth['auth_user_id'], 'test_channel', 'Not a boolean')
 
@@ -69,7 +71,7 @@ def test_channels_create_boolean():
 # Testing the return value of channels_create is a valid int for both public and private. 
 def test_channels_create_return():
     clear_v1()
-    auth = auth_register_v1(generic_user)
+    auth = auth_register_v1('abc@def.com', 'password', 'first', 'last')
     channel_id_one = channels_create_v1(auth['auth_user_id'], 'test_channel_public', True)
     channel_id_two = channels_create_v1(auth['auth_user_id'], 'test_channel_private', False)
     with pytest.raises(AccessError):
