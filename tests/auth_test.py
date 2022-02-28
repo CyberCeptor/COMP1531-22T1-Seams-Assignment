@@ -115,7 +115,19 @@ def test_register_invalid_name():
         auth_register_v1('abc@def.com', 'password', '-', ' ')
     clear_v1()
 
-def test_register_handle_invalid_symbols(store_users):
+# based on code Hayden wrote in project starter video
+def test_register_works():
+    clear_v1()
+    register_return = auth_register_v1('abc@def.com', 'password', 
+                                        'first', 'last')
+    auth_user_id1 = register_return['auth_user_id'] 
+
+    login_return = auth_login_v1('abc@def.com', 'password')
+    auth_user_id2 = login_return['auth_user_id']
+    
+    assert auth_user_id1 == auth_user_id2
+
+def test_handle_creation_invalid_symbols(store_users):
     # first name has symbols
     auth_register_v1('abc@def.com', 'password', "f'irst-fir st", 'last')
     handle0 = store_users[0]['handle']
@@ -126,7 +138,7 @@ def test_register_handle_invalid_symbols(store_users):
     handle1 = store_users[1]['handle']
     assert handle1 == 'firstlastlast'
 
-def test_register_handle_capitals(store_users):
+def test_handle_creation_capitals(store_users):
     # first name has capitals
     auth_register_v1('abc@def.com', 'password', 'FIRST', 'last')
     handle0 = store_users[0]['handle']
@@ -142,7 +154,7 @@ def test_register_handle_capitals(store_users):
     handle2 = store_users[2]['handle']
     assert handle2 == 'firstlastee'
 
-def test_register_handle_invalid_length(store_users):
+def test_handle_creation_invalid_length(store_users):
     # first name longer than 20 characters
     auth_register_v1('abc@def.com', 'password', 'abcdefghijklmnopqrstuvwxyz', 
                     'last')
@@ -160,7 +172,7 @@ def test_register_handle_invalid_length(store_users):
     handle2 = store_users[2]['handle']
     assert handle2 == 'abcdefghijklmnopqrla'
 
-def test_register_handle_duplicates(store_users):
+def test_handle_creation_duplicates(store_users):
     auth_register_v1('abc@def.com', 'password', 'first', 'last')
     handle0 = store_users[0]['handle']
     assert handle0 == 'firstlast'
@@ -169,7 +181,7 @@ def test_register_handle_duplicates(store_users):
     handle1 = store_users[1]['handle']
     assert handle1 == 'firstlast0'
 
-def test_register_handle_invalid_length_duplicates(store_users):
+def test_handle_creation_invalid_length_duplicates(store_users):
     auth_register_v1('abc@def.com', 'password', 'abcdefghijklmnopqr', 'last')
     handle0 = store_users[0]['handle']
     assert handle0 == 'abcdefghijklmnopqrla'
@@ -179,18 +191,6 @@ def test_register_handle_invalid_length_duplicates(store_users):
     assert handle1 == 'abcdefghijklmnopqrla0'
 
     assert len(handle0) != len(handle1)
-    
-# based on code Hayden wrote in project starter video
-def test_register_works():
-    clear_v1()
-    register_return = auth_register_v1('abc@def.com', 'password', 
-                                        'first', 'last')
-    auth_user_id1 = register_return['auth_user_id'] 
-
-    login_return = auth_login_v1('abc@def.com', 'password')
-    auth_user_id2 = login_return['auth_user_id']
-    
-    assert auth_user_id1 == auth_user_id2
 
 def test_login_invalid(clear_and_register):
     # email does not belong to a user
