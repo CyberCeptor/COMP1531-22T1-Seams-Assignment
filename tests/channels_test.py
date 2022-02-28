@@ -1,5 +1,4 @@
 
-
 import pytest
 
 from src.auth import auth_register_v1
@@ -65,7 +64,7 @@ def test_channels_create_boolean():
         channels_create_v1(1, 'test_channel', 'Not a boolean')
 
 # Testing duplicate channels names created with the same is_public.
-def test_channels_duplicate_name(clear_and_register):
+def test_channels_duplicate_name():
     channels_create_v1(1, 'test_channel_public3', True)
     with pytest.raises(InputError):  
         channels_create_v1(1, 'test_channel_public3', True)
