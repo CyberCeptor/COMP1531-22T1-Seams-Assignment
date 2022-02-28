@@ -5,10 +5,18 @@ from src.auth import auth_login_v1
 from src.error import InputError
 from src.other import clear_v1
 
+from src.data_store import data_store
+
 @pytest.fixture
 def clear_and_register():
     clear_v1()
     auth_register_v1('abc@def.com', 'password', 'first', 'last')
+
+def test_clear_works():
+    store = data_store.get()
+    auth_register_v1('abc@def.com', 'password', 'first', 'last')
+    clear_v1()
+    assert store['users'] == []
 
 def test_register_invalid_email():
     # missing @ and .
@@ -98,7 +106,7 @@ def test_register_works():
     auth_user_id1 = register_return['auth_user_id'] 
 
     login_return = auth_login_v1('abc@def.com', 'password')
-    auth_user_id2 = login_return['auth_user_id']   
+    auth_user_id2 = login_return['auth_user_id']
     
     assert auth_user_id1 == auth_user_id2
 
