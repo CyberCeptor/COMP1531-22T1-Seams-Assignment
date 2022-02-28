@@ -23,6 +23,7 @@ Comments for each test case if function name is not specific enough
 Reference any code used from internet/lectures in comments
 Add link if from internet
 80 character margin
+Single quotation marks (‘   ’) for strings
 
 
 
