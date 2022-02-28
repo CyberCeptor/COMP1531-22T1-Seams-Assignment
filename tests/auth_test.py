@@ -126,6 +126,22 @@ def test_register_handle_invalid_symbols(store_users):
     handle1 = store_users[1]['handle']
     assert handle1 == 'firstlastlast'
 
+def test_register_handle_capitals(store_users):
+    # first name has capitals
+    auth_register_v1('abc@def.com', 'password', 'FIRST', 'last')
+    handle0 = store_users[0]['handle']
+    assert handle0 == 'firstlast'
+
+    # last name has capitals
+    auth_register_v1('abc@def.co', 'password', 'first', 'LASTY')
+    handle1 = store_users[1]['handle']
+    assert handle1 == 'firstlasty'
+
+    # both names have capitals
+    auth_register_v1('abc@def.co', 'password', 'firST', 'LAStee')
+    handle2 = store_users[2]['handle']
+    assert handle1 == 'firstlastee'
+
 def test_register_handle_invalid_length(store_users):
     # first name longer than 20 characters
     auth_register_v1('abc@def.com', 'password', 'abcdefghijklmnopqrstuvwxyz', 
@@ -140,7 +156,7 @@ def test_register_handle_invalid_length(store_users):
     assert handle1 == 'firstabcdefghijklmno'
 
     # name longer than 20 characters
-    auth_register_v1('abc@def.c', 'password', 'abcdefghijklmnopqr', 'last')
+    auth_register_v1('abc@de.com', 'password', 'abcdefghijklmnopqr', 'last')
     handle2 = store_users[2]['handle']
     assert handle2 == 'abcdefghijklmnopqrla'
 

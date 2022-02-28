@@ -57,15 +57,27 @@ def auth_register_v1(email, password, name_first, name_last):
 
     # check for name that would create invalid handle
     full_name = name_first + name_last
-    alpha = 0
+    count_alpha = 0
     for c in full_name:
         if c.isalpha() == True:
-            alpha += 1
-    if alpha == 0:
+            count_alpha += 1
+    if count_alpha == 0:
         raise InputError('Invalid name')
 
-    # create a handle
-    handle = ''
+    # create a handle by removing any valid name symbols and lowering the case
+    handle = ''.join(c for c in full_name if c not in "'- ")
+    handle = handle.lower()
+    # slice the string if the handle is too long
+    if len(handle) > 20:
+        handle = handle[0:20]
+
+    # check for duplicate handles
+    duplicate_count = -1
+    for user in store['users']:
+        if user['handle'] == handle:
+            duplicate_count += 1
+    if duplicate_count > -1:
+        handle = handle + str(duplicate_count)
 
     # append user data as a dictionary if everything is valid
     user_dict = {'id': u_id, 'email': email, 'pw': password, 
