@@ -200,3 +200,4 @@ def test_login_invalid(clear_and_register):
     # incorrect password
     with pytest.raises(InputError):
         auth_login_v1('abc@def.com', 'wordpass')
+    clear_v1()
