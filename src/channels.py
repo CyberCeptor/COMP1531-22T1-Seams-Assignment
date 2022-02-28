@@ -1,6 +1,5 @@
 from src.error import InputError
 from src.error import AccessError
-from src.auth import auth
 
 from data_store import data_store
 
