@@ -104,7 +104,10 @@ def handle_creation(store, full_name):
     # check for duplicate handles
     duplicate_count = -1
     for user in store['users']:
-        if user['handle'] == handle:
+        # from https://stackoverflow.com/a/30315056
+        # strip numbers from string handle and compare 
+        to_compare = re.sub(r'\d+', '', user['handle'])
+        if to_compare == handle:
             duplicate_count += 1
     if duplicate_count > -1:
         handle = handle + str(duplicate_count)
