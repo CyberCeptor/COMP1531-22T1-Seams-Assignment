@@ -3,4 +3,9 @@ auth.py
 - first and last names can only include the ASCII characters for: a-z, A-Z, 
     hyphens, apostrophes and spaces
 - handles can only include the ASCII characters for: a-z, 0-9
-- 
+
+channels.py
+- channel name can contain any character
+
+
+
