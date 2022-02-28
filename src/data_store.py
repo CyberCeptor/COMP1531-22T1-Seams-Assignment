@@ -27,7 +27,20 @@ Example usage:
 ## YOU SHOULD MODIFY THIS OBJECT BELOW
 initial_object = {
     'users': [],
+    'channels': [],
 }
+
+
+
+'''  
+    channel_data = {
+        'channel_id': channel_id,
+        'name': name,
+        'owner_members': [auth_user_id],
+        'all_members': [auth_user_id],
+        'is_public': is_public,
+    }
+'''
 ## YOU SHOULD MODIFY THIS OBJECT ABOVE
 
 ## YOU ARE ALLOWED TO CHANGE THE BELOW IF YOU WISH
