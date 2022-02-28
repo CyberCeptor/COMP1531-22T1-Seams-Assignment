@@ -91,7 +91,7 @@ def channels_create_v1(auth_user_id, name, is_public):
 
 
     # get the number of channels created so far, incremented for the new channel id.
-    channel_id = len(data_store['channels']) + 1
+    channel_id = len(store['channels']) + 1
 
     # Storing the channel information 
     channel_data = {
