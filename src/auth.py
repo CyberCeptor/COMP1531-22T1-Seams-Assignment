@@ -55,11 +55,19 @@ def auth_register_v1(email, password, name_first, name_last):
     if not re.fullmatch(valid_name_regex, name_last):
         raise InputError('Invalid last name')
 
+    # check for name that would create invalid handle
+    full_name = name_first + name_last
+    alpha = 0
+    for c in full_name:
+        if c.isalpha() == True:
+            alpha += 1
+    if alpha == 0:
+        raise InputError('Invalid name')
+
     # create a handle
     handle = ''
 
     # append user data as a dictionary if everything is valid
-    store['users'] = []
     user_dict = {'id': u_id, 'email': email, 'pw': password, 
                 'first': name_first, 'last': name_last, 'handle': handle}
     store['users'].append(user_dict)
