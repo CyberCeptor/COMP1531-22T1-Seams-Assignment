@@ -1,6 +1,7 @@
 
 
 import pytest
+
 from src.auth import auth_register_v1
 from src.channels import channels_create_v1
 from src.other import clear_v1
@@ -64,14 +65,14 @@ def test_channels_create_boolean():
         channels_create_v1(1, 'test_channel', 'Not a boolean')
 
 # Testing duplicate channels names created with the same is_public.
-def test_channels_duplicate_name():
+def test_channels_duplicate_name(clear_and_register):
     channels_create_v1(1, 'test_channel_public3', True)
     with pytest.raises(InputError):  
         channels_create_v1(1, 'test_channel_public3', True)
 
-    channels_create_v1(1, 'test_channel_private4', False)
+    channels_create_v1(1, 'test_channel_priv4', False)
     with pytest.raises(InputError):  
-        channels_create_v1(1, 'test_channel_private4', False)
+        channels_create_v1(1, 'test_channel_priv4', False)
 
 
 # Testing the return value of channels_create is a valid int for both public and private. 
@@ -80,7 +81,7 @@ def test_channels_create_return(clear_and_register):
     channel_id_two = channels_create_v1(1, 'test_channel_private', False)
     assert channel_id_one['channel_id'] == 1
     assert channel_id_two['channel_id'] == 2
-
+    clear_v1()
 
 #####################################################
 #                                                   #
@@ -92,6 +93,7 @@ def test_channels_create_return(clear_and_register):
 def test_channels_list_v1():
     clear_v1()
     channel1 = auth_register_v1('abc@def.com', 'password', 'first', 'last')
+    clear_v1()
 
 
 # Testing the channels_list_v1 when multiple channels are created and added to it.
