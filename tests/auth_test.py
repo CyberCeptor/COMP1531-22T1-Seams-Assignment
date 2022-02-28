@@ -138,9 +138,9 @@ def test_register_handle_capitals(store_users):
     assert handle1 == 'firstlasty'
 
     # both names have capitals
-    auth_register_v1('abc@def.co', 'password', 'firST', 'LAStee')
+    auth_register_v1('abc@de.co', 'password', 'firST', 'LAStee')
     handle2 = store_users[2]['handle']
-    assert handle1 == 'firstlastee'
+    assert handle2 == 'firstlastee'
 
 def test_register_handle_invalid_length(store_users):
     # first name longer than 20 characters
