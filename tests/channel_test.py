@@ -1,3 +1,4 @@
+from unicodedata import name
 import pytest
 
 from src.auth import auth_register_v1
@@ -7,10 +8,6 @@ from src.other import clear_v1
 from src.error import InputError
 from src.error import AccessError
 
-@pytest.fixture
-def clear_and_register():
-    clear_v1()
-    auth_register_v1('abc@def.com', 'password', 'first', 'last')
 
 @pytest.fixture
 def channel_create():
@@ -54,11 +51,13 @@ def test_channel_detail_invalid_channel():
     clear_v1()
 
 # Testing valid type for channel_details_v1
-def test_channels_create_return(clear_and_register):
+def test_channels_create_return(channel_create):
     channel_details = channel_details_v1('1','1')
-    assert channel_details['name'] == 'channel_name'
-    assert channel_details['is_public'] == True
-    assert channel_details['owner_members'] == '1'
-    assert channel_details['all_members'] == '1'
+    assert channel_details == {
+        "name": "channel_name",
+        "is_public": True,
+        "owner_members": "1",
+        "all_members": "1",
+    }
 clear_v1()
 
