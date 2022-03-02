@@ -12,7 +12,7 @@ from src.error import AccessError
 @pytest.fixture
 def channel_create():
     clear_v1()
-    channels_create_v1('1','channel_name','True')
+    channels_create_v1(1,'channel_name',True)
 
 # testing input user id is valid
 def test_valid_auth_user_id():
@@ -51,7 +51,7 @@ def test_channel_detail_invalid_channel():
     clear_v1()
 
 # Testing valid type for channel_details_v1
-def test_channels_create_return(channel_create):
+def test_channels_details_return(channel_create):
     channel_details = channel_details_v1('1','1')
     assert channel_details == {
         "name": "channel_name",

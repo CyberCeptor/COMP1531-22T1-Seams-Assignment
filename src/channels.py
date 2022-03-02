@@ -2,7 +2,7 @@ from src.error import InputError
 from src.error import AccessError
 
 from src.data_store import data_store
-
+from src.channel import search_user
 
 
 
@@ -35,6 +35,10 @@ def channels_list_v1(auth_user_id):
 
 def channels_listall_v1(auth_user_id):
     store = data_store.get()
+    user = search_user(auth_user_id)
+    if user is None:
+        raise InputError("Not an authorised user.")
+
     # return lists of all channels(including private ones) with details
     return {"channels": store['channels'] }
 
@@ -47,6 +51,13 @@ def search_user_by_id(auth_user_id):
             return user
     return None
 
+
+
+
+
+    # Creates a new channel with the given name and is either public or private.
+    # The user who created it automatically joins it.
+    # Returns the channel id.
 
 
 

@@ -2,6 +2,7 @@ import pytest
 
 from src.auth import auth_register_v1
 from src.channels import channels_create_v1, channels_listall_v1 
+
 from src.other import clear_v1
 from src.error import InputError
 from src.error import AccessError
@@ -43,7 +44,8 @@ def test_channels_create_valid_auth_id():
     with pytest.raises(AccessError):
         channels_create_v1(-2, 'test_channel_private2', False)
 
-# Testing channel name is less 1 character, gives no input for name. Input Error
+# Testing channel name is less than 1 character, gives no input for name. Input Error
+
 def test_channels_create_too_short():
     with pytest.raises(InputError):
         channels_create_v1(1, "", True)
@@ -107,19 +109,20 @@ def test_channels_list_v1():
 @pytest.fixture
 def channel_create():
     clear_v1()
-    channels_create_v1('channel_name','True')
+    channels_create_v1(1, 'channel_name', True)
 
 # testing input user id is valid
 def test_valid_auth_user_id():
     with pytest.raises(InputError):
-        channels_listall_v1('-1','1')
+        channels_listall_v1('-1')
     clear_v1()
 
 # testing if return values are the right type
-def test_channels_details_v1_return(channel_create):
+def test_channels_listall_v1_return(channel_create):
     channel_listall = channels_listall_v1('1','1')
     channel_listall = channel_listall["channels"]
     assert channel_listall[0] == {
         "channel_id": "1",
         "name": "channel_name",
     }
+

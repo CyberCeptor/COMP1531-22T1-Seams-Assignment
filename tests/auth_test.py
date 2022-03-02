@@ -162,7 +162,7 @@ def test_handle_creation_invalid_length(store_users):
     assert handle0 == 'abcdefghijklmnopqrst'
 
     # last name longer than 20 characters
-    auth_register_v1('abc@def.com', 'password', 'first', 
+    auth_register_v1('abc@def.co', 'password', 'first', 
                     'abcdefghijklmnopqrstuvwxyz')
     handle1 = store_users[1]['handle']
     assert handle1 == 'firstabcdefghijklmno'
