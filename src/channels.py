@@ -38,7 +38,6 @@ def channels_listall_v1(auth_user_id):
     # return lists of all channels(including private ones) with details
     return {"channels": store['channels'] }
 
-
 #helper function to see if user is in the data base
 def search_user_by_id(auth_user_id):
     store = data_store.get()
