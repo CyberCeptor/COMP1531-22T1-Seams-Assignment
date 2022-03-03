@@ -14,7 +14,8 @@ def channels_list_v1(auth_user_id):
     # add the channel information to the new dict.
     # return new dict.
 
-
+    if type(auth_user_id) != int:
+        raise InputError("The ID must be of type int.")
 
 
     return {

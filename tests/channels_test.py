@@ -87,15 +87,20 @@ def test_channels_create_return(clear_and_register):
 #                                                   #
 #####################################################
 
+
+"""Check that the given valid exists."""
 def test_channels_list_valid_id():
     clear_v1()
     auth_register_v1('abc@def.com', 'password', 'first', 'last')
     channels_create_v1(1, 'test_channel', True)
     channels_create_v1(1, 'test_channel', False)
-    with pytest.raises(InputError):
+    with pytest.raises(AccessError):
         channels_list_v1(2)
-
-
+    with pytest.raises(InputError):
+        channels_list_v1(True)
+    with pytest.raises(InputError):
+        channels_list_v1('String')
+    
 
 
 """testing when the channel id is incorrect. For both public/private channels created"""
