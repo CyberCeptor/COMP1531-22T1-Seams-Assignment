@@ -36,17 +36,11 @@ def channels_list_v1(auth_user_id):
 def channels_listall_v1(auth_user_id):
     store = data_store.get()
 
-    # user = search_user_by_id(auth_user_id)
-    # if user is None:
-    #     raise InputError("Not an authorised user.")
+    user = search_user_by_id(auth_user_id)
+    if user is None:
+        raise InputError("Not an authorised user.")
     # Check that the auth_user_id exists.
-    user_exists = False
-    for user in store['users']:
-        if user['id'] == auth_user_id:
-            user_exists = True
-    # if the auth_user_id is not found, the user does not exist.
-    if user_exists == False:
-        raise InputError("Not an valid user.")
+  
 
 
     # create new dictionary for "channels" which stores channel_id & name
