@@ -1,4 +1,3 @@
-from ast import Store
 import pytest
 
 from src.auth import auth_register_v1
@@ -6,26 +5,23 @@ from src.other import clear_v1
 from src.error import InputError
 from src.error import AccessError
 from src.channels import channels_create_v1
-from src.channel import channel_details_v1
 from src.channel import channel_invite_v1
 from src.data_store import *
 from src.channel import channel_join_v1
 
 
-### Test Chanel_invite    Zefan Cao(Van)
+### Test Chanel_invite    Zefan Cao(Van) z5237177
 #
 #
 #
 # Test successs
-
 def test_invite_successful():
     clear_v1()
     store = data_store.get()
     inviter_info = auth_register_v1('wangkaiyan233@gmail.com', 'wky19991123', 'Wang', 'kaiyan')
     invitee_info = auth_register_v1('xuezhiqian234@gmail.com', 'xzq19991123', 'Xue', 'zhiqian')
-    createchannel =channels_create_v1(inviter_info['auth_user_id'], 'namechannelwky', True)
-    
-    channel_invite_v1(inviter_info['auth_user_id'], createchannel['channel_id'], invitee_info['auth_user_id'])
+    createchannel =channels_create_v1(inviter_info['auth_user_id'], 'namechannelwky', True)   
+    channel_invite_v1(1, 1, 2)
     assert len(store['channels'][0]['all_members']) == 2
 
 # Inputerror:Test the function has an invalid channel_id
@@ -34,21 +30,21 @@ def test_invite_wrong_channel():
     inviter_info = auth_register_v1('wangkaiyan233@gmail.com', 'wky19991123', 'Wang', 'kaiyan')
     invitee_info = auth_register_v1('xuezhiqian234@gmail.com', 'xzq19991123', 'Xue', 'zhiqian')
     with pytest.raises(InputError):
-        channel_invite_v1(inviter_info['auth_user_id'], 6, invitee_info['auth_user_id'])
+        channel_invite_v1(1, 0, 2)
 
 # Inputerror:Test the function has an invalid invitee.
 def test_invite_wrong_invitee():
     clear_v1()
     invitee_info = auth_register_v1('xuezhiqian234@gmail.com', 'xzq19991123', 'Xue', 'zhiqian')
     with pytest.raises(InputError):
-        channel_invite_v1(1, 0, invitee_info['auth_user_id'])
+        channel_invite_v1(1, 1, invitee_info['auth_user_id'])
 
 # Inputerror:Test the function has an invalid inviter.
 def test_invite_wrong_inviter():
     clear_v1()
     inviter_info = auth_register_v1('wangkaiyan233@gmail.com', 'wky19991123', 'Wang', 'kaiyan')
     with pytest.raises(InputError):
-        channel_invite_v1(inviter_info['auth_user_id'], 0, 1)
+        channel_invite_v1(inviter_info['auth_user_id'], 1, 2)
 
 # Inputerror:Test the invitee is already in channel
 def test_channel_invite_user_already_joined():
@@ -56,8 +52,9 @@ def test_channel_invite_user_already_joined():
     inviter_info = auth_register_v1('wangkaiyan233@gmail.com', 'wky19991123', 'Wang', 'kaiyan')
     invitee_info = auth_register_v1('xuezhiqian234@gmail.com', 'xzq19991123', 'Xue', 'zhiqian')
     channels_create_v1(inviter_info['auth_user_id'], 'namewkychannel', True)
+    channel_join_v1(invitee_info['auth_user_id'], 1)
     with pytest.raises(InputError):
-        channel_invite_v1(inviter_info['auth_user_id'], 0, invitee_info['auth_user_id'],)
+        channel_invite_v1(invitee_info['auth_user_id'],1, 1)
 
 # Accesserror: Test the inviter is not in the channel
 def test_channel_invite_unauthorised():
@@ -69,12 +66,11 @@ def test_channel_invite_unauthorised():
     with pytest.raises(AccessError):
         channel_invite_v1(inviter_info['auth_user_id'], createchannel['channel_id'], invitee_info['auth_user_id'])
 
-######## Test channel_join_v1
+######## Test channel_join_v1 Zefan Cao z5237177
 #
 #
 #
 # Test successful
-'''
 def test_channel_join_successful():
     clear_v1()
     store = data_store.get()
@@ -83,25 +79,28 @@ def test_channel_join_successful():
     newchannel = channels_create_v1(inviter_info['auth_user_id'], 'namechannelwky', True)
     channel_join_v1(invitee_info['auth_user_id'], newchannel['channel_id'])
     assert len(store['channels'][0]['all_members']) == 2
-'''
-'''
-#
-def test_channel_join_flockr_owner_joins_private_channel():
-    clear_v1()
-    userA = auth_register('validemail@gmail.com', '123abc!@#', 'Dennis', 'Lin')
-    userB = auth_register('validemail2@gmail.com', '123abc!@#', 'Guanbin', 'Wen')
-    newchannel = channels_create(userB['token'], 'validchannelname', False)
-    channel.channel_join(userA['token'], newchannel['channel_id'])
-    assert len(data['channels'][0]['members']) == 2
-'''
 
-# InputError: Channel ID is not a valid channel
-def test_channel_join_invalid_channel():
+
+# InputError:Channel is an invalid channel
+def test_join_invalid_channel():
     clear_v1()
-    userB = auth_register_v1('validemail2@gmail.com', '123abc!@#', 'Dennis', 'Lin')
+    invitee_info = auth_register_v1('xuezhiqian234@gmail.com', 'xzq19991123', 'Xue', 'zhiqian')
     with pytest.raises(InputError):
-        channel_join_v1(userB['auth_user_id'], 0)
+        channel_join_v1(1, 0)
 
+# Inputerror: user is already in channel
+def test_join_already_exist():
+    clear_v1()
+    inviter_info = auth_register_v1('wangkaiyan233@gmail.com', 'wky19991123', 'Wang', 'kaiyan')
+    channels_create_v1(1, 'validchannelname', True)
+    with pytest.raises(InputError):
+        channel_join_v1(1, 1)
 
-
-
+# AccessError: channel is valid that is private and the user is not a global owner
+def test_join_channel_is_private():
+    clear_v1()
+    inviter_info = auth_register_v1('wangkaiyan233@gmail.com', 'wky19991123', 'Wang', 'kaiyan')
+    invitee_info = auth_register_v1('xuezhiqian234@gmail.com', 'xzq19991123', 'Xue', 'zhiqian')
+    newchannel = channels_create_v1(inviter_info['auth_user_id'], 'validchannelname', False) # it is a private channel
+    with pytest.raises(AccessError):
+        channel_join_v1(invitee_info['auth_user_id'], newchannel['channel_id'])
