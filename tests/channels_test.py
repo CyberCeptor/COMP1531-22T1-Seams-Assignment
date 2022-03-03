@@ -114,13 +114,13 @@ def clear_and_register_and_create():
 # testing input user id is valid
 def test_valid_auth_user_id():
     with pytest.raises(InputError):
-        channels_listall_v1('-1')
+        channels_listall_v1(-1)
     clear_v1()
 
 # testing if return values are the right type
 def test_channels_listall_v1_return(clear_and_register_and_create):
     result = channels_listall_v1(1)
-    assert result['channels'] == {
+    assert result['channels'][0] == {
         "channel_id": 1,
         "name": 'channel_name',
     }
