@@ -81,6 +81,7 @@ def channels_create_v1(auth_user_id, name, is_public):
         'name': name,
         'owner_members': [auth_user_id],
         'all_members': [auth_user_id],
+        'global_owners': [auth_user_id],
         'is_public': is_public,
     }
 
