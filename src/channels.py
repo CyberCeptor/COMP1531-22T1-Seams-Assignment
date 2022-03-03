@@ -2,7 +2,7 @@ from src.error import InputError
 from src.error import AccessError
 
 from src.data_store import data_store
-from src.channel import search_user
+from src.channel import search_user_by_id
 
 
 
@@ -35,12 +35,36 @@ def channels_list_v1(auth_user_id):
 
 def channels_listall_v1(auth_user_id):
     store = data_store.get()
-    user = search_user(auth_user_id)
-    if user is None:
-        raise InputError("Not an authorised user.")
+
+    # user = search_user_by_id(auth_user_id)
+    # if user is None:
+    #     raise InputError("Not an authorised user.")
+    # Check that the auth_user_id exists.
+    user_exists = False
+    for user in store['users']:
+        if user['id'] == auth_user_id:
+            user_exists = True
+    # if the auth_user_id is not found, the user does not exist.
+    if user_exists == False:
+        raise InputError("Not an valid user.")
+
+
+    # create new dictionary for "channels" which stores channel_id & name
+    channels_return = {
+        'channel_id':[],
+        'name': [],
+    }
+    # create list of dictionaries to store channels_return
+    dict_list = []
+    for channel in store['channels']:
+        channels_return['channel_id'].append(channel['channel_id']),
+        channels_return['name'].append(channel['name']),
+        dict_list.append(channels_return)
 
     # return lists of all channels(including private ones) with details
-    return {"channels": store['channels'] }
+    return {
+        "channels": dict_list
+    }
 
 #helper function to see if user is in the data base
 def search_user_by_id(auth_user_id):
@@ -54,10 +78,6 @@ def search_user_by_id(auth_user_id):
 
 
 
-
-    # Creates a new channel with the given name and is either public or private.
-    # The user who created it automatically joins it.
-    # Returns the channel id.
 
 
 

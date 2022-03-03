@@ -17,7 +17,7 @@ def channel_details_v1(auth_user_id, channel_id):
     store = data_store.get()
     channel = []
     # see if user is authorised
-    user = search_user(auth_user_id)
+    user = search_user_by_id(auth_user_id)
     if user is None:
         raise InputError("Not an authorised user.")
 
@@ -54,7 +54,7 @@ def search_channel(auth_user_id, channel_id):
     return valid
 
 #helper function to see if user is in the data base
-def search_user(auth_user_id):
+def search_user_by_id(auth_user_id):
     store = data_store.get()
     users = store['users']
     for user in users:
