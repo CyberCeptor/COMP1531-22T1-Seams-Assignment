@@ -105,11 +105,37 @@ def test_channels_list_v1():
 #          Channels Listall Test Functions           #
 #                                                   #
 #####################################################
+user1 = {
+    'email': 'abd.def@com',
+    'pw': 'password',
+    'first': 'first',
+    'last': 'last',
+}
+
+channel1 = {
+    'name': 'channel_name',
+    'is_public': True
+}
+
+users = [user1]
+
+@pytest.fixture
+def user_create():
+    for user in users:
+        result = auth_register_v1(
+            user["email"], user["pw"], 
+            user["first"], user["last"]
+        )
+        user['id'] = result['auth_user_id']
 
 @pytest.fixture
 def channel_create():
     clear_v1()
-    channels_create_v1(1, 'channel_name', True)
+    result = channels_create_v1(
+        user1['id'], channel1['name'], 
+        channel1['is_public']
+    )
+    channel1['channel_id'] = result['channel_id']
 
 # testing input user id is valid
 def test_valid_auth_user_id():
@@ -118,11 +144,14 @@ def test_valid_auth_user_id():
     clear_v1()
 
 # testing if return values are the right type
-def test_channels_listall_v1_return(channel_create):
-    channel_listall = channels_listall_v1('1','1')
-    channel_listall = channel_listall["channels"]
-    assert channel_listall[0] == {
-        "channel_id": "1",
-        "name": "channel_name",
+def test_channels_listall_v1_return():
+    # user_create()
+    # channel_create()
+    result = channels_listall_v1(user1['id'])
+    result = result['channels']
+    assert result[0] == {
+        "channel_id": channel1['channel_id'],
+        "name": channel1['name']
     }
+    clear_v1()
 
