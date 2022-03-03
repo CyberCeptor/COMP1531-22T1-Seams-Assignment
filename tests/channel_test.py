@@ -8,54 +8,20 @@ from src.other import clear_v1
 from src.error import InputError
 from src.error import AccessError
 
-user1 = {
-    'email': 'abd.def@com',
-    'pw': 'password',
-    'first': 'first',
-    'last': 'last',
-    'handle_str': 'firstlast'
-}
-
-channel1 = {
-    'name': 'channel_name',
-    'is_public': True
-}
-
-users = [user1]
-
 @pytest.fixture
-def user_create():
-    for user in users:
-        result = auth_register_v1(
-            user["email"], user["pw"], 
-            user["first"], user["last"]
-        )
-        user1['id'] = result['auth_user_id']
-
-@pytest.fixture
-def channel_create():
+def clear_and_register_and_create():
     clear_v1()
-    result = channels_create_v1(
-        user1['id'], channel1['name'], 
-        channel1['is_public']
-    )
-    channel1['channel_id'] = result['channel_id']
+    auth_register_v1('abc@def.com', 'password', 'first', 'last')
+    channels_create_v1(1, 'channel_name', True)
 
 # Testing valid type for channel_details_v1
 def test_channels_details_return():
-    result = channel_details_v1(user1['id'],channel1['channel_id'])
-    user = {
-        "u_id": user1['id'],
-        "email": user1['email'],
-        "name_first": user1['first'],
-        "name_last": user1['last'],
-        "handle_str": user1['handle_str'],
-    }
+    result = channel_details_v1(1,1)
     assert result == {
-        "name": channel1['name'],
-        "is_public": channel1['is_public'],
-        "owner_members": user,
-        "all_members": user,
+        "name": 'channel_name',
+        "is_public": True,
+        "owner_members": 1,
+        "all_members": 1,
     }
 clear_v1()
 
@@ -92,8 +58,8 @@ def test_channel_detail_invalid_channel():
 
 # channel id valid but user is not a member of
 def test_channel_detail_invalid_channel():
-    with pytest.raises(InputError):
-        channel_details_v1('2','')
+    with pytest.raises(AccessError):
+        channel_details_v1('2','1')
     clear_v1()
 
 
