@@ -87,6 +87,17 @@ def test_channels_create_return(clear_and_register):
 #                                                   #
 #####################################################
 
+def test_channels_list_valid_id():
+    clear_v1()
+    auth_register_v1('abc@def.com', 'password', 'first', 'last')
+    channels_create_v1(1, 'test_channel', True)
+    channels_create_v1(1, 'test_channel', False)
+    with pytest.raises(InputError):
+        channels_list_v1(2)
+
+
+
+
 """testing when the channel id is incorrect. For both public/private channels created"""
 def test_channels_list_id_check():
     clear_v1()
@@ -123,6 +134,7 @@ def test_channels_list_v1():
     channels_create_v1(2, 'test2_channel_priv', False)
     
     channels_list = channels_list_v1(1) #returns a Dict containing 'channel_id' and 'name' of all channels the user is in.
+    channels_list2 = channels_list_v1(2)
 
     # check the first four channels in the dict, check that the channel_id matches what was created.
     assert channels_list['channels'][0]['channel_id'] == chan1['channel_id']
@@ -130,7 +142,7 @@ def test_channels_list_v1():
     assert channels_list['channels'][2]['channel_id'] == chan3['channel_id']
     assert channels_list['channels'][3]['channel_id'] == chan4['channel_id']
 
-    # Testing to make sure that only 4 channels have been created.
+    # Testing to make sure that only 4 channels have been created for that user.
     assert len(channels_list['channels']) == 4
 
     clear_v1()
