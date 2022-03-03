@@ -67,12 +67,12 @@ def channels_create_v1(auth_user_id, name, is_public):
     # retrieving channel data from data_store
     store = data_store.get()
 
-<<<<<<< HEAD
+
     check_valid_auth_id(auth_user_id)
-=======
+
     if auth_user_id < 1:
         raise AccessError("The user id is not valid (out of bounds).")
->>>>>>> jenys-branch
+
 
     if len(name) > 20:
         raise InputError("The channel name must be less than 20 characters.")
