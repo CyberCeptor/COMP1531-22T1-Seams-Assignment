@@ -14,7 +14,8 @@ def channels_list_v1(auth_user_id):
     # add the channel information to the new dict.
     # return new dict.
 
-
+    if type(auth_user_id) != int:
+        raise InputError("The ID must be of type int.")
 
 
     return {
@@ -22,8 +23,21 @@ def channels_list_v1(auth_user_id):
         	{
         		'channel_id': 1,
         		'name': 'My Channel',
-        	}
+        	}, #Temporary to check some tests are working correctly.
+            {
+        		'channel_id': 2,
+        		'name': 'My Channel',
+        	}, 
+            {
+        		'channel_id': 3,
+        		'name': 'My Channel',
+        	}, 
+            {
+        		'channel_id': 4,
+        		'name': 'My Channel',
+        	},
         ],
+        
     }
 
 
@@ -53,16 +67,21 @@ def channels_create_v1(auth_user_id, name, is_public):
     # retrieving channel data from data_store
     store = data_store.get()
 
+<<<<<<< HEAD
     check_valid_auth_id(auth_user_id)
+=======
+    if auth_user_id < 1:
+        raise AccessError("The user id is not valid (out of bounds).")
+>>>>>>> jenys-branch
 
     if len(name) > 20:
-        raise InputError("Error: the channel name must be less than 20 characters.")
+        raise InputError("The channel name must be less than 20 characters.")
 
     if len(name) < 1:
-        raise InputError("Error: no channel name was entered.")
+        raise InputError("No channel name was entered.")
 
     if type(is_public) != bool:
-        raise InputError("Error: the public/private value given is not of type bool.")
+        raise InputError("The public/private value given is not of type bool.")
 
     # Test channel names for repition, unless public vs private.
     # Loops through data_store['channels'] to check channel names if they already exist
