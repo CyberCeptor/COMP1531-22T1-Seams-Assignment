@@ -22,8 +22,21 @@ def channels_list_v1(auth_user_id):
         	{
         		'channel_id': 1,
         		'name': 'My Channel',
-        	}
+        	}, #Temporary to check some tests are working correctly.
+            {
+        		'channel_id': 2,
+        		'name': 'My Channel',
+        	}, 
+            {
+        		'channel_id': 3,
+        		'name': 'My Channel',
+        	}, 
+            {
+        		'channel_id': 4,
+        		'name': 'My Channel',
+        	},
         ],
+        
     }
 
 
