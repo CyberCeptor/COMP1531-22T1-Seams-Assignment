@@ -68,16 +68,16 @@ def channels_create_v1(auth_user_id, name, is_public):
     store = data_store.get()
 
     if auth_user_id < 1:
-        raise AccessError("Error: the user id is not valid (out of bounds).")
+        raise AccessError("The user id is not valid (out of bounds).")
 
     if len(name) > 20:
-        raise InputError("Error: the channel name must be less than 20 characters.")
+        raise InputError("The channel name must be less than 20 characters.")
 
     if len(name) < 1:
-        raise InputError("Error: no channel name was entered.")
+        raise InputError("No channel name was entered.")
 
     if type(is_public) != bool:
-        raise InputError("Error: the public/private value given is not of type bool.")
+        raise InputError("The public/private value given is not of type bool.")
 
 
     # Test channel names for repition, unless public vs private.
