@@ -1,5 +1,5 @@
 from src.error import InputError
-from src.error import AccessError
+from src.other import check_valid_auth_id
 
 from src.data_store import data_store
 
@@ -53,8 +53,7 @@ def channels_create_v1(auth_user_id, name, is_public):
     # retrieving channel data from data_store
     store = data_store.get()
 
-    if auth_user_id < 1:
-        raise AccessError("Error: the user id is not valid (out of bounds).")
+    check_valid_auth_id(auth_user_id)
 
     if len(name) > 20:
         raise InputError("Error: the channel name must be less than 20 characters.")
@@ -65,7 +64,6 @@ def channels_create_v1(auth_user_id, name, is_public):
     if type(is_public) != bool:
         raise InputError("Error: the public/private value given is not of type bool.")
 
-
     # Test channel names for repition, unless public vs private.
     # Loops through data_store['channels'] to check channel names if they already exist
     # and are of the same is_public (public/private) then cannot be created.
@@ -73,22 +71,6 @@ def channels_create_v1(auth_user_id, name, is_public):
     for channel in store['channels']:
         if channel['name'] == name and channel['is_public'] == is_public:
             raise InputError("This channel name already exists.")
-
-    # Check that the auth_user_id exists.
-    user_exists = False
-    for user in store['users']:
-        if user['id'] == auth_user_id:
-            user_exists = True
-    # if the auth_user_id is not found, the user does not exist.
-    if user_exists == False:
-        raise AccessError("User does not exist in users database.")
-
-
-    #Need to check that the auth_user_id is valid by comparing from the data dict.
-
-
-
-
 
     # get the number of channels created so far, incremented for the new channel id.
     channel_id = len(store['channels']) + 1
@@ -99,6 +81,7 @@ def channels_create_v1(auth_user_id, name, is_public):
         'name': name,
         'owner_members': [auth_user_id],
         'all_members': [auth_user_id],
+        'global_owners': [auth_user_id],
         'is_public': is_public,
     }
 
