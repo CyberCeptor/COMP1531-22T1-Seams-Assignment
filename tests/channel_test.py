@@ -13,16 +13,6 @@ from src.channel import channel_join_v1
 #
 #
 #
-# Test successs
-def test_invite_successful():
-    clear_v1()
-    store = data_store.get()
-    inviter_info = auth_register_v1('wangkaiyan233@gmail.com', 'wky19991123', 'Wang', 'kaiyan')
-    invitee_info = auth_register_v1('xuezhiqian234@gmail.com', 'xzq19991123', 'Xue', 'zhiqian')
-    createchannel =channels_create_v1(inviter_info['auth_user_id'], 'namechannelwky', True)   
-    channel_invite_v1(1, 1, 2)
-    assert len(store['channels'][0]['all_members']) == 2
-
 # Inputerror:Test the function has an invalid channel_id
 def test_invite_wrong_channel():
     clear_v1()
@@ -69,17 +59,6 @@ def test_channel_invite_not_in_channel():
 #
 #
 #
-# Test successful
-def test_channel_join_successful():
-    clear_v1()
-    store = data_store.get()
-    inviter_info = auth_register_v1('wangkaiyan233@gmail.com', 'wky19991123', 'Wang', 'kaiyan')
-    invitee_info = auth_register_v1('xuezhiqian234@gmail.com', 'xzq19991123', 'Xue', 'zhiqian')
-    newchannel = channels_create_v1(inviter_info['auth_user_id'], 'namechannelwky', True)
-    channel_join_v1(invitee_info['auth_user_id'], newchannel['channel_id'])
-    assert len(store['channels'][0]['all_members']) == 2
-
-
 # InputError:Channel is an invalid channel
 def test_join_invalid_channel():
     clear_v1()

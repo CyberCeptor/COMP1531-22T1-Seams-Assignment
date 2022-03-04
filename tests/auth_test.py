@@ -14,8 +14,6 @@ from src.auth import auth_login_v1, auth_register_v1
 from src.other import clear_v1
 from src.error import InputError
 
-from src.data_store import data_store
-
 NAME_22_CHARS = 'abcdefghijklmnopqrstuv'
 NAME_52_CHARS = 'abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz'
 
@@ -32,22 +30,6 @@ def fixture_clear_and_register():
 
     clear_v1()
     auth_register_v1('abc@def.com', 'password', 'first', 'last')
-
-@pytest.fixture(name='stored_data')
-def fixture_get_stored_data():
-    """ clears any data stored in data_store and returns the users dict
-
-    Arguments: N/A
-
-    Exceptions: N/A
-
-    Return Value:
-        Returns the users dict from data_store """
-
-    clear_v1()
-    store = data_store.get()
-    users = store['users']
-    return users
 
 def test_register_invalid_email():
     """ registers a user with an invalid email and raises an InputError for each
@@ -190,124 +172,6 @@ def test_register_works():
     # if user_id's are identical, then it is a vald login
     assert auth_user_id1 == auth_user_id2
     clear_v1()
-
-def test_create_handle_invalid_symbols(stored_data):
-    """ creates handles for the given users and tests if the valid name symbols
-    are succesfully removed
-
-    Arguments:
-        stored_data (fixture) - returns the user dict from data_store
-
-    Exceptions: N/A
-
-    Return Value: N/A """
-
-    # first name has symbols
-    auth_register_v1('abc@def.com', 'password', "f'irst-fir st", 'last')
-    handle0 = stored_data[0]['handle']
-    assert handle0 == 'firstfirstlast'
-
-    # last name has symbols
-    auth_register_v1('abc@def.co', 'password', 'first', "la'st-la st")
-    handle1 = stored_data[1]['handle']
-    assert handle1 == 'firstlastlast'
-    clear_v1()
-
-def test_create_handle_capitals(stored_data):
-    """ creates handles for the below users and tests if capitals are
-    succesfully removed
-
-    Arguments:
-        stored_data (fixture) - returns the user dict from data_store
-
-    Exceptions: N/A
-
-    Return Value: N/A """
-
-    # first name has capitals
-    auth_register_v1('abc@def.com', 'password', 'FIRST', 'last')
-    handle0 = stored_data[0]['handle']
-    assert handle0 == 'firstlast'
-
-    # last name has capitals
-    auth_register_v1('abc@def.co', 'password', 'first', 'LASTY')
-    handle1 = stored_data[1]['handle']
-    assert handle1 == 'firstlasty'
-
-    # both names have capitals
-    auth_register_v1('abc@de.co', 'password', 'firST', 'LAStee')
-    handle2 = stored_data[2]['handle']
-    assert handle2 == 'firstlastee'
-    clear_v1()
-
-def test_create_handle_invalid_length(stored_data):
-    """ creates handles for the below users and tests if extra characters are
-    succesfully removed
-
-    Arguments: N/A
-
-    Exceptions:
-        stored_data (fixture) - returns the user dict from data_store
-
-    Return Value: N/A """
-
-    # first name longer than 20 characters
-    auth_register_v1('abc@def.com', 'password', NAME_22_CHARS, 'last')
-    handle0 = stored_data[0]['handle']
-    assert handle0 == 'abcdefghijklmnopqrst'
-
-    # last name longer than 20 characters
-    auth_register_v1('abc@def.co', 'password', 'first', NAME_22_CHARS)
-    handle1 = stored_data[1]['handle']
-    assert handle1 == 'firstabcdefghijklmno'
-
-    # name longer than 20 characters
-    auth_register_v1('abc@de.com', 'password', 'abcdefghijklmnopqr', 'last')
-    handle2 = stored_data[2]['handle']
-    assert handle2 == 'abcdefghijklmnopqrla'
-    clear_v1()
-
-def test_create_handle_duplicates(stored_data):
-    """ creates handles for the below users and tests if duplicate handles are
-    dealt with by adding on numbers
-
-    Arguments: N/A
-
-    Exceptions:
-        stored_data (fixture) - returns the user dict from data_store
-
-    Return Value: N/A """
-
-    auth_register_v1('abc@def.com', 'password', 'first', 'last')
-    handle0 = stored_data[0]['handle']
-    assert handle0 == 'firstlast'
-
-    auth_register_v1('abc@def.co', 'password', 'first', 'last')
-    handle1 = stored_data[1]['handle']
-    assert handle1 == 'firstlast0'
-    clear_v1()
-
-def test_create_handle_invalid_length_duplicates(stored_data):
-    """ creates handles for the below users and tests if extra characters are
-    succesfully removed and if duplicate handles are dealt with by adding on
-    numbers
-
-    Arguments: N/A
-
-    Exceptions:
-        stored_data (fixture) - returns the user dict from data_store
-
-    Return Value: N/A """
-
-    auth_register_v1('abc@def.com', 'password', 'abcdefghijklmnopqr', 'last')
-    handle0 = stored_data[0]['handle']
-    assert handle0 == 'abcdefghijklmnopqrla'
-
-    auth_register_v1('abc@def.co', 'password', 'abcdefghijklmnopqr', 'last')
-    handle1 = stored_data[1]['handle']
-    assert handle1 == 'abcdefghijklmnopqrla0'
-
-    assert len(handle0) != len(handle1)
 
 def test_login_invalid(clear_and_register):
     """ logs a user in and raises an InputError for each invalid case
