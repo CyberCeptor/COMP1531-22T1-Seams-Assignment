@@ -1,15 +1,6 @@
-<<<<<<< HEAD
+
 from src.error import InputError, AccessError
-from src.other import check_valid_auth_id, check_if_the_user_is_in_a_channel
-=======
-from src.error import InputError
-
-from src.error import AccessError
 from src.other import check_valid_auth_id, check_user_is_member
-
-from src.other import check_valid_auth_id
-from src.other import check_user_is_member
->>>>>>> f154f4005b7c88385617b8d334f1109779d92db6
 
 from src.data_store import data_store
 
@@ -33,16 +24,6 @@ def channels_list_v1(auth_user_id):
                 'name': channel['name'],
             }
             channels_list.append(channel_data)
-
-    check_valid_auth_id(auth_user_id)
-    check_if_the_user_is_in_a_channel(auth_user_id)
-
-    # Need to check that the user is in any channel, if not raise error
-
-
-
-
-
 
     return {
         'channels': channels_list
@@ -70,6 +51,7 @@ def channels_listall_v1(auth_user_id):
             }
         dict_list.append(channel_return)
 
+
     # return lists of all channels(including private ones) with details
     return {
         "channels": dict_list
@@ -83,16 +65,13 @@ def channels_create_v1(auth_user_id, name, is_public):
     # retrieving channel data from data_store
     store = data_store.get()
 
-<<<<<<< HEAD
-
     check_valid_auth_id(auth_user_id)
 
     if auth_user_id < 1:
         raise AccessError("The user id is not valid (out of bounds).")
 
-=======
     check_valid_auth_id(auth_user_id)
->>>>>>> 94980058cc34f1c7ff87970e371664ea98903a4a
+
 
     if len(name) > 20:
         raise InputError("The channel name must be less than 20 characters.")
@@ -125,6 +104,7 @@ def channels_create_v1(auth_user_id, name, is_public):
     }
 
     store['channels'].append(channel_data)
+    data_store.set(store)
 
     return {
         'channel_id': channel_id

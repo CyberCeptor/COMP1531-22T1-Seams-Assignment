@@ -1,20 +1,8 @@
 import pytest
-
 from src.auth import auth_register_v1
-<<<<<<< HEAD
-<<<<<<< HEAD
-from src.channels import channels_create_v1, channels_list_v1
-=======
-from src.channels import channels_create_v1, channels_listall_v1 
-
->>>>>>> f154f4005b7c88385617b8d334f1109779d92db6
-=======
 from src.channels import channels_create_v1, channels_list_v1, channels_listall_v1
->>>>>>> 94980058cc34f1c7ff87970e371664ea98903a4a
 from src.other import clear_v1
-from src.error import InputError
-from src.error import AccessError
-
+from src.error import InputError, AccessError
 
 
 # Assumption that valid login from auth_register.
@@ -96,17 +84,8 @@ def test_channels_create_return(clear_and_register):
 #####################################################
 
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 """Check that the given channel exists."""
 def test_channels_list_valid_id():
-=======
-def test_channels_list_v1(clear_and_register):
->>>>>>> f154f4005b7c88385617b8d334f1109779d92db6
-=======
-"""Check that the given valid exists."""
-def test_channels_list_valid_id():
->>>>>>> 94980058cc34f1c7ff87970e371664ea98903a4a
     clear_v1()
     auth_register_v1('abc@def.com', 'password', 'first', 'last')
     channels_create_v1(1, 'test_channel', True)
