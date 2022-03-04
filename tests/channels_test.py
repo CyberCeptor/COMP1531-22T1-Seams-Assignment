@@ -138,9 +138,11 @@ def test_valid_auth_user_id(clear_and_register_and_create):
 
     # pylint: disable=unused-argument
 
-    with pytest.raises(InputError):
+    with pytest.raises(AccessError):
         channels_listall_v1(-1)
-    clear_v1()
+    with pytest.raises(AccessError):
+        channels_listall_v1(2)
+
 
 # testing if return values are the right type
 def test_channels_listall_v1_return(clear_and_register_and_create):
