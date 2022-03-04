@@ -11,7 +11,7 @@ Description: implementation for
     - helper functions for the above
 """
 
-from src.error import InputError, AcessError
+from src.error import InputError, AccessError
 from src.other import check_valid_auth_id, check_user_is_member
 from src.data_store import data_store
 
