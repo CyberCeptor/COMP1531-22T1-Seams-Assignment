@@ -1,8 +1,8 @@
 from src.error import InputError
-from src.error import AccessError
+from src.other import check_valid_auth_id
+from src.other import check_user_is_member
 
 from src.data_store import data_store
-from src.channel import search_user_by_id
 
 
 
@@ -36,45 +36,22 @@ def channels_list_v1(auth_user_id):
 def channels_listall_v1(auth_user_id):
     store = data_store.get()
 
-    user = search_user_by_id(auth_user_id)
-    if user is None:
-        raise InputError("Not an authorised user.")
     # Check that the auth_user_id exists.
-  
+    check_valid_auth_id(auth_user_id)
 
-
-    # create new dictionary for "channels" which stores channel_id & name
-    channels_return = {
-        'channel_id': None,
-        'name':None,
-    }
-    # create list of dictionaries to store channels_return
+    # create list of dictionaries to store each channel_return
     dict_list = []
     for channel in store['channels']:
-        channels_return['channel_id'] = channel['channel_id']
-        channels_return['name'] = channel['name']
-        dict_list.append(channels_return)
+        channel_return = {
+                'channel_id': channel['channel_id'], 
+                'name': channel['name']
+            }
+        dict_list.append(channel_return)
 
     # return lists of all channels(including private ones) with details
     return {
         "channels": dict_list
     }
-
-#helper function to see if user is in the data base
-def search_user_by_id(auth_user_id):
-    store = data_store.get()
-    users = store['users']
-    for user in users:
-        if user['id'] == auth_user_id:
-            return user
-    return None
-
-
-
-
-
-
-
 
     # Creates a new channel with the given name and is either public or private.
     # The user who created it automatically joins it.
@@ -84,8 +61,7 @@ def channels_create_v1(auth_user_id, name, is_public):
     # retrieving channel data from data_store
     store = data_store.get()
 
-    if auth_user_id < 1:
-        raise AccessError("Error: the user id is not valid (out of bounds).")
+    check_valid_auth_id(auth_user_id)
 
     if len(name) > 20:
         raise InputError("Error: the channel name must be less than 20 characters.")
@@ -96,7 +72,6 @@ def channels_create_v1(auth_user_id, name, is_public):
     if type(is_public) != bool:
         raise InputError("Error: the public/private value given is not of type bool.")
 
-
     # Test channel names for repition, unless public vs private.
     # Loops through data_store['channels'] to check channel names if they already exist
     # and are of the same is_public (public/private) then cannot be created.
@@ -104,22 +79,6 @@ def channels_create_v1(auth_user_id, name, is_public):
     for channel in store['channels']:
         if channel['name'] == name and channel['is_public'] == is_public:
             raise InputError("This channel name already exists.")
-
-    # Check that the auth_user_id exists.
-    user_exists = False
-    for user in store['users']:
-        if user['id'] == auth_user_id:
-            user_exists = True
-    # if the auth_user_id is not found, the user does not exist.
-    if user_exists == False:
-        raise AccessError("User does not exist in users database.")
-
-
-    #Need to check that the auth_user_id is valid by comparing from the data dict.
-
-
-
-
 
     # get the number of channels created so far, incremented for the new channel id.
     channel_id = len(store['channels']) + 1
@@ -130,11 +89,11 @@ def channels_create_v1(auth_user_id, name, is_public):
         'name': name,
         'owner_members': [auth_user_id],
         'all_members': [auth_user_id],
+        'global_owners': [auth_user_id],
         'is_public': is_public,
     }
 
     store['channels'].append(channel_data)
-    
 
     return {
         'channel_id': channel_id
