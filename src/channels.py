@@ -2,7 +2,7 @@ from src.error import InputError
 from src.other import check_valid_auth_id
 
 from src.data_store import data_store
-
+from src.channel import search_user_by_id
 
 
 
@@ -31,16 +31,47 @@ def channels_list_v1(auth_user_id):
 
 
 
+# Provide a list of all channels, including private channels, (and their associated details)
 
 def channels_listall_v1(auth_user_id):
-    return {
-        'channels': [
-        	{
-        		'channel_id': 1,
-        		'name': 'My Channel',
-        	}
-        ],
+    store = data_store.get()
+
+    user = search_user_by_id(auth_user_id)
+    if user is None:
+        raise InputError("Not an authorised user.")
+    # Check that the auth_user_id exists.
+  
+
+
+    # create new dictionary for "channels" which stores channel_id & name
+    channels_return = {
+        'channel_id':[],
+        'name': [],
     }
+    # create list of dictionaries to store channels_return
+    dict_list = []
+    for channel in store['channels']:
+        channels_return['channel_id'].append(channel['channel_id']),
+        channels_return['name'].append(channel['name']),
+        dict_list.append(channels_return)
+
+    # return lists of all channels(including private ones) with details
+    return {
+        "channels": dict_list
+    }
+
+#helper function to see if user is in the data base
+def search_user_by_id(auth_user_id):
+    store = data_store.get()
+    users = store['users']
+    for user in users:
+        if user['id'] == auth_user_id:
+            return user
+    return None
+
+
+
+
 
 
 
