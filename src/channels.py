@@ -1,19 +1,18 @@
 from src.error import InputError
+
 from src.error import AccessError
 from src.other import check_valid_auth_id, check_user_is_member
+
+from src.other import check_valid_auth_id
+from src.other import check_user_is_member
 
 from src.data_store import data_store
 
 
 
 
-
+"""Loops """
 def channels_list_v1(auth_user_id):
-
-    # looping threough data_store['channels']
-    # search through 'all_members', when the auth_user_id occurs,
-    # add the channel information to the new dict.
-    # return new dict.
 
     if type(auth_user_id) != int:
         raise InputError("The ID must be of type int.")
@@ -63,8 +62,7 @@ def channels_create_v1(auth_user_id, name, is_public):
     # retrieving channel data from data_store
     store = data_store.get()
 
-    if auth_user_id < 1:
-        raise AccessError("The user id is not valid (out of bounds).")
+    check_valid_auth_id(auth_user_id)
 
     if len(name) > 20:
         raise InputError("The channel name must be less than 20 characters.")
