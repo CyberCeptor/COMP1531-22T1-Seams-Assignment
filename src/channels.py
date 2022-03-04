@@ -1,8 +1,13 @@
+<<<<<<< HEAD
 from src.error import InputError, AccessError
 from src.other import check_valid_auth_id, check_if_the_user_is_in_a_channel
+=======
+from src.error import InputError
+from src.other import check_valid_auth_id
+from src.other import check_user_is_member
+>>>>>>> f154f4005b7c88385617b8d334f1109779d92db6
 
 from src.data_store import data_store
-
 
 
 
@@ -55,19 +60,29 @@ def channels_list_v1(auth_user_id):
 
 
 
+# Provide a list of all channels, including private channels, (and their associated details)
 
 def channels_listall_v1(auth_user_id):
+    store = data_store.get()
+
+    # Check that the auth_user_id exists.
+    check_valid_auth_id(auth_user_id)
+
+    # create list of dictionaries to store each channel_return
+    dict_list = []
+    for channel in store['channels']:
+        is_member = check_user_is_member(auth_user_id, channel['channel_id'])
+        if is_member == True:
+            channel_return = {
+                'channel_id': channel['channel_id'], 
+                'name': channel['name']
+            }
+            dict_list.append(channel_return)
+
+    # return lists of all channels(including private ones) with details
     return {
-        'channels': [
-        	{
-        		'channel_id': 1,
-        		'name': 'My Channel',
-        	}
-        ],
+        "channels": dict_list
     }
-
-
-
 
     # Creates a new channel with the given name and is either public or private.
     # The user who created it automatically joins it.
@@ -115,7 +130,6 @@ def channels_create_v1(auth_user_id, name, is_public):
     }
 
     store['channels'].append(channel_data)
-    
 
     return {
         'channel_id': channel_id

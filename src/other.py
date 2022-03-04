@@ -57,4 +57,5 @@ def check_user_is_member(auth_user_id, channel_id):
         if member == auth_user_id:
             user_is_member = True
 
+
     return user_is_member
