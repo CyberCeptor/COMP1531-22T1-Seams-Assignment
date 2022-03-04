@@ -38,6 +38,8 @@ Meeting notes:
 - Feedback on tests and implementations
 - Debugging
 
-
-
+03.03
+Members present: Aleesha, Aisha, Jenson, Van, Jed
+Meeting type: Lab
+Get as much done tonight for the autotests tomorrow
 
