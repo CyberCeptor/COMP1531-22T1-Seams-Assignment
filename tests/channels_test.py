@@ -47,7 +47,7 @@ def test_channels_create_too_short(clear_and_register):
     with pytest.raises(InputError):
         channels_create_v1(1, "", False)
 
-# Testing for channel name longer than 20 characters for both public and private channels. InputError.
+# Testing for channel name longer than 20 characters for both public and private channels.
 def test_channels_create_invalid_name(clear_and_register):
     with pytest.raises(InputError):
         channels_create_v1(1, 'MoreThan20CharPublic!', True)
@@ -145,7 +145,7 @@ def test_channels_list_v1():
 
 #####################################################
 #                                                   #
-#          Channels Listall Test Functions           #
+#          Channels Listall Test Functions          #
 #                                                   #
 #####################################################
 @pytest.fixture
