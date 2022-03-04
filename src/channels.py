@@ -1,21 +1,36 @@
-<<<<<<< HEAD
-from src.error import InputError, AccessError
-from src.other import check_valid_auth_id, check_if_the_user_is_in_a_channel
-=======
-from src.error import InputError
+"""
+Filename: channels.py
 
-from src.error import AccessError
+Author: Jenson Morgan(z5360181),Yangjun Yue(5317840)
+Created: 24/02/2022 - 04/03/2022
+
+Description: implementation for
+    - creating either a public or a private channel with given name
+    - providing a list of channels the user is part of and give channel id and name
+    - list all valid channels and provide their channel id and name
+    - helper functions for the above
+"""
+
+from src.error import InputError, AcessError
 from src.other import check_valid_auth_id, check_user_is_member
-
-from src.other import check_valid_auth_id
-from src.other import check_user_is_member
->>>>>>> f154f4005b7c88385617b8d334f1109779d92db6
-
 from src.data_store import data_store
 
 
-
 def channels_list_v1(auth_user_id):
+    """
+    Provides a channel list of all the public channels
+    the user is a member of.
+
+    Arguments:
+        auth_user_id(int)    - must be a valid user id.
+
+    Exceptions: 
+        null
+    
+    Return Value:
+        Returns a dict containing the channel_id and name of the channels
+        the user is a member of
+    """
 
     if type(auth_user_id) != int:
         raise InputError("The ID must be of type int.")
@@ -33,29 +48,29 @@ def channels_list_v1(auth_user_id):
                 'name': channel['name'],
             }
             channels_list.append(channel_data)
-
-    check_valid_auth_id(auth_user_id)
-    check_if_the_user_is_in_a_channel(auth_user_id)
-
-    # Need to check that the user is in any channel, if not raise error
-
-
-
-
-
-
     return {
         'channels': channels_list
     }
 
 
 
-
-
-
 # Provide a list of all channels, including private channels, (and their associated details)
-
 def channels_listall_v1(auth_user_id):
+    """ 
+    check is user is valid then provides lists of diictionaries containing
+    channel id and channel names
+
+    Arguments:
+        auth_user_id (int)      - an integer that specifies user id
+
+    Exceptions:
+        N/A
+
+    Return Value:
+        Returns list of dictionaries containing channel id as int
+        and channel name as str
+    """
+
     store = data_store.get()
 
     # Check that the auth_user_id exists.
@@ -80,19 +95,32 @@ def channels_listall_v1(auth_user_id):
     # Returns the channel id.
 
 def channels_create_v1(auth_user_id, name, is_public):
-    # retrieving channel data from data_store
+    """
+    Creates a new channel with the name and is_public status given.
+    The creating member is an owner_member and has permissions to
+    add and remove other members.
+
+    Arguments:  
+        auth_user_id (int)  - a valid int user_id
+        name (str)          - a string that is unique 
+            (i.e. a channel can have the same name, aslong as they differ in public/private)
+        is_public (boolean) - a bool to state its public/private value (True == public)
+    
+    Exceptions:
+        AccessError         - Occurs when the given user_id does not exist in Seams
+        InputError          - Occurs when the channel name given is less than 1 character
+            and greater than 20 characters
+                            - Occurs when is_public is not a bool
+                            - Occurs when the channel name and is_public combo already exists
+    
+    Return Value:
+        Returns a dict containing the channel_id, name, owner_members, 
+            all_members, global_owners, is_public
+    """
+
     store = data_store.get()
 
-<<<<<<< HEAD
-
     check_valid_auth_id(auth_user_id)
-
-    if auth_user_id < 1:
-        raise AccessError("The user id is not valid (out of bounds).")
-
-=======
-    check_valid_auth_id(auth_user_id)
->>>>>>> 94980058cc34f1c7ff87970e371664ea98903a4a
 
     if len(name) > 20:
         raise InputError("The channel name must be less than 20 characters.")
