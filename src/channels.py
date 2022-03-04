@@ -45,14 +45,14 @@ def channels_listall_v1(auth_user_id):
 
     # create new dictionary for "channels" which stores channel_id & name
     channels_return = {
-        'channel_id':[],
-        'name': [],
+        'channel_id': None,
+        'name':None,
     }
     # create list of dictionaries to store channels_return
     dict_list = []
     for channel in store['channels']:
-        channels_return['channel_id'].append(channel['channel_id']),
-        channels_return['name'].append(channel['name']),
+        channels_return['channel_id'] = channel['channel_id']
+        channels_return['name'] = channel['name']
         dict_list.append(channels_return)
 
     # return lists of all channels(including private ones) with details
