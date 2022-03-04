@@ -1,5 +1,6 @@
 from src.error import InputError
 from src.error import AccessError
+from src.other import check_valid_auth_id, check_user_is_member
 
 from src.data_store import data_store
 
@@ -17,27 +18,22 @@ def channels_list_v1(auth_user_id):
     if type(auth_user_id) != int:
         raise InputError("The ID must be of type int.")
 
+    check_valid_auth_id(auth_user_id)
+
+    store = data_store.get()
+    channels_list = []
+
+    for channel in store['channels']:
+        is_member = check_user_is_member(auth_user_id, channel['channel_id'])
+        if is_member:
+            channel_data = {
+                'channel_id': channel['channel_id'], 
+                'name': channel['name'],
+            }
+            channels_list.append(channel_data)
 
     return {
-        'channels': [
-        	{
-        		'channel_id': 1,
-        		'name': 'My Channel',
-        	}, #Temporary to check some tests are working correctly.
-            {
-        		'channel_id': 2,
-        		'name': 'My Channel',
-        	}, 
-            {
-        		'channel_id': 3,
-        		'name': 'My Channel',
-        	}, 
-            {
-        		'channel_id': 4,
-        		'name': 'My Channel',
-        	},
-        ],
-        
+        'channels': channels_list
     }
 
 

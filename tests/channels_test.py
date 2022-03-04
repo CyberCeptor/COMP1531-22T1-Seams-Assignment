@@ -103,23 +103,16 @@ def test_channels_list_valid_id():
     
 
 
-"""testing when the channel id is incorrect. For both public/private channels created"""
+"""check that the given id is in a channel. For both public/private channels created"""
 def test_channels_list_id_check():
     clear_v1()
     auth_register_v1('abc@def.com', 'password', 'first', 'last')
     channels_create_v1(1, 'test_channel_public', True)
     channels_create_v1(1, 'test_channel_private', False)
+    # auth_id 1 has created two channels, there is no user 4444 to create the channels list.
     with pytest.raises(AccessError):
-        channels_list_v1(44444) # give incorrect channel_id, should not exist.
+        channels_list_v1(44444) # give incorrect auth_id.
 
-
-"""Test that if the user is not in the channel, channels_list_v1 returns nothing.
-There is no channel created, so the user cannot be in any channel."""
-def test_channels_list_not_in_channel():
-    clear_v1()
-    auth_register_v1('abc@def.com', 'password', 'first', 'last')
-    with pytest.raises(AccessError):
-        channels_list_v1(1)
     
 """Test that the channels list is functionally with multiple channels being created.
 This also tests for public and private channels.
