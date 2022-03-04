@@ -1,4 +1,3 @@
-from unicodedata import name
 import pytest
 
 from src.auth import auth_register_v1
