@@ -1,8 +1,8 @@
 from src.error import InputError
 from src.other import check_valid_auth_id
+from src.other import check_user_is_member
 
 from src.data_store import data_store
-from src.channel import search_user_by_id
 
 
 
@@ -36,45 +36,24 @@ def channels_list_v1(auth_user_id):
 def channels_listall_v1(auth_user_id):
     store = data_store.get()
 
-    user = search_user_by_id(auth_user_id)
-    if user is None:
-        raise InputError("Not an authorised user.")
     # Check that the auth_user_id exists.
-  
+    check_valid_auth_id(auth_user_id)
 
-
-    # create new dictionary for "channels" which stores channel_id & name
-    channels_return = {
-        'channel_id':[],
-        'name': [],
-    }
-    # create list of dictionaries to store channels_return
+    # create list of dictionaries to store each channel_return
     dict_list = []
     for channel in store['channels']:
-        channels_return['channel_id'].append(channel['channel_id']),
-        channels_return['name'].append(channel['name']),
-        dict_list.append(channels_return)
+        is_member = check_user_is_member(auth_user_id, channel['channel_id'])
+        if is_member == True:
+            channel_return = {
+                'channel_id': channel['channel_id'], 
+                'name': channel['name']
+            }
+            dict_list.append(channel_return)
 
     # return lists of all channels(including private ones) with details
     return {
         "channels": dict_list
     }
-
-#helper function to see if user is in the data base
-def search_user_by_id(auth_user_id):
-    store = data_store.get()
-    users = store['users']
-    for user in users:
-        if user['id'] == auth_user_id:
-            return user
-    return None
-
-
-
-
-
-
-
 
     # Creates a new channel with the given name and is either public or private.
     # The user who created it automatically joins it.
@@ -117,7 +96,6 @@ def channels_create_v1(auth_user_id, name, is_public):
     }
 
     store['channels'].append(channel_data)
-    
 
     return {
         'channel_id': channel_id
