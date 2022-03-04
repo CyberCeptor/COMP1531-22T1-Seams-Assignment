@@ -1,3 +1,12 @@
+"""
+Filename: channel_test.py
+
+Author: Yangjun Yue(z5317840), Zefan Cao(z5237177)
+Created: 28/02/2022 - 04/03/2022
+
+Description: pytests for channel_details_v1, channel_invite_v1 and channel join_v1
+"""
+
 import pytest
 from src.channel import channel_details_v1
 from src.auth import auth_register_v1
@@ -86,23 +95,40 @@ def test_join_channel_is_private():
 ########
 #
 #
-@pytest.fixture
-def clear_and_register_and_create():
+@pytest.fixture(name='clear_and_register_and_create')
+def fixture_clear_and_register_and_create():
+    """ clears any data stored in data_store and registers a user with the
+    given information, create a channel using user id
+
+    Arguments: N/A
+
+    Exceptions: N/A
+
+    Return Value: N/A """
     clear_v1()
     auth_register_v1('abc@def.com', 'password', 'first', 'last')
     channels_create_v1(1, 'channel_name', True)
 
 # testing input user id is valid
 def test_channel_details_invalid_user_type(clear_and_register_and_create):
+    """ testing invalid user type to raise input error
+
+    Arguments: clear_and_register_and_create (fixture)
+
+    Exceptions:
+        InputError - Raised for all test cases listed below
+
+    Return Value: N/A """
+
+    # pylint: disable=unused-argument
+
     # no user input
     with pytest.raises(InputError):
         channel_details_v1('', 1)
     # wrong type user input
     with pytest.raises(InputError):
         channel_details_v1('not int',1)
-
-def test_channel_details_invalid_user(clear_and_register_and_create):
-    # user does not exist
+    # user is not in the channel
     with pytest.raises(AccessError):
         channel_details_v1(2, 1)
     # non exist user input
@@ -111,6 +137,17 @@ def test_channel_details_invalid_user(clear_and_register_and_create):
 
 # channel id does not refer to a valid channel
 def test_channel_details_invalid_channel(clear_and_register_and_create):
+    """ testing invalid channel id to raise input error
+
+    Arguments: clear_and_register_and_create (fixture)
+
+    Exceptions:
+        InputError - Raised for all test cases listed below
+
+    Return Value: N/A """
+
+    # pylint: disable=unused-argument
+
     # no channel id input
     with pytest.raises(InputError):
         channel_details_v1(1,'')
@@ -123,6 +160,16 @@ def test_channel_details_invalid_channel(clear_and_register_and_create):
 
 # Testing valid type for channel_details_v1
 def test_channel_details_return(clear_and_register_and_create):
+    """ testing if channel_details_v1 returns right values
+
+    Arguments: clear_and_register_and_create (fixture)
+
+    Exceptions: N/A
+
+    Return Value: N/A """
+
+    # pylint: disable=unused-argument
+
     result = channel_details_v1(1, 1)
     assert result == {
         'name': 'channel_name',

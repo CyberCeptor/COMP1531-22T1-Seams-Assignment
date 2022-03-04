@@ -13,6 +13,7 @@ Description: implementation for
 
 from src.error import InputError
 from src.other import check_valid_auth_id, check_user_is_member
+
 from src.data_store import data_store
 
 
@@ -75,7 +76,7 @@ def channels_listall_v1(auth_user_id):
 
     store = data_store.get()
 
-    # Check that the auth_user_id exists.
+    # check that the auth_user_id exists
     check_valid_auth_id(auth_user_id)
 
     # create list of dictionaries to store each channel_return
@@ -91,6 +92,7 @@ def channels_listall_v1(auth_user_id):
     return {
         "channels": dict_list
     }
+
 
     # Creates a new channel with the given name and is either public or private.
     # The user who created it automatically joins it.
