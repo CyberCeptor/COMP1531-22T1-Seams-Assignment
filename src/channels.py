@@ -42,13 +42,11 @@ def channels_listall_v1(auth_user_id):
     # create list of dictionaries to store each channel_return
     dict_list = []
     for channel in store['channels']:
-        is_member = check_user_is_member(auth_user_id, channel['channel_id'])
-        if is_member == True:
-            channel_return = {
+        channel_return = {
                 'channel_id': channel['channel_id'], 
                 'name': channel['name']
             }
-            dict_list.append(channel_return)
+        dict_list.append(channel_return)
 
     # return lists of all channels(including private ones) with details
     return {
