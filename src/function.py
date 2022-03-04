@@ -74,10 +74,15 @@ def add_invitee(u_id, channel_id):
                     return
 
 #Create a function to check the user is a global owner or not 
-def check_owner_global(auth_user_id):
+def check_owner_global(auth_user_id, channel_id):
+    tnumber = 0
     for user in store['users']:
         if user['id'] == auth_user_id:
-            tnumber = user['permission_id']
+            for channel in store['channels']:
+                if channel['channel_id'] == channel_id:
+                    if auth_user_id in channel['global_owners']:
+                       tnumber = 1
+            
     if tnumber == 1:
         return True
     return False
