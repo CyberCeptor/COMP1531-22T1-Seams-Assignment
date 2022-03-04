@@ -1,4 +1,8 @@
 from src.error import InputError
+
+from src.error import AccessError
+from src.other import check_valid_auth_id, check_user_is_member
+
 from src.other import check_valid_auth_id
 from src.other import check_user_is_member
 
@@ -6,24 +10,27 @@ from src.data_store import data_store
 
 
 
-
 def channels_list_v1(auth_user_id):
 
-    # looping threough data_store['channels']
-    # search through 'all_members', when the auth_user_id occurs,
-    # add the channel information to the new dict.
-    # return new dict.
+    if type(auth_user_id) != int:
+        raise InputError("The ID must be of type int.")
 
+    check_valid_auth_id(auth_user_id)
 
+    store = data_store.get()
+    channels_list = []
 
+    for channel in store['channels']:
+        is_member = check_user_is_member(auth_user_id, channel['channel_id'])
+        if is_member:
+            channel_data = {
+                'channel_id': channel['channel_id'], 
+                'name': channel['name'],
+            }
+            channels_list.append(channel_data)
 
     return {
-        'channels': [
-        	{
-        		'channel_id': 1,
-        		'name': 'My Channel',
-        	}
-        ],
+        'channels': channels_list
     }
 
 
@@ -64,13 +71,13 @@ def channels_create_v1(auth_user_id, name, is_public):
     check_valid_auth_id(auth_user_id)
 
     if len(name) > 20:
-        raise InputError("Error: the channel name must be less than 20 characters.")
+        raise InputError("The channel name must be less than 20 characters.")
 
     if len(name) < 1:
-        raise InputError("Error: no channel name was entered.")
+        raise InputError("No channel name was entered.")
 
     if type(is_public) != bool:
-        raise InputError("Error: the public/private value given is not of type bool.")
+        raise InputError("The public/private value given is not of type bool.")
 
     # Test channel names for repition, unless public vs private.
     # Loops through data_store['channels'] to check channel names if they already exist
