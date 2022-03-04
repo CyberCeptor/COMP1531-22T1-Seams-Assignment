@@ -10,7 +10,7 @@ from src.data_store import *
 from src.channel import channel_join_v1
 
 
-### Test Chanel_invite    Zefan Cao(Van) z5237177
+#### Test Chanel_invite    Zefan Cao(Van) z5237177
 #
 #
 #
