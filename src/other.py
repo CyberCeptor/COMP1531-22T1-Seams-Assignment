@@ -1,3 +1,4 @@
+from src.error import InputError
 from src.error import AccessError
 
 from src.data_store import data_store
@@ -12,6 +13,9 @@ def clear_v1():
 def check_valid_auth_id(auth_user_id):
     """ checks if the given auth_user_id exists by checking if it is larger than
     0 and if it is found in the stored user data """
+    if type(auth_user_id) != int:
+        raise InputError('User id is not of a valid type')
+
     if auth_user_id < 1:
         raise AccessError('The user id is not valid (out of bounds)')
     
@@ -25,17 +29,32 @@ def check_valid_auth_id(auth_user_id):
     if user_exists == False:
         raise AccessError('User does not exist in users database')
 
+def check_valid_channel_id(channel_id):
+    """ checks if the given auth_user_id exists by checking if it is larger than
+    0 and if it is found in the stored channel data """
+    if type(channel_id) != int:
+        raise InputError('Channel id is not of a valid type')
 
-def check_if_the_user_is_in_a_channel(auth_user_id):
-    store = data_store.get()
-    user_is_in_a_channel = False
-
-    for channels in store['channels']:
-        for members in channels['all_members']:
-            if members == auth_user_id:
-                user_is_in_a_channel = True
-
-
-    if user_is_in_a_channel == False:
-        raise AccessError('Channel does not exist in the channels database')
+    if channel_id < 1:
+        raise InputError('The channel id is not valid (out of bounds)')
     
+    store = data_store.get()
+    channel_exists = False
+    for channel in store['channels']:
+        if channel['channel_id'] == channel_id:
+            channel_exists = True
+
+    # if the auth_user_id is not found, raise an AccessError
+    if channel_exists == False:
+        raise InputError('Channel does not exist in channels database')
+
+# helper to see if the authorised user is a member of the channel
+def check_user_is_member(auth_user_id, channel_id):
+    store = data_store.get()
+    user_is_member = False
+    channel = store['channels'][channel_id - 1]
+    for member in channel['all_members']:
+        if member == auth_user_id:
+            user_is_member = True
+
+    return user_is_member
