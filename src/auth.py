@@ -100,12 +100,13 @@ def auth_register_v1(email, password, name_first, name_last):
         'first': name_first,
         'last': name_last,
         'handle': handle,
+        'permission_id': 1 if u_id == 0 else 2
     }
 
     # store the user information into the list of users
     store['users'].append(user_dict)
     data_store.set(store)
-
+    
     return {
         'auth_user_id': u_id,
     }

@@ -48,7 +48,7 @@ def check_valid_channel_id(channel_id):
     if channel_exists == False:
         raise InputError('Channel does not exist in channels database')
 
-# helper to see if the authorised user is a member of the channel
+##helper to see if the authorised user is a member of the channel
 def check_user_is_member(auth_user_id, channel_id):
     store = data_store.get()
     user_is_member = False
