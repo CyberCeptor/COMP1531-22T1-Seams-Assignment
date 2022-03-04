@@ -1,16 +1,8 @@
 from src.error import InputError
-<<<<<<< HEAD
 from src.error import AccessError
 from src.data_store import *
 from src.function import *
 from src.channels import *
-=======
-from src.other import check_valid_auth_id
-from src.other import check_user_is_member
-from src.other import check_valid_channel_id
-
-from src.data_store import data_store
->>>>>>> master
 
 def channel_invite_v1(auth_user_id, channel_id, u_id):
     check_valid_inviter(auth_user_id) # check the inviter is valid or not
