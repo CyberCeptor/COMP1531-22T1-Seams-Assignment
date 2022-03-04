@@ -1,3 +1,17 @@
+"""
+Filename: channel.py
+
+Author: Yangjun Yue(z5317840), Zefan Cao(z5237177)
+Created: 28/02/2022 - 04/03/2022
+
+Description: implementation for
+    - providing channel details including channel id and channel name with user id input
+    - allowing members of both private and public channels to invite valid user and add them to the channel
+    - allowing authorised user to join a channel with channel id
+    - helper functions for the above
+"""
+
+
 from src.error import InputError
 from src.error import AccessError
 from src.data_store import data_store
@@ -15,34 +29,50 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
     elif check_user_is_member(auth_user_id, channel_id) is True:
         if check_user_is_member(u_id, channel_id) is True:
             raise InputError('Invitee is already in the channel')
-        else:  
+        else:
             add_invitee(u_id, channel_id) #add user
     return {
     }
 
-#  Given a channel with ID channel_id that the authorised user is a member of channel
-#  provide basic details about the channel.
+
 def channel_details_v1(auth_user_id, channel_id):
+    """ check if given user id and channel id are valid,
+    return details about the channel including channel name, publicity, owner
+    members and all members with given user id and channel id.
+
+    Arguments:
+        auth_user_id (int)    - an integer that specifies user id
+        channel_id (int) - an integer that specifies channel id
+
+    Exceptions:
+        InputError - Occurs if the user id does not exist in channel
+
+    Return Value:
+        Returns a dictionary containing channel name, publicity of the channel,
+        owner members and all members if given user id and channel id are valid
+    """
+
     store = data_store.get()
 
     # see if given auth_user_id and channel_id are valid
     check_valid_auth_id(auth_user_id)
     check_valid_channel_id(channel_id)
 
+    # is_member is a bool to check whether given user is in the given channel
     is_member = check_user_is_member(auth_user_id, channel_id)
-    if is_member == False:
+    if is_member is False:
         raise InputError('User does not exist in channel')
 
+    # channel id starts at 1, so -1 to get the correct dict
     channel = store['channels'][channel_id - 1]
 
+    #return requires keys and values from stored data
     return {
         'name': channel['name'],
         'is_public': channel['is_public'],
         'owner_members': channel['owner_members'],
         'all_members': channel['all_members'],
     }
-
-# return { name, is_public, owner_members, all_members }
 
 
 def channel_messages_v1(auth_user_id, channel_id, start):
