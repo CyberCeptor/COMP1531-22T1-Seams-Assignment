@@ -33,7 +33,7 @@ def test_valid_auth_user_id():
         channel_details_v1('', 1)
     clear_v1()
     # non exist user inpt
-    with pytest.raises(InputError):
+    with pytest.raises(AccessError):
         channel_details_v1(-1, 1)
     clear_v1()
     # wrong type user input
