@@ -6,7 +6,6 @@ from src.error import InputError
 from src.error import AccessError
 from src.channels import channels_create_v1
 from src.channel import channel_invite_v1
-from src.data_store import data_store
 from src.channel import channel_join_v1
 
 #### Test Chanel_invite    Zefan Cao(Van) z5237177
