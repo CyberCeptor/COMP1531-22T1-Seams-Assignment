@@ -88,7 +88,7 @@ def test_channels_create_return(clear_and_register):
 #####################################################
 
 
-"""Check that the given valid exists."""
+"""Check that the given channel exists."""
 def test_channels_list_valid_id():
     clear_v1()
     auth_register_v1('abc@def.com', 'password', 'first', 'last')

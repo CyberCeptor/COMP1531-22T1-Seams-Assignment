@@ -1,5 +1,5 @@
-from src.error import InputError
-from src.other import check_valid_auth_id
+from src.error import InputError, AccessError
+from src.other import check_valid_auth_id, check_if_the_user_is_in_a_channel
 
 from src.data_store import data_store
 
@@ -16,6 +16,16 @@ def channels_list_v1(auth_user_id):
 
     if type(auth_user_id) != int:
         raise InputError("The ID must be of type int.")
+
+
+    check_valid_auth_id(auth_user_id)
+    check_if_the_user_is_in_a_channel(auth_user_id)
+
+    # Need to check that the user is in any channel, if not raise error
+
+
+
+
 
 
     return {

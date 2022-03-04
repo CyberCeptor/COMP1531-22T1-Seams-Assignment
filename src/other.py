@@ -24,3 +24,18 @@ def check_valid_auth_id(auth_user_id):
     # if the auth_user_id is not found, raise an AccessError
     if user_exists == False:
         raise AccessError('User does not exist in users database')
+
+
+def check_if_the_user_is_in_a_channel(auth_user_id):
+    store = data_store.get()
+    user_is_in_a_channel = False
+
+    for channels in store['channels']:
+        for members in channels['all_members']:
+            if members == auth_user_id:
+                user_is_in_a_channel = True
+
+
+    if user_is_in_a_channel == False:
+        raise AccessError('Channel does not exist in the channels database')
+    
