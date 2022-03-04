@@ -20,22 +20,11 @@ from src.error import AccessError
 #          Channels Create Test Functions           #
 #                                                   #
 #####################################################
-'''
-Parameters: 
-    {auth_user_id,  (int)
-    name,           (string)
-    is_public}      (Boolean, True/False)
 
-Return Type:
-    {channel_id}    (int)
-'''
-
-### auth['auth_user_id'] is accessing the item in the Dictionary of User.
-### is_public is True and False, so need to test for both public and private channels.
 @pytest.fixture
 def clear_and_register():
     """
-    clears any data stored in data_stored and registers a user with the 
+    clears any data stored in data_stored and registers a user with the
     given information
     Arguments: N/A
 
@@ -50,12 +39,12 @@ def clear_and_register():
 def test_channels_create_valid_auth_id(clear_and_register):
     """
     Registers a valid user, and them
-    attempts to create 4 channels with unregistered user_id's, 
+    attempts to create 4 channels with unregistered user_id's,
     both public and private channels.
 
     Arguments: clear_and_register
 
-    Exceptions: 
+    Exceptions:
         AccessError - Raised for all tests below
 
     Return Value: N/A
@@ -77,7 +66,7 @@ def test_channels_create_too_short(clear_and_register):
 
     Arguments: clear_and_register
 
-    Exceptions: 
+    Exceptions:
         InputError  - Raised for all cases below
 
     Return Value:   N/A
@@ -107,14 +96,14 @@ def test_channels_create_invalid_name(clear_and_register):
 
 def test_channels_create_boolean(clear_and_register):
     """
-    Creates a channel with a string as the is_public argument, 
+    Creates a channel with a string as the is_public argument,
         which should be a boolean.
 
     Arguments:  clear_and_register
 
     Exceptions:
         InputError - Raised for the case
-    
+
     Return Value:   N/A
     """
     with pytest.raises(InputError):
@@ -132,15 +121,15 @@ def test_channels_duplicate_name(clear_and_register):
         InputError  -   Raised for all test cases below
     """
     channels_create_v1(1, 'test_channel_public', True)
-    with pytest.raises(InputError):  
+    with pytest.raises(InputError):
         channels_create_v1(1, 'test_channel_public', True)
 
     channels_create_v1(1, 'test_channel_private', False)
-    with pytest.raises(InputError):  
+    with pytest.raises(InputError):
         channels_create_v1(1, 'test_channel_private', False)
 
 
-# Testing the return value of channels_create is a valid int for both public and private. 
+# Testing the return value of channels_create is a valid int for both public and private.
 def test_channels_create_return(clear_and_register):
     """
     Creates two channels (public and private) and asserts that the
@@ -164,8 +153,8 @@ def test_channels_create_return(clear_and_register):
 #####################################################
 
 
-"""Check that the given valid exists."""
 def test_channels_list_valid_id():
+    """Check that the given valid exists."""
     clear_v1()
     auth_register_v1('abc@def.com', 'password', 'first', 'last')
     channels_create_v1(1, 'test_channel', True)
@@ -176,11 +165,10 @@ def test_channels_list_valid_id():
         channels_list_v1(True)
     with pytest.raises(InputError):
         channels_list_v1('String')
-    
 
 
-"""check that the given id is in a channel. For both public/private channels created"""
 def test_channels_list_id_check():
+    """check that the given id is in a channel. For both public/private channels created"""
     clear_v1()
     auth_register_v1('abc@def.com', 'password', 'first', 'last')
     channels_create_v1(1, 'test_channel_public', True)
@@ -189,11 +177,13 @@ def test_channels_list_id_check():
     with pytest.raises(AccessError):
         channels_list_v1(44444) # give incorrect auth_id.
 
-    
-"""Test that the channels list is functionally with multiple channels being created.
-This also tests for public and private channels.
-Also tests that channel_list only returns the channel that the id is in."""
+
 def test_channels_list_v1():
+    """
+    Test that the channels list is functionally with multiple channels being created.
+    This also tests for public and private channels.
+    Also tests that channel_list only returns the channel that the id is in.
+    """
     clear_v1()
     auth_register_v1('abc@def.com', 'password', 'first', 'last')
     chan1 = channels_create_v1(1, 'test_channel_public1', True)
@@ -206,9 +196,9 @@ def test_channels_list_v1():
     auth_register_v1('def@abc.com', 'password', 'first', 'last')
     channels_create_v1(2, 'test2_channel_pub', True)
     channels_create_v1(2, 'test2_channel_priv', False)
-    
-    channels_list = channels_list_v1(1) #returns a Dict containing 'channel_id' and 'name' of all channels the user is in.
-    channels_list2 = channels_list_v1(2)
+    #returns a Dict containing 'channel_id' and 'name' of all channels the user is in.
+    channels_list = channels_list_v1(1)
+    channels_list_v1(2)
 
     # check the first four channels in the dict, check that the channel_id matches what was created.
     assert channels_list['channels'][0]['channel_id'] == chan1['channel_id']
@@ -225,12 +215,12 @@ def test_channels_list_v1():
 
 #####################################################
 #                                                   #
-#          Channels Listall Test Functions           #
+#          Channels Listall Test Functions          #
 #                                                   #
 #####################################################
 @pytest.fixture
 def clear_and_register_and_create():
-    """ 
+    """
     Clears any data stored in data_store and registers a user with the
     given information, create a channel using user id
 
@@ -238,7 +228,7 @@ def clear_and_register_and_create():
 
     Exceptions: N/A
 
-    Return Value: N/A 
+    Return Value: N/A
     """
 
     clear_v1()
@@ -247,7 +237,7 @@ def clear_and_register_and_create():
 
 # testing input user id is valid
 def test_valid_auth_user_id(clear_and_register_and_create):
-    """ 
+    """
     Testing invalid user type to raise input error
 
     Arguments: clear_and_register_and_create (fixture)
@@ -255,7 +245,7 @@ def test_valid_auth_user_id(clear_and_register_and_create):
     Exceptions:
         InputError - non existing user id
 
-    Return Value: N/A 
+    Return Value: N/A
     """
 
     with pytest.raises(AccessError):
@@ -271,9 +261,8 @@ def test_channels_listall_v1_return(clear_and_register_and_create):
 
     Exceptions: N/S
 
-    Return Value: N/A 
+    Return Value: N/A
     """
-
     result = channels_listall_v1(1)
     assert result['channels'][0] == {
         'channel_id': 1,
