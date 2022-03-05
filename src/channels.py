@@ -5,7 +5,6 @@ from src.other import check_valid_auth_id, check_user_is_member
 
 from src.other import check_valid_auth_id
 from src.other import check_user_is_member
-
 from src.data_store import data_store
 
 
