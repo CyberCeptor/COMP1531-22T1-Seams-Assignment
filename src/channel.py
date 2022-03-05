@@ -15,7 +15,7 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
     elif check_user_is_member(auth_user_id, channel_id) is True:
         if check_user_is_member(u_id, channel_id) is True:
             raise InputError('Invitee is already in the channel')
-        else:  
+        else:
             add_invitee(u_id, channel_id) #add user
     return {
     }
@@ -58,39 +58,40 @@ def channel_messages_v1(auth_user_id, channel_id, start):
         'start': 0,
         'end': 50,
     }
-    
+
 #### channel_join_v1 is written by zefan cao z5237177
 #
 #
 #
 def channel_join_v1(auth_user_id, channel_id):
     check_valid_channel_id(channel_id)  #check the channle is valid or not
-    check_valid_auth_id(auth_user_id) #check the invitee is valid or not
-    if check_user_is_member(auth_user_id, channel_id) is True:  #check the invitee whether is already in the channel
+    check_valid_auth_id(auth_user_id)   #check the invitee is valid or not
+    #check the invitee whether is already in the channel
+    if check_user_is_member(auth_user_id, channel_id) is True:
         raise InputError('Invitee is already in the channel')
+    #check the user whether is a global owner
+    #if the user is a global owner, add immediately, even this is a priavate channel
     else:
-        if check_owner_global(auth_user_id,channel_id) == True: #check the user whether is a global owner (if the user is a global owner, add immediately, even this is a priavate channel)
+        if check_owner_global(auth_user_id,channel_id) == True:
             add_invitee(auth_user_id, channel_id) # add user
-            return 
+            return
         check_public_channel(channel_id) #check the channel whether is public
         add_invitee(auth_user_id, channel_id) #add user
-        return 
-
+        return
 
 #Create a function to add the invitee
-def add_invitee(u_id, channel_id):  
+def add_invitee(u_id, channel_id):
     for channel in store['channels']:
         if channel['channel_id'] == channel_id:
             channel['all_members'].append(u_id)
-                
 
-#Create a function to check the user is a global owner or not 
+#Create a function to check the user is a global owner or not
 def check_owner_global(auth_user_id, channel_id):
     tnumber = 0
-    for channel in store['channels']: 
+    for channel in store['channels']:
         if channel['channel_id'] == channel_id:
             if auth_user_id in channel['global_owners']:
-                tnumber = 1            
+                tnumber = 1     
     if tnumber == 1:
         return True
     return False
@@ -108,7 +109,7 @@ def check_public_channel(channel_id):
     '''
     # based on examples written by others: https://github.com/eustace65
     if is_public(channel_id) == False :
-        raise AccessError('Channel is private') 
+        raise AccessError('Channel is private')
     return
 
 #Create the function used in the check_public_channel function
