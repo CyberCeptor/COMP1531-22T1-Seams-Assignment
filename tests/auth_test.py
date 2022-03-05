@@ -31,7 +31,7 @@ def fixture_clear_and_register():
     clear_v1()
     auth_register_v1('abc@def.com', 'password', 'first', 'last')
 
-def test_register_invalid_email():
+def test_register_invalid_email(clear_and_register):
     """ registers a user with an invalid email and raises an InputError for each
     case
 
@@ -41,6 +41,7 @@ def test_register_invalid_email():
         InputError - Raised for all test cases listed below
 
     Return Value: N/A """
+    # pylint: disable=unused-argument
 
     # missing @ and .
     with pytest.raises(InputError):
@@ -88,7 +89,7 @@ def test_register_duplicate_email(clear_and_register):
         auth_register_v1('abc@def.com', 'password', 'first', 'last')
     clear_v1()
 
-def test_register_invalid_password():
+def test_register_invalid_password(clear_and_register):
     """ registers a user with an invalid password i.e one that is too short and
     raises an InputError
 
@@ -98,12 +99,13 @@ def test_register_invalid_password():
         InputError - Raised for the test case below
 
     Return Value: N/A """
+    # pylint: disable=unused-argument
 
     # password too short
     with pytest.raises(InputError):
         auth_register_v1('abc@def.com', 'pass', 'first', 'last')
 
-def test_register_invalid_name():
+def test_register_invalid_name(clear_and_register):
     """ registers a user with an invalid name and raises an InputError for each
     case
 
@@ -113,6 +115,7 @@ def test_register_invalid_name():
         InputError - Raised for each test case below
 
     Return Value: N/A """
+    # pylint: disable=unused-argument
 
     # first name too short
     with pytest.raises(InputError):

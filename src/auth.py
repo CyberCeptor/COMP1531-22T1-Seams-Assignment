@@ -20,7 +20,8 @@ VALID_EMAIL_REGEX = r'^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}$'
 VALID_NAME_REGEX = r'^[a-zA-Z\'\-\s]{1,50}$'
 
 def auth_login_v1(email, password):
-    """ logs a user in with the given email and password and returns their
+    """
+    logs a user in with the given email and password and returns their
     authorised user id
 
     Arguments:
@@ -34,7 +35,8 @@ def auth_login_v1(email, password):
 
     Return Value:
         Returns a dict containing the auth_user_id if the email and password
-        combination is valid """
+        combination is valid
+    """
 
     store = data_store.get()
     u_id = -1
@@ -61,7 +63,8 @@ def auth_login_v1(email, password):
 
 # based on code Haydon wrote in project starter video
 def auth_register_v1(email, password, name_first, name_last):
-    """ registers a user with the given email, password, name_first and
+    """
+    registers a user with the given email, password, name_first and
     name_last and stores this information in data_store
 
     Arguments:
@@ -74,7 +77,8 @@ def auth_register_v1(email, password, name_first, name_last):
         InputError - Occurs if the password is less than 6 letters
 
     Return Value:
-        Returns a dict containing the generated auth_user_id """
+        Returns a dict containing the generated auth_user_id
+    """
 
     store = data_store.get()
     # generate user id
@@ -100,19 +104,19 @@ def auth_register_v1(email, password, name_first, name_last):
         'first': name_first,
         'last': name_last,
         'handle': handle,
-        'permission_id': 1 if u_id == 0 else 2
     }
 
     # store the user information into the list of users
     store['users'].append(user_dict)
     data_store.set(store)
-    
+
     return {
         'auth_user_id': u_id,
     }
 
 def check_invalid_email(store, valid_email_regex, email):
-    """ tests if the given email is valid using the VALID_EMAIL_REGEX and checks
+    """
+    tests if the given email is valid using the VALID_EMAIL_REGEX and checks
     if there is already another user with that email
 
     Arguments:
@@ -124,7 +128,8 @@ def check_invalid_email(store, valid_email_regex, email):
         InputError - Occurs if the email doesn't match the regex and if there is
         already a user with the same email
 
-    Return Value: N/A """
+    Return Value: N/A
+    """
 
     # check for valid email address
     if not re.fullmatch(valid_email_regex, email):
@@ -136,7 +141,8 @@ def check_invalid_email(store, valid_email_regex, email):
             raise InputError('Email has already been taken')
 
 def check_invalid_name(name_first, name_last, full_name):
-    """ tests if the given name is valid using the VALID_NAME_REGEX above and
+    """
+    tests if the given name is valid using the VALID_NAME_REGEX above and
     checks if the names will create an invalid handle
 
     Arguments:
@@ -148,7 +154,8 @@ def check_invalid_name(name_first, name_last, full_name):
         InputError - Occurs if the first and/or last name doesn't match the
         VALID_NAME_REGEX, and if the fullname would create an invalid handle
 
-    Return Value: N/A """
+    Return Value: N/A
+    """
 
     # check for invalid first name
     if not re.fullmatch(VALID_NAME_REGEX, name_first):
@@ -167,7 +174,8 @@ def check_invalid_name(name_first, name_last, full_name):
         raise InputError('Invalid name')
 
 def create_handle(store, full_name):
-    """ creates the user's handle from their full name
+    """
+    creates the user's handle from their full name
 
     Arguments:
         store (dict)    - a dict that stores user and channel data
@@ -176,7 +184,8 @@ def create_handle(store, full_name):
     Exceptions: N/A
 
     Return Value:
-        Returns a string containing the generated handle """
+        Returns a string containing the generated handle
+    """
 
     # create a handle by removing any valid name symbols and lowering the case
     handle = ''.join(char for char in full_name if char not in "'- ")
