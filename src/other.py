@@ -17,13 +17,15 @@ from src.error import InputError, AccessError
 from src.data_store import data_store
 
 def clear_v1():
-    """ clears the stored data in data_store
+    """
+    clears the stored data in data_store
 
     Arguments: N/A
 
     Exceptions: N/A
 
-    Return Value: N/A """
+    Return Value: N/A
+    """
 
     store = data_store.get()
     store['users'] = []
@@ -31,7 +33,8 @@ def clear_v1():
     data_store.set(store)
 
 def check_valid_auth_id(auth_user_id):
-    """ checks if the given auth_user_id is valid by checking if it is larger
+    """
+    checks if the given auth_user_id is valid by checking if it is larger
     than 0 and if it is found in the stored user data
 
     Arguments:
@@ -42,7 +45,8 @@ def check_valid_auth_id(auth_user_id):
         AccessError - Occurs if auth_user_id is less than 1 or is not found
         in the stored user data
 
-    Return Value: N/A """
+    Return Value: N/A
+    """
 
     if isinstance(auth_user_id, int) is False:
         raise InputError('User id is not of a valid type')
@@ -61,7 +65,8 @@ def check_valid_auth_id(auth_user_id):
         raise AccessError('User does not exist in users database')
 
 def check_valid_channel_id(channel_id):
-    """ checks if the given channel_id is valid by checking if it is larger than
+    """
+    checks if the given channel_id is valid by checking if it is larger than
     0 and if it is found in the stored channel data
 
     Arguments:
@@ -71,7 +76,8 @@ def check_valid_channel_id(channel_id):
         InputError - Occurs if channel_id is not of type int, is less than 1 or
         is not found in the stored channel data
 
-    Return Value: N/A """
+    Return Value: N/A
+    """
 
     if isinstance(channel_id, int) is False:
         raise InputError('Channel id is not of a valid type')
@@ -90,7 +96,8 @@ def check_valid_channel_id(channel_id):
         raise InputError('Channel does not exist in channels database')
 
 def check_user_is_member(auth_user_id, channel_id):
-    """ checks if the given user is a member of the given channel by searching
+    """
+    checks if the given user is a member of the given channel by searching
     the stored channel member data
 
     Arguments:
@@ -101,7 +108,8 @@ def check_user_is_member(auth_user_id, channel_id):
 
     Return Value:
         Returns a Boolean depending on if the auth_user_id is found in the
-        channel members data """
+        channel members data
+    """
 
     store = data_store.get()
     channel = store['channels'][channel_id - 1]

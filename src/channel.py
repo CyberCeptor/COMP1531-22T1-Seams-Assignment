@@ -5,19 +5,20 @@ Author: Yangjun Yue(z5317840), Zefan Cao(z5237177)
 Created: 28/02/2022 - 04/03/2022
 
 Description: implementation for
-    - providing channel details including channel id and channel name with user id input
-    - allowing members of both private and public channels to invite valid user and add them to the channel
+    - providing channel details including channel id and channel name with
+        user id input
+    - allowing members of both private and public channels to invite a valid
+        user and add them to the channel
     - allowing authorised user to join a channel with channel id
     - helper functions for the above
 """
 
+from src.error import InputError, AccessError
 
-from src.error import InputError
-from src.error import AccessError
-from src.data_store import data_store
 from src.other import check_valid_auth_id
-from src.other import check_user_is_member
-from src.other import check_valid_channel_id
+from src.other import check_user_is_member, check_valid_channel_id
+
+from src.data_store import data_store
 
 store = data_store.get()
 def channel_invite_v1(auth_user_id, channel_id, u_id):
