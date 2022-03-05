@@ -122,7 +122,7 @@ def channels_create_v1(auth_user_id, name, is_public):
     if len(name) > 20:
         raise InputError('The channel name must be less than 20 characters')
 
-    if name is '':
+    if name == '':
         raise InputError('No channel name was entered')
 
     if not isinstance(is_public, bool):
