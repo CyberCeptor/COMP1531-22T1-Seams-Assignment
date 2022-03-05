@@ -3,16 +3,15 @@ Filename: channels.py
 
 Author: Jenson Morgan(z5360181), Yangjun Yue(z5317840)
 Created: 24/02/2022 - 04/03/2022
-
+from src.other import check_valid_auth_id
+from src.other import check_user_is_member
 Description: implementation for
     - creating either a public or a private channel with given name
     - listing all channels the user is part of and gives the channel id and name
     - listing all valid channels and provide their channel id and name
 """
-
 from src.error import InputError
 from src.other import check_valid_auth_id, check_user_is_member
-
 from src.data_store import data_store
 
 def channels_list_v1(auth_user_id):
