@@ -1,7 +1,7 @@
 """
 Filename: channels.py
 
-Author: Jenson Morgan(z5360181),Yangjun Yue(5317840)
+Author: Jenson Morgan(z5360181), Yangjun Yue(z5317840)
 Created: 24/02/2022 - 04/03/2022
 
 Description: implementation for
@@ -15,7 +15,6 @@ from src.error import InputError
 from src.other import check_valid_auth_id, check_user_is_member
 
 from src.data_store import data_store
-
 
 def channels_list_v1(auth_user_id):
     """
@@ -33,10 +32,10 @@ def channels_list_v1(auth_user_id):
         the user is a member of
     """
     if not isinstance(auth_user_id, int):
-        raise InputError("The ID must be of type int.")
+        raise InputError('The ID must be of type int')
 
     if isinstance(auth_user_id, bool):
-        raise InputError("The ID must be of type int.")
+        raise InputError('The ID must be of type int')
 
     check_valid_auth_id(auth_user_id)
 
@@ -90,7 +89,7 @@ def channels_listall_v1(auth_user_id):
 
     # return lists of all channels(including private ones) with details
     return {
-        "channels": dict_list
+        'channels': dict_list
     }
 
 
@@ -127,13 +126,13 @@ def channels_create_v1(auth_user_id, name, is_public):
     check_valid_auth_id(auth_user_id)
 
     if len(name) > 20:
-        raise InputError("The channel name must be less than 20 characters.")
+        raise InputError('The channel name must be less than 20 characters')
 
     if len(name) < 1:
-        raise InputError("No channel name was entered.")
+        raise InputError('No channel name was entered')
 
     if not isinstance(is_public, bool):
-        raise InputError("The public/private value given is not of type bool.")
+        raise InputError('The public/private value given is not of type bool')
 
     # Test channel names for repition, unless public vs private.
     # Loops through data_store['channels'] to check channel names if they already exist
@@ -142,7 +141,7 @@ def channels_create_v1(auth_user_id, name, is_public):
     # as long as they have different is_public values.
     for channel in store['channels']:
         if channel['name'] == name and channel['is_public'] == is_public:
-            raise InputError("This channel name already exists.")
+            raise InputError('This channel name already exists')
 
     # get the number of channels created so far, incremented for the new channel id.
     channel_id = len(store['channels']) + 1
