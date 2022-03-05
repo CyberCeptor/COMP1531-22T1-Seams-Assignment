@@ -113,6 +113,7 @@ def add_invitee(u_id, channel_id):
     for channel in store['channels']:
         if channel['channel_id'] == channel_id:
             channel['all_members'].append(u_id)
+    data_store.set(store)
                 
 
 #Create a function to check the user is a global owner or not 
