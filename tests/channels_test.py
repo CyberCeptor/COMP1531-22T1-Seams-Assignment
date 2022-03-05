@@ -23,8 +23,8 @@ from src.channels import channels_listall_v1, channels_list_v1
 #                                                   #
 #####################################################
 
-@pytest.fixture
-def clear_and_register():
+@pytest.fixture(name='clear_and_register')
+def fixture_clear_and_register():
     """
     clears any data stored in data_stored and registers a user with the
     given information
@@ -51,7 +51,7 @@ def test_channels_create_valid_auth_id(clear_and_register):
 
     Return Value: N/A
     """
-
+    # pylint: disable=unused-argument
     with pytest.raises(AccessError):
         channels_create_v1(2, 'test_channel_public', True)
     with pytest.raises(AccessError):
@@ -74,14 +74,13 @@ def test_channels_create_too_short(clear_and_register):
 
     Return Value:   N/A
     """
-
+    # pylint: disable=unused-argument
     with pytest.raises(InputError):
         channels_create_v1(1, "", True)
     with pytest.raises(InputError):
         channels_create_v1(1, "", False)
 
 
-# Testing for channel name longer than 20 characters for both public and private channels. InputError.
 def test_channels_create_invalid_name(clear_and_register):
     """
     Creates a public/private channel with names > 20 characters
@@ -93,7 +92,7 @@ def test_channels_create_invalid_name(clear_and_register):
 
     Return Value:   N/A
     """
-
+    # pylint: disable=unused-argument
     with pytest.raises(InputError):
         channels_create_v1(1, 'MoreThan20CharPublic!', True)
     with pytest.raises(InputError):
@@ -113,7 +112,7 @@ def test_channels_create_boolean(clear_and_register):
 
     Return Value:   N/A
     """
-
+    # pylint: disable=unused-argument
     with pytest.raises(InputError):
         channels_create_v1(1, 'test_channel', 'Not a boolean')
 
@@ -128,6 +127,7 @@ def test_channels_duplicate_name(clear_and_register):
     Exceptions:
         InputError  -   Raised for all test cases below
     """
+    # pylint: disable=unused-argument
     channels_create_v1(1, 'test_channel_public', True)
     with pytest.raises(InputError):
         channels_create_v1(1, 'test_channel_public', True)
@@ -148,6 +148,7 @@ def test_channels_create_return(clear_and_register):
 
     Return Value: N/A
     """
+    # pylint: disable=unused-argument
     channel_id_one = channels_create_v1(1, 'test_channel_public', True)
     channel_id_two = channels_create_v1(1, 'test_channel_private', False)
     assert channel_id_one['channel_id'] == 1
@@ -162,7 +163,19 @@ def test_channels_create_return(clear_and_register):
 
 
 def test_channels_list_valid_id():
-    """Check that the given valid exists."""
+    """
+    Creates a 2 channels:
+        -   tests if given a non-existant
+        user_id it raises an accesserror
+        -   tests for non-int input (bool, string)
+    Arguments:  N/A
+
+    Exceptions:
+        AccessError  - raised for non-user_id
+        InputError  - for non int input
+
+    Return Value: N/A
+    """
     clear_v1()
     auth_register_v1('abc@def.com', 'password', 'first', 'last')
     channels_create_v1(1, 'test_channel', True)
@@ -176,7 +189,16 @@ def test_channels_list_valid_id():
 
 
 def test_channels_list_id_check():
-    """check that the given id is in a channel. For both public/private channels created"""
+    """
+    Create channel, and test a non-valid id.
+
+    Arguments: N/A
+
+    Exceptions:
+        AccessError -   for the non valid id case below
+
+    Return Value: N/A
+    """
     clear_v1()
     auth_register_v1('abc@def.com', 'password', 'first', 'last')
     channels_create_v1(1, 'test_channel_public', True)
@@ -191,7 +213,15 @@ def test_channels_list_v1():
     Test that the channels list is functionally with multiple channels being created.
     This also tests for public and private channels.
     Also tests that channel_list only returns the channel that the id is in.
+
+    Arguments:  N/A
+
+    Exceptions: N/A
+
+    Return Value:   N/A
     """
+
+
     clear_v1()
     auth_register_v1('abc@def.com', 'password', 'first', 'last')
     chan1 = channels_create_v1(1, 'test_channel_public1', True)
