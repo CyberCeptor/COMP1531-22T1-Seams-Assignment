@@ -24,23 +24,33 @@ Example usage:
     data_store.set(store)
 '''
 
+"""
+Our Implementation:
+data = {
+    'users' = [
+        'id': 1,
+        'email': 'abc.def@com',
+        'pw': 'password',
+        'first': 'first',
+        'last': 'last',
+        'handle': 'firstlast',
+    ],
+    'channels' = [
+        'channel_id': 1,
+        'name': 'channel_name',
+        'owner_members': [1],
+        'all_members': [1],
+        'global_owners': [1],
+        'is_public': is_public,
+    ]
+}
+"""
+
 ## YOU SHOULD MODIFY THIS OBJECT BELOW
 initial_object = {
     'users': [],
     'channels': [],
 }
-
-
-
-'''  
-    channel_data = {
-        'channel_id': channel_id,
-        'name': name,
-        'owner_members': [auth_user_id],
-        'all_members': [auth_user_id],
-        'is_public': is_public,
-    }
-'''
 ## YOU SHOULD MODIFY THIS OBJECT ABOVE
 
 ## YOU ARE ALLOWED TO CHANGE THE BELOW IF YOU WISH

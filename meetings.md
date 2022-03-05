@@ -38,6 +38,8 @@ Meeting notes:
 - Feedback on tests and implementations
 - Debugging
 
-
-
-
+04.03
+Members present: Aleesha, Aisha, Jenson, Van, Jed
+Meeting type: Lab
+Get as much done tonight for the autotests tomorrow
+Need to ask if we need a docstring at the top of each .py file and what we need to include
