@@ -101,7 +101,7 @@ def channel_messages_v1(auth_user_id, channel_id, start):
     # is_member is a bool to check whether given user is in the given channel
     is_member = check_user_is_member(auth_user_id, channel_id)
     if is_member is False:
-        raise InputError('User does not exist in channel')
+        raise AccessError('User does not exist in channel')
     
     # message starts
     start_message = store['messages'][start]
