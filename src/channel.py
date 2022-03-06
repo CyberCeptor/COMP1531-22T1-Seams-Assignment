@@ -75,7 +75,7 @@ def channel_details_v1(auth_user_id, channel_id):
         'all_members': channel['all_members'],
     }
 
-
+#####   (Jed)Xingjian Dong z5221888
 def channel_messages_v1(auth_user_id, channel_id, start):
     """ check if given user id and channel id are valid.
 
