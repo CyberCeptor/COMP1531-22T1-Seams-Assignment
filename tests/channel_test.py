@@ -248,7 +248,7 @@ def test_channel_details_return(clear_and_register_and_create):
         'all_members': [1],
     }
 
-def test_invalid_channel(clear_and_register_and_create_and_start):
+def test_invalid_channel(clear_and_register_and_create):
     """
     testing invalid channel id to raise input error
 
@@ -271,7 +271,7 @@ def test_invalid_channel(clear_and_register_and_create_and_start):
     with pytest.raises(InputError):
         channel_messages_v1(1, 'not int', 0)
 
-def test_no_member_user_in_valid_channel(clear_and_register_and_create_and_start):
+def test_channel_messages_invalid_user(clear_and_register_and_create):
     """
 
 
