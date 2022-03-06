@@ -40,44 +40,42 @@ def fixture_clear_and_register_and_create():
 #written by zefan cao z5237177
 
 # Inputerror:Test the function has an invalid channel
-def test_invite_wrong_channel():
+def test_invite_wrong_channel(clear_and_register_and_create):
     """
     clears any data stored in data_store and registers a invitee,
     a inviter with given information, testing invalid channel to raise input error
 
-    Arguments: N/A
+    Arguments: clear_and_register_and_create (fixture)
 
     Exceptions:
         InputError - Raised for an invlaid channel
 
     Return Value: N/A
     """
-    clear_v1()
-    auth_register_v1('wangkaiyan233@gmail.com', 'wky19991123', 'Wang', 'kaiyan')
+    # pylint: disable=unused-argument
     auth_register_v1('xuezhiqian234@gmail.com', 'xzq19991123', 'Xue', 'zhiqian')
     with pytest.raises(InputError):
         channel_invite_v1(1, 0, 2)
 
 # Inputerror:Test the function has an invalid invitee.
-def test_invite_wrong_invitee():
+def test_invite_wrong_invitee(clear_and_register_and_create):
     """
     clears any data stored in data_store and registers a invitee
     with given information, testing invalid invitee to raise input error
 
-    Arguments: N/A
+    Arguments: clear_and_register_and_create (fixture)
 
     Exceptions:
         InputError - Raised for an invlaid invitee
 
     Return Value: N/A
     """
-    clear_v1()
-    auth_register_v1('xuezhiqian234@gmail.com', 'xzq19991123', 'Xue', 'zhiqian')
+    # pylint: disable=unused-argument
     with pytest.raises(InputError):
         channel_invite_v1(1, 1, 1)
 
 # Inputerror:Test the function has an invalid inviter.
-def test_invite_wrong_inviter():
+def test_invite_wrong_inviter(clear_and_register_and_create):
     """
     clears any data stored in data_store and registers a inviter
     with given information, testing invalid inviter to raise input error
@@ -89,13 +87,12 @@ def test_invite_wrong_inviter():
 
     Return Value: N/A
     """
-    clear_v1()
-    auth_register_v1('wangkaiyan233@gmail.com', 'wky19991123', 'Wang', 'kaiyan')
+    # pylint: disable=unused-argument
     with pytest.raises(AccessError):
         channel_invite_v1(1, 1, 2)
 
 # Inputerror:Test the invitee is already in channel
-def test_channel_invite_user_already_joined():
+def test_channel_invite_user_already_joined(clear_and_register_and_create):
     """
     clears any data stored in data_store and registers a invitee, a inviter,
     a truowner withi given info, testing a invitee is alredy in channel to raise input error
@@ -107,30 +104,28 @@ def test_channel_invite_user_already_joined():
 
     Return Value: N/A
     """
-    clear_v1()
-    truowner_info = auth_register_v1('limingzhe@gmail.com', 'lmz19991123', 'Li', 'mingzhe')
-    channels_create_v1(truowner_info['auth_user_id'], 'namechatnnelwky', True)
+    # pylint: disable=unused-argument
     invitee_info = auth_register_v1('xuezhiqian234@gmail.com', 'xzq19991123', 'Xue', 'zhiqian')
     channel_join_v1(invitee_info['auth_user_id'], 1)
     with pytest.raises(InputError):
         channel_invite_v1(invitee_info['auth_user_id'], 1, 1)
 
 # Accesserror: Test the inviter is not in the channel
-def test_channel_invite_not_in_channel():
+def test_channel_invite_not_in_channel(clear_and_register_and_create):
     """
     clears any data stored in data_store and registers a inviter, a invitee,
     the owner of channel with the given information,
     create a channel with user id, and then use the inviter(is not in channel)
     to add the invitee to raise a access error
 
-    Arguments: N/A
+    Arguments: clear_and_register_and_create (fixture)
 
     Exceptions:
         AccessError: Raised for a invter(not in channel) add the invitee
 
     Return Value: N/A
     """
-
+    # pylint: disable=unused-argument
     clear_v1()
     inviter_info = auth_register_v1('limingzhe@gmail.com', 'lmz19991123', 'Li', 'mingzhe')
     createchannel = channels_create_v1(inviter_info['auth_user_id'], 'namechatnnelwky', True)
@@ -148,7 +143,7 @@ def test_channel_invite_not_in_channel():
 #written by zefan cao z5237177
 
 # Inputerror: channel is invalid
-def test_join_invalid_channel():
+def test_join_invalid_channel(clear_and_register_and_create):
     """
     clears any data stored in data_store and registers a invitee with
     given information, testing an invalid channel to raise input error
@@ -160,14 +155,14 @@ def test_join_invalid_channel():
 
     Return Value: N/A
     """
-
+    # pylint: disable=unused-argument
     clear_v1()
     auth_register_v1('xuezhiqian234@gmail.com', 'xzq19991123', 'Xue', 'zhiqian')
     with pytest.raises(InputError):
         channel_join_v1(1, 0)
 
 # Inputerror: user is already in channel
-def test_join_already_exist():
+def test_join_already_exist(clear_and_register_and_create):
     """
     clears any data stored in data_store and registers a invitee with
     given information, testing a invitee is alredy in channel to raise input error
@@ -179,7 +174,7 @@ def test_join_already_exist():
 
     Return Value: N/A
     """
-
+    # pylint: disable=unused-argument
     clear_v1()
     auth_register_v1('wangkaiyan233@gmail.com', 'wky19991123', 'Wang', 'kaiyan')
     channels_create_v1(1, 'validchannelname', True)
@@ -187,7 +182,7 @@ def test_join_already_exist():
         channel_join_v1(1, 1)
 
 # AccessError: channel is valid that is private and the user is not a global owner
-def test_join_channel_is_private():
+def test_join_channel_is_private(clear_and_register_and_create):
     """
     clears any data stored in data_store and registers a invitee, a inviter
     with given information, create a channel with user id, testing the channel
@@ -200,7 +195,7 @@ def test_join_channel_is_private():
 
     Return Value: N/A
     """
-
+    # pylint: disable=unused-argument
     clear_v1()
     inviter_info = auth_register_v1('wangkaiyan233@gmail.com', 'wky19991123', 'Wang', 'kaiyan')
     invitee_info = auth_register_v1('xuezhiqian234@gmail.com', 'xzq19991123', 'Xue', 'zhiqian')
@@ -224,7 +219,7 @@ def test_channel_details_invalid_user_type(clear_and_register_and_create):
 
     Return Value: N/A
     """
-
+    # pylint: disable=unused-argument
     # no user input
     with pytest.raises(InputError):
         channel_details_v1('', 1)
@@ -249,7 +244,7 @@ def test_channel_details_invalid_channel(clear_and_register_and_create):
 
     Return Value: N/A
     """
-
+    # pylint: disable=unused-argument
     # no channel id input
     with pytest.raises(InputError):
         channel_details_v1(1, '')
@@ -270,7 +265,7 @@ def test_channel_details_return(clear_and_register_and_create):
 
     Return Value: N/A
     """
-
+    # pylint: disable=unused-argument
     result = channel_details_v1(1, 1)
     assert result == {
         'name': 'channel_name',
