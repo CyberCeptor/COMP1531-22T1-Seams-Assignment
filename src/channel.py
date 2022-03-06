@@ -1,7 +1,7 @@
 """
 Filename: channel.py
 
-Author: Yangjun Yue(z5317840), Zefan Cao(z5237177)
+Author: Yangjun Yue(z5317840), Zefan Cao(z5237177), (Jed)Xingjian Dong z5221888
 Created: 28/02/2022 - 04/03/2022
 
 Description: implementation for
