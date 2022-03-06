@@ -44,10 +44,10 @@ data = {
         'is_public': is_public,
     ],
     'messages' = [
-        'message_id': 'dunno_yet',
+        'message_id': '1',
         'u_id': 1,
         'message': 'hewwo',
-        'time_sent': 'fix this when we know more'
+        'time_sent': '1582426789'
     ]
 }
 """
