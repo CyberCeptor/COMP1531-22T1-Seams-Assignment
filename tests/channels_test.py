@@ -68,7 +68,7 @@ def test_channels_create_too_short(clear_and_register):
 
     Return Value:   N/A
     """
-    id1 = clear_and_register[0]
+    id1 = clear_and_register['auth_user_id']
     # Testing channel name is less than 1 character. Input Error
     with pytest.raises(InputError):
         channels_create_v1(id1, "", True)
@@ -86,7 +86,7 @@ def test_channels_create_invalid_name(clear_and_register):
 
     Return Value:   N/A
     """
-    id1 = clear_and_register[0]
+    id1 = clear_and_register['auth_user_id']
     with pytest.raises(InputError):
         channels_create_v1(id1, 'MoreThan20CharPublic!', True)
     with pytest.raises(InputError):
@@ -104,7 +104,7 @@ def test_channels_create_boolean(clear_and_register):
 
     Return Value:   N/A
     """
-    id1 = clear_and_register[0]
+    id1 = clear_and_register['auth_user_id']
     with pytest.raises(InputError):
         channels_create_v1(id1, 'test_channel', 'Not a boolean')
 
@@ -118,7 +118,7 @@ def test_channels_duplicate_name(clear_and_register):
     Exceptions:
         InputError  -   Raised for all test cases below
     """
-    id1 = clear_and_register[0]
+    id1 = clear_and_register['auth_user_id']
     channels_create_v1(id1, 'test_channel_public', True)
     with pytest.raises(InputError):
         channels_create_v1(id1, 'test_channel_public', True)

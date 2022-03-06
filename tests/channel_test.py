@@ -131,9 +131,12 @@ def test_channel_invite_inviter_not_in_channel():
     clear_v1()
     user1 = auth_register_v1('li@gmail.com', 'lmz191123', 'Li', 'minge')
     id1 = user1['auth_user_id']
-    chan_id1 = channels_create_v1(id1, 'namelwky', True)
+    chan1 = channels_create_v1(id1, 'namelwky', True)
+    chan_id1 = chan1['channel_id']
+
     user2 = auth_register_v1('xue4@gmail.com', 'xzq19991123', 'Xue', 'zhan')
     id2 = user2['auth_user_id']
+
     user3 = auth_register_v1('wan3@gmail.com', 'wky191123', 'Wang', 'kaan')
     id3 = user3['auth_user_id']
     with pytest.raises(AccessError):
@@ -189,9 +192,10 @@ def test_channel_join_private_channel():
     clear_v1()
     user1 = auth_register_v1('wangk@gmail.com', 'wky19991123', 'Wang', 'kaiyan')
     id1 = user1['auth_user_id']
-    user2 = auth_register_v1('xuezhiqian234@gmail.com', 'xzq19991123', 'Xue', 'zhiqian')
+    user2 = auth_register_v1('xuezh@gmail.com', 'xzq19991123', 'Xue', 'zhiqian')
     id2 = user2['auth_user_id']
-    chan_id1 = channels_create_v1(id1, 'validchannelname', False)
+    chan1 = channels_create_v1(id1, 'validchannelname', False)
+    chan_id1 = chan1['channel_id']
     with pytest.raises(AccessError):
         channel_join_v1(id2, chan_id1)
 
