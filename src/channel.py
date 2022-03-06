@@ -1,8 +1,8 @@
 """
 Filename: channel.py
 
-Author: Yangjun Yue(z5317840), Zefan Cao(z5237177)
-Created: 28/02/2022 - 04/03/2022
+Author: Yangjun Yue(z5317840), Zefan Cao(z5237177), Xingjian Dong (z5221888)
+Created: 28/02/2022 - 06/03/2022
 
 Description: implementation for
     - providing channel details including channel id and channel name with
@@ -11,6 +11,7 @@ Description: implementation for
         user and add them to the channel
     - allowing authorised user to join a channel with channel id
     - helper functions for the above
+    - return messages to channel authorised user
 """
 
 from src.error import InputError, AccessError
@@ -92,17 +93,69 @@ def channel_details_v1(auth_user_id, channel_id):
     }
 
 def channel_messages_v1(auth_user_id, channel_id, start):
+    """
+    check if given user id and channel id are valid,
+    check start not overflow in channel,
+    return messages to a channel authorised user,
+    if too much messages do pagination operate.
+
+    Arguments:
+        auth_user_id (int)    - an integer that specifies user id
+        channel_id (int) - an integer that specifies channel id
+        start (int) - an integer that specifies index for message
+
+    Exceptions:
+        AccessError - Occurs if the user id does not exist in channel
+
+    Return Value:
+        Returns a dictionary containing message_id, u_id, message, time_sent,
+        start and end if given user id and channel id are valid
+    """
+
+    store = data_store.get()
+
+    # see if given auth_user_id and channel_id are valid
+    check_valid_auth_id(auth_user_id)
+    check_valid_channel_id(channel_id)
+
+    # is_member is a bool to check whether given user is in the given channel
+    is_member = check_user_is_member(auth_user_id, channel_id)
+    if is_member is False:
+        raise AccessError('User does not exist in channel')
+    
+    # message starts
+    start_message = store['messages'][start]
+    
+    # get how many messages
+    total_messages = len(store['messages'])
+
+    # get end
+    end = start + 50
+
+    # make sure end is suitable index place
+    if end >= total_messages:
+        end = -1
+
+    # the messages list
+    messages_to_return = []
+
+    # if mesages not overflow
+    if end == -1:
+        if start == total_messages - 1: # if there is only 1 message
+            messages_to_return.append(start_message)
+        else:
+            for idx, message in store['messages']:
+                if idx >= start:
+                    messages_to_return.append(message)
+    else:
+        for idx, message in store['messages']:
+            if (idx >= start) and (idx < end):
+                messages_to_return.append(message)
+    
     return {
-        'messages': [
-            {
-                'message_id': 1,
-                'u_id': 1,
-                'message': 'Hello world',
-                'time_sent': 1582426789,
-            }
-        ],
-        'start': 0,
-        'end': 50,
+        'messages': messages_to_return,
+        'start': start,
+        'end': end,
     }
 
 def channel_join_v1(auth_user_id, channel_id):

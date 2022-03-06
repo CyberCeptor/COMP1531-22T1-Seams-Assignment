@@ -1,18 +1,23 @@
 """
 Filename: channel_test.py
 
-Author: Yangjun Yue(z5317840), Zefan Cao(z5237177)
-Created: 28/02/2022 - 04/03/2022
+Author: Yangjun Yue(z5317840), Zefan Cao(z5237177), Xingjian Dong (z5221888)
+Created: 28/02/2022 - 06/03/2022
 
 Description: pytests for channel_details_v1, channel_invite_v1 and
-            channel join_v1
+            channel join_v1, channel_messages_v1
 """
 
 import pytest
+
 from src.auth import auth_register_v1
+
 from src.other import clear_v1
 from src.error import InputError, AccessError
-from src.channel import channel_invite_v1, channel_details_v1, channel_join_v1
+
+from src.channel import channel_invite_v1, channel_details_v1
+from src.channel import channel_join_v1, channel_messages_v1
+
 from src.channels import channels_create_v1
 
 @pytest.fixture(name='clear_and_register_and_create')
@@ -242,5 +247,54 @@ def test_channel_details_return(clear_and_register_and_create):
         'owner_members': [1],
         'all_members': [1],
     }
+
+def test_channel_messages_invalid_channel(clear_and_register_and_create):
+    """
+    testing invalid channel id to raise input error
+
+    Arguments: clear_and_register_and_create (fixture)
+
+    Exceptions: InputError - Raised for all test cases listed below
+
+    Return Value: N/A
+    """
+
+    # pylint: disable=unused-argument
+
+    # no channel id input
+    with pytest.raises(InputError):
+        channel_messages_v1(1, '', 0)
+    # wrong channel id input
+    with pytest.raises(InputError):
+        channel_messages_v1(1, -1, 0)
+    # wrong type channel id input
+    with pytest.raises(InputError):
+        channel_messages_v1(1, 'not int', 0)
+
+def test_channel_messages_invalid_user(clear_and_register_and_create):
+    """
+    testing unauthorised user to raise access error
+
+    Arguments: clear_and_register_and_create (fixture)
+
+    Exceptions: AccessError - Raised for all test cases listed below
+
+    Return Value: N/A
+    """
+
+    # pylint: disable=unused-argument
+
+    # no user input
+    with pytest.raises(InputError):
+        channel_messages_v1('', 1, 0)
+    # wrong type user input
+    with pytest.raises(InputError):
+        channel_messages_v1('not int', 1, 0)
+    # user is not in the channel
+    with pytest.raises(AccessError):
+        channel_messages_v1(2, 1, 0)
+    # non exist user input
+    with pytest.raises(AccessError):
+        channel_messages_v1(-1, 1, 0)
 
 clear_v1()
