@@ -44,9 +44,9 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
     # then add u_id into the channel
     if check_user_is_member(auth_user_id, channel_id) is False:
         raise AccessError('Inviter is not in the channel')
-    if check_user_is_member(auth_user_id, channel_id) is True:
-        if check_user_is_member(u_id, channel_id) is True:
-            raise InputError('Invitee is already in the channel')
+    
+    if check_user_is_member(u_id, channel_id) is True:
+        raise InputError('Invitee is already in the channel')
     else:
         add_invitee(u_id, channel_id) #add user
     return {
@@ -125,7 +125,7 @@ def channel_messages_v1(auth_user_id, channel_id, start):
 
     # message starts
     start_message = store['messages'][start]
-    
+
     # get how many messages
     total_messages = len(store['messages'])
 
