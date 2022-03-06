@@ -11,13 +11,14 @@ Description: implementation for
     - helper functions for the above
 """
 
-
+import datetime
 from src.error import InputError
 from src.error import AccessError
 from src.data_store import data_store
 from src.other import check_valid_auth_id
 from src.other import check_user_is_member
 from src.other import check_valid_channel_id
+from src.other import check_start_is_less_or_equal_to_total_number
 
 store = data_store.get()
 def channel_invite_v1(auth_user_id, channel_id, u_id):
@@ -76,17 +77,54 @@ def channel_details_v1(auth_user_id, channel_id):
 
 
 def channel_messages_v1(auth_user_id, channel_id, start):
+    """ check if given user id and channel id are valid.
+
+    Arguments:
+        auth_user_id (int)    - an integer that specifies user id
+        channel_id (int) - an integer that specifies channel id
+        start (int) - an integer that specifies index for message
+
+    Exceptions:
+        InputError - Occurs if the user id does not exist in channel
+
+    Return Value:
+        Returns a dictionary containing message_id, u_id, message, time_sent,
+        start and end if given user id and channel id are valid
+    """
+
+    store = data_store.get()
+
+    # see if given auth_user_id and channel_id are valid
+    check_valid_auth_id(auth_user_id)
+    check_valid_channel_id(channel_id)
+
+    # is_member is a bool to check whether given user is in the given channel
+    is_member = check_user_is_member(auth_user_id, channel_id)
+    if is_member is False:
+        raise InputError('User does not exist in channel')
+    
+    # message id starts at 1, so -1 to get the correct dict
+    message = store['message'][message_id - 1]
+    
+    # check_start_is_less_or_equal_to_total_number(start, end)
+
+    if message_id > 50:
+        end = start + 50
+    #else end = -1
+
+    message['time_sent'] = datetime.datetime.now()
+    
     return {
         'messages': [
             {
-                'message_id': 1,
-                'u_id': 1,
-                'message': 'Hello world',
-                'time_sent': 1582426789,
+                'message_id': message['message_id'],
+                'u_id': [auth_user_id],
+                'message': message['message'],
+                'time_sent': message['time_sent'],
             }
         ],
-        'start': 0,
-        'end': 50,
+        'start': start,
+        'end': end,
     }
     
 #### channel_join_v1 is written by zefan cao z5237177
