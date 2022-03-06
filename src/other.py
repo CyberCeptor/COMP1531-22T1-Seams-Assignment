@@ -109,3 +109,9 @@ def check_user_is_member(auth_user_id, channel_id):
         return True
 
     return False
+
+def check_start_is_less_or_equal_to_total_number(start, end):
+    if start <= end - start:
+        return True
+    else:
+        return False
