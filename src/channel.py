@@ -85,7 +85,7 @@ def channel_messages_v1(auth_user_id, channel_id, start):
         start (int) - an integer that specifies index for message
 
     Exceptions:
-        InputError - Occurs if the user id does not exist in channel
+        AccessError - Occurs if the user id does not exist in channel
 
     Return Value:
         Returns a dictionary containing message_id, u_id, message, time_sent,
@@ -103,26 +103,34 @@ def channel_messages_v1(auth_user_id, channel_id, start):
     if is_member is False:
         raise InputError('User does not exist in channel')
     
-    # message id starts at 1, so -1 to get the correct dict
-    message = store['message'][message_id - 1]
+    # message starts
+    start_message = store['messages'][start]
     
     # check_start_is_less_or_equal_to_total_number(start, end)
 
-    if message_id > 50:
-        end = start + 50
-    #else end = -1
+    total_messages = len(store['messages'])
+    end = start + 50
+    if end >= total_messages:
+        end = -1
 
-    message['time_sent'] = datetime.datetime.now()
+    #message['time_sent'] = datetime.datetime.now()
+
+    messages_to_return = []
+
+    if end == -1:
+        if start == total_messages:
+            messages_to_return.append(start_message)
+        else:
+            for idx, message in store['messages']:
+                if idx >= start:
+                    messages_to_return.append(message)
+    else:
+        for idx, message in store['messages']:
+            if (idx >= start) and (idx < end):
+                messages_to_return.append(message)
     
     return {
-        'messages': [
-            {
-                'message_id': message['message_id'],
-                'u_id': [auth_user_id],
-                'message': message['message'],
-                'time_sent': message['time_sent'],
-            }
-        ],
+        'messages': messages_to_return,
         'start': start,
         'end': end,
     }
