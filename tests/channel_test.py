@@ -42,8 +42,8 @@ def fixture_clear_and_register_and_create():
 # Inputerror:Test the function has an invalid channel
 def test_channel_invite_invalid_channel(clear_and_register_and_create):
     """
-    clears any data stored in data_store and registers a invitee,
-    a inviter with given information, testing invalid channel to raise input error
+    clears any data stored in data_store and registers a invitee, a inviter
+    with given information, testing invalid channel to raise input error
 
     Arguments: clear_and_register_and_create (fixture)
 
@@ -92,10 +92,11 @@ def test_channel_invite_invalid_invitee(clear_and_register_and_create):
         channel_invite_v1(1, 1, 2)
 
 # Inputerror:Test the invitee is already in channel
-def test_channel_invite_invitee_user_already_joined(clear_and_register_and_create):
+def test_channel_invite_invitee_already_joined(clear_and_register_and_create):
     """
     clears any data stored in data_store and registers a invitee, a inviter,
-    a truowner withi given info, testing a invitee is alredy in channel to raise input error
+    a truowner withi given info, testing a invitee is alredy in channel
+    to raise input error
 
     Arguments: clear_and_register_and_create (fixture)
 
@@ -105,7 +106,7 @@ def test_channel_invite_invitee_user_already_joined(clear_and_register_and_creat
     Return Value: N/A
     """
     # pylint: disable=unused-argument
-    invitee_info = auth_register_v1('xue2@gmail.com', 'xzq191123', 'Xue', 'zhan')
+    invitee_info = auth_register_v1('xue@gmail.com', 'xzq19123', 'Xue', 'zhan')
     channel_join_v1(invitee_info['auth_user_id'], 1)
     with pytest.raises(InputError):
         channel_invite_v1(1, 1, 2)
@@ -128,12 +129,13 @@ def test_channel_invite_inviter_not_in_channel(clear_and_register_and_create):
     # pylint: disable=unused-argument
     clear_v1()
     inviter_info = auth_register_v1('li@gmail.com', 'lmz191123', 'Li', 'minge')
-    createchannel = channels_create_v1(inviter_info['auth_user_id'], 'namelwky', True)
-    invitee_info = auth_register_v1('xue4@gmail.com', 'xzq19991123', 'Xue', 'zhan')
-    inviter_info = auth_register_v1('wan3@gmail.com', 'wky191123', 'Wang', 'kaan')
+    createchannel = channels_create_v1(inviter_info['auth_user_id'],
+                    'namelwky', True)
+    invitee_info = auth_register_v1('xue@gmail.com', 'xzq191123', 'Xue', 'zan')
+    inviter_info = auth_register_v1('wan3@gmail.com', 'wky1923', 'Wang', 'kaan')
     with pytest.raises(AccessError):
-        channel_invite_v1(inviter_info['auth_user_id'], createchannel['channel_id'],
-        invitee_info['auth_user_id'])
+        channel_invite_v1(inviter_info['auth_user_id'],
+        createchannel['channel_id'], invitee_info['auth_user_id'])
 
 #####################################################
 #                                                   #
