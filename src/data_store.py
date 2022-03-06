@@ -29,7 +29,7 @@ Our Implementation:
 data = {
     'users' = [
         'id': 1,
-        'email': 'abc.def@com',
+        'email': 'abc@def.com',
         'pw': 'password',
         'first': 'first',
         'last': 'last',
@@ -42,6 +42,12 @@ data = {
         'all_members': [1],
         'global_owners': [1],
         'is_public': is_public,
+    ],
+    'messages' = [
+        'message_id': 'dunno_yet',
+        'u_id': 1,
+        'message': 'hewwo',
+        'time_sent': 'fix this when we know more'
     ]
 }
 """
