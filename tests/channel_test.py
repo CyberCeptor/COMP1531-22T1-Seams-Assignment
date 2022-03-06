@@ -1,7 +1,7 @@
 """
 Filename: channel_test.py
 
-Author: Yangjun Yue(z5317840), Zefan Cao(z5237177)
+Author: Yangjun Yue(z5317840), Zefan Cao(z5237177), (Jed)Xingjian Dong z5221888
 Created: 28/02/2022 - 04/03/2022
 
 Description: pytests for channel_details_v1, channel_invite_v1 and channel join_v1
