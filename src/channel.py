@@ -38,7 +38,7 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
     check_valid_auth_id(auth_user_id) # check the inviter is valid or not
     check_valid_auth_id(u_id)# check the invitee is valid or not
     check_valid_channel_id(channel_id) # check the channel is valid or not
-    # if auth_user_id is a member of the channel and u_id isn't 
+    # if auth_user_id is a member of the channel and u_id isn't
     # then add u_id into the channel
     if check_user_is_member(auth_user_id, channel_id) is False:
         raise AccessError('Inviter is not in the channel')
