@@ -16,6 +16,7 @@ from src.error import AccessError
 from src.channels import channels_create_v1
 from src.channel import channel_invite_v1
 from src.channel import channel_join_v1
+from src.channel import channel_messages_v1
 #from src.other import check_start_is_less_or_equal_to_total_number
 
 #### Test Chanel_invite    Zefan Cao(Van) z5237177
@@ -214,13 +215,13 @@ def test_invalid_channel(clear_and_register_and_create_and_start):
 
     # no channel id input
     with pytest.raises(InputError):
-        channel_details_v1(1,'')
+        channel_messages_v1(1,'',0)
     # wrong channel id input
     with pytest.raises(InputError):
-        channel_details_v1(1,-1)
+        channel_messages_v1(1,-1,0)
     # wrong type channel id input
     with pytest.raises(InputError):
-        channel_details_v1(1,'not int')
+        channel_messages_v1(1,'not int',0)
 
 '''
 # start is greater than the total number of messages in the channel
@@ -262,15 +263,15 @@ def test_no_member_user_in_valid_channel(clear_and_register_and_create_and_start
 
     # no user input
     with pytest.raises(InputError):
-        channel_details_v1('', 1)
+        channel_messages_v1('', 1,0)
     # wrong type user input
     with pytest.raises(InputError):
-        channel_details_v1('not int',1)
+        channel_messages_v1('not int',1,0)
     # user is not in the channel
     with pytest.raises(AccessError):
-        channel_details_v1(2, 1)
+        channel_messages_v1(2, 1,0)
     # non exist user input
     with pytest.raises(AccessError):
-        channel_details_v1(-1, 1)
+        channel_messages_v1(-1, 1,0)
 
 clear_v1()
