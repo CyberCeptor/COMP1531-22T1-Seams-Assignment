@@ -35,7 +35,8 @@ def fixture_clear_and_register_and_create():
 def test_channel_invite_invalid_channel(clear_and_register_and_create):
     """
     clears any data stored in data_store and registers a invitee,
-    a inviter with given information, testing invalid channel to raise input error
+    a inviter with given information, testing invalid channel to raise input
+    error
 
     Arguments: clear_and_register_and_create (fixture)
 
