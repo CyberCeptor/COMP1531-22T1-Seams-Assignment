@@ -248,11 +248,11 @@ def test_channel_details_return(clear_and_register_and_create):
         'all_members': [1],
     }
 
-def test_invalid_channel(clear_and_register_and_create):
+def test_channel_messages_invalid_channel(clear_and_register_and_create):
     """
     testing invalid channel id to raise input error
 
-    Arguments: clear_and_register_and_create_and_start (fixture)
+    Arguments: clear_and_register_and_create (fixture)
 
     Exceptions: InputError - Raised for all test cases listed below
 
@@ -275,7 +275,7 @@ def test_channel_messages_invalid_user(clear_and_register_and_create):
     """
 
 
-    Arguments: clear_and_register_and_create_and_start (fixture)
+    Arguments: clear_and_register_and_create (fixture)
 
     Exceptions: N/A
 

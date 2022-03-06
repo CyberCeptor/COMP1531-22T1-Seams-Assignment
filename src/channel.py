@@ -92,7 +92,8 @@ def channel_details_v1(auth_user_id, channel_id):
     }
 
 def channel_messages_v1(auth_user_id, channel_id, start):
-    """ check if given user id and channel id are valid.
+    """
+    check if given user id and channel id are valid.
 
     Arguments:
         auth_user_id (int)    - an integer that specifies user id
