@@ -136,7 +136,8 @@ def channels_create_v1(auth_user_id, name, is_public):
         if channel['name'] == name and channel['is_public'] == is_public:
             raise InputError('This channel name already exists')
 
-    # get the number of channels created so far, incremented for the new channel id.
+    # get the number of channels created so far, incremented for the new channel
+    id.
     channel_id = len(store['channels']) + 1
 
     # Storing the channel information
