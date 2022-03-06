@@ -164,8 +164,8 @@ def test_channel_join_invalid_channel(clear_and_register_and_create):
 # Inputerror: user is already in channel
 def test_channel_join_user_already_in_channel(clear_and_register_and_create):
     """
-    clears any data stored in data_store and registers a invitee with
-    given information, testing a invitee is alredy in channel to raise input error
+    clears any data stored in data_store and registers a invitee with given
+    information testing invitee is alredy in channel to raise input error
 
     Arguments: clear_and_register_and_create (fixture)
 
@@ -178,7 +178,8 @@ def test_channel_join_user_already_in_channel(clear_and_register_and_create):
     with pytest.raises(InputError):
         channel_join_v1(1, 1)
 
-# AccessError: channel is valid that is private and the user is not a global owner
+# AccessError: channel is valid that is private and the user
+# is not a global owner
 def test_channel_join_private_channel():
     """
     clears any data stored in data_store and registers a invitee, a inviter
@@ -193,9 +194,9 @@ def test_channel_join_private_channel():
     Return Value: N/A
     """
     clear_v1()
-    inviter_info = auth_register_v1('wangkaiyan233@gmail.com', 'wky19991123', 'Wang', 'kaiyan')
-    invitee_info = auth_register_v1('xuezhiqian234@gmail.com', 'xzq19991123', 'Xue', 'zhiqian')
-    newchannel = channels_create_v1(inviter_info['auth_user_id'], 'validchannelname', False)
+    inviter_info = auth_register_v1('wan@gmail.com', 'wky1123', 'Wang', 'kaan')
+    invitee_info = auth_register_v1('xu@gmail.com', 'xzq19123', 'Xue', 'zhiqn')
+    newchannel = channels_create_v1(inviter_info['auth_user_id'], 'vme', False)
     with pytest.raises(AccessError):
         channel_join_v1(invitee_info['auth_user_id'], newchannel['channel_id'])
 
