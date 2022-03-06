@@ -273,11 +273,11 @@ def test_channel_messages_invalid_channel(clear_and_register_and_create):
 
 def test_channel_messages_invalid_user(clear_and_register_and_create):
     """
-
+    testing unauthorised user to raise access error
 
     Arguments: clear_and_register_and_create (fixture)
 
-    Exceptions: N/A
+    Exceptions: AccessError - Raised for all test cases listed below
 
     Return Value: N/A
     """

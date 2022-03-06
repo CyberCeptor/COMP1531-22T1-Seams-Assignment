@@ -11,6 +11,7 @@ Description: implementation for
         user and add them to the channel
     - allowing authorised user to join a channel with channel id
     - helper functions for the above
+    - return messages to channel authorised user
 """
 
 from src.error import InputError, AccessError
@@ -93,7 +94,10 @@ def channel_details_v1(auth_user_id, channel_id):
 
 def channel_messages_v1(auth_user_id, channel_id, start):
     """
-    check if given user id and channel id are valid.
+    check if given user id and channel id are valid,
+    check start not overflow in channel,
+    return messages to a channel authorised user,
+    if too much messages do pagination operate.
 
     Arguments:
         auth_user_id (int)    - an integer that specifies user id
