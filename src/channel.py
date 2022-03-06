@@ -126,16 +126,22 @@ def channel_messages_v1(auth_user_id, channel_id, start):
     # message starts
     start_message = store['messages'][start]
     
-    # check_start_is_less_or_equal_to_total_number(start, end)
+    # get how many messages
     total_messages = len(store['messages'])
+
+    # get end
     end = start + 50
+
+    # make sure end is suitable index place
     if end >= total_messages:
         end = -1
 
+    # the messages list
     messages_to_return = []
 
+    # if mesages not overflow
     if end == -1:
-        if start == total_messages:
+        if start == total_messages - 1: # if there is only 1 message
             messages_to_return.append(start_message)
         else:
             for idx, message in store['messages']:
