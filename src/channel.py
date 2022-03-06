@@ -1,8 +1,8 @@
 """
 Filename: channel.py
 
-Author: Yangjun Yue(z5317840), Zefan Cao(z5237177), (Jed)Xingjian Dong z5221888
-Created: 28/02/2022 - 04/03/2022
+Author: Yangjun Yue(z5317840), Zefan Cao(z5237177), Xingjian Dong (z5221888)
+Created: 28/02/2022 - 06/03/2022
 
 Description: implementation for
     - providing channel details including channel id and channel name with
@@ -13,11 +13,9 @@ Description: implementation for
     - helper functions for the above
 """
 
-import datetime
 from src.error import InputError, AccessError
 from src.other import check_valid_auth_id
 from src.other import check_user_is_member, check_valid_channel_id
-from src.other import check_start_is_less_or_equal_to_total_number
 
 from src.data_store import data_store
 
@@ -93,7 +91,6 @@ def channel_details_v1(auth_user_id, channel_id):
         'all_members': channel['all_members'],
     }
 
-#####   (Jed)Xingjian Dong z5221888
 def channel_messages_v1(auth_user_id, channel_id, start):
     """ check if given user id and channel id are valid.
 
@@ -125,13 +122,10 @@ def channel_messages_v1(auth_user_id, channel_id, start):
     start_message = store['messages'][start]
     
     # check_start_is_less_or_equal_to_total_number(start, end)
-
     total_messages = len(store['messages'])
     end = start + 50
     if end >= total_messages:
         end = -1
-
-    #message['time_sent'] = datetime.datetime.now()
 
     messages_to_return = []
 
