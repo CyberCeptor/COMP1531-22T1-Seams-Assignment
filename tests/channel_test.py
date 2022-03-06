@@ -1,23 +1,24 @@
 """
 Filename: channel_test.py
 
-Author: Yangjun Yue(z5317840), Zefan Cao(z5237177), (Jed)Xingjian Dong z5221888
-Created: 28/02/2022 - 04/03/2022
+Author: Yangjun Yue(z5317840), Zefan Cao(z5237177), Xingjian Dong (z5221888)
+Created: 28/02/2022 - 06/03/2022
 
 Description: pytests for channel_details_v1, channel_invite_v1 and
-            channel join_v1
+            channel join_v1, channel_messages_v1
 """
 
 import pytest
+
 from src.auth import auth_register_v1
+
 from src.other import clear_v1
 from src.error import InputError, AccessError
-from src.channel import channel_invite_v1, channel_details_v1, channel_join_v1
+
+from src.channel import channel_invite_v1, channel_details_v1
+from src.channel import channel_join_v1, channel_messages_v1
+
 from src.channels import channels_create_v1
-from src.channel import channel_invite_v1
-from src.channel import channel_join_v1
-from src.channel import channel_messages_v1
-#from src.other import check_start_is_less_or_equal_to_total_number
 
 @pytest.fixture(name='clear_and_register_and_create')
 def fixture_clear_and_register_and_create():
@@ -32,12 +33,6 @@ def fixture_clear_and_register_and_create():
     Return Value: N/A
     """
 
-#### Test Chanel_invite    Zefan Cao(Van) z5237177
-#
-#
-#
-# Inputerror:Test the function has an invalid channel_id
-def test_invite_wrong_channel():
     clear_v1()
     auth_register_v1('abc@def.com', 'password', 'first', 'last')
     channels_create_v1(1, 'channel_name', True)
@@ -253,29 +248,9 @@ def test_channel_details_return(clear_and_register_and_create):
         'all_members': [1],
     }
 
-##### Test channel_messages_v1 (Jed)Xingjian Dong z5221888
-#
-@pytest.fixture(name='clear_and_register_and_create_and_start')
-def fixture_clear_and_register_and_create_and_start():
-    """
-    Clears any data stored in data_store and registers a user with the
-    given information, create a channel using user id and start place
-
-    Arguments: N/A
-
-    Exceptions: N/A
-
-    Return Value: N/A
-    """ 
-
-    clear_v1()
-    auth_register_v1('abc@def.com', 'password', 'first', 'last')
-    channels_create_v1(1, 'channel_name', True)
-    #check_start_is_less_or_equal_to_total_number(0, 50)
-
-# channel id does not refer to a valid channel
 def test_invalid_channel(clear_and_register_and_create_and_start):
-    """ testing invalid channel id to raise input error
+    """
+    testing invalid channel id to raise input error
 
     Arguments: clear_and_register_and_create_and_start (fixture)
 
@@ -288,42 +263,17 @@ def test_invalid_channel(clear_and_register_and_create_and_start):
 
     # no channel id input
     with pytest.raises(InputError):
-        channel_messages_v1(1,'',0)
+        channel_messages_v1(1, '', 0)
     # wrong channel id input
     with pytest.raises(InputError):
-        channel_messages_v1(1,-1,0)
+        channel_messages_v1(1, -1, 0)
     # wrong type channel id input
     with pytest.raises(InputError):
-        channel_messages_v1(1,'not int',0)
+        channel_messages_v1(1, 'not int', 0)
 
-'''
-# start is greater than the total number of messages in the channel
-def test_greter_start(clear_and_register_and_create_and_start):
-    """ testing too big start incex to raise input error
-
-    Arguments: clear_and_register_and_create_and_start (fixture)
-
-    Exceptions: InputError - Raised for all test cases listed below
-
-    Return Value: N/A
+def test_no_member_user_in_valid_channel(clear_and_register_and_create_and_start):
     """
 
-    # pylint: disable=unused-argument
-
-    # no start input
-    with pytest.raises(InputError):
-        check_start_is_less_or_equal_to_total_number('',50)
-    # too big start input
-    with pytest.raises(InputError):
-        check_start_is_less_or_equal_to_total_number(51,50)
-    # wrong start input
-    with pytest.raises(InputError):
-        check_start_is_less_or_equal_to_total_number(-1,50)
-'''
-
-# channel_id is valid and the authorised user is not a member of the channel
-def test_no_member_user_in_valid_channel(clear_and_register_and_create_and_start):
-    """ testing too big start incex to raise input error
 
     Arguments: clear_and_register_and_create_and_start (fixture)
 
@@ -336,15 +286,15 @@ def test_no_member_user_in_valid_channel(clear_and_register_and_create_and_start
 
     # no user input
     with pytest.raises(InputError):
-        channel_messages_v1('', 1,0)
+        channel_messages_v1('', 1, 0)
     # wrong type user input
     with pytest.raises(InputError):
-        channel_messages_v1('not int',1,0)
+        channel_messages_v1('not int', 1, 0)
     # user is not in the channel
     with pytest.raises(AccessError):
-        channel_messages_v1(2, 1,0)
+        channel_messages_v1(2, 1, 0)
     # non exist user input
     with pytest.raises(AccessError):
-        channel_messages_v1(-1, 1,0)
+        channel_messages_v1(-1, 1, 0)
 
 clear_v1()
