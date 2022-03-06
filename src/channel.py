@@ -16,12 +16,12 @@ Description: implementation for
 from src.error import InputError, AccessError
 from src.other import check_valid_auth_id
 from src.other import check_user_is_member, check_valid_channel_id
+
 from src.data_store import data_store
 
-store = data_store.get()
-#channel_invite_v1 is wriiten by zefan cao z5237177
 def channel_invite_v1(auth_user_id, channel_id, u_id):
-    """ check if given user id and channel id are valid,
+    """
+    check if given user id and channel id are valid,
     and then add the user into the channel with u_id, channel_id
     return nothing
 
@@ -39,7 +39,9 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
     check_valid_auth_id(auth_user_id) # check the inviter is valid or not
     check_valid_auth_id(u_id)# check the invitee is valid or not
     check_valid_channel_id(channel_id) # check the channel is valid or not
-    if check_user_is_member(auth_user_id, channel_id) is False: # use the if statement to judge
+    # if auth_user_id is a member of the channel and u_id isn't
+    # then add u_id into the channel
+    if check_user_is_member(auth_user_id, channel_id) is False:
         raise AccessError('Inviter is not in the channel')
     if check_user_is_member(auth_user_id, channel_id) is True:
         if check_user_is_member(u_id, channel_id) is True:
@@ -49,9 +51,9 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
     return {
     }
 
-
 def channel_details_v1(auth_user_id, channel_id):
-    """ check if given user id and channel id are valid,
+    """
+    check if given user id and channel id are valid,
     return details about the channel including channel name, publicity, owner
     members and all members with given user id and channel id.
 
@@ -66,6 +68,8 @@ def channel_details_v1(auth_user_id, channel_id):
         Returns a dictionary containing channel name, publicity of the channel,
         owner members and all members if given user id and channel id are valid
     """
+
+    store = data_store.get()
 
     # see if given auth_user_id and channel_id are valid
     check_valid_auth_id(auth_user_id)
@@ -87,7 +91,6 @@ def channel_details_v1(auth_user_id, channel_id):
         'all_members': channel['all_members'],
     }
 
-
 def channel_messages_v1(auth_user_id, channel_id, start):
     return {
         'messages': [
@@ -102,9 +105,9 @@ def channel_messages_v1(auth_user_id, channel_id, start):
         'end': 50,
     }
 
-#channel_join_v1 is written by zefan cao z5237177
 def channel_join_v1(auth_user_id, channel_id):
-    """ check if given user id and channel id are valid,
+    """
+    check if given user id and channel id are valid,
     and then add the user into the channel with channel_id
     return nothing
 
@@ -117,25 +120,25 @@ def channel_join_v1(auth_user_id, channel_id):
 
     Return Value: N/A
     """
-    check_valid_channel_id(channel_id)  #check the channle is valid or not
     check_valid_auth_id(auth_user_id)   #check the invitee is valid or not
+    check_valid_channel_id(channel_id)  #check the channle is valid or not
+
     #check the invitee whether is already in the channel
     if check_user_is_member(auth_user_id, channel_id) is True:
         raise InputError('Invitee is already in the channel')
+
     #check the user whether is a global owner
-    #if the user is a global owner, add immediately, even this is a priavate channel
-    if check_owner_global(auth_user_id,channel_id) is True:
+    #if the user is a global owner, add immediately, even this is a priavate
+    # channel
+    if check_user_is_global_owner(auth_user_id, channel_id) is True:
         add_invitee(auth_user_id, channel_id) # add user
-        return
+
     check_public_channel(channel_id) #check the channel whether is public
     add_invitee(auth_user_id, channel_id) #add user
-    return
 
-#Create a function to add the invitee
-#written by zefan cao z5237177
 def add_invitee(u_id, channel_id):
-    """ add the user into the channel with channel_id
-    return nothing
+    """
+    add the user into the channel with channel_id
 
     Arguments:
         u_id (int)    - an integer that specifies user(invitee) id
@@ -145,15 +148,15 @@ def add_invitee(u_id, channel_id):
 
     Return Value: N/A
     """
-    for channel in store['channels']:
-        if channel['channel_id'] == channel_id:
-            channel['all_members'].append(u_id)
+    store = data_store.get()
+
+    channel = store['channels'][channel_id - 1]
+    channel['all_members'].append(u_id)
     data_store.set(store)
 
-#Create a function to check the user is a global owner or not
-#written by zefan cao z5237177
-def check_owner_global(auth_user_id, channel_id):
-    """ check the user whether is a global owner in channel
+def check_user_is_global_owner(auth_user_id, channel_id):
+    """
+    check the user whether is a global owner in channel
     with auth user id and channel id, return nothing
 
     Arguments:
@@ -164,20 +167,16 @@ def check_owner_global(auth_user_id, channel_id):
 
     Return Value: N/A
     """
-    tnumber = 0
-    for channel in store['channels']:
-        if channel['channel_id'] == channel_id:
-            if auth_user_id in channel['global_owners']:
-                tnumber = 1
-    if tnumber == 1:
+    store = data_store.get()
+
+    channel = store['channels'][channel_id - 1]
+    if auth_user_id in channel['global_owners']:
         return True
     return False
 
-#Create a function to check the channel is public or not
-#written by zefan cao z5237177
-# based on examples written by others: https://github.com/eustace65
 def check_public_channel(channel_id):
-    """ check the channel is public or not with channel id
+    """
+    check the channel is public or not with channel id
     return nothing
 
     Arguments:
@@ -188,25 +187,8 @@ def check_public_channel(channel_id):
 
     Return Value: N/A
     """
-    if is_public(channel_id) is False :
+    store = data_store.get()
+
+    channel = store['channels'][channel_id - 1]
+    if channel['is_public'] is False:
         raise AccessError('Channel is private')
-
-#Create the function used in the check_public_channel function
-#written by zefan cao z5237177
-def is_public(channel_id):
-    """ this function is used in check_public_channel function
-    check the channel is public or not with channel id, return nothing
-
-    Arguments:
-        channel_id (int) - an integer that specifies channel id
-
-    Exceptions:
-        InputError - Occurs if the channel id is not in channel
-
-    Return Value: N/A
-    """
-    for channel in store['channels']:
-        if channel['channel_id'] == channel_id:
-            return channel['is_public']
-        raise InputError('Channel is invalid')
-    
