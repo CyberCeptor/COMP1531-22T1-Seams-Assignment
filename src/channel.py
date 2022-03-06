@@ -175,7 +175,6 @@ def check_owner_global(auth_user_id, channel_id):
 
 #Create a function to check the channel is public or not
 #written by zefan cao z5237177
-# based on examples written by others: https://github.com/eustace65
 def check_public_channel(channel_id):
     """ check the channel is public or not with channel id
     return nothing
@@ -188,25 +187,6 @@ def check_public_channel(channel_id):
 
     Return Value: N/A
     """
-    if is_public(channel_id) is False :
+    channel = store['channels'][channel_id - 1]
+    if channel['is_public'] is False:
         raise AccessError('Channel is private')
-
-#Create the function used in the check_public_channel function
-#written by zefan cao z5237177
-def is_public(channel_id):
-    """ this function is used in check_public_channel function
-    check the channel is public or not with channel id, return nothing
-
-    Arguments:
-        channel_id (int) - an integer that specifies channel id
-
-    Exceptions:
-        InputError - Occurs if the channel id is not in channel
-
-    Return Value: N/A
-    """
-    for channel in store['channels']:
-        if channel['channel_id'] == channel_id:
-            return channel['is_public']
-        raise InputError('Channel is invalid')
-    
