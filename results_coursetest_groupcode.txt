@@ -1,0 +1,716 @@
+============================= test session starts ==============================
+platform linux -- Python 3.7.3, pytest-6.2.5, py-1.10.0, pluggy-1.0.0 -- /usr/bin/python3
+cachedir: .pytest_cache
+hypothesis profile 'default' -> database=DirectoryBasedExampleDatabase('/tmp_amd/kamen/export/kamen/3/cs1531/project-automarking/tempstore/.hypothesis/examples')
+rootdir: /tmp_amd/kamen/export/kamen/3/cs1531/project-automarking/tempstore, configfile: pytest.ini
+plugins: forked-1.3.0, xdist-2.2.1, hypothesis-6.1.1, timeout-1.4.2
+collecting ... collected 71 items
+
+tests/auth_tests/auth_login_test.py::test_successful_login PASSED        [  1%]
+tests/auth_tests/auth_login_test.py::test_unregistered_user PASSED       [  2%]
+tests/auth_tests/auth_login_test.py::test_registered_but_incorrect_password PASSED [  4%]
+tests/auth_tests/auth_register_test.py::test_invalid_email[@gmail.com] PASSED [  5%]
+tests/auth_tests/auth_register_test.py::test_invalid_email[bob] PASSED   [  7%]
+tests/auth_tests/auth_register_test.py::test_invalid_email[bob@bob@bob.com] PASSED [  8%]
+tests/auth_tests/auth_register_test.py::test_invalid_password[12345] PASSED [  9%]
+tests/auth_tests/auth_register_test.py::test_invalid_password[] PASSED   [ 11%]
+tests/auth_tests/auth_register_test.py::test_invalid_name_first[] PASSED [ 12%]
+tests/auth_tests/auth_register_test.py::test_invalid_name_first[aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa] PASSED [ 14%]
+tests/auth_tests/auth_register_test.py::test_invalid_name_last[] PASSED  [ 15%]
+tests/auth_tests/auth_register_test.py::test_invalid_name_last[bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb] PASSED [ 16%]
+tests/auth_tests/auth_register_test.py::test_duplicate_email PASSED      [ 18%]
+tests/auth_tests/auth_register_test.py::test_auth_register_pass_normal PASSED [ 19%]
+tests/auth_tests/auth_register_test.py::test_auth_register_pass_password_short PASSED [ 21%]
+tests/auth_tests/auth_register_test.py::test_auth_register_pass_password_long PASSED [ 22%]
+tests/auth_tests/auth_register_test.py::test_auth_register_pass_names_short PASSED [ 23%]
+tests/auth_tests/auth_register_test.py::test_auth_register_pass_names_long PASSED [ 25%]
+tests/auth_tests/auth_register_test.py::test_auth_register_pass_double_same_password FAILED [ 26%]
+tests/auth_tests/auth_register_test.py::test_auth_register_pass_double_same_name PASSED [ 28%]
+tests/channel_tests/channel_details_test.py::test_channel_owner_can_get_details FAILED [ 29%]
+tests/channel_tests/channel_details_test.py::test_channel_member_can_get_details FAILED [ 30%]
+tests/channel_tests/channel_details_test.py::test_handles_generated_correctly[abcdefghij-klmnopqrs-abcdefghijklmnopqrs-abcdefghij-klmnopqrs-abcdefghijklmnopqrs0] FAILED [ 32%]
+tests/channel_tests/channel_details_test.py::test_handles_generated_correctly[abcdefghij-klmnopqrst-abcdefghijklmnopqrst-abcdefghij-klmnopqrst-abcdefghijklmnopqrst0] FAILED [ 33%]
+tests/channel_tests/channel_details_test.py::test_handles_generated_correctly[@bcdefgh!j-klmn opqrst-bcdefghjklmnopqrst-bcdefghj-klmnopqrst-bcdefghjklmnopqrst0] FAILED [ 35%]
+tests/channel_tests/channel_details_test.py::test_handles_generated_correctly[abc-def0-abcdef0-abc-def-abcdef1] FAILED [ 36%]
+tests/channel_tests/channel_details_test.py::test_non_channel_member_cant_get_details FAILED [ 38%]
+tests/channel_tests/channel_details_test.py::test_invalid_channel_id PASSED [ 39%]
+tests/channel_tests/channel_details_test.py::test_invalid_token PASSED   [ 40%]
+tests/channel_tests/channel_invite_test.py::test_error_when_already_member PASSED [ 42%]
+tests/channel_tests/channel_invite_test.py::test_inviting_global_owner FAILED [ 43%]
+tests/channel_tests/channel_invite_test.py::test_inviting_global_member FAILED [ 45%]
+tests/channel_tests/channel_invite_test.py::test_invitation_from_non_channel_member PASSED [ 46%]
+tests/channel_tests/channel_invite_test.py::test_channel_id_invalid PASSED [ 47%]
+tests/channel_tests/channel_invite_test.py::test_u_id_invalid FAILED     [ 49%]
+tests/channel_tests/channel_invite_test.py::test_invalid_token PASSED    [ 50%]
+tests/channel_tests/channel_join_test.py::test_global_owner_can_join_private_channel FAILED [ 52%]
+tests/channel_tests/channel_join_test.py::test_global_owner_can_join_public_channel FAILED [ 53%]
+tests/channel_tests/channel_join_test.py::test_global_member_can_join_public_channel FAILED [ 54%]
+tests/channel_tests/channel_join_test.py::test_global_member_cant_join_private_channel PASSED [ 56%]
+tests/channel_tests/channel_join_test.py::test_already_joined_channel PASSED [ 57%]
+tests/channel_tests/channel_join_test.py::test_join_invalid_channel_id PASSED [ 59%]
+tests/channel_tests/channel_join_test.py::test_invalid_token PASSED      [ 60%]
+tests/channel_tests/channel_messages_test.py::test_successful_no_messages FAILED [ 61%]
+tests/channel_tests/channel_messages_test.py::test_input_error_when_start_greater_than_message_num FAILED [ 63%]
+tests/channel_tests/channel_messages_test.py::test_access_error_when_user_is_non_member PASSED [ 64%]
+tests/channel_tests/channel_messages_test.py::test_input_error_when_channel_id_invalid PASSED [ 66%]
+tests/channel_tests/channel_messages_test.py::test_access_error_when_invalid_token_given PASSED [ 67%]
+tests/channels_tests/channels_create_test.py::test_create_channel_successful[True-andys room] FAILED [ 69%]
+tests/channels_tests/channels_create_test.py::test_create_channel_successful[False-andys room] FAILED [ 70%]
+tests/channels_tests/channels_create_test.py::test_channel_invalid_name_length[True-] PASSED [ 71%]
+tests/channels_tests/channels_create_test.py::test_channel_invalid_name_length[True-I AM NOT A TOY AND ALSO THIS NAME IS TOO LONG] PASSED [ 73%]
+tests/channels_tests/channels_create_test.py::test_channel_invalid_name_length[False-] PASSED [ 74%]
+tests/channels_tests/channels_create_test.py::test_channel_invalid_name_length[False-I AM NOT A TOY AND ALSO THIS NAME IS TOO LONG] PASSED [ 76%]
+tests/channels_tests/channels_create_test.py::test_invalid_token PASSED  [ 77%]
+tests/channels_tests/channels_list_test.py::test_when_member_is_in_no_channels PASSED [ 78%]
+tests/channels_tests/channels_list_test.py::test_channel_owner_in_channel[True-andy] PASSED [ 80%]
+tests/channels_tests/channels_list_test.py::test_channel_owner_in_channel[False-andy] PASSED [ 81%]
+tests/channels_tests/channels_list_test.py::test_channel_member_in_channel[True-andy] PASSED [ 83%]
+tests/channels_tests/channels_list_test.py::test_channel_member_in_channel[False-andy] PASSED [ 84%]
+tests/channels_tests/channels_list_test.py::test_user_in_multiple_channels[False-True-ZERG-andy] PASSED [ 85%]
+tests/channels_tests/channels_list_test.py::test_user_in_multiple_channels[False-False-ZERG-andy] PASSED [ 87%]
+tests/channels_tests/channels_list_test.py::test_user_in_multiple_channels[True-True-ZERG-andy] PASSED [ 88%]
+tests/channels_tests/channels_list_test.py::test_user_in_multiple_channels[True-False-ZERG-andy] PASSED [ 90%]
+tests/channels_tests/channels_list_test.py::test_invalid_token PASSED    [ 91%]
+tests/channels_tests/channels_listall_test.py::test_when_no_channels PASSED [ 92%]
+tests/channels_tests/channels_listall_test.py::test_when_one_channel_exists_private PASSED [ 94%]
+tests/channels_tests/channels_listall_test.py::test_when_one_channel_exists_public PASSED [ 95%]
+tests/channels_tests/channels_listall_test.py::test_when_multiple_channels_exist PASSED [ 97%]
+tests/channels_tests/channels_listall_test.py::test_invalid_token PASSED [ 98%]
+tests/other_tests/clear_test.py::test_cant_login_after_clear PASSED      [100%]
+
+====== Marks recorded: 24.12 ======
+
+
+=================================== FAILURES ===================================
+_________________ test_auth_register_pass_double_same_password _________________
+
+    def test_auth_register_pass_double_same_password():
+        assert is_valid(auth_register_v1(EMAIL, PASSWORD, FIRST, LAST))
+>       assert is_valid(auth_register_v1("second.email@domain.com", PASSWORD, "F2", "L2"))
+
+tests/auth_tests/auth_register_test.py:75: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/auth.py:95: in auth_register_v1
+    check_invalid_name(name_first, name_last, full_name)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name_first = 'F2', name_last = 'L2', full_name = 'F2L2'
+
+    def check_invalid_name(name_first, name_last, full_name):
+        """
+        tests if the given name is valid using the VALID_NAME_REGEX above and
+        checks if the names will create an invalid handle
+    
+        Arguments:
+            name_first (str) - a string that contains the user's first name
+            name_last (str)  - a string that contains the user's last name
+            full_name (str)  - a string that contains the user's first and last name
+    
+        Exceptions:
+            InputError - Occurs if the first and/or last name doesn't match the
+            VALID_NAME_REGEX, and if the fullname would create an invalid handle
+    
+        Return Value: N/A
+        """
+    
+        # check for invalid first name
+        if not re.fullmatch(VALID_NAME_REGEX, name_first):
+>           raise InputError('Invalid first name')
+E           src.error.InputError: Invalid first name
+
+src/auth.py:162: InputError
+______________________ test_channel_owner_can_get_details ______________________
+
+woodys_public_toybox = Channel(name='woodys toybox', is_public=True, channel_id=1, owner_members=[1], all_members=[])
+user_woody = User(email='sheriff.woody@andysroom.com', password='qazwsx!!', name_first='sheriff', name_last='woody', u_id=1, token=1)
+
+    def test_channel_owner_can_get_details(woodys_public_toybox, user_woody):
+        ch_deets = channel_details_v1(user_woody.token, woodys_public_toybox.channel_id)
+    
+        assert ch_deets['name'] == woodys_public_toybox.name
+        assert ch_deets['is_public'] == woodys_public_toybox.is_public
+    
+>       assert user_woody.u_id in [k['u_id'] for k in ch_deets['all_members']]
+
+tests/channel_tests/channel_details_test.py:28: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+.0 = <list_iterator object at 0x7f5974802ef0>
+
+>   assert user_woody.u_id in [k['u_id'] for k in ch_deets['all_members']]
+E   TypeError: 'int' object is not subscriptable
+
+tests/channel_tests/channel_details_test.py:28: TypeError
+_____________________ test_channel_member_can_get_details ______________________
+
+woodys_public_toybox = Channel(name='woodys toybox', is_public=True, channel_id=1, owner_members=[1], all_members=[])
+user_woody = User(email='sheriff.woody@andysroom.com', password='qazwsx!!', name_first='sheriff', name_last='woody', u_id=1, token=1)
+user_buzz = User(email='buzz.lightyear@starcommand.com', password='qazwsx@@', name_first='buzz', name_last='lightyear', u_id=2, token=2)
+
+    def test_channel_member_can_get_details(woodys_public_toybox, user_woody, user_buzz):
+        channel_join_v1(user_buzz.token, woodys_public_toybox.channel_id)
+        ch_deets = channel_details_v1(user_buzz.token, woodys_public_toybox.channel_id)
+    
+        assert ch_deets['name'] == woodys_public_toybox.name
+        assert ch_deets['is_public'] == woodys_public_toybox.is_public
+    
+>       assert user_woody.u_id in [k['u_id'] for k in ch_deets['all_members']]
+
+tests/channel_tests/channel_details_test.py:39: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+.0 = <list_iterator object at 0x7f597479fa58>
+
+>   assert user_woody.u_id in [k['u_id'] for k in ch_deets['all_members']]
+E   TypeError: 'int' object is not subscriptable
+
+tests/channel_tests/channel_details_test.py:39: TypeError
+_ test_handles_generated_correctly[abcdefghij-klmnopqrs-abcdefghijklmnopqrs-abcdefghij-klmnopqrs-abcdefghijklmnopqrs0] _
+
+first1 = 'abcdefghij', last1 = 'klmnopqrs', handle1 = 'abcdefghijklmnopqrs'
+first2 = 'abcdefghij', last2 = 'klmnopqrs', handle2 = 'abcdefghijklmnopqrs0'
+woodys_public_toybox = Channel(name='woodys toybox', is_public=True, channel_id=1, owner_members=[1], all_members=[])
+user_woody = User(email='sheriff.woody@andysroom.com', password='qazwsx!!', name_first='sheriff', name_last='woody', u_id=1, token=1)
+
+    @pytest.mark.parametrize('first1, last1, handle1, first2, last2, handle2', [
+        ('abcdefghij', 'klmnopqrs', 'abcdefghijklmnopqrs', 'abcdefghij', 'klmnopqrs', 'abcdefghijklmnopqrs0'),
+        ('abcdefghij', 'klmnopqrst', 'abcdefghijklmnopqrst', 'abcdefghij', 'klmnopqrst', 'abcdefghijklmnopqrst0'),
+        ('@bcdefgh!j', 'klmn opqrst', 'bcdefghjklmnopqrst', 'bcdefghj', 'klmnopqrst', 'bcdefghjklmnopqrst0'),
+        ('abc', 'def0', 'abcdef0', 'abc', 'def', 'abcdef1'),
+    ])
+    def test_handles_generated_correctly(first1, last1, handle1, first2, last2, handle2, woodys_public_toybox, user_woody):
+        email1 = 'blah1@email.com'
+        email2 = 'blah2@email.com'
+    
+        auth_register_v1('blah3@email.com', 'password1', 'abc', 'def')
+    
+        u_id1 = auth_register_v1(email1, 'password1', first1, last1)['auth_user_id']
+        channel_join_v1(u_id1, woodys_public_toybox.channel_id)
+    
+        u_id2 = auth_register_v1(email2, 'password1', first2, last2)['auth_user_id']
+        channel_join_v1(u_id2, woodys_public_toybox.channel_id)
+    
+        ch_deets = channel_details_v1(user_woody.token, woodys_public_toybox.channel_id)
+    
+        for k in ch_deets['all_members']:
+>           if k['u_id'] == u_id1:
+E           TypeError: 'int' object is not subscriptable
+
+tests/channel_tests/channel_details_test.py:67: TypeError
+_ test_handles_generated_correctly[abcdefghij-klmnopqrst-abcdefghijklmnopqrst-abcdefghij-klmnopqrst-abcdefghijklmnopqrst0] _
+
+first1 = 'abcdefghij', last1 = 'klmnopqrst', handle1 = 'abcdefghijklmnopqrst'
+first2 = 'abcdefghij', last2 = 'klmnopqrst', handle2 = 'abcdefghijklmnopqrst0'
+woodys_public_toybox = Channel(name='woodys toybox', is_public=True, channel_id=1, owner_members=[1], all_members=[])
+user_woody = User(email='sheriff.woody@andysroom.com', password='qazwsx!!', name_first='sheriff', name_last='woody', u_id=1, token=1)
+
+    @pytest.mark.parametrize('first1, last1, handle1, first2, last2, handle2', [
+        ('abcdefghij', 'klmnopqrs', 'abcdefghijklmnopqrs', 'abcdefghij', 'klmnopqrs', 'abcdefghijklmnopqrs0'),
+        ('abcdefghij', 'klmnopqrst', 'abcdefghijklmnopqrst', 'abcdefghij', 'klmnopqrst', 'abcdefghijklmnopqrst0'),
+        ('@bcdefgh!j', 'klmn opqrst', 'bcdefghjklmnopqrst', 'bcdefghj', 'klmnopqrst', 'bcdefghjklmnopqrst0'),
+        ('abc', 'def0', 'abcdef0', 'abc', 'def', 'abcdef1'),
+    ])
+    def test_handles_generated_correctly(first1, last1, handle1, first2, last2, handle2, woodys_public_toybox, user_woody):
+        email1 = 'blah1@email.com'
+        email2 = 'blah2@email.com'
+    
+        auth_register_v1('blah3@email.com', 'password1', 'abc', 'def')
+    
+        u_id1 = auth_register_v1(email1, 'password1', first1, last1)['auth_user_id']
+        channel_join_v1(u_id1, woodys_public_toybox.channel_id)
+    
+        u_id2 = auth_register_v1(email2, 'password1', first2, last2)['auth_user_id']
+        channel_join_v1(u_id2, woodys_public_toybox.channel_id)
+    
+        ch_deets = channel_details_v1(user_woody.token, woodys_public_toybox.channel_id)
+    
+        for k in ch_deets['all_members']:
+>           if k['u_id'] == u_id1:
+E           TypeError: 'int' object is not subscriptable
+
+tests/channel_tests/channel_details_test.py:67: TypeError
+_ test_handles_generated_correctly[@bcdefgh!j-klmn opqrst-bcdefghjklmnopqrst-bcdefghj-klmnopqrst-bcdefghjklmnopqrst0] _
+
+first1 = '@bcdefgh!j', last1 = 'klmn opqrst', handle1 = 'bcdefghjklmnopqrst'
+first2 = 'bcdefghj', last2 = 'klmnopqrst', handle2 = 'bcdefghjklmnopqrst0'
+woodys_public_toybox = Channel(name='woodys toybox', is_public=True, channel_id=1, owner_members=[1], all_members=[])
+user_woody = User(email='sheriff.woody@andysroom.com', password='qazwsx!!', name_first='sheriff', name_last='woody', u_id=1, token=1)
+
+    @pytest.mark.parametrize('first1, last1, handle1, first2, last2, handle2', [
+        ('abcdefghij', 'klmnopqrs', 'abcdefghijklmnopqrs', 'abcdefghij', 'klmnopqrs', 'abcdefghijklmnopqrs0'),
+        ('abcdefghij', 'klmnopqrst', 'abcdefghijklmnopqrst', 'abcdefghij', 'klmnopqrst', 'abcdefghijklmnopqrst0'),
+        ('@bcdefgh!j', 'klmn opqrst', 'bcdefghjklmnopqrst', 'bcdefghj', 'klmnopqrst', 'bcdefghjklmnopqrst0'),
+        ('abc', 'def0', 'abcdef0', 'abc', 'def', 'abcdef1'),
+    ])
+    def test_handles_generated_correctly(first1, last1, handle1, first2, last2, handle2, woodys_public_toybox, user_woody):
+        email1 = 'blah1@email.com'
+        email2 = 'blah2@email.com'
+    
+        auth_register_v1('blah3@email.com', 'password1', 'abc', 'def')
+    
+>       u_id1 = auth_register_v1(email1, 'password1', first1, last1)['auth_user_id']
+
+tests/channel_tests/channel_details_test.py:58: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/auth.py:95: in auth_register_v1
+    check_invalid_name(name_first, name_last, full_name)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name_first = '@bcdefgh!j', name_last = 'klmn opqrst'
+full_name = '@bcdefgh!jklmn opqrst'
+
+    def check_invalid_name(name_first, name_last, full_name):
+        """
+        tests if the given name is valid using the VALID_NAME_REGEX above and
+        checks if the names will create an invalid handle
+    
+        Arguments:
+            name_first (str) - a string that contains the user's first name
+            name_last (str)  - a string that contains the user's last name
+            full_name (str)  - a string that contains the user's first and last name
+    
+        Exceptions:
+            InputError - Occurs if the first and/or last name doesn't match the
+            VALID_NAME_REGEX, and if the fullname would create an invalid handle
+    
+        Return Value: N/A
+        """
+    
+        # check for invalid first name
+        if not re.fullmatch(VALID_NAME_REGEX, name_first):
+>           raise InputError('Invalid first name')
+E           src.error.InputError: Invalid first name
+
+src/auth.py:162: InputError
+______ test_handles_generated_correctly[abc-def0-abcdef0-abc-def-abcdef1] ______
+
+first1 = 'abc', last1 = 'def0', handle1 = 'abcdef0', first2 = 'abc'
+last2 = 'def', handle2 = 'abcdef1'
+woodys_public_toybox = Channel(name='woodys toybox', is_public=True, channel_id=1, owner_members=[1], all_members=[])
+user_woody = User(email='sheriff.woody@andysroom.com', password='qazwsx!!', name_first='sheriff', name_last='woody', u_id=1, token=1)
+
+    @pytest.mark.parametrize('first1, last1, handle1, first2, last2, handle2', [
+        ('abcdefghij', 'klmnopqrs', 'abcdefghijklmnopqrs', 'abcdefghij', 'klmnopqrs', 'abcdefghijklmnopqrs0'),
+        ('abcdefghij', 'klmnopqrst', 'abcdefghijklmnopqrst', 'abcdefghij', 'klmnopqrst', 'abcdefghijklmnopqrst0'),
+        ('@bcdefgh!j', 'klmn opqrst', 'bcdefghjklmnopqrst', 'bcdefghj', 'klmnopqrst', 'bcdefghjklmnopqrst0'),
+        ('abc', 'def0', 'abcdef0', 'abc', 'def', 'abcdef1'),
+    ])
+    def test_handles_generated_correctly(first1, last1, handle1, first2, last2, handle2, woodys_public_toybox, user_woody):
+        email1 = 'blah1@email.com'
+        email2 = 'blah2@email.com'
+    
+        auth_register_v1('blah3@email.com', 'password1', 'abc', 'def')
+    
+>       u_id1 = auth_register_v1(email1, 'password1', first1, last1)['auth_user_id']
+
+tests/channel_tests/channel_details_test.py:58: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/auth.py:95: in auth_register_v1
+    check_invalid_name(name_first, name_last, full_name)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+name_first = 'abc', name_last = 'def0', full_name = 'abcdef0'
+
+    def check_invalid_name(name_first, name_last, full_name):
+        """
+        tests if the given name is valid using the VALID_NAME_REGEX above and
+        checks if the names will create an invalid handle
+    
+        Arguments:
+            name_first (str) - a string that contains the user's first name
+            name_last (str)  - a string that contains the user's last name
+            full_name (str)  - a string that contains the user's first and last name
+    
+        Exceptions:
+            InputError - Occurs if the first and/or last name doesn't match the
+            VALID_NAME_REGEX, and if the fullname would create an invalid handle
+    
+        Return Value: N/A
+        """
+    
+        # check for invalid first name
+        if not re.fullmatch(VALID_NAME_REGEX, name_first):
+            raise InputError('Invalid first name')
+    
+        # check for invalid last name
+        if not re.fullmatch(VALID_NAME_REGEX, name_last):
+>           raise InputError('Invalid last name')
+E           src.error.InputError: Invalid last name
+
+src/auth.py:166: InputError
+___________________ test_non_channel_member_cant_get_details ___________________
+
+woodys_public_toybox = Channel(name='woodys toybox', is_public=True, channel_id=1, owner_members=[1], all_members=[])
+user_zerg = User(email='zerg.thedestroyer@zergworld.com', password='!!qazwsx', name_first='lord', name_last='zerg', u_id=2, token=2)
+
+    def test_non_channel_member_cant_get_details(woodys_public_toybox, user_zerg):
+        with pytest.raises(err.AccessError):
+>           channel_details_v1(user_zerg.token, woodys_public_toybox.channel_id)
+
+tests/channel_tests/channel_details_test.py:81: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+auth_user_id = 2, channel_id = 1
+
+    def channel_details_v1(auth_user_id, channel_id):
+        """
+        check if given user id and channel id are valid,
+        return details about the channel including channel name, publicity, owner
+        members and all members with given user id and channel id.
+    
+        Arguments:
+            auth_user_id (int)    - an integer that specifies user id
+            channel_id (int) - an integer that specifies channel id
+    
+        Exceptions:
+            InputError - Occurs if the user id does not exist in channel
+    
+        Return Value:
+            Returns a dictionary containing channel name, publicity of the channel,
+            owner members and all members if given user id and channel id are valid
+        """
+    
+        store = data_store.get()
+    
+        # see if given auth_user_id and channel_id are valid
+        check_valid_auth_id(auth_user_id)
+        check_valid_channel_id(channel_id)
+    
+        # is_member is a bool to check whether given user is in the given channel
+        is_member = check_user_is_member(auth_user_id, channel_id)
+        if is_member is False:
+>           raise InputError('User does not exist in channel')
+E           src.error.InputError: User does not exist in channel
+
+src/channel.py:82: InputError
+__________________________ test_inviting_global_owner __________________________
+
+user_woody = User(email='sheriff.woody@andysroom.com', password='qazwsx!!', name_first='sheriff', name_last='woody', u_id=1, token=1)
+user_zerg = User(email='zerg.thedestroyer@zergworld.com', password='!!qazwsx', name_first='lord', name_last='zerg', u_id=2, token=2)
+zergs_private_lair = Channel(name='zergs lair', is_public=False, channel_id=1, owner_members=[2], all_members=[])
+
+    def test_inviting_global_owner(user_woody, user_zerg, zergs_private_lair):
+        channel_invite_v1(user_zerg.token, zergs_private_lair.channel_id, user_woody.u_id)
+    
+        ch_deets = channel_details_v1(user_woody.token, zergs_private_lair.channel_id)
+    
+>       assert user_woody.u_id in [k['u_id'] for k in ch_deets['all_members']]
+
+tests/channel_tests/channel_invite_test.py:32: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+.0 = <list_iterator object at 0x7f59746fc588>
+
+>   assert user_woody.u_id in [k['u_id'] for k in ch_deets['all_members']]
+E   TypeError: 'int' object is not subscriptable
+
+tests/channel_tests/channel_invite_test.py:32: TypeError
+_________________________ test_inviting_global_member __________________________
+
+user_woody = User(email='sheriff.woody@andysroom.com', password='qazwsx!!', name_first='sheriff', name_last='woody', u_id=1, token=1)
+user_buzz = User(email='buzz.lightyear@starcommand.com', password='qazwsx@@', name_first='buzz', name_last='lightyear', u_id=2, token=2)
+woodys_public_toybox = Channel(name='woodys toybox', is_public=True, channel_id=1, owner_members=[1], all_members=[])
+
+    def test_inviting_global_member(user_woody, user_buzz, woodys_public_toybox):
+        channel_invite_v1(user_woody.token, woodys_public_toybox.channel_id, user_buzz.u_id)
+    
+        ch_deets = channel_details_v1(user_buzz.token, woodys_public_toybox.channel_id)
+    
+>       assert user_buzz.u_id in [k['u_id'] for k in ch_deets['all_members']]
+
+tests/channel_tests/channel_invite_test.py:41: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+.0 = <list_iterator object at 0x7f59747b5cc0>
+
+>   assert user_buzz.u_id in [k['u_id'] for k in ch_deets['all_members']]
+E   TypeError: 'int' object is not subscriptable
+
+tests/channel_tests/channel_invite_test.py:41: TypeError
+______________________________ test_u_id_invalid _______________________________
+
+user_woody = User(email='sheriff.woody@andysroom.com', password='qazwsx!!', name_first='sheriff', name_last='woody', u_id=1, token=1)
+woodys_public_toybox = Channel(name='woodys toybox', is_public=True, channel_id=1, owner_members=[1], all_members=[])
+
+    def test_u_id_invalid(user_woody, woodys_public_toybox):
+        with pytest.raises(err.InputError):
+>           channel_invite_v1(user_woody.token, woodys_public_toybox.channel_id, -1)
+
+tests/channel_tests/channel_invite_test.py:57: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/channel.py:41: in channel_invite_v1
+    check_valid_auth_id(u_id)# check the invitee is valid or not
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+auth_user_id = -1
+
+    def check_valid_auth_id(auth_user_id):
+        """
+        checks if the given auth_user_id is valid by checking if it is larger
+        than 0 and if it is found in the stored user data
+    
+        Arguments:
+            auth_user_id (int) - a int that represents a user
+    
+        Exceptions:
+            InputError - Occurs if auth_user_id is not of type int
+            AccessError - Occurs if auth_user_id is less than 1 or is not found
+            in the stored user data
+    
+        Return Value: N/A
+        """
+    
+        if isinstance(auth_user_id, int) is False:
+            raise InputError('User id is not of a valid type')
+    
+        if auth_user_id < 1:
+>           raise AccessError('The user id is not valid (out of bounds)')
+E           src.error.AccessError: The user id is not valid (out of bounds)
+
+src/other.py:53: AccessError
+__________________ test_global_owner_can_join_private_channel __________________
+
+user_woody = User(email='sheriff.woody@andysroom.com', password='qazwsx!!', name_first='sheriff', name_last='woody', u_id=1, token=1)
+zergs_private_lair = Channel(name='zergs lair', is_public=False, channel_id=1, owner_members=[2], all_members=[])
+
+    def test_global_owner_can_join_private_channel(user_woody, zergs_private_lair):
+>       channel_join_v1(user_woody.token, zergs_private_lair.channel_id)
+
+tests/channel_tests/channel_join_test.py:22: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/channel.py:189: in channel_join_v1
+    check_public_channel(channel_id) #check the channel whether is public
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+channel_id = 1
+
+    def check_public_channel(channel_id):
+        """
+        check the channel is public or not with channel id
+        return nothing
+    
+        Arguments:
+            channel_id (int) - an integer that specifies channel id
+    
+        Exceptions:
+            AccessError - Occurs if the channel(channel id == False) is private
+    
+        Return Value: N/A
+        """
+        store = data_store.get()
+    
+        channel = store['channels'][channel_id - 1]
+        if channel['is_public'] is False:
+>           raise AccessError('Channel is private')
+E           src.error.AccessError: Channel is private
+
+src/channel.py:247: AccessError
+__________________ test_global_owner_can_join_public_channel ___________________
+
+user_buzz = User(email='buzz.lightyear@starcommand.com', password='qazwsx@@', name_first='buzz', name_last='lightyear', u_id=1, token=1)
+woodys_public_toybox = Channel(name='woodys toybox', is_public=True, channel_id=1, owner_members=[2], all_members=[])
+
+    def test_global_owner_can_join_public_channel(user_buzz, woodys_public_toybox):
+        channel_join_v1(user_buzz.token, woodys_public_toybox.channel_id)
+    
+        ch_deets = channel_details_v1(user_buzz.token, woodys_public_toybox.channel_id)
+    
+>       assert user_buzz.u_id in [k['u_id'] for k in ch_deets['all_members']]
+
+tests/channel_tests/channel_join_test.py:35: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+.0 = <list_iterator object at 0x7f597476deb8>
+
+>   assert user_buzz.u_id in [k['u_id'] for k in ch_deets['all_members']]
+E   TypeError: 'int' object is not subscriptable
+
+tests/channel_tests/channel_join_test.py:35: TypeError
+__________________ test_global_member_can_join_public_channel __________________
+
+woodys_public_toybox = Channel(name='woodys toybox', is_public=True, channel_id=1, owner_members=[1], all_members=[])
+user_buzz = User(email='buzz.lightyear@starcommand.com', password='qazwsx@@', name_first='buzz', name_last='lightyear', u_id=2, token=2)
+
+    def test_global_member_can_join_public_channel(woodys_public_toybox, user_buzz):
+        channel_join_v1(user_buzz.token, woodys_public_toybox.channel_id)
+    
+        ch_deets = channel_details_v1(user_buzz.token, woodys_public_toybox.channel_id)
+    
+>       assert user_buzz.u_id in [k['u_id'] for k in ch_deets['all_members']]
+
+tests/channel_tests/channel_join_test.py:44: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+.0 = <list_iterator object at 0x7f597479f7f0>
+
+>   assert user_buzz.u_id in [k['u_id'] for k in ch_deets['all_members']]
+E   TypeError: 'int' object is not subscriptable
+
+tests/channel_tests/channel_join_test.py:44: TypeError
+_________________________ test_successful_no_messages __________________________
+
+woodys_public_toybox = Channel(name='woodys toybox', is_public=True, channel_id=1, owner_members=[1], all_members=[])
+user_woody = User(email='sheriff.woody@andysroom.com', password='qazwsx!!', name_first='sheriff', name_last='woody', u_id=1, token=1)
+
+    def test_successful_no_messages(woodys_public_toybox, user_woody):
+>       ch_msgs = channel_messages_v1(user_woody.token, woodys_public_toybox.channel_id, 0)
+
+tests/channel_tests/channel_messages_test.py:22: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+auth_user_id = 1, channel_id = 1, start = 0
+
+    def channel_messages_v1(auth_user_id, channel_id, start):
+        """
+        check if given user id and channel id are valid,
+        check start not overflow in channel,
+        return messages to a channel authorised user,
+        if too much messages do pagination operate.
+    
+        Arguments:
+            auth_user_id (int)    - an integer that specifies user id
+            channel_id (int) - an integer that specifies channel id
+            start (int) - an integer that specifies index for message
+    
+        Exceptions:
+            AccessError - Occurs if the user id does not exist in channel
+    
+        Return Value:
+            Returns a dictionary containing message_id, u_id, message, time_sent,
+            start and end if given user id and channel id are valid
+        """
+    
+        store = data_store.get()
+    
+        # see if given auth_user_id and channel_id are valid
+        check_valid_auth_id(auth_user_id)
+        check_valid_channel_id(channel_id)
+    
+        # is_member is a bool to check whether given user is in the given channel
+        is_member = check_user_is_member(auth_user_id, channel_id)
+        if is_member is False:
+            raise AccessError('User does not exist in channel')
+    
+        # message starts
+>       start_message = store['messages'][start]
+E       KeyError: 'messages'
+
+src/channel.py:127: KeyError
+_____________ test_input_error_when_start_greater_than_message_num _____________
+
+woodys_public_toybox = Channel(name='woodys toybox', is_public=True, channel_id=1, owner_members=[1], all_members=[])
+user_woody = User(email='sheriff.woody@andysroom.com', password='qazwsx!!', name_first='sheriff', name_last='woody', u_id=1, token=1)
+
+    def test_input_error_when_start_greater_than_message_num(woodys_public_toybox, user_woody):
+        with pytest.raises(err.InputError):
+>           channel_messages_v1(user_woody.token, woodys_public_toybox.channel_id, 21389429)
+
+tests/channel_tests/channel_messages_test.py:31: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+auth_user_id = 1, channel_id = 1, start = 21389429
+
+    def channel_messages_v1(auth_user_id, channel_id, start):
+        """
+        check if given user id and channel id are valid,
+        check start not overflow in channel,
+        return messages to a channel authorised user,
+        if too much messages do pagination operate.
+    
+        Arguments:
+            auth_user_id (int)    - an integer that specifies user id
+            channel_id (int) - an integer that specifies channel id
+            start (int) - an integer that specifies index for message
+    
+        Exceptions:
+            AccessError - Occurs if the user id does not exist in channel
+    
+        Return Value:
+            Returns a dictionary containing message_id, u_id, message, time_sent,
+            start and end if given user id and channel id are valid
+        """
+    
+        store = data_store.get()
+    
+        # see if given auth_user_id and channel_id are valid
+        check_valid_auth_id(auth_user_id)
+        check_valid_channel_id(channel_id)
+    
+        # is_member is a bool to check whether given user is in the given channel
+        is_member = check_user_is_member(auth_user_id, channel_id)
+        if is_member is False:
+            raise AccessError('User does not exist in channel')
+    
+        # message starts
+>       start_message = store['messages'][start]
+E       KeyError: 'messages'
+
+src/channel.py:127: KeyError
+_______________ test_create_channel_successful[True-andys room] ________________
+
+name = 'andys room', is_public = True
+user_zerg = User(email='zerg.thedestroyer@zergworld.com', password='!!qazwsx', name_first='lord', name_last='zerg', u_id=1, token=1)
+user_woody = User(email='sheriff.woody@andysroom.com', password='qazwsx!!', name_first='sheriff', name_last='woody', u_id=2, token=2)
+
+    @pytest.mark.parametrize('name', ['andys room'])
+    @pytest.mark.parametrize('is_public', [True, False])
+    def test_create_channel_successful(name, is_public, user_zerg, user_woody):
+        ch_id = channels_create_v1(user_zerg.token, name, is_public)['channel_id']
+        deets = channel_details_v1(user_zerg.token, ch_id)
+    
+        assert deets['name'] == name
+>       assert user_zerg.u_id in [memb['u_id'] for memb in deets['owner_members']]
+
+tests/channels_tests/channels_create_test.py:29: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+.0 = <list_iterator object at 0x7f59746fcb38>
+
+>   assert user_zerg.u_id in [memb['u_id'] for memb in deets['owner_members']]
+E   TypeError: 'int' object is not subscriptable
+
+tests/channels_tests/channels_create_test.py:29: TypeError
+_______________ test_create_channel_successful[False-andys room] _______________
+
+name = 'andys room', is_public = False
+user_zerg = User(email='zerg.thedestroyer@zergworld.com', password='!!qazwsx', name_first='lord', name_last='zerg', u_id=1, token=1)
+user_woody = User(email='sheriff.woody@andysroom.com', password='qazwsx!!', name_first='sheriff', name_last='woody', u_id=2, token=2)
+
+    @pytest.mark.parametrize('name', ['andys room'])
+    @pytest.mark.parametrize('is_public', [True, False])
+    def test_create_channel_successful(name, is_public, user_zerg, user_woody):
+        ch_id = channels_create_v1(user_zerg.token, name, is_public)['channel_id']
+        deets = channel_details_v1(user_zerg.token, ch_id)
+    
+        assert deets['name'] == name
+>       assert user_zerg.u_id in [memb['u_id'] for memb in deets['owner_members']]
+
+tests/channels_tests/channels_create_test.py:29: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+.0 = <list_iterator object at 0x7f59747a53c8>
+
+>   assert user_zerg.u_id in [memb['u_id'] for memb in deets['owner_members']]
+E   TypeError: 'int' object is not subscriptable
+
+tests/channels_tests/channels_create_test.py:29: TypeError
+=========================== short test summary info ============================
+FAILED tests/auth_tests/auth_register_test.py::test_auth_register_pass_double_same_password
+FAILED tests/channel_tests/channel_details_test.py::test_channel_owner_can_get_details
+FAILED tests/channel_tests/channel_details_test.py::test_channel_member_can_get_details
+FAILED tests/channel_tests/channel_details_test.py::test_handles_generated_correctly[abcdefghij-klmnopqrs-abcdefghijklmnopqrs-abcdefghij-klmnopqrs-abcdefghijklmnopqrs0]
+FAILED tests/channel_tests/channel_details_test.py::test_handles_generated_correctly[abcdefghij-klmnopqrst-abcdefghijklmnopqrst-abcdefghij-klmnopqrst-abcdefghijklmnopqrst0]
+FAILED tests/channel_tests/channel_details_test.py::test_handles_generated_correctly[@bcdefgh!j-klmn opqrst-bcdefghjklmnopqrst-bcdefghj-klmnopqrst-bcdefghjklmnopqrst0]
+FAILED tests/channel_tests/channel_details_test.py::test_handles_generated_correctly[abc-def0-abcdef0-abc-def-abcdef1]
+FAILED tests/channel_tests/channel_details_test.py::test_non_channel_member_cant_get_details
+FAILED tests/channel_tests/channel_invite_test.py::test_inviting_global_owner
+FAILED tests/channel_tests/channel_invite_test.py::test_inviting_global_member
+FAILED tests/channel_tests/channel_invite_test.py::test_u_id_invalid - src.er...
+FAILED tests/channel_tests/channel_join_test.py::test_global_owner_can_join_private_channel
+FAILED tests/channel_tests/channel_join_test.py::test_global_owner_can_join_public_channel
+FAILED tests/channel_tests/channel_join_test.py::test_global_member_can_join_public_channel
+FAILED tests/channel_tests/channel_messages_test.py::test_successful_no_messages
+FAILED tests/channel_tests/channel_messages_test.py::test_input_error_when_start_greater_than_message_num
+FAILED tests/channels_tests/channels_create_test.py::test_create_channel_successful[True-andys room]
+FAILED tests/channels_tests/channels_create_test.py::test_create_channel_successful[False-andys room]
+======================== 18 failed, 53 passed in 0.96s =========================
