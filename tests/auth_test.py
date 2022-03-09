@@ -70,6 +70,11 @@ def test_register_invalid_email(clear_and_register):
     # numbers after .
     with pytest.raises(InputError):
         auth_register_v1('abc@def.123', 'password', 'first', 'last')
+    
+    # name has no letters -> would create an empty handle
+    with pytest.raises(InputError):
+        auth_register_v1('abc@def.com', 'password', '-', ' ')
+
 
 # based on code Haydon wrote in project starter video
 def test_register_duplicate_email(clear_and_register):
@@ -132,26 +137,6 @@ def test_register_invalid_name(clear_and_register):
     # last name too long
     with pytest.raises(InputError):
         auth_register_v1('abc@def.com', 'password', 'first', NAME_52_CHARS)
-
-    # first name has symbols other than - and ' and spaces
-    with pytest.raises(InputError):
-        auth_register_v1('abc@def.com', 'password', 'first@', 'last')
-
-    # first name has numbers
-    with pytest.raises(InputError):
-        auth_register_v1('abc@def.com', 'password', 'first1', 'last')
-
-    # last name has symbols other than - and ' and spaces
-    with pytest.raises(InputError):
-        auth_register_v1('abc@def.com', 'password', 'first', 'last@')
-
-    # last name has numbers
-    with pytest.raises(InputError):
-        auth_register_v1('abc@def.com', 'password', 'first', 'last1')
-
-    # name has no letters -> would create an empty handle
-    with pytest.raises(InputError):
-        auth_register_v1('abc@def.com', 'password', '-', ' ')
 
 # based on code Hayden wrote in project starter video
 def test_register_works():

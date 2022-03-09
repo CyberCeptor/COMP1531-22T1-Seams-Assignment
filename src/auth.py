@@ -17,7 +17,6 @@ from src.error import InputError
 from src.data_store import data_store
 
 VALID_EMAIL_REGEX = r'^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}$'
-VALID_NAME_REGEX = r'^[a-zA-Z\'\-\s]{1,50}$'
 
 def auth_login_v1(email, password):
     """
@@ -104,6 +103,7 @@ def auth_register_v1(email, password, name_first, name_last):
         'first': name_first,
         'last': name_last,
         'handle': handle,
+        'perm_id': 1 if u_id == 1 else 2
     }
 
     # store the user information into the list of users
@@ -158,14 +158,14 @@ def check_invalid_name(name_first, name_last, full_name):
     """
 
     # check for invalid first name
-    if not re.fullmatch(VALID_NAME_REGEX, name_first):
+    if name_first == '' or len(name_first) > 50:
         raise InputError('Invalid first name')
 
     # check for invalid last name
-    if not re.fullmatch(VALID_NAME_REGEX, name_last):
+    if name_last == '' or len(name_last) > 50:
         raise InputError('Invalid last name')
 
-    # check for name that would create invalid handle i.e. no letters
+    # check for invalid full name
     count_alpha = 0
     for char in full_name:
         if char.isalpha() is True:
@@ -188,7 +188,7 @@ def create_handle(store, full_name):
     """
 
     # create a handle by removing any valid name symbols and lowering the case
-    handle = ''.join(char for char in full_name if char not in "'- ")
+    handle = ''.join(char for char in full_name if char.isalnum())
     handle = handle.lower()
 
     # slice the handle if it is too long
@@ -198,11 +198,11 @@ def create_handle(store, full_name):
     # iterates through stored handles and checks for duplicates
     duplicate_count = -1
     for user in store['users']:
-        # from https://stackoverflow.com/a/30315056
-        # strips numbers from a user's handle and compares it to the newly
-        # generated handle
-        to_compare = re.sub(r'\d+', '', user['handle'])
-        if to_compare == handle:
+        to_compare = user['handle']
+        if to_compare[-1].isnumeric() is True:
+            if to_compare.rstrip(to_compare[-1]) == handle:
+                duplicate_count += 1
+        elif to_compare == handle:
             duplicate_count += 1
 
     # if there are duplicates, add the corresponding number to the end of

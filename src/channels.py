@@ -127,10 +127,8 @@ def channels_create_v1(auth_user_id, name, is_public):
     if not isinstance(is_public, bool):
         raise InputError('The public/private value given is not of type bool')
 
-    # Test channel names for repition, unless public vs private.
     # Loops through data_store['channels'] to check channel names if they
-    # already exist and are of the same is_public (public/private) then cannot
-    # be created. Having two channles with the same name is fine,
+    # already exist. Having two channles with the same name is fine,
     # as long as they have different is_public values.
     for channel in store['channels']:
         if channel['name'] == name and channel['is_public'] == is_public:
@@ -140,13 +138,28 @@ def channels_create_v1(auth_user_id, name, is_public):
     # id.
     channel_id = len(store['channels']) + 1
 
+    for user in store['users']:
+        if user['id'] == auth_user_id:
+            user_info = user
+
     # Storing the channel information
     channel_data = {
         'channel_id': channel_id,
         'name': name,
-        'owner_members': [auth_user_id],
-        'all_members': [auth_user_id],
-        'global_owners': [auth_user_id],
+        'owner_members': [{
+            'u_id': user_info['id'],
+            'email': user_info['email'],
+            'name_first': user_info['first'],
+            'name_last': user_info['last'],
+            'handle_str': user_info['handle']
+        }],
+        'all_members': [{
+            'u_id': user_info['id'],
+            'email': user_info['email'],
+            'name_first': user_info['first'],
+            'name_last': user_info['last'],
+            'handle_str': user_info['handle']
+        }],
         'is_public': is_public,
     }
 
