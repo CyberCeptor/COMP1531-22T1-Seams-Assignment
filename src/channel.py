@@ -185,13 +185,13 @@ def channel_join_v1(auth_user_id, channel_id):
     if check_user_is_member(auth_user_id, channel_id) is True:
         raise InputError('Invitee is already in the channel')
 
-    #check the user whether is a global owner
-    #if the user is a global owner, add immediately, even this is a priavate
-    # channel
-    if check_user_is_global_owner(auth_user_id) is True:
-        add_invitee(auth_user_id, channel_id) # add user
-
-    check_public_channel(channel_id) #check the channel whether is public
+    # check if the user is a global owner
+    # if not, check if it is a private channel
+    if check_user_is_global_owner(auth_user_id) is False:
+        check_private_channel(channel_id) #check the channel whether is public
+    
+    # if the user is a global owner and the channel is private, or if the user
+    # is not a global owner and the channel is public, add them to the channel
     add_invitee(auth_user_id, channel_id) #add user
 
 def add_invitee(u_id, channel_id):
@@ -245,7 +245,7 @@ def check_user_is_global_owner(auth_user_id):
                 return True
     return False
 
-def check_public_channel(channel_id):
+def check_private_channel(channel_id):
     """
     check the channel is public or not with channel id
     return nothing
