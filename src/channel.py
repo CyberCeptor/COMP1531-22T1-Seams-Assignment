@@ -125,14 +125,18 @@ def channel_messages_v1(auth_user_id, channel_id, start):
     if is_member is False:
         raise AccessError('User does not exist in channel')
 
-    # get how many messages
-    total_messages = len(store['messages'])
+    # get how many messages in the channel
+    for channel in store['channels']:
+        if channel['channel_id'] == channel_id:
+            chan = channel
+
+    total_messages = len(chan['messages'])
 
     if start > total_messages:
         raise InputError('Invalid start, not enough messages')
 
     # message starts
-    start_message = store['messages'][start]
+    start_message = chan['messages'][start]
 
     # get end
     end = start + 50
@@ -149,11 +153,11 @@ def channel_messages_v1(auth_user_id, channel_id, start):
         if start == total_messages - 1: # if there is only 1 message
             messages_to_return.append(start_message)
         else:
-            for idx, message in store['messages']:
+            for idx, message in chan['messages']:
                 if idx >= start:
                     messages_to_return.append(message)
     else:
-        for idx, message in store['messages']:
+        for idx, message in chan['messages']:
             if start <= idx < end:
                 messages_to_return.append(message)
 

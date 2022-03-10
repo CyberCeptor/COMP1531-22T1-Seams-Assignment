@@ -29,11 +29,6 @@ def channels_list_v1(auth_user_id):
         Returns a dict containing the channel_id and name of the channels
         the user is a member of
     """
-    if not isinstance(auth_user_id, int):
-        raise InputError('The ID must be of type int')
-
-    if isinstance(auth_user_id, bool):
-        raise InputError('The ID must be of type int')
 
     check_valid_auth_id(auth_user_id)
 
@@ -161,6 +156,7 @@ def channels_create_v1(auth_user_id, name, is_public):
             'handle_str': user_info['handle']
         }],
         'is_public': is_public,
+        'messages': []
     }
 
     store['channels'].append(channel_data)
