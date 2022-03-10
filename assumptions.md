@@ -7,6 +7,7 @@ auth.py
 channels.py
 - channel name can contain any character
 - two channels can have the same name if they have a different is_public value
+- channel ids are of type integer
 
 channel.py
 - channel creator is the global owner

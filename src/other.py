@@ -11,9 +11,7 @@ Description: implementation for
         - checking if a channel_id is valid
         - checking if a user is a member of a channel
 """
-
 from src.error import InputError, AccessError
-
 from src.data_store import data_store
 
 def clear_v1():
