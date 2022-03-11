@@ -55,6 +55,12 @@ def test_channels_create_valid_auth_id(clear_and_register):
         channels_create_v1(-2, 'test_channel_public2', True)
     with pytest.raises(AccessError):
         channels_create_v1(-2, 'test_channel_private2', False)
+    with pytest.raises(InputError):
+        channels_create_v1('', 'test_channel_private2', False)
+    with pytest.raises(InputError):
+        channels_create_v1('not int', 'test_channel_private2', False)
+    with pytest.raises(InputError):
+        channels_create_v1(True, 'test_channel_private2', False)
 
 def test_channels_create_too_short(clear_and_register):
     """
@@ -71,9 +77,9 @@ def test_channels_create_too_short(clear_and_register):
     id1 = clear_and_register['auth_user_id']
     # Testing channel name is less than 1 character. Input Error
     with pytest.raises(InputError):
-        channels_create_v1(id1, "", True)
+        channels_create_v1(id1, '', True)
     with pytest.raises(InputError):
-        channels_create_v1(id1, "", False)
+        channels_create_v1(id1, '', False)
 
 def test_channels_create_invalid_name(clear_and_register):
     """
@@ -107,6 +113,8 @@ def test_channels_create_boolean(clear_and_register):
     id1 = clear_and_register['auth_user_id']
     with pytest.raises(InputError):
         channels_create_v1(id1, 'test_channel', 'Not a boolean')
+    with pytest.raises(InputError):
+        channels_create_v1(id1, 'test_channel', 1)
 
 def test_channels_duplicate_name(clear_and_register):
     """
@@ -148,10 +156,14 @@ def test_channels_list_valid_id():
     channels_create_v1(id1, 'test_channel', False)
     with pytest.raises(AccessError):
         channels_list_v1(2)
+    with pytest.raises(AccessError):
+        channels_list_v1(-2)
     with pytest.raises(InputError):
         channels_list_v1(True)
     with pytest.raises(InputError):
         channels_list_v1('String')
+    with pytest.raises(InputError):
+        channels_list_v1('')
 
 def test_channels_list_id_check():
     """
@@ -236,7 +248,7 @@ def fixture_clear_and_register_and_create():
     chan_id1 = channels_create_v1(1, 'channel_name', True)
     return [user1['auth_user_id'], chan_id1['channel_id']]
 
-def test_channels_listall_invalid_user(clear_and_register_and_create):
+def test_channels_listall_invalid_user_id(clear_and_register_and_create):
     """
     Testing invalid user id to raise input error
 
@@ -253,6 +265,12 @@ def test_channels_listall_invalid_user(clear_and_register_and_create):
         channels_listall_v1(-1)
     with pytest.raises(AccessError):
         channels_listall_v1(2)
+    with pytest.raises(InputError):
+        channels_listall_v1('4')
+    with pytest.raises(InputError):
+        channels_listall_v1('not int')
+    with pytest.raises(InputError):
+        channels_listall_v1(True)
 
 # testing if return values are the right type
 def test_channels_listall_v1_return(clear_and_register_and_create):
