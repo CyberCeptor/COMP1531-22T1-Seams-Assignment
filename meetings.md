@@ -67,3 +67,11 @@ feedback:
 - conftest files
 - more clear and descriptive commit messages
 8pm Mondays meeting, standup Wednesdays, tutlab Fridays
+
+14.03
+Members present: Aleesha, Aisha, Jenson, Van, Jed
+Meeting type: check-in
+to get done by Friday this week:
+- change tests to work with GET, POST requests for v2 of our functions
+next step:
+- start implementation on v2 functions
