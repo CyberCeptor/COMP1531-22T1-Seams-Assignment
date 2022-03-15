@@ -27,20 +27,32 @@ Example usage:
 """
 Our Implementation:
 data = {
-    'users' = [
+    'users' = [{
         'id': 1,
         'email': 'abc@def.com',
         'pw': 'password',
         'first': 'first',
         'last': 'last',
         'handle': 'firstlast',
-    ],
-    'channels' = [
+        'perm_id': 1,
+    }],
+    'channels' = [{
         'channel_id': 1,
         'name': 'channel_name',
-        'owner_members': [1],
-        'all_members': [1],
-        'global_owners': [1],
+        'owner_members': [{
+            'u_id': 1,
+            'email': 'abc@def.com',
+            'name_first': 'first',
+            'name_last': 'last',
+            'handle_str': 'firstlast',
+        }],
+        'all_members': [{
+            'u_id': 1,
+            'email': 'abc@def.com',
+            'name_first': 'first',
+            'name_last': 'last',
+            'handle_str': 'firstlast',
+        }],
         'is_public': is_public,
         'messages' = [
             'message_id': '1',
@@ -48,7 +60,7 @@ data = {
             'message': 'hewwo',
             'time_sent': '1582426789'
         ],
-    ],
+    }],
 }
 """
 
