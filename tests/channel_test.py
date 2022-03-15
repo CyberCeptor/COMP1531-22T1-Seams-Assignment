@@ -90,7 +90,7 @@ def test_channel_invite_invalid_inviter(clear_and_register_and_create):
     chan_id1 = clear_and_register_and_create[1]
     with pytest.raises(AccessError):
         channel_invite_v1(2, chan_id1, id1)
-    with pytest.raises(AccessError):
+    with pytest.raises(InputError):
         channel_invite_v1(-2, chan_id1, id1)
     with pytest.raises(InputError):
         channel_invite_v1(True, chan_id1, id1)
@@ -113,7 +113,7 @@ def test_channel_invite_invalid_invitee(clear_and_register_and_create):
     chan_id1 = clear_and_register_and_create[1]
     with pytest.raises(AccessError):
         channel_invite_v1(id1, chan_id1, 2)
-    with pytest.raises(AccessError):
+    with pytest.raises(InputError):
         channel_invite_v1(id1, chan_id1, -2)
     with pytest.raises(InputError):
         channel_invite_v1(id1, chan_id1, True)
@@ -186,7 +186,7 @@ def test_channel_invite_invalid_user_id(clear_and_register_and_create):
     chan_id1 = clear_and_register_and_create[1]
     with pytest.raises(AccessError):
         channel_join_v1(2, chan_id1)
-    with pytest.raises(AccessError):
+    with pytest.raises(InputError):
         channel_join_v1(-2, chan_id1)
     with pytest.raises(InputError):
         channel_join_v1(True, chan_id1)
@@ -285,7 +285,7 @@ def test_channel_details_invalid_user_id(clear_and_register_and_create):
     with pytest.raises(AccessError):
         channel_details_v1(2, chan_id1)
     # non exist user input
-    with pytest.raises(AccessError):
+    with pytest.raises(InputError):
         channel_details_v1(-1, chan_id1)
 
 def test_channel_details_invalid_channel(clear_and_register_and_create):
@@ -503,7 +503,7 @@ def test_channel_messages_invalid_user_id(clear_and_register_and_create):
     with pytest.raises(AccessError):
         channel_messages_v1(2, chan_id1, 0)
     # non exist user input
-    with pytest.raises(AccessError):
+    with pytest.raises(InputError):
         channel_messages_v1(-1, chan_id1, 0)
 
 clear_v1()

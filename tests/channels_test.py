@@ -51,9 +51,9 @@ def test_channels_create_valid_auth_id(clear_and_register):
         channels_create_v1(2, 'test_channel_public', True)
     with pytest.raises(AccessError):
         channels_create_v1(2, 'test_channel_private', False)
-    with pytest.raises(AccessError):
+    with pytest.raises(InputError):
         channels_create_v1(-2, 'test_channel_public2', True)
-    with pytest.raises(AccessError):
+    with pytest.raises(InputError):
         channels_create_v1(-2, 'test_channel_private2', False)
     with pytest.raises(InputError):
         channels_create_v1('', 'test_channel_private2', False)
@@ -156,7 +156,7 @@ def test_channels_list_valid_id():
     channels_create_v1(id1, 'test_channel', False)
     with pytest.raises(AccessError):
         channels_list_v1(2)
-    with pytest.raises(AccessError):
+    with pytest.raises(InputError):
         channels_list_v1(-2)
     with pytest.raises(InputError):
         channels_list_v1(True)
@@ -261,7 +261,7 @@ def test_channels_listall_invalid_user_id(clear_and_register_and_create):
     """
     # pylint: disable=unused-argument
 
-    with pytest.raises(AccessError):
+    with pytest.raises(InputError):
         channels_listall_v1(-1)
     with pytest.raises(AccessError):
         channels_listall_v1(2)

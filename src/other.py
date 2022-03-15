@@ -28,7 +28,6 @@ def clear_v1():
     store = data_store.get()
     store['users'] = []
     store['channels'] = []
-    store['messages'] = []
     data_store.set(store)
 
 def check_valid_auth_id(auth_user_id):
@@ -51,7 +50,7 @@ def check_valid_auth_id(auth_user_id):
         raise InputError('User id is not of a valid type')
 
     if auth_user_id < 1:
-        raise AccessError('The user id is not valid (out of bounds)')
+        raise InputError('The user id is not valid (out of bounds)')
 
     store = data_store.get()
     user_exists = False
