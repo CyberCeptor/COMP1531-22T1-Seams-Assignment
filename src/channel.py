@@ -137,7 +137,7 @@ def channel_messages_v1(auth_user_id, channel_id, start):
 
     if total_messages == 0:
         return {
-            'messages': messages_to_return,
+            'messages': [],
             'start': start,
             'end': -1,
         }
