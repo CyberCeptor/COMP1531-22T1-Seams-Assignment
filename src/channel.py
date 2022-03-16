@@ -135,8 +135,7 @@ def channel_messages_v1(auth_user_id, channel_id, start):
     if start > total_messages:
         raise InputError('Invalid start, not enough messages')
 
-    # if there are no messages to return
-    if len(chan['messages']) == 0:
+    if total_messages == 0:
         return {
             'messages': [],
             'start': start,
