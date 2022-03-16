@@ -50,13 +50,14 @@ def auth_login_v1(email, password):
             if stored_pw == password:
                 u_id = user['id']
             else: # email belongs to a user but incorrect password
-                raise InputError('Incorrect password')
+                raise InputError(description='Incorrect password')
 
     # if u_id = -1 then a user with given email does not exist
     if u_id == -1:
-        raise InputError('Email does not belong to a user')
+        raise InputError(description='Email does not belong to a user')
 
     return {
+        'token': '2',
         'auth_user_id': u_id,
     }
 
@@ -87,7 +88,7 @@ def auth_register_v1(email, password, name_first, name_last):
 
     # check for invalid password
     if len(password) < 6:
-        raise InputError('Password is too short')
+        raise InputError(description='Password is too short')
 
     # check for invalid name
     full_name = name_first + name_last
@@ -112,8 +113,8 @@ def auth_register_v1(email, password, name_first, name_last):
     data_store.set(store)
 
     return {
-        'auth_user_id': u_id,
         'token': '1',
+        'auth_user_id': u_id,
     }
 
 def check_invalid_email(store, valid_email_regex, email):
@@ -135,12 +136,12 @@ def check_invalid_email(store, valid_email_regex, email):
 
     # check for valid email address
     if not re.fullmatch(valid_email_regex, email):
-        raise InputError('Invalid email address')
+        raise InputError(description='Invalid email address')
 
     # check for duplicate email
     for user in store['users']:
         if user['email'] == email:
-            raise InputError('Email has already been taken')
+            raise InputError(description='Email has already been taken')
 
 def check_invalid_name(name_first, name_last, full_name):
     """
@@ -161,11 +162,11 @@ def check_invalid_name(name_first, name_last, full_name):
 
     # check for invalid first name
     if name_first == '' or len(name_first) > 50:
-        raise InputError('Invalid first name')
+        raise InputError(description='Invalid first name')
 
     # check for invalid last name
     if name_last == '' or len(name_last) > 50:
-        raise InputError('Invalid last name')
+        raise InputError(description='Invalid last name')
 
     # check for invalid full name
     count_alpha = 0
@@ -173,7 +174,7 @@ def check_invalid_name(name_first, name_last, full_name):
         if char.isalpha() is True:
             count_alpha += 1
     if count_alpha == 0:
-        raise InputError('Invalid name')
+        raise InputError(description='Invalid name')
 
 def create_handle(store, full_name):
     """
