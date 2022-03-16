@@ -6,13 +6,13 @@ Created: 24/02/2022 - 04/03/2022
 
 Description: pytests for auth_register_v1 and auth_login_v1
 """
+import json
 
 import pytest
 
-from src.auth import auth_login_v1, auth_register_v1
+import requests
 
-from src.other import clear_v1
-from src.error import InputError
+from src import config
 
 NAME_22_CHARS = 'abcdefghijklmnopqrstuv'
 NAME_52_CHARS = 'abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz'
@@ -28,8 +28,13 @@ def fixture_clear_and_register():
 
     Return Value: N/A """
 
-    clear_v1()
-    auth_register_v1('abc@def.com', 'password', 'first', 'last')
+    # clear_v1()
+    # auth_register_v1('abc@def.com', 'password', 'first', 'last')
+    requests.delete(config.url + 'clear/v1')
+
+    requests.post(config.url + 'auth/register/v2', 
+                  json={'email': 'abc@def.com', 'password': 'password',
+                        'name_first': 'first', 'name_last': 'last'})
 
 def test_register_invalid_email(clear_and_register):
     """ registers a user with an invalid email and raises an InputError for each
@@ -43,38 +48,69 @@ def test_register_invalid_email(clear_and_register):
     Return Value: N/A """
     # pylint: disable=unused-argument
 
+    # no email input
+    # with pytest.raises(InputError):
+    #     auth_register_v1('', 'password', 'first', 'last')
+    resp0 = requests.post(config.url + 'auth/register/v2',
+                         json={'email': '', 'password': 'password',
+                               'name_first': 'first', 'name_last': 'last'})
+    assert resp0.status_code == 400
+
     # missing @ and .
-    with pytest.raises(InputError):
-        auth_register_v1('abc', 'password', 'first', 'last')
+    # with pytest.raises(InputError):
+    #     auth_register_v1('abc', 'password', 'first', 'last')
+    resp1 = requests.post(config.url + 'auth/register/v2',
+                         json={'email': 'abc', 'password': 'password',
+                               'name_first': 'first', 'name_last': 'last'})
+    assert resp1.status_code == 400
 
     # missing @
-    with pytest.raises(InputError):
-        auth_register_v1('abc.def', 'password', 'first', 'last')
+    # with pytest.raises(InputError):
+    #     auth_register_v1('abc.def', 'password', 'first', 'last')
+    resp2 = requests.post(config.url + 'auth/register/v2',
+                         json={'email': 'abc.def', 'password': 'password',
+                               'name_first': 'first', 'name_last': 'last'})
+    assert resp2.status_code == 400
 
     # missing .
-    with pytest.raises(InputError):
-        auth_register_v1('abc@def', 'password', 'first', 'last')
+    # with pytest.raises(InputError):
+    #     auth_register_v1('abc@def', 'password', 'first', 'last')
+    resp3 = requests.post(config.url + 'auth/register/v2', 
+                         json={'email': 'abc@def', 'password': 'password',
+                               'name_first': 'first', 'name_last': 'last'})
+    assert resp3.status_code == 400
 
     # missing characters before @
-    with pytest.raises(InputError):
-        auth_register_v1('@def.com', 'password', 'first', 'last')
+    # with pytest.raises(InputError):
+    #     auth_register_v1('@def.com', 'password', 'first', 'last')
+    resp4 = requests.post(config.url + 'auth/register/v2', 
+                         json={'email': '@def.com', 'password': 'password',
+                               'name_first': 'first', 'name_last': 'last'})
+    assert resp4.status_code == 400
 
     # missing characters between @ and .
-    with pytest.raises(InputError):
-        auth_register_v1('abc@.com', 'password', 'first', 'last')
+    # with pytest.raises(InputError):
+    #     auth_register_v1('abc@.com', 'password', 'first', 'last')
+    resp5 = requests.post(config.url + 'auth/register/v2', 
+                         json={'email': 'abc@.com', 'password': 'password',
+                               'name_first': 'first', 'name_last': 'last'})
+    assert resp5.status_code == 400
 
     # missing characters after .
-    with pytest.raises(InputError):
-        auth_register_v1('abc@def.', 'password', 'first', 'last')
+    # with pytest.raises(InputError):
+    #     auth_register_v1('abc@def.', 'password', 'first', 'last')
+    resp6 = requests.post(config.url + 'auth/register/v2', 
+                         json={'email': 'abc@def.', 'password': 'password',
+                               'name_first': 'first', 'name_last': 'last'})
+    assert resp6.status_code == 400
 
     # numbers after .
-    with pytest.raises(InputError):
-        auth_register_v1('abc@def.123', 'password', 'first', 'last')
-    
-    # name has no letters -> would create an empty handle
-    with pytest.raises(InputError):
-        auth_register_v1('abc@def.com', 'password', '-', ' ')
-
+    # with pytest.raises(InputError):
+    #     auth_register_v1('abc@def.123', 'password', 'first', 'last')
+    resp7 = requests.post(config.url + 'auth/register/v2', 
+                         json={'email': 'abc@def.123', 'password': 'password',
+                               'name_first': 'first', 'name_last': 'last'})
+    assert resp7.status_code == 400
 
 # based on code Haydon wrote in project starter video
 def test_register_duplicate_email(clear_and_register):
@@ -90,9 +126,12 @@ def test_register_duplicate_email(clear_and_register):
     Return Value: N/A """
     # pylint: disable=unused-argument
 
-    with pytest.raises(InputError):
-        auth_register_v1('abc@def.com', 'password', 'first', 'last')
-    clear_v1()
+    # with pytest.raises(InputError):
+    #     auth_register_v1('abc@def.com', 'password', 'first', 'last')
+    resp = requests.post(config.url + 'auth/register/v2', 
+                         json={'email': 'abc@def.com', 'password': 'password',
+                               'name_first': 'first', 'name_last': 'last'})
+    assert resp.status_code == 400
 
 def test_register_invalid_password(clear_and_register):
     """ registers a user with an invalid password i.e one that is too short and
@@ -107,8 +146,12 @@ def test_register_invalid_password(clear_and_register):
     # pylint: disable=unused-argument
 
     # password too short
-    with pytest.raises(InputError):
-        auth_register_v1('abc@def.com', 'pass', 'first', 'last')
+    # with pytest.raises(InputError):
+    #     auth_register_v1('abc@def.com', 'pass', 'first', 'last')
+    resp = requests.post(config.url + 'auth/register/v2', 
+                         json={'email': 'def@ghi.com', 'password': 'pass',
+                               'name_first': 'first', 'name_last': 'last'})
+    assert resp.status_code == 400
 
 def test_register_invalid_name(clear_and_register):
     """ registers a user with an invalid name and raises an InputError for each
@@ -123,43 +166,87 @@ def test_register_invalid_name(clear_and_register):
     # pylint: disable=unused-argument
 
     # first name too short
-    with pytest.raises(InputError):
-        auth_register_v1('abc@def.com', 'password', '', 'last')
+    # with pytest.raises(InputError):
+    #     auth_register_v1('abc@def.com', 'password', '', 'last')
+    resp0 = requests.post(config.url + 'auth/register/v2', 
+                         json={'email': 'def@ghi.com', 'password': 'password',
+                               'name_first': '', 'name_last': 'last'})
+    assert resp0.status_code == 400
 
     # last name too short
-    with pytest.raises(InputError):
-        auth_register_v1('abc@def.com', 'password', 'first', '')
+    # with pytest.raises(InputError):
+    #     auth_register_v1('abc@def.com', 'password', 'first', '')
+    resp1 = requests.post(config.url + 'auth/register/v2', 
+                         json={'email': 'def@ghi.com', 'password': 'password',
+                               'name_first': 'first', 'name_last': ''})
+    assert resp1.status_code == 400
 
     # first name too long
-    with pytest.raises(InputError):
-        auth_register_v1('abc@def.com', 'password', NAME_52_CHARS, 'last')
+    # with pytest.raises(InputError):
+    #     auth_register_v1('abc@def.com', 'password', NAME_52_CHARS, 'last')
+    resp2 = requests.post(config.url + 'auth/register/v2', 
+                         json={'email': 'def@ghi.com', 'password': 'password',
+                               'name_first': NAME_52_CHARS, 'name_last': 'last'}
+                        )
+    assert resp2.status_code == 400
 
     # last name too long
-    with pytest.raises(InputError):
-        auth_register_v1('abc@def.com', 'password', 'first', NAME_52_CHARS)
+    # with pytest.raises(InputError):
+    #     auth_register_v1('abc@def.com', 'password', 'first', NAME_52_CHARS)
+    resp3 = requests.post(config.url + 'auth/register/v2', 
+                         json={'email': 'def@ghi.com', 'password': 'password',
+                               'name_first': 'first',
+                               'name_last': NAME_52_CHARS})
+    assert resp3.status_code == 400
+
+    # name has no letters -> would create an empty handle
+    # with pytest.raises(InputError):
+    #     auth_register_v1('abc@def.com', 'password', '-', ' ')
+    resp4 = requests.post(config.url + 'auth/register/v2', 
+                         json={'email': 'def@ghi.com', 'password': 'password',
+                               'name_first': '-', 'name_last': ' '})
+    assert resp4.status_code == 400
 
 # based on code Hayden wrote in project starter video
-def test_register_works():
-    """ tests if auth_register_v1 works by registering a user and logging them
-    in
+# def test_register_works():
+#     """ tests if auth_register_v1 works by registering a user and logging them
+#     in
 
-    Arguments: N/A
+#     Arguments: N/A
 
-    Exceptions: N/A
+#     Exceptions: N/A
 
-    Return Value: N/A """
+#     Return Value: N/A """
 
-    clear_v1()
-    register_return = auth_register_v1('abc@def.com', 'password',
-                                       'first', 'last')
-    auth_user_id1 = register_return['auth_user_id']
+#     # clear_v1()
+#     # register_return = auth_register_v1('abc@def.com', 'password',
+#     #                                    'first', 'last')
+#     # auth_user_id1 = register_return['auth_user_id']
+#     requests.delete(config.url + 'clear/v1')
+#     requests.post(config.url + 'auth/register/v2', 
+#                   json={'email': 'abc@def.com', 'password': 'password',
+#                         'name_first': 'first', 'last_name': 'last'})
 
-    login_return = auth_login_v1('abc@def.com', 'password')
-    auth_user_id2 = login_return['auth_user_id']
+#     # get user data for the user that was just registered
+#     register = requests.get(config.url + 'users/all/v1')
+#     register_data = json.loads(register.text)
+#     assert len(register_data) == 1
+#     register_id = register_data[0]['auth_user_id']
 
-    # if user_id's are identical, then it is a vald login
-    assert auth_user_id1 == auth_user_id2
-    clear_v1()
+#     # login_return = auth_login_v1('abc@def.com', 'password')
+#     # auth_user_id2 = login_return['auth_user_id']
+#     requests.post(config.url + 'auth/login/v2', 
+#                   json={'token': 'abc@def.com', 'password': 'password'})
+
+#     # get current user data after logging in
+#     login = requests.get(config.url + 'users/all/v1')
+#     login_data = json.loads(login.text)
+#     assert len(login_data) == 1
+#     login_id = login_data[0]['auth_user_id']
+
+#     # if auth_user_ids are identical, it is a valid login
+#     # assert auth_user_id1 == auth_user_id2
+#     assert register_id == login_id
 
 def test_login_invalid(clear_and_register):
     """ logs a user in and raises an InputError for each invalid case
@@ -174,11 +261,18 @@ def test_login_invalid(clear_and_register):
     # pylint: disable=unused-argument
 
     # email does not belong to a user
-    with pytest.raises(InputError):
-        auth_login_v1('ghi@jkl.com', 'password')
+    # with pytest.raises(InputError):
+    #     auth_login_v1('ghi@jkl.com', 'password')
+    resp0 = requests.post(config.url + 'auth/login/v2', 
+                          json={'email': 'ghi@jkl.com', 'password': 'password'})
+    assert resp0.status_code == 400
 
     # incorrect password
-    with pytest.raises(InputError):
-        auth_login_v1('abc@def.com', 'wordpass')
+    # with pytest.raises(InputError):
+    #     auth_login_v1('abc@def.com', 'wordpass')
+    resp1 = requests.post(config.url + 'auth/login/v2', 
+                          json={'email': 'abc@def.com', 'password': 'wordpass'})
+    assert resp1.status_code == 400
 
-clear_v1()
+# clear_v1()
+requests.delete(config.url + 'clear/v1')
