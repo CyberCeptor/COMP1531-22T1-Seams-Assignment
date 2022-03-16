@@ -35,10 +35,7 @@ data = {
         'last': 'last',
         'handle': 'firstlast',
         'perm_id': 1,
-<<<<<<< HEAD
         'token': 'dunno yet',
-=======
->>>>>>> master
     }],
     'channels' = [{
         'channel_id': 1,
