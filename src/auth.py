@@ -103,7 +103,8 @@ def auth_register_v1(email, password, name_first, name_last):
         'first': name_first,
         'last': name_last,
         'handle': handle,
-        'perm_id': 1 if u_id == 1 else 2
+        'perm_id': 1 if u_id == 1 else 2,
+        'token': '1',
     }
 
     # store the user information into the list of users
@@ -112,6 +113,7 @@ def auth_register_v1(email, password, name_first, name_last):
 
     return {
         'auth_user_id': u_id,
+        'token': '1',
     }
 
 def check_invalid_email(store, valid_email_regex, email):
