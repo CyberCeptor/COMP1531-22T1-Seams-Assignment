@@ -208,45 +208,47 @@ def test_register_invalid_name(clear_and_register):
     assert resp4.status_code == 400
 
 # based on code Hayden wrote in project starter video
-# def test_register_works():
-#     """ tests if auth_register_v1 works by registering a user and logging them
-#     in
+def test_register_works():
+    """ tests if auth_register_v1 works by registering a user and logging them
+    in
 
-#     Arguments: N/A
+    Arguments: N/A
 
-#     Exceptions: N/A
+    Exceptions: N/A
 
-#     Return Value: N/A """
+    Return Value: N/A """
 
-#     # clear_v1()
-#     # register_return = auth_register_v1('abc@def.com', 'password',
-#     #                                    'first', 'last')
-#     # auth_user_id1 = register_return['auth_user_id']
-#     requests.delete(config.url + 'clear/v1')
-#     requests.post(config.url + 'auth/register/v2', 
-#                   json={'email': 'abc@def.com', 'password': 'password',
-#                         'name_first': 'first', 'last_name': 'last'})
+    # clear_v1()
+    # register_return = auth_register_v1('abc@def.com', 'password',
+    #                                    'first', 'last')
+    # auth_user_id1 = register_return['auth_user_id']
+    requests.delete(config.url + 'clear/v1')
+    resp0 = requests.post(config.url + 'auth/register/v2', 
+                         json={'email': 'abc@def.com', 'password': 'password',
+                               'name_first': 'first', 'name_last': 'last'})
+    assert resp0.status_code == 200
 
-#     # get user data for the user that was just registered
-#     register = requests.get(config.url + 'users/all/v1')
-#     register_data = json.loads(register.text)
-#     assert len(register_data) == 1
-#     register_id = register_data[0]['auth_user_id']
+    register_data = resp0.json()
+    print(register_data)
+    register_token = register_data['token']
+    register_id = register_data['auth_user_id']
 
-#     # login_return = auth_login_v1('abc@def.com', 'password')
-#     # auth_user_id2 = login_return['auth_user_id']
-#     requests.post(config.url + 'auth/login/v2', 
-#                   json={'token': 'abc@def.com', 'password': 'password'})
+    # login_return = auth_login_v1('abc@def.com', 'password')
+    # auth_user_id2 = login_return['auth_user_id']
+    resp1 = requests.post(config.url + 'auth/login/v2', 
+                  json={'email': 'abc@def.com', 'password': 'password'})
+    assert resp1.status_code == 200
 
-#     # get current user data after logging in
-#     login = requests.get(config.url + 'users/all/v1')
-#     login_data = json.loads(login.text)
-#     assert len(login_data) == 1
-#     login_id = login_data[0]['auth_user_id']
+    login_data = resp1.json()
+    login_token = login_data['token']
+    login_id = login_data['auth_user_id']
 
-#     # if auth_user_ids are identical, it is a valid login
-#     # assert auth_user_id1 == auth_user_id2
-#     assert register_id == login_id
+    # if auth_user_ids are identical and token generated from registering is
+    # different from token generated
+    # from logging in, then it is a valid login
+    # assert auth_user_id1 == auth_user_id2
+    assert register_id == login_id
+    assert register_token != login_token
 
 def test_login_invalid(clear_and_register):
     """ logs a user in and raises an InputError for each invalid case
