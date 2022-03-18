@@ -9,6 +9,10 @@ Description: pytests for channels_create_v1
 
 import pytest
 
+import config
+
+import requests
+
 from src.auth import auth_register_v1
 
 from src.other import clear_v1
@@ -27,14 +31,50 @@ def fixture_clear_and_register():
 
     Return Value: N/A
     """
-    clear_v1()
-    user1 = auth_register_v1('abc@def.com', 'password', 'first', 'last')
-    return user1
+    # clear_v1()
+    # user1 = auth_register_v1('abc@def.com', 'password', 'first', 'last')
+    # return user1
+    requests.delete(config.url + 'clear/v1')
+    resp = requests.post(config.url + 'auth/register/v2', 
+                         json={'email': 'abc@def.com', 'password': 'password',
+                               'name_first': 'first', 'name_last': 'last'})
+    data = resp.json()
+    token = data['token']
+    return token
 
-def test_channels_create_valid_auth_id(clear_and_register):
+# def test_channels_create_valid_auth_id(clear_and_register):
+#     """
+#     Registers a valid user, and them
+#     attempts to create 4 channels with unregistered user_id's,
+#     both public and private channels.
+
+#     Arguments: clear_and_register
+
+#     Exceptions:
+#         AccessError - Raised for all tests below
+
+#     Return Value: N/A
+#     """
+#     # pylint: disable=unused-argument
+#     with pytest.raises(AccessError):
+#         channels_create_v1(2, 'test_channel_public', True)
+#     with pytest.raises(AccessError):
+#         channels_create_v1(2, 'test_channel_private', False)
+#     with pytest.raises(InputError):
+#         channels_create_v1(-2, 'test_channel_public2', True)
+#     with pytest.raises(InputError):
+#         channels_create_v1(-2, 'test_channel_private2', False)
+#     with pytest.raises(InputError):
+#         channels_create_v1('', 'test_channel_private2', False)
+#     with pytest.raises(InputError):
+#         channels_create_v1('not int', 'test_channel_private2', False)
+#     with pytest.raises(InputError):
+#         channels_create_v1(True, 'test_channel_private2', False)
+
+def test_channels_create_valid_token(clear_and_register):
     """
     Registers a valid user, and them
-    attempts to create 4 channels with unregistered user_id's,
+    attempts to create multipole channels with invalid token values,
     both public and private channels.
 
     Arguments: clear_and_register
@@ -45,20 +85,40 @@ def test_channels_create_valid_auth_id(clear_and_register):
     Return Value: N/A
     """
     # pylint: disable=unused-argument
-    with pytest.raises(AccessError):
-        channels_create_v1(2, 'test_channel_public', True)
-    with pytest.raises(AccessError):
-        channels_create_v1(2, 'test_channel_private', False)
-    with pytest.raises(InputError):
-        channels_create_v1(-2, 'test_channel_public2', True)
-    with pytest.raises(InputError):
-        channels_create_v1(-2, 'test_channel_private2', False)
-    with pytest.raises(InputError):
-        channels_create_v1('', 'test_channel_private2', False)
-    with pytest.raises(InputError):
-        channels_create_v1('not int', 'test_channel_private2', False)
-    with pytest.raises(InputError):
-        channels_create_v1(True, 'test_channel_private2', False)
+    # token is an integer value
+    resp0 = requests.post(config.url + 'channels/create/v2', 
+                          json={'token': 2, 'name': 'test_channel_public',
+                                'is_public': True})
+    assert resp0.status_code == 400
+
+    resp1 = requests.post(config.url + 'channels/create/v2', 
+                          json={'token': 2, 'name': 'test_channel_private',
+                                'is_public': False})
+    assert resp1.status_code == 400
+
+    # token is a boolean value
+    resp2 = requests.post(config.url + 'channels/create/v2', 
+                          json={'token': True, 'name': 'test_channel_public',
+                                'is_public': True})
+    assert resp2.status_code == 400
+
+    resp3 = requests.post(config.url + 'channels/create/v2', 
+                          json={'token': True, 'name': 'test_channel_private',
+                                'is_public': False})
+    assert resp3.status_code == 400
+
+    # token is a string but not a jwt token string
+    resp4 = requests.post(config.url + 'channels/create/v2', 
+                          json={'token': 'normal_string',
+                                'name': 'test_channel_public',
+                                'is_public': True})
+    assert resp4.status_code == 403
+
+    resp5 = requests.post(config.url + 'channels/create/v2', 
+                          json={'token': 'normal_string',
+                                'name': 'test_channel_private',
+                                'is_public': False})
+    assert resp5.status_code == 403
 
 def test_channels_create_too_short(clear_and_register):
     """
@@ -72,12 +132,20 @@ def test_channels_create_too_short(clear_and_register):
 
     Return Value:   N/A
     """
-    id1 = clear_and_register['auth_user_id']
-    # Testing channel name is less than 1 character. Input Error
-    with pytest.raises(InputError):
-        channels_create_v1(id1, '', True)
-    with pytest.raises(InputError):
-        channels_create_v1(id1, '', False)
+    # id1 = clear_and_register['auth_user_id']
+    # # Testing channel name is less than 1 character. Input Error
+    # with pytest.raises(InputError):
+    #     channels_create_v1(id1, '', True)
+    # with pytest.raises(InputError):
+    #     channels_create_v1(id1, '', False)
+    token = clear_and_register
+    resp0 = requests.post(config.url + 'channels/create/v2', 
+                          json={'token': token, 'name': '', 'is_public': True})
+    assert resp0.status_code == 400
+
+    resp1 = requests.post(config.url + 'channels/create/v2', 
+                          json={'token': token, 'name': '', 'is_public': False})
+    assert resp1.status_code == 400
 
 def test_channels_create_invalid_name(clear_and_register):
     """
@@ -90,11 +158,21 @@ def test_channels_create_invalid_name(clear_and_register):
 
     Return Value:   N/A
     """
-    id1 = clear_and_register['auth_user_id']
-    with pytest.raises(InputError):
-        channels_create_v1(id1, 'MoreThan20CharPublic!', True)
-    with pytest.raises(InputError):
-        channels_create_v1(id1, 'MoreThan20CharPrivate', False)
+    # id1 = clear_and_register['auth_user_id']
+    # with pytest.raises(InputError):
+    #     channels_create_v1(id1, 'MoreThan20CharPublic!', True)
+    # with pytest.raises(InputError):
+    #     channels_create_v1(id1, 'MoreThan20CharPrivate', False)
+    token = clear_and_register
+    resp0 = requests.post(config.url + 'channels/create/v2', 
+                          json={'token': token, 'name': 'MoreThan20CharPublic!',
+                                'is_public': True})
+    assert resp0.status_code == 400
+
+    resp1 = requests.post(config.url + 'channels/create/v2', 
+                          json={'token': token, 'name': 'MoreThan20CharPrivat',
+                                'is_public': False})
+    assert resp1.status_code == 400
 
 def test_channels_create_boolean(clear_and_register):
     """
