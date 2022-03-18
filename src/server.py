@@ -88,6 +88,7 @@ def login():
         'auth_user_id': user['auth_user_id']
     })
 
+
 @APP.route('/clear/v1', methods=['DELETE'])
 def clear():
     clear_v1()
