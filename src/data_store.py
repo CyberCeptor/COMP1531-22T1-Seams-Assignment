@@ -61,6 +61,12 @@ data = {
             'time_sent': '1582426789'
         ],
     }],
+    'tokens' = [{
+        'user_id': user_data['id'],
+        'session_id': SESSION_ID_COUNTER,
+        'token': token,
+        'time': datetime.datetime.now(),
+    }],
 }
 """
 

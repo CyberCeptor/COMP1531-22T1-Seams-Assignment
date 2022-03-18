@@ -17,7 +17,6 @@ import jwt, datetime
 
 TOKEN_CODE = 'hotpot'
 algorithm = 'HS256'
-VALID_TOKENS = []
 SESSION_ID_COUNTER = 0
 
 def clear_v1():
@@ -132,7 +131,7 @@ def token_generate(user_data):
     token = jwt.encode({'id': user_data['id'], 'session_id': SESSION_ID_COUNTER, 'handle': user_data['handle']}, TOKEN_CODE, algorithm=algorithm)
     
     token_dict = {
-        'user_id': 'id',
+        'user_id': user_data['id'],
         'session_id': SESSION_ID_COUNTER,
         'token': token,
         'time': datetime.datetime.now(),
