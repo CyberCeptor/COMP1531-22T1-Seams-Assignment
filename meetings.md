@@ -75,3 +75,11 @@ to get done by Friday this week:
 - change tests to work with GET, POST requests for v2 of our functions
 next step:
 - start implementation on v2 functions
+
+18.03
+Members present: Aleesha, Aisha, Jenson, Van, Jed
+Meeting type: Lab
+- complete at least v2 functions by Tuesday for first autotests
+- push regularly
+- create new http functions in server.py for now and we can separate later if needed
+- keeping Monday 8pm meeting, Wednesday standup, Friday meeting schedule unless we want more during flexi week
