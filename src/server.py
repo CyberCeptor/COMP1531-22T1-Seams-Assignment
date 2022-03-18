@@ -101,6 +101,17 @@ def login():
 #         raise AccessError(description='Token is not valid')
 #     return dumps({})
 
+# @APP.route('/users/all/v1', methods=['GET'])
+# def get_users():
+#     token = request.args.get('token')
+
+#     # check that token is valid
+#     return dumps({
+#         'users': [{k, data_store[k]} for k in
+#                   ['u_id', 'email', 'name_first', 'name_last', 'handle_str']
+#                   if k in data_store]
+#     })
+
 @APP.route('/clear/v1', methods=['DELETE'])
 def clear():
     clear_v1()
