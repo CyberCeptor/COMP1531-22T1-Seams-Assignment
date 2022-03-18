@@ -1,5 +1,8 @@
 import sys
 import signal
+
+import pickle
+
 from json import dumps
 from flask import Flask, request
 from flask_cors import CORS
@@ -32,6 +35,21 @@ APP.register_error_handler(Exception, defaultHandler)
 
 #### NO NEED TO MODIFY ABOVE THIS POINT, EXCEPT IMPORTS
 
+data_store = []
+try:
+    data = pickle.load(open('datastore.p'), 'rb')
+except Exception:
+    pass
+
+def get_data():
+    global data_store
+    return data_store
+
+def save_data():
+    data = get_data()
+    with open('datastore.p', 'wb') as FILE:
+        pickle.dump(data, FILE)
+
 # Example
 # http://127.0.0.1:1337/hello
 # body -> hewwo!
@@ -45,7 +63,7 @@ def hello():
 def echo():
     data = request.args.get('data')
     if data == 'echo':
-   	    raise InputError(description='Cannot echo "echo"')
+        raise InputError(description='Cannot echo "echo"')
     return dumps({
         'data': data
     })
