@@ -218,6 +218,10 @@ def test_channels_list_v1():
 
     clear_v1()
 
+
+
+
+
 @pytest.fixture(name='clear_and_register_and_create')
 def fixture_clear_and_register_and_create():
     """
