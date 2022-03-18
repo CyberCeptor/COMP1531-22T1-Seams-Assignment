@@ -229,7 +229,6 @@ def test_register_works():
     assert resp0.status_code == 200
 
     register_data = resp0.json()
-    print(register_data)
     register_token = register_data['token']
     register_id = register_data['auth_user_id']
 
