@@ -186,11 +186,21 @@ def test_channels_create_boolean(clear_and_register):
 
     Return Value:   N/A
     """
-    id1 = clear_and_register['auth_user_id']
-    with pytest.raises(InputError):
-        channels_create_v1(id1, 'test_channel', 'Not a boolean')
-    with pytest.raises(InputError):
-        channels_create_v1(id1, 'test_channel', 1)
+    # id1 = clear_and_register['auth_user_id']
+    # with pytest.raises(InputError):
+    #     channels_create_v1(id1, 'test_channel', 'Not a boolean')
+    # with pytest.raises(InputError):
+    #     channels_create_v1(id1, 'test_channel', 1)
+    token = clear_and_register
+    resp0 = requests.post(config.url + 'channels/create/v2', 
+                          json={'token': token, 'name': 'test_channel',
+                                'is_public': 'Not a boolean'})
+    assert resp0.status_code == 400
+
+    resp1 = requests.post(config.url + 'channels/create/v2', 
+                          json={'token': token, 'name': 'test_channel',
+                                'is_public': 1})
+    assert resp1.status_code == 400
 
 def test_channels_duplicate_name(clear_and_register):
     """
@@ -202,13 +212,34 @@ def test_channels_duplicate_name(clear_and_register):
     Exceptions:
         InputError  -   Raised for all test cases below
     """
-    id1 = clear_and_register['auth_user_id']
-    channels_create_v1(id1, 'test_channel_public', True)
-    with pytest.raises(InputError):
-        channels_create_v1(id1, 'test_channel_public', True)
+    # id1 = clear_and_register['auth_user_id']
+    # channels_create_v1(id1, 'test_channel_public', True)
+    # with pytest.raises(InputError):
+    #     channels_create_v1(id1, 'test_channel_public', True)
 
-    channels_create_v1(id1, 'test_channel_private', False)
-    with pytest.raises(InputError):
-        channels_create_v1(id1, 'test_channel_private', False)
+    # channels_create_v1(id1, 'test_channel_private', False)
+    # with pytest.raises(InputError):
+    #     channels_create_v1(id1, 'test_channel_private', False)
+    token = clear_and_register
+    resp0 = requests.post(config.url + 'channels/create/v2', 
+                          json={'token': token, 'name': 'test_channel_public',
+                                'is_public': True})
+    assert resp0.status_code == 200
 
-clear_v1()
+    resp1 = requests.post(config.url + 'channels/create/v2', 
+                          json={'token': token, 'name': 'test_channel_public',
+                                'is_public': True})
+    assert resp1.status_code == 400
+
+    resp2 = requests.post(config.url + 'channels/create/v2', 
+                          json={'token': token, 'name': 'test_channel_private',
+                                'is_public': False})
+    assert resp2.status_code == 200
+
+    resp3 = requests.post(config.url + 'channels/create/v2', 
+                          json={'token': token, 'name': 'test_channel_public',
+                                'is_public': True})
+    assert resp3.status_code == 400
+
+# clear_v1()
+requests.delete(config.url + 'clear/v1')
