@@ -6,7 +6,7 @@ import pickle
 from json import dumps
 from flask import Flask, request
 from flask_cors import CORS
-from src.error import InputError
+from src.error import InputError, AccessError
 from src import config
 
 from src.auth import auth_register_v1, auth_login_v1
@@ -88,6 +88,18 @@ def login():
         'auth_user_id': user['auth_user_id']
     })
 
+# @APP.route('/auth/logout/v1', methods=['POST'])
+# def logout():
+#     data = request.get_json()
+#     valid_token = False
+#     # check token is valid
+#     for saved_token in data_store['tokens']:
+#         if saved_token['token'] == data['token']:
+#             data_store.remove(saved_token)
+#             valid_token = True
+#     if valid_token is False:
+#         raise AccessError(description='Token is not valid')
+#     return dumps({})
 
 @APP.route('/clear/v1', methods=['DELETE'])
 def clear():
