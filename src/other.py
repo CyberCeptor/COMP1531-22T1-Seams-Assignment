@@ -13,6 +13,12 @@ Description: implementation for
 """
 from src.error import InputError, AccessError
 from src.data_store import data_store
+import jwt, datetime
+
+TOKEN_CODE = 'hotpot'
+algorithm = 'HS256'
+VALID_TOKENS = []
+SESSION_ID_COUNTER = 0
 
 def clear_v1():
     """
@@ -117,3 +123,24 @@ def check_user_is_member(auth_user_id, channel_id):
                     return True
 
     return False
+
+
+
+# called when a user logs in and registers.
+def token_generate(user_data):
+    global SESSION_ID_COUNTER # needed to pull the variable, not re-declare it, allows for modification, not needed for reading.
+    token = jwt.encode({'id': user_data['id'], 'session_id': SESSION_ID_COUNTER, 'handle': user_data['handle']}, TOKEN_CODE, algorithm=algorithm)
+    
+    token_dict = {
+        'user_id': 'id',
+        'session_id': SESSION_ID_COUNTER,
+        'token': token,
+        'time': datetime.datetime.now(),
+    }
+    store = data_store.get()
+    store['tokens'].append(token_dict)
+    data_store.set(store)
+    SESSION_ID_COUNTER = SESSION_ID_COUNTER + 1
+    return token_dict
+
+

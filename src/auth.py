@@ -15,6 +15,7 @@ import re
 from src.error import InputError
 
 from src.data_store import data_store
+from src.other import token_generate
 
 VALID_EMAIL_REGEX = r'^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}$'
 
@@ -49,12 +50,14 @@ def auth_login_v1(email, password):
             # correct email and password
             if stored_pw == password:
                 u_id = user['id']
+                user['token'].append(token_generate(user))
             else: # email belongs to a user but incorrect password
                 raise InputError(description='Incorrect password')
 
     # if u_id = -1 then a user with given email does not exist
     if u_id == -1:
         raise InputError(description='Email does not belong to a user')
+
 
     return {
         'token': '2',
@@ -105,15 +108,14 @@ def auth_register_v1(email, password, name_first, name_last):
         'last': name_last,
         'handle': handle,
         'perm_id': 1 if u_id == 1 else 2,
-        'token': '1',
     }
-
+    
     # store the user information into the list of users
     store['users'].append(user_dict)
     data_store.set(store)
 
     return {
-        'token': '1',
+        'token': token_generate(user_dict),
         'auth_user_id': u_id,
     }
 
