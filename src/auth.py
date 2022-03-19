@@ -17,11 +17,11 @@ import hashlib
 from src.error import InputError
 
 from src.data_store import data_store
-from src.other import token_generate
+from src.token import token_generate
 
 VALID_EMAIL_REGEX = r'^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}$'
 
-def auth_login_v1(email, password):
+def auth_login_v2(email, password):
     """
     logs a user in with the given email and password and returns their
     authorised user id
@@ -42,6 +42,7 @@ def auth_login_v1(email, password):
 
     store = data_store.get()
     u_id = -1
+    token = -1
 
     # iterates through stored user data and checks if any emails and passwords
     # match the given ones
@@ -53,7 +54,8 @@ def auth_login_v1(email, password):
             encrypted_pw = hashlib.sha256(password.encode()).hexdigest()
             if stored_pw == encrypted_pw:
                 u_id = user['id']
-                user['token'].append(token_generate(user))
+                token = token_generate(user)
+                user['token'].append(token)
             else: # email belongs to a user but incorrect password
                 raise InputError(description='Incorrect password')
 
@@ -63,12 +65,12 @@ def auth_login_v1(email, password):
 
 
     return {
-        'token': '2',
+        'token': token,
         'auth_user_id': u_id,
     }
 
 # based on code Haydon wrote in project starter video
-def auth_register_v1(email, password, name_first, name_last):
+def auth_register_v2(email, password, name_first, name_last):
     """
     registers a user with the given email, password, name_first and
     name_last and stores this information in data_store
@@ -123,6 +125,7 @@ def auth_register_v1(email, password, name_first, name_last):
         'token': token_generate(user_dict),
         'auth_user_id': u_id,
     }
+
 
 def check_invalid_email(store, valid_email_regex, email):
     """
