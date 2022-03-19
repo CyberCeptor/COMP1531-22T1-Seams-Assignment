@@ -42,31 +42,13 @@ def token_get_user_id(token):
     decoded = jwt.decode(token, KEY, ALGORITHM)
     return int(decoded['user_id'])
 
-
-# given a token, returns True if the token is < 24 hours old, otherwise False and removes the token from the data_store
-def token_check_time_frame(token):
-    decoded = jwt.decode(token, KEY, ALGORITHM)
-    token_lifetime = datetime.datetime.now() - decoded['time']
-    if token_lifetime.days == 0:
-        return True
-    token_remove(token)
-    return False
-
-# given a token, validate that the token exists in the tokens diction in data_store
-def token_check_exists(token):
-    store = data_store.get()
-    for stored_token in store['tokens']:
-        if stored_token['token'] == token:
-            return True
-    return False
-
 # iterates through the token dictionary, and returns the dict of the token given.
 def token_locate_in_data_store(token):
     store = data_store.get()
     for stored_token in store['tokens']:
         if stored_token['token'] == token:
             return stored_token
-    return False
+    raise AccessError('Invalid token')
 
 # when the token is older then 24hr, remove from the datastore dict list.
 def token_remove(token):
@@ -76,12 +58,13 @@ def token_remove(token):
         store['tokens'].remove(token_to_remove)
         data_store.set(store)
         return True
-    raise AccessError('Token not found.')
+    raise AccessError('Invalid token')
 
 
 # checks that the created token matches the user information in their dictionary.
 def token_valid_check(token):
     # decode will check the current time againest the expiry time
+    token_check_type(token)
     valid = True
     error_message = ''
     try:
@@ -96,5 +79,5 @@ def token_valid_check(token):
         raise AccessError(error_message)
 
 def token_check_type(token):    
-    if isinstance(token, str) is not True or type(token) is bool:
+    if isinstance(token, str) is not True:
         raise InputError('Invalid token')
