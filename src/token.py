@@ -19,7 +19,8 @@ def token_new_session_id():
 def token_generate(user_data):
     session_id = token_new_session_id()
     token = jwt.encode({'id': user_data['id'], 'session_id': session_id, 'handle': user_data['handle'], 'time': datetime.datetime.now()}, TOKEN_CODE, algorithm=algorithm)
-    
+    # validate the new token created, if not raises an Error.
+    token_valid_check(user_data, token)
     token_dict = {
         'user_id': user_data['id'],
         'session_id': SESSION_ID_COUNTER,
@@ -30,6 +31,11 @@ def token_generate(user_data):
     store = data_store.get()
     store['tokens'].append(token_dict)
     data_store.set(store)
+
+    # checks that the token has been added to the data_store.
+    if token_check_exists(token) == False:
+        raise AccessError('Token not found in data_store')
+
     return token_dict
 
 # given a token, returns the user_id
@@ -37,25 +43,40 @@ def token_get_user_id(token):
     decoded = jwt.decode(token, TOKEN_CODE, algorithm)
     return int(decoded['user_id'])
 
-# given a token, returns True if the token is < 24 hours old, otherwise False.
+
+# given a token, returns True if the token is < 24 hours old, otherwise False and removes the token from the data_store
 def token_check_time_frame(token):
     decoded = jwt.decode(token, TOKEN_CODE, algorithm)
     token_lifetime = datetime.datetime.now() - decoded['time']
     if token_lifetime.days == 0:
         return True
+    token_remove_expired(token)
     return False
 
 # given a token, validate that the token exists in the tokens diction in data_store
 def token_check_exists(token):
     store = data_store.get()
     for stored_token in store['token']:
-        if token == stored_token:
+        if stored_token == token:
             return True
     return False
 
+
+def token_locate_in_data_store(token):
+    store = data_store.get()
+    for stored_token in store['token']:
+        if stored_token == token:
+            return stored_token
+    return False
+
 # when the token is older then 24hr, remove from the datastore dict list.
-def token_expired(token):
-    return
+def token_remove_expired(token):
+    token_to_remove = token_locate_in_data_store(token)
+    if token_to_remove:
+        store = data_store.get()
+        store['tokens'].remove(token_to_remove)
+        data_store.set(store)
+
 
 # checks that the created token matches the user information in their dictionary.
 def token_valid_check(user_data, token):
