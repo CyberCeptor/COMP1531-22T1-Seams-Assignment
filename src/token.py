@@ -35,8 +35,8 @@ def token_generate(user_data):
     data_store.set(store)
 
     # checks that the token has been added to the data_store.
-    if token_check_exists(token) == False:
-        raise AccessError('Token not found in data_store')
+    # if token_check_exists(token) == False:
+    #     raise AccessError('Token not found in data_store')
 
     return token_dict
 
@@ -84,7 +84,7 @@ def token_remove(token):
 
 # checks that the created token matches the user information in their dictionary.
 def token_valid_check(user_data, token):
-    jwt.decode(token, TOKEN_CODE, algorithm)
+    jwt.decode(token, TOKEN_CODE, algorithm=algorithm)
     return True
 
 def token_check_type(token):    
