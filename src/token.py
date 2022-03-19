@@ -5,7 +5,7 @@ import jwt
 import datetime
 from src.error import InputError, AccessError
 from src.data_store import data_store
-from flask import jsonify
+# from flask import jsonify
 
 TOKEN_CODE = 'hotpot'
 algorithm = 'HS256'
@@ -67,7 +67,7 @@ def token_check_exists(token):
 def token_locate_in_data_store(token):
     store = data_store.get()
     for stored_token in store['tokens']:
-        if stored_token == token:
+        if stored_token['token'] == token:
             return stored_token
     return False
 
