@@ -20,7 +20,7 @@ def token_generate(user_data):
     id = user_data['id']
     token = jwt.encode({'id': id}, SECRET, algorithm='HS256')
     # validate the new token created, if not raises an Error.
-    token_valid_check(user_data, token)
+    token_valid_check(token)
     token_dict = {
         'user_id': user_data['id'],
         'session_id': SESSION_ID_COUNTER,
@@ -83,7 +83,7 @@ def token_remove(token):
 # checks that the created token matches the user information in their dictionary.
 def token_valid_check(token):
     decoded = jwt.decode(token, SECRET, algorithm=['HS256'])
-    return True
+    return int(decoded['id'])
 
 def token_check_type(token):    
     if isinstance(token, str) is not True or type(token) is bool:
