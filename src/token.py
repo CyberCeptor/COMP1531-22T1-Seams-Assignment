@@ -20,7 +20,7 @@ def token_new_session_id():
 def token_generate(user_data):
     session_id = token_new_session_id()
     expire_time = datetime.datetime.now() + datetime.timedelta(hours=24)
-    token = jwt.encode({'id': user_data['id'], 'session_id': session_id, 'handle': user_data['handle'], 'exp': expire_time}, TOKEN_CODE, algorithm=algorithm)
+    token = jwt.encode({'id': user_data['id'], 'session_id': session_id, 'handle': user_data['handle'], 'exp': expire_time}, 'hotpot', 'HS256')
     # validate the new token created, if not raises an Error.
     token_valid_check(user_data, token)
     token_dict = {
@@ -84,7 +84,7 @@ def token_remove(token):
 
 # checks that the created token matches the user information in their dictionary.
 def token_valid_check(user_data, token):
-    jwt.decode(token, TOKEN_CODE, algorithm=algorithm)
+    jwt.decode(token, 'hotpot', 'HS256')
     return True
 
 def token_check_type(token):    
