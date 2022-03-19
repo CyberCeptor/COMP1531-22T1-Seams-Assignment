@@ -40,13 +40,13 @@ def token_generate(user_data):
 
 # given a token, returns the user_id
 def token_get_user_id(token):
-    decoded = jwt.decode(token, SECRET, algorithm='HS256')
+    decoded = jwt.decode(token, SECRET, algorithm=['HS256'])
     return int(decoded['user_id'])
 
 
 # given a token, returns True if the token is < 24 hours old, otherwise False and removes the token from the data_store
 def token_check_time_frame(token):
-    decoded = jwt.decode(token, SECRET, algorithm='HS256')
+    decoded = jwt.decode(token, SECRET, algorithm=['HS256'])
     token_lifetime = datetime.now() - decoded['time']
     if token_lifetime.days == 0:
         return True
@@ -82,7 +82,7 @@ def token_remove(token):
 
 # checks that the created token matches the user information in their dictionary.
 def token_valid_check(user_data, token):
-    jwt.decode(token, SECRET, algorithm='HS256')
+    jwt.decode(token, SECRET, algorithm=['HS256'])
     return True
 
 def token_check_type(token):    
