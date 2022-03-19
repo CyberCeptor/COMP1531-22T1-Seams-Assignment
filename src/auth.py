@@ -55,7 +55,7 @@ def auth_login_v2(email, password):
             if stored_pw == encrypted_pw:
                 u_id = user['id']
                 token = token_generate(user)
-                user['token'].append(token)
+                token_valid_check(user, token)
             else: # email belongs to a user but incorrect password
                 raise InputError(description='Incorrect password')
 
@@ -63,7 +63,6 @@ def auth_login_v2(email, password):
     if u_id == -1:
         raise InputError(description='Email does not belong to a user')
 
-    token_valid_check(user, token)
 
     return {
         'token': token,
@@ -124,7 +123,7 @@ def auth_register_v2(email, password, name_first, name_last):
 
     token = token_generate(user_dict)
     token_valid_check(user_dict, token)
-    
+
     return {
         'auth_user_id': u_id,
         'token': token,
