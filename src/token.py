@@ -17,9 +17,8 @@ def token_new_session_id():
 
 # called when a user logs in and registers.
 def token_generate(user_data):
-    session_id = token_new_session_id()
-    #expire_time = datetime.datetime.now() + datetime.timedelta(hours=24)
-    token = jwt.encode({'id': user_data['id'], 'session_id': session_id}, SECRET, algorithm='HS256')
+    id = user_data['id']
+    token = jwt.encode({'id': id}, SECRET, algorithm='HS256')
     # validate the new token created, if not raises an Error.
     token_valid_check(user_data, token)
     token_dict = {
