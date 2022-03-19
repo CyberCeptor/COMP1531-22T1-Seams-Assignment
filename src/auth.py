@@ -12,6 +12,8 @@ Description: implementation for
 
 import re
 
+import hashlib
+
 from src.error import InputError
 
 from src.data_store import data_store
@@ -48,7 +50,8 @@ def auth_login_v1(email, password):
         stored_pw = user['pw']
         if stored_email == email:
             # correct email and password
-            if stored_pw == password:
+            encrypted_pw = hashlib.sha256(password.encode()).hexdigest()
+            if stored_pw == encrypted_pw:
                 u_id = user['id']
                 user['token'].append(token_generate(user))
             else: # email belongs to a user but incorrect password
@@ -93,6 +96,8 @@ def auth_register_v1(email, password, name_first, name_last):
     if len(password) < 6:
         raise InputError(description='Password is too short')
 
+    encrypted_pw = hashlib.sha256(password.encode()).hexdigest()
+
     # check for invalid name
     full_name = name_first + name_last
     check_invalid_name(name_first, name_last, full_name)
@@ -103,7 +108,7 @@ def auth_register_v1(email, password, name_first, name_last):
     user_dict = {
         'id': u_id,
         'email': email,
-        'pw': password,
+        'pw': encrypted_pw,
         'first': name_first,
         'last': name_last,
         'handle': handle,
