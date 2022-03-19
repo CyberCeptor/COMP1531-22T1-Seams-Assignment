@@ -58,7 +58,7 @@ def token_check_time_frame(token):
 # given a token, validate that the token exists in the tokens diction in data_store
 def token_check_exists(token):
     store = data_store.get()
-    for stored_token in store['token']:
+    for stored_token in store['tokens']:
         if stored_token == token:
             return True
     return False
@@ -95,5 +95,5 @@ def token_valid_check(user_data, token):
         raise AccessError('Invalid token')
 
 def token_check_type(token):
-    if isinstance(token, str) is False or type(token) is bool:
+    if isinstance(token, str) is not True or type(token) is bool:
         raise InputError('Invalid token')
