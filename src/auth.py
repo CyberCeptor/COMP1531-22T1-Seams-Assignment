@@ -17,7 +17,7 @@ import hashlib
 from src.error import InputError
 
 from src.data_store import data_store
-from src.token import token_generate, token_remove
+from src.token import token_generate, token_remove, token_valid_check
 
 VALID_EMAIL_REGEX = r'^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}$'
 
@@ -63,6 +63,7 @@ def auth_login_v2(email, password):
     if u_id == -1:
         raise InputError(description='Email does not belong to a user')
 
+    token_valid_check(user, token)
 
     return {
         'token': token,
@@ -121,9 +122,12 @@ def auth_register_v2(email, password, name_first, name_last):
     store['users'].append(user_dict)
     data_store.set(store)
 
+    token = token_generate(user_dict)
+    token_valid_check(user_dict, token)
+    
     return {
         'auth_user_id': u_id,
-        'token': token_generate(user_dict),
+        'token': token,
     }
 
 

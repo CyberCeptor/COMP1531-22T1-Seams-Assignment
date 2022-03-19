@@ -1,3 +1,6 @@
+"""
+    Doc String == e.
+"""
 import jwt, datetime
 from src.error import InputError, AccessError
 from src.data_store import data_store
@@ -78,16 +81,18 @@ def token_remove(token):
 
 # checks that the created token matches the user information in their dictionary.
 def token_valid_check(user_data, token):
-    decoded = jwt.decode(token, TOKEN_CODE, algorithm)
-    if decoded['id'] != user_data['id']:
-        raise InputError('Incorrect id in token')
-    if decoded['session_id'] != user_data['session_id']:
-        raise InputError('Incorrect session id in token')
-    if decoded['handle'] != user_data['handle']:
-        raise InputError('Incorrect handle in token')
-    if token_check_time_frame(token) == False:
-        raise InputError('Token has expired')
-
+    if token_check_exists(token):
+        decoded = jwt.decode(token, TOKEN_CODE, algorithm)
+        if decoded['id'] != user_data['id']:
+            raise AccessError('Incorrect id in token')
+        if decoded['session_id'] != user_data['session_id']:
+            raise AccessError('Incorrect session id in token')
+        if decoded['handle'] != user_data['handle']:
+            raise AccessError('Incorrect handle in token')
+        if token_check_time_frame(token) == False:
+            raise AccessError('Token has expired')
+    else:
+        raise AccessError('Token does not exist.')
 
 
 
