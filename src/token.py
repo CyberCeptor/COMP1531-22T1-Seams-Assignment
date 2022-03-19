@@ -84,15 +84,7 @@ def token_remove(token):
 
 # checks that the created token matches the user information in their dictionary.
 def token_valid_check(user_data, token):
-    # token_check_type(token)
-    # if token_check_exists(token):
-    #     decoded = jwt.decode(token, TOKEN_CODE, algorithm)
-    #     if decoded['id'] != user_data['id'] or decoded['session_id'] != user_data['session_id'] or decoded['handle'] != user_data['handle']:
-    #         raise AccessError('Invalid token')
-    #     elif token_check_time_frame(token) == False:
-    #         raise AccessError('Token has expired')
-    # else:
-    #     raise AccessError('Invalid token')
+    jwt.decode(token, TOKEN_CODE, algorithm)
     return True
 
 def token_check_type(token):    
