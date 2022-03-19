@@ -36,7 +36,7 @@ def token_generate(user_data):
     # if token_check_exists(token) == False:
     #     raise AccessError('Token not found in data_store')
 
-    return token_dict
+    return token
 
 # given a token, returns the user_id
 def token_get_user_id(token):
