@@ -50,15 +50,12 @@ def token_locate_in_data_store(token):
             return stored_token
     raise AccessError('Invalid token')
 
-# when the token is older then 24hr, remove from the datastore dict list.
+# if the token is older then 24hours old, or the user logs out, the token is removed.
 def token_remove(token):
     token_to_remove = token_locate_in_data_store(token)
-    if token_to_remove:
-        store = data_store.get()
-        store['tokens'].remove(token_to_remove)
-        data_store.set(store)
-        return True
-    raise AccessError('Invalid token')
+    store = data_store.get()
+    store['tokens'].remove(token_to_remove)
+    data_store.set(store)
 
 
 # checks that the created token matches the user information in their dictionary.
