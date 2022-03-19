@@ -7,7 +7,7 @@ from src.error import InputError, AccessError
 from src.data_store import data_store
 # from flask import jsonify
 
-SECRET = "hotpot"
+KEY = "hotpot"
 ALGORITHM = "HS256"
 SESSION_ID_COUNTER = 0
 
@@ -22,7 +22,7 @@ def token_generate(user_data):
     session_id = token_new_session_id()
     expiry_time = datetime.datetime.now() + datetime.timedelta(hours=24)
     handle = user_data['handle']
-    token = jwt.encode({'id': id, 'session_id': session_id, 'handle': handle, 'exp': expiry_time}, SECRET, ALGORITHM)
+    token = jwt.encode({'id': id, 'session_id': session_id, 'handle': handle, 'exp': expiry_time}, KEY, ALGORITHM)
     # validate the new token created, if not raises an Error.
     token_valid_check(token)
     token_dict = {
@@ -39,13 +39,13 @@ def token_generate(user_data):
 
 # given a token, returns the user_id
 def token_get_user_id(token):
-    decoded = jwt.decode(token, SECRET, ALGORITHM)
+    decoded = jwt.decode(token, KEY, ALGORITHM)
     return int(decoded['user_id'])
 
 
 # given a token, returns True if the token is < 24 hours old, otherwise False and removes the token from the data_store
 def token_check_time_frame(token):
-    decoded = jwt.decode(token, SECRET, ALGORITHM)
+    decoded = jwt.decode(token, KEY, ALGORITHM)
     token_lifetime = datetime.datetime.now() - decoded['time']
     if token_lifetime.days == 0:
         return True
@@ -82,8 +82,18 @@ def token_remove(token):
 # checks that the created token matches the user information in their dictionary.
 def token_valid_check(token):
     # decode will check the current time againest the expiry time
-    decoded = jwt.decode(token, SECRET, ALGORITHM)
-    return int(decoded['id'])
+    valid = True
+    error_message = ''
+    try:
+        jwt.decode(token, KEY, ALGORITHM)
+    except jwt.ExpiredSignatureError:
+        valid = False
+        error_message = 'Token has expired'
+    except jwt.DecodeError:
+        valid = False
+        error_message = 'Invalid token'
+    if not valid:
+        raise AccessError(error_message)
 
 def token_check_type(token):    
     if isinstance(token, str) is not True or type(token) is bool:
