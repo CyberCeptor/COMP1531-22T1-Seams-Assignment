@@ -84,7 +84,7 @@ def token_remove(token):
 
 # checks that the created token matches the user information in their dictionary.
 def token_valid_check(user_data, token):
-    token_check_int(token)
+    token_check_type(token)
     if token_check_exists(token):
         decoded = jwt.decode(token, TOKEN_CODE, algorithm)
         if decoded['id'] != user_data['id'] or decoded['session_id'] != user_data['session_id'] or decoded['handle'] != user_data['handle']:
@@ -94,6 +94,6 @@ def token_valid_check(user_data, token):
     else:
         raise AccessError('Invalid token')
 
-def token_check_int(token):
-    if isinstance(token, int) is False or type(token) is bool:
+def token_check_type(token):
+    if isinstance(token, str) is False or type(token) is bool:
         raise InputError('Invalid token')
