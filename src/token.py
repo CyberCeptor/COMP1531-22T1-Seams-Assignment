@@ -1,7 +1,8 @@
 """
     Doc String == e.
 """
-import jwt, datetime
+import jwt
+from datetime import datetime
 from src.error import InputError, AccessError
 from src.data_store import data_store
 
@@ -17,14 +18,14 @@ def token_new_session_id():
 # called when a user logs in and registers.
 def token_generate(user_data):
     session_id = token_new_session_id()
-    token = jwt.encode({'id': user_data['id'], 'session_id': session_id, 'handle': user_data['handle'], 'time': datetime.datetime.now()}, TOKEN_CODE, algorithm=algorithm)
+    token = jwt.encode({'id': user_data['id'], 'session_id': session_id, 'handle': user_data['handle'], 'time': datetime.now()}, TOKEN_CODE, algorithm=algorithm)
     # validate the new token created, if not raises an Error.
     token_valid_check(user_data, token)
     token_dict = {
         'user_id': user_data['id'],
         'session_id': SESSION_ID_COUNTER,
         'token': token,
-        'time': datetime.datetime.now(),
+        'time': datetime.now(),
     }
 
     store = data_store.get()
@@ -46,7 +47,7 @@ def token_get_user_id(token):
 # given a token, returns True if the token is < 24 hours old, otherwise False and removes the token from the data_store
 def token_check_time_frame(token):
     decoded = jwt.decode(token, TOKEN_CODE, algorithm)
-    token_lifetime = datetime.datetime.now() - decoded['time']
+    token_lifetime = datetime.now() - decoded['time']
     if token_lifetime.days == 0:
         return True
     token_remove(token)
