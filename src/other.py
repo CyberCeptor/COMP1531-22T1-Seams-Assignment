@@ -128,7 +128,7 @@ def check_user_is_member(auth_user_id, channel_id):
 # called when a user logs in and registers.
 def token_generate(user_data):
     global SESSION_ID_COUNTER # needed to pull the variable, not re-declare it, allows for modification, not needed for reading.
-    token = jwt.encode({'id': user_data['id'], 'session_id': SESSION_ID_COUNTER, 'handle': user_data['handle']}, TOKEN_CODE, algorithm=algorithm)
+    token = jwt.encode({'id': user_data['id'], 'session_id': SESSION_ID_COUNTER, 'handle': user_data['handle'], 'time': datetime.datetime.now()}, TOKEN_CODE, algorithm=algorithm)
     
     token_dict = {
         'user_id': user_data['id'],
@@ -142,4 +142,28 @@ def token_generate(user_data):
     SESSION_ID_COUNTER = SESSION_ID_COUNTER + 1
     return token_dict
 
+# given a token, returns the user_id
+def token_get_user_id(token):
+    decoded = jwt.decode(token, TOKEN_CODE, algorithm)
+    return int(decoded['user_id'])
+
+# given a token, returns True if the token is < 24 hours old, otherwise False.
+def token_check_time_frame(token):
+    decoded = jwt.decode(token, TOKEN_CODE, algorithm)
+    token_lifetime = datetime.datetime.now() - decoded['time']
+    if token_lifetime.days == 0:
+        return True
+    return False
+
+# given a token, validate that the token exists in the tokens diction in data_store
+def token_valid_check(token):
+    store = data_store.get()
+    for stored_token in store['token']:
+        if token == stored_token:
+            return True
+    return False
+
+# when the token is older then 24hr, remove from the datastore dict list.
+def token_expired(token):
+    return
 
