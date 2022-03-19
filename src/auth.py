@@ -125,7 +125,7 @@ def auth_register_v1(email, password, name_first, name_last):
     token_valid_check(user_dict, token)
 
     return {
-        'token': token
+        'token': token,
         'auth_user_id': u_id,
     }
 
