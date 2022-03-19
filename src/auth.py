@@ -1,7 +1,7 @@
 """
 Filename: auth.py
 
-Author: Aleesha, z5371516
+Author: Aleesha, z5371516, Jenson, z5360181
 Created: 24/02/2022 - 04/03/2022
 
 Description: implementation for
@@ -17,7 +17,7 @@ import hashlib
 from src.error import InputError
 
 from src.data_store import data_store
-from src.token import token_generate
+from src.token import token_generate, token_remove
 
 VALID_EMAIL_REGEX = r'^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}$'
 
@@ -122,8 +122,8 @@ def auth_register_v2(email, password, name_first, name_last):
     data_store.set(store)
 
     return {
-        'token': token_generate(user_dict),
         'auth_user_id': u_id,
+        'token': token_generate(user_dict),
     }
 
 
@@ -224,3 +224,7 @@ def create_handle(store, full_name):
         handle = handle + str(duplicate_count)
 
     return handle
+
+# given an active token, invalidates the token to log the user out.
+def auth_logout_v1(token):
+    token_remove(token)

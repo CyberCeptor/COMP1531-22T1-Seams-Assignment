@@ -1,14 +1,10 @@
-
 import jwt, datetime
 from src.error import InputError, AccessError
 from src.data_store import data_store
 
-
 TOKEN_CODE = 'hotpot'
 algorithm = 'HS256'
 SESSION_ID_COUNTER = 0
-
-
 
 def token_new_session_id():
     global SESSION_ID_COUNTER
@@ -50,7 +46,7 @@ def token_check_time_frame(token):
     token_lifetime = datetime.datetime.now() - decoded['time']
     if token_lifetime.days == 0:
         return True
-    token_remove_expired(token)
+    token_remove(token)
     return False
 
 # given a token, validate that the token exists in the tokens diction in data_store
@@ -61,21 +57,23 @@ def token_check_exists(token):
             return True
     return False
 
-
+# iterates through the token dictionary, and returns the dict of the token given.
 def token_locate_in_data_store(token):
     store = data_store.get()
-    for stored_token in store['token']:
+    for stored_token in store['tokens']:
         if stored_token == token:
             return stored_token
     return False
 
 # when the token is older then 24hr, remove from the datastore dict list.
-def token_remove_expired(token):
+def token_remove(token):
     token_to_remove = token_locate_in_data_store(token)
     if token_to_remove:
         store = data_store.get()
         store['tokens'].remove(token_to_remove)
         data_store.set(store)
+        return True
+    raise AccessError('Token not found.')
 
 
 # checks that the created token matches the user information in their dictionary.

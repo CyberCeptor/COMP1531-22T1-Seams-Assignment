@@ -277,3 +277,6 @@ def test_login_invalid(clear_and_register):
 
 # clear_v1()
 requests.delete(config.url + 'clear/v1')
+
+
+
