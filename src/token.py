@@ -59,7 +59,7 @@ def token_check_time_frame(token):
 def token_check_exists(token):
     store = data_store.get()
     for stored_token in store['tokens']:
-        if stored_token == token:
+        if stored_token['token'] == token:
             return True
     return False
 
