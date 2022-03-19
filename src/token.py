@@ -20,23 +20,20 @@ def token_new_session_id():
 def token_generate(user_data):
     id = user_data['id']
     session_id = token_new_session_id()
-    token = jwt.encode({'id': id, 'session_id': session_id}, SECRET, ALGORITHM)
+    expiry_time = datetime.datetime.now() + datetime.timedelta(hours=24)
+    handle = user_data['handle']
+    token = jwt.encode({'id': id, 'session_id': session_id, 'handle': handle, 'exp': expiry_time}, SECRET, ALGORITHM)
     # validate the new token created, if not raises an Error.
     token_valid_check(token)
     token_dict = {
         'user_id': user_data['id'],
         'session_id': session_id,
         'token': token,
-        'time': datetime.datetime.now(),
     }
 
     store = data_store.get()
     store['tokens'].append(token_dict)
     data_store.set(store)
-
-    # checks that the token has been added to the data_store.
-    # if token_check_exists(token) == False:
-    #     raise AccessError('Token not found in data_store')
 
     return token
 
@@ -49,7 +46,7 @@ def token_get_user_id(token):
 # given a token, returns True if the token is < 24 hours old, otherwise False and removes the token from the data_store
 def token_check_time_frame(token):
     decoded = jwt.decode(token, SECRET, ALGORITHM)
-    token_lifetime = datetime.now() - decoded['time']
+    token_lifetime = datetime.datetime.now() - decoded['time']
     if token_lifetime.days == 0:
         return True
     token_remove(token)
@@ -84,6 +81,7 @@ def token_remove(token):
 
 # checks that the created token matches the user information in their dictionary.
 def token_valid_check(token):
+    # decode will check the current time againest the expiry time
     decoded = jwt.decode(token, SECRET, ALGORITHM)
     return int(decoded['id'])
 
