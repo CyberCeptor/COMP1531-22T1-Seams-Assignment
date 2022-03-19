@@ -82,7 +82,7 @@ def token_remove(token):
 
 # checks that the created token matches the user information in their dictionary.
 def token_valid_check(token):
-    decoded = jwt.decode(token, SECRET, algorithm=["HS256"])
+    decoded = jwt.decode(token, SECRET, algorithms=["HS256"])
     return int(decoded['id'])
 
 def token_check_type(token):    
