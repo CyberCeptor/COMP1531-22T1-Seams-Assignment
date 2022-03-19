@@ -7,7 +7,7 @@ from src.error import InputError, AccessError
 from src.data_store import data_store
 # from flask import jsonify
 
-SECRET = 'hotpot'
+SECRET = "hotpot"
 SESSION_ID_COUNTER = 0
 
 def token_new_session_id():
@@ -18,7 +18,7 @@ def token_new_session_id():
 # called when a user logs in and registers.
 def token_generate(user_data):
     id = user_data['id']
-    token = jwt.encode({'id': id}, SECRET, algorithm='HS256')
+    token = jwt.encode({'id': id}, SECRET, algorithm="HS256")
     # validate the new token created, if not raises an Error.
     token_valid_check(token)
     token_dict = {
@@ -40,13 +40,13 @@ def token_generate(user_data):
 
 # given a token, returns the user_id
 def token_get_user_id(token):
-    decoded = jwt.decode(token, SECRET, algorithm=['HS256'])
+    decoded = jwt.decode(token, SECRET, algorithm=["HS256"])
     return int(decoded['user_id'])
 
 
 # given a token, returns True if the token is < 24 hours old, otherwise False and removes the token from the data_store
 def token_check_time_frame(token):
-    decoded = jwt.decode(token, SECRET, algorithm=['HS256'])
+    decoded = jwt.decode(token, SECRET, algorithm=["HS256"])
     token_lifetime = datetime.now() - decoded['time']
     if token_lifetime.days == 0:
         return True
@@ -82,7 +82,7 @@ def token_remove(token):
 
 # checks that the created token matches the user information in their dictionary.
 def token_valid_check(token):
-    decoded = jwt.decode(token, SECRET, algorithm=['HS256'])
+    decoded = jwt.decode(token, SECRET, algorithm=["HS256"])
     return int(decoded['id'])
 
 def token_check_type(token):    
