@@ -27,7 +27,7 @@ def token_generate(user_data):
         'user_id': user_data['id'],
         'session_id': SESSION_ID_COUNTER,
         'token': token,
-        'time': datetime.now(),
+        'time': datetime.datetime.now(),
     }
 
     store = data_store.get()
