@@ -1,7 +1,7 @@
 """
 Filename: auth.py
 
-Author: Aleesha, z5371516
+Author: Aleesha, z5371516, Jenson, z5360181
 Created: 24/02/2022 - 04/03/2022
 
 Description: implementation for
@@ -12,12 +12,14 @@ Description: implementation for
 
 import re
 
+import hashlib
+
 from src.error import InputError
 
 from src.data_store import data_store
+from src.token import token_generate, token_remove, token_valid_check
 
 VALID_EMAIL_REGEX = r'^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}$'
-VALID_NAME_REGEX = r'^[a-zA-Z\'\-\s]{1,50}$'
 
 def auth_login_v1(email, password):
     """
@@ -40,6 +42,7 @@ def auth_login_v1(email, password):
 
     store = data_store.get()
     u_id = -1
+    token = -1
 
     # iterates through stored user data and checks if any emails and passwords
     # match the given ones
@@ -48,17 +51,22 @@ def auth_login_v1(email, password):
         stored_pw = user['pw']
         if stored_email == email:
             # correct email and password
-            if stored_pw == password:
+            encrypted_pw = hashlib.sha256(password.encode()).hexdigest()
+            if stored_pw == encrypted_pw:
                 u_id = user['id']
+                token = token_generate(user)
+                token_valid_check(token)
             else: # email belongs to a user but incorrect password
-                raise InputError('Incorrect password')
+                raise InputError(description='Incorrect password')
 
     # if u_id = -1 then a user with given email does not exist
     if u_id == -1:
-        raise InputError('Email does not belong to a user')
+        raise InputError(description='Email does not belong to a user')
+
 
     return {
         'auth_user_id': u_id,
+        'token': token,
     }
 
 # based on code Haydon wrote in project starter video
@@ -88,7 +96,9 @@ def auth_register_v1(email, password, name_first, name_last):
 
     # check for invalid password
     if len(password) < 6:
-        raise InputError('Password is too short')
+        raise InputError(description='Password is too short')
+
+    encrypted_pw = hashlib.sha256(password.encode()).hexdigest()
 
     # check for invalid name
     full_name = name_first + name_last
@@ -100,19 +110,25 @@ def auth_register_v1(email, password, name_first, name_last):
     user_dict = {
         'id': u_id,
         'email': email,
-        'pw': password,
+        'pw': encrypted_pw,
         'first': name_first,
         'last': name_last,
         'handle': handle,
+        'perm_id': 1 if u_id == 1 else 2,
     }
-
+    
     # store the user information into the list of users
     store['users'].append(user_dict)
     data_store.set(store)
 
+    token = token_generate(user_dict)
+    token_valid_check(token)
+
     return {
+        'token': token,
         'auth_user_id': u_id,
     }
+
 
 def check_invalid_email(store, valid_email_regex, email):
     """
@@ -133,12 +149,12 @@ def check_invalid_email(store, valid_email_regex, email):
 
     # check for valid email address
     if not re.fullmatch(valid_email_regex, email):
-        raise InputError('Invalid email address')
+        raise InputError(description='Invalid email address')
 
     # check for duplicate email
     for user in store['users']:
         if user['email'] == email:
-            raise InputError('Email has already been taken')
+            raise InputError(description='Email has already been taken')
 
 def check_invalid_name(name_first, name_last, full_name):
     """
@@ -158,20 +174,20 @@ def check_invalid_name(name_first, name_last, full_name):
     """
 
     # check for invalid first name
-    if not re.fullmatch(VALID_NAME_REGEX, name_first):
-        raise InputError('Invalid first name')
+    if name_first == '' or len(name_first) > 50:
+        raise InputError(description='Invalid first name')
 
     # check for invalid last name
-    if not re.fullmatch(VALID_NAME_REGEX, name_last):
-        raise InputError('Invalid last name')
+    if name_last == '' or len(name_last) > 50:
+        raise InputError(description='Invalid last name')
 
-    # check for name that would create invalid handle i.e. no letters
+    # check for invalid full name
     count_alpha = 0
     for char in full_name:
         if char.isalpha() is True:
             count_alpha += 1
     if count_alpha == 0:
-        raise InputError('Invalid name')
+        raise InputError(description='Invalid name')
 
 def create_handle(store, full_name):
     """
@@ -188,7 +204,7 @@ def create_handle(store, full_name):
     """
 
     # create a handle by removing any valid name symbols and lowering the case
-    handle = ''.join(char for char in full_name if char not in "'- ")
+    handle = ''.join(char for char in full_name if char.isalnum())
     handle = handle.lower()
 
     # slice the handle if it is too long
@@ -198,11 +214,11 @@ def create_handle(store, full_name):
     # iterates through stored handles and checks for duplicates
     duplicate_count = -1
     for user in store['users']:
-        # from https://stackoverflow.com/a/30315056
-        # strips numbers from a user's handle and compares it to the newly
-        # generated handle
-        to_compare = re.sub(r'\d+', '', user['handle'])
-        if to_compare == handle:
+        to_compare = user['handle']
+        if to_compare[-1].isnumeric() is True:
+            if to_compare.rstrip(to_compare[-1]) == handle:
+                duplicate_count += 1
+        elif to_compare == handle:
             duplicate_count += 1
 
     # if there are duplicates, add the corresponding number to the end of
@@ -211,3 +227,7 @@ def create_handle(store, full_name):
         handle = handle + str(duplicate_count)
 
     return handle
+
+# given an active token, invalidates the token to log the user out.
+def auth_logout_v1(token):
+    token_remove(token)

@@ -48,3 +48,38 @@ Need to ask if we need a docstring at the top of each .py file and what we need 
 Members present: Aleesha, Aisha, Jenson, Van, Jed
 Meeting type: check-in on teams (mainly channel_message function)
 Fixing test files and implementation for channel_message
+
+11.03
+Members present: Aleesha, Aisha, Jenson, Van, Jed
+Meeting type: Lab
+plan:
+- fix up any iteration 1 errors
+- change iteration 1 tests to fit with new spec
+- change iteration 1 implementation to fit new spec
+- start iteration 2 implementation
+aim to finish by thursday 24th! (in time for autotests then we can go back and fix)
+feedback:
+- extra test: check that when channel_messages is run, the return is empty
+- classes for specific return types
+- could be more pythonic
+- branch functions into other files
+- test coverage for some files good but not all
+- conftest files
+- more clear and descriptive commit messages
+8pm Mondays meeting, standup Wednesdays, tutlab Fridays
+
+14.03
+Members present: Aleesha, Aisha, Jenson, Van, Jed
+Meeting type: check-in
+to get done by Friday this week:
+- change tests to work with GET, POST requests for v2 of our functions
+next step:
+- start implementation on v2 functions
+
+18.03
+Members present: Aleesha, Aisha, Jenson, Van, Jed
+Meeting type: Lab
+- complete at least v2 functions by Tuesday for first autotests
+- push regularly
+- create new http functions in server.py for now and we can separate later if needed
+- keeping Monday 8pm meeting, Wednesday standup, Friday meeting schedule unless we want more during flexi week

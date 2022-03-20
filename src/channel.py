@@ -79,17 +79,19 @@ def channel_details_v1(auth_user_id, channel_id):
     # is_member is a bool to check whether given user is in the given channel
     is_member = check_user_is_member(auth_user_id, channel_id)
     if is_member is False:
-        raise InputError('User does not exist in channel')
+        raise AccessError('User does not exist in channel')
 
-    # channel id starts at 1, so -1 to get the correct dict
-    channel = store['channels'][channel_id - 1]
+    # find the channel information
+    for channel in store['channels']:
+        if channel['channel_id'] == channel_id:
+            channel_info = channel
 
     #return requires keys and values from stored data
     return {
-        'name': channel['name'],
-        'is_public': channel['is_public'],
-        'owner_members': channel['owner_members'],
-        'all_members': channel['all_members'],
+        'name': channel_info['name'],
+        'is_public': channel_info['is_public'],
+        'owner_members': channel_info['owner_members'],
+        'all_members': channel_info['all_members'],
     }
 
 def channel_messages_v1(auth_user_id, channel_id, start):
@@ -123,11 +125,25 @@ def channel_messages_v1(auth_user_id, channel_id, start):
     if is_member is False:
         raise AccessError('User does not exist in channel')
 
-    # message starts
-    start_message = store['messages'][start]
+    # get how many messages in the channel
+    for channel in store['channels']:
+        if channel['channel_id'] == channel_id:
+            chan = channel
 
-    # get how many messages
-    total_messages = len(store['messages'])
+    total_messages = len(chan['messages'])
+
+    if start > total_messages:
+        raise InputError('Invalid start, not enough messages')
+
+    if total_messages == 0:
+        return {
+            'messages': [],
+            'start': start,
+            'end': -1,
+        }
+
+    # message starts
+    start_message = chan['messages'][start]
 
     # get end
     end = start + 50
@@ -144,11 +160,11 @@ def channel_messages_v1(auth_user_id, channel_id, start):
         if start == total_messages - 1: # if there is only 1 message
             messages_to_return.append(start_message)
         else:
-            for idx, message in store['messages']:
+            for idx, message in chan['messages']:
                 if idx >= start:
                     messages_to_return.append(message)
     else:
-        for idx, message in store['messages']:
+        for idx, message in chan['messages']:
             if start <= idx < end:
                 messages_to_return.append(message)
 
@@ -180,13 +196,13 @@ def channel_join_v1(auth_user_id, channel_id):
     if check_user_is_member(auth_user_id, channel_id) is True:
         raise InputError('Invitee is already in the channel')
 
-    #check the user whether is a global owner
-    #if the user is a global owner, add immediately, even this is a priavate
-    # channel
-    if check_user_is_global_owner(auth_user_id, channel_id) is True:
-        add_invitee(auth_user_id, channel_id) # add user
-
-    check_public_channel(channel_id) #check the channel whether is public
+    # check if the user is a global owner
+    # if not, check if it is a private channel
+    if check_user_is_global_owner(auth_user_id) is False:
+        check_private_channel(channel_id) #check the channel whether is public
+    
+    # if the user is a global owner and the channel is private, or if the user
+    # is not a global owner and the channel is public, add them to the channel
     add_invitee(auth_user_id, channel_id) #add user
 
 def add_invitee(u_id, channel_id):
@@ -203,14 +219,27 @@ def add_invitee(u_id, channel_id):
     """
     store = data_store.get()
 
-    channel = store['channels'][channel_id - 1]
-    channel['all_members'].append(u_id)
+    for user in store['users']:
+        if user['id'] == u_id:
+            user_info = user
+
+    new_member = {
+        'u_id': user_info['id'],
+        'email': user_info['email'],
+        'name_first': user_info['first'],
+        'name_last': user_info['last'],
+        'handle_str': user_info['handle']
+    }
+
+    for channel in store['channels']:
+        if channel['channel_id'] == channel_id:
+            channel['all_members'].append(new_member)
     data_store.set(store)
 
-def check_user_is_global_owner(auth_user_id, channel_id):
+def check_user_is_global_owner(auth_user_id):
     """
-    check the user whether is a global owner in channel
-    with auth user id and channel id, return nothing
+    check the user whether is a global owner with auth user id and channel id,
+    return nothing
 
     Arguments:
         auth_user_id (int)    - an integer that specifies user(inviter) id
@@ -221,13 +250,13 @@ def check_user_is_global_owner(auth_user_id, channel_id):
     Return Value: N/A
     """
     store = data_store.get()
-
-    channel = store['channels'][channel_id - 1]
-    if auth_user_id in channel['global_owners']:
-        return True
+    for user in store['users']:
+        if user['id'] == auth_user_id:
+            if user['perm_id'] == 1:
+                return True
     return False
 
-def check_public_channel(channel_id):
+def check_private_channel(channel_id):
     """
     check the channel is public or not with channel id
     return nothing
@@ -242,6 +271,7 @@ def check_public_channel(channel_id):
     """
     store = data_store.get()
 
-    channel = store['channels'][channel_id - 1]
-    if channel['is_public'] is False:
-        raise AccessError('Channel is private')
+    for channel in store['channels']:
+        if channel['channel_id'] == channel_id:
+            if channel['is_public'] is False:
+                raise AccessError('Channel is private')

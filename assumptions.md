@@ -1,16 +1,13 @@
 auth.py
 - password can include any symbols including spaces, no checks for strength
-- first and last names can only include the ASCII characters for: a-z, A-Z, 
-    hyphens, apostrophes and spaces
-- handles can only include the ASCII characters for: a-z, 0-9
+- first and last names can include any character
+- symbols from names are removed when creating handles
+- the global owner is the first user to sign up to Seams
 
 channels.py
 - channel name can contain any character
 - two channels can have the same name if they have a different is_public value
-- channel ids are of type integer
 
-channel.py
-- channel creator is the global owner
 
 
 

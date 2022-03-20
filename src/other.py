@@ -14,6 +14,7 @@ Description: implementation for
 from src.error import InputError, AccessError
 from src.data_store import data_store
 
+
 def clear_v1():
     """
     clears the stored data in data_store
@@ -46,11 +47,11 @@ def check_valid_auth_id(auth_user_id):
     Return Value: N/A
     """
 
-    if isinstance(auth_user_id, int) is False:
+    if isinstance(auth_user_id, int) is False or type(auth_user_id) is bool:
         raise InputError('User id is not of a valid type')
 
     if auth_user_id < 1:
-        raise AccessError('The user id is not valid (out of bounds)')
+        raise InputError('The user id is not valid (out of bounds)')
 
     store = data_store.get()
     user_exists = False
@@ -77,7 +78,7 @@ def check_valid_channel_id(channel_id):
     Return Value: N/A
     """
 
-    if isinstance(channel_id, int) is False:
+    if isinstance(channel_id, int) is False or type(channel_id) is bool:
         raise InputError('Channel id is not of a valid type')
 
     if channel_id < 1:
@@ -110,8 +111,11 @@ def check_user_is_member(auth_user_id, channel_id):
     """
 
     store = data_store.get()
-    channel = store['channels'][channel_id - 1]
-    if auth_user_id in channel['all_members']:
-        return True
+    for channel in store['channels']:
+        if channel['channel_id'] == channel_id:
+            for member in channel['all_members']:
+                if member['u_id'] == auth_user_id:
+                    return True
 
     return False
+
