@@ -56,14 +56,12 @@ def auth_login_v1(email, password):
             if stored_pw == encrypted_pw:
                 u_id = user['id']
                 token = token_generate(user)
-                token_valid_check(token)
             else: # email belongs to a user but incorrect password
                 raise InputError(description='Incorrect password')
 
     # if u_id = -1 then a user with given email does not exist
     if u_id == -1:
         raise InputError(description='Email does not belong to a user')
-
 
     return {
         'token': token,
@@ -122,14 +120,10 @@ def auth_register_v1(email, password, name_first, name_last):
     store['users'].append(user_dict)
     data_store.set(store)
 
-    token = token_generate(user_dict)
-    token_valid_check(token)
-
     return {
-        'token': token,
+        'token': token_generate(user_dict),
         'auth_user_id': u_id,
     }
-
 
 def check_invalid_email(store, valid_email_regex, email):
     """
