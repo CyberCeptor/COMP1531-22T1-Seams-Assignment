@@ -8,14 +8,10 @@ Description: pytests for channel join_v1
 """
 
 import pytest
-
 from src.auth import auth_register_v1
-
 from src.other import clear_v1
 from src.error import InputError, AccessError
-
-from src.channel import channel_join_v1
-
+from src.channel import channel_join_v2
 from src.channels import channels_create_v1
 
 @pytest.fixture(name='clear_and_register_and_create')
@@ -34,7 +30,7 @@ def fixture_clear_and_register_and_create():
     clear_v1()
     user1 = auth_register_v1('abc@def.com', 'password', 'first', 'last')
     chan1 = channels_create_v1(1, 'channel_name', True)
-    return [user1['auth_user_id'], chan1['channel_id']]
+    return [user1['token'], chan1['channel_id'], user1['auth_user_id']]
 
 def test_channel_join_invalid_channel(clear_and_register_and_create):
     """
@@ -50,15 +46,15 @@ def test_channel_join_invalid_channel(clear_and_register_and_create):
     """
     id1 = clear_and_register_and_create[0]
     with pytest.raises(InputError):
-        channel_join_v1(id1, 5)
+        channel_join_v2(id1, 5)
     with pytest.raises(InputError):
-        channel_join_v1(id1, True)
+        channel_join_v2(id1, True)
     with pytest.raises(InputError):
-        channel_join_v1(id1, -5)
+        channel_join_v2(id1, -5)
     with pytest.raises(InputError):
-        channel_join_v1(id1, '6')
+        channel_join_v2(id1, '6')
     with pytest.raises(InputError):
-        channel_join_v1(id1, '')
+        channel_join_v2(id1, '')
 
 def test_channel_join_user_already_in_channel(clear_and_register_and_create):
     """
@@ -76,7 +72,7 @@ def test_channel_join_user_already_in_channel(clear_and_register_and_create):
     id1 = clear_and_register_and_create[0]
     chan_id1 = clear_and_register_and_create[1]
     with pytest.raises(InputError):
-        channel_join_v1(chan_id1, id1)
+        channel_join_v2(id1, chan_id1)
 
 def test_channel_join_private_channel():
     """
@@ -93,12 +89,12 @@ def test_channel_join_private_channel():
     """
     clear_v1()
     user1 = auth_register_v1('wangk@gmail.com', 'wky19991123', 'Wang', 'kaiyan')
-    id1 = user1['auth_user_id']
+    id1 = user1['token']
     user2 = auth_register_v1('xuezh@gmail.com', 'xzq19991123', 'Xue', 'zhiqian')
-    id2 = user2['auth_user_id']
+    id2 = user2['token']
     chan1 = channels_create_v1(id1, 'validchannelname', False)
     chan_id1 = chan1['channel_id']
     with pytest.raises(AccessError):
-        channel_join_v1(id2, chan_id1)
+        channel_join_v2(id2, chan_id1)
 
 clear_v1()
