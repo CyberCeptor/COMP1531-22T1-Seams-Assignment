@@ -69,6 +69,7 @@ data = {
 initial_object = {
     'users': [],
     'channels': [],
+    'tokens': [],
 }
 ## YOU SHOULD MODIFY THIS OBJECT ABOVE
 

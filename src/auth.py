@@ -15,6 +15,7 @@ import re
 import hashlib
 
 from src.error import InputError
+from src.token import token_generate
 
 from src.data_store import data_store
 
@@ -41,6 +42,7 @@ def auth_login_v1(email, password):
 
     store = data_store.get()
     u_id = -1
+    token = -1
 
     # iterates through stored user data and checks if any emails and passwords
     # match the given ones
@@ -52,6 +54,7 @@ def auth_login_v1(email, password):
             encrypted_pw = hashlib.sha256(password.encode()).hexdigest()
             if stored_pw == encrypted_pw:
                 u_id = user['id']
+                token = token_generate(user)
             else: # email belongs to a user but incorrect password
                 raise InputError(description='Incorrect password')
 
@@ -60,7 +63,7 @@ def auth_login_v1(email, password):
         raise InputError(description='Email does not belong to a user')
 
     return {
-        'token': '2',
+        'token': token,
         'auth_user_id': u_id,
     }
 
@@ -110,15 +113,16 @@ def auth_register_v1(email, password, name_first, name_last):
         'last': name_last,
         'handle': handle,
         'perm_id': 1 if u_id == 1 else 2,
-        'token': '1',
     }
+
+    token = token_generate(user_dict)
 
     # store the user information into the list of users
     store['users'].append(user_dict)
     data_store.set(store)
 
     return {
-        'token': '1',
+        'token': token,
         'auth_user_id': u_id,
     }
 
