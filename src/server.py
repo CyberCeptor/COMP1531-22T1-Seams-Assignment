@@ -37,7 +37,7 @@ APP.register_error_handler(Exception, defaultHandler)
 
 data_store = []
 try:
-    data = pickle.load(open('datastore.p'), 'rb')
+    data_store = pickle.load(open('datastore.p'), 'rb')
 except Exception:
     pass
 
@@ -46,9 +46,9 @@ def get_data():
     return data_store
 
 def save_data():
-    data = get_data()
+    data_store = get_data()
     with open('datastore.p', 'wb') as FILE:
-        pickle.dump(data, FILE)
+        pickle.dump(data_store, FILE)
 
 # Example
 # http://127.0.0.1:1337/hello

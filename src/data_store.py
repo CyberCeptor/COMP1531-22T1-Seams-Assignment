@@ -35,7 +35,6 @@ data = {
         'last': 'last',
         'handle': 'firstlast',
         'perm_id': 1,
-        'token': 'dunno yet',
     }],
     'channels' = [{
         'channel_id': 1,
@@ -61,6 +60,12 @@ data = {
             'message': 'hewwo',
             'time_sent': '1582426789'
         ],
+    }],
+    'tokens' = [{
+        'user_id': user_data['id'],
+        'session_id': SESSION_ID_COUNTER,
+        'token': token,
+        'time': datetime.datetime.now(),
     }],
 }
 """

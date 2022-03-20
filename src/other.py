@@ -14,6 +14,7 @@ Description: implementation for
 from src.error import InputError, AccessError
 from src.data_store import data_store
 
+
 def clear_v1():
     """
     clears the stored data in data_store
@@ -117,3 +118,4 @@ def check_user_is_member(auth_user_id, channel_id):
                     return True
 
     return False
+
