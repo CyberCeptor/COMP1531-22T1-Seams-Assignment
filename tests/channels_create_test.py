@@ -39,7 +39,6 @@ def fixture_clear_and_register():
                          json={'email': 'abc@def.com', 'password': 'password',
                                'name_first': 'first', 'name_last': 'last'})
     data = resp.json()
-    print(data)
     token = data['token']
     return token
 

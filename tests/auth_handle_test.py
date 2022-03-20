@@ -9,6 +9,10 @@ Description: pytests for handle generation from auth_register_v1
 
 import pytest
 
+import requests
+
+from src import config
+
 from src.auth import auth_register_v1
 
 from src.other import clear_v1
@@ -34,6 +38,18 @@ def fixture_clear_and_register_and_create():
     user1 = auth_register_v1('abc@def.com', 'password', 'first', 'last')
     chan1 = channels_create_v1(1, 'channel_name', True)
     return [user1['auth_user_id'], chan1['channel_id']]
+
+    # requests.delete(config.url + 'clear/v1')
+    # resp = requests.post(config.url + 'auth/register/v2', 
+    #                      json={'email': 'abc@def.com', 'password': 'password',
+    #                            'name_first': 'first', 'name_last': 'last'})
+    # resp0 = requests.post(config.url + 'channels/create/v2', 
+    #                       json={'token': 2, 'name': 'test_channel_public',
+    #                             'is_public': True})
+    
+    # data = resp.json()
+    # token = data['token']
+    # return token
 
 def test_create_handle_duplicate(clear_and_register_and_create):
     """
