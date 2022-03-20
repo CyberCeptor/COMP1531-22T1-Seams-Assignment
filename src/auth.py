@@ -222,7 +222,3 @@ def create_handle(store, full_name):
         handle = handle + str(duplicate_count)
 
     return handle
-
-# given an active token, invalidates the token to log the user out.
-def auth_logout_v1(token):
-    token_remove(token)

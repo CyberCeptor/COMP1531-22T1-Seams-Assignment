@@ -7,6 +7,7 @@ from json import dumps
 from flask import Flask, request
 from flask_cors import CORS
 from src.error import InputError, AccessError
+from src.token import token_remove, token_valid_check
 from src import config
 
 from src.auth import auth_register_v1, auth_login_v1
@@ -71,9 +72,9 @@ def echo():
 @APP.route('/auth/register/v2', methods=['POST'])
 def register():
     data = request.get_json()
-    print(data)
     user = auth_register_v1(data['email'], data['password'],
                             data['name_first'], data['name_last'])
+    save_data()
     return dumps({
         'token': user['token'],
         'auth_user_id': user['auth_user_id']
@@ -83,23 +84,20 @@ def register():
 def login():
     data = request.get_json()
     user = auth_login_v1(data['email'], data['password'])
+    save_data()
     return dumps({
         'token': user['token'],
         'auth_user_id': user['auth_user_id']
     })
 
-# @APP.route('/auth/logout/v1', methods=['POST'])
-# def logout():
-#     data = request.get_json()
-#     valid_token = False
-#     # check token is valid
-#     for saved_token in data_store['tokens']:
-#         if saved_token['token'] == data['token']:
-#             data_store.remove(saved_token)
-#             valid_token = True
-#     if valid_token is False:
-#         raise AccessError(description='Token is not valid')
-#     return dumps({})
+@APP.route('/auth/logout/v1', methods=['POST'])
+def logout():
+    data = request.get_json()
+    token = data['token']
+    token_valid_check(token)
+    token_remove(token)
+    save_data()
+    return dumps({})
 
 # @APP.route('/users/all/v1', methods=['GET'])
 # def get_users():
@@ -115,6 +113,7 @@ def login():
 @APP.route('/clear/v1', methods=['DELETE'])
 def clear():
     clear_v1()
+    save_data()
     return dumps({})
 
 #### NO NEED TO MODIFY BELOW THIS POINT
