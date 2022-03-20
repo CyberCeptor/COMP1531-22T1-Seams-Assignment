@@ -16,6 +16,11 @@ def token_new_session_id():
     SESSION_ID_COUNTER += 1
     return SESSION_ID_COUNTER
 
+def reset_session_id():
+    global SESSION_ID_COUNTER
+    SESSION_ID_COUNTER = 0
+    return SESSION_ID_COUNTER
+
 # called when a user logs in and registers.
 def token_generate(user_data):
     id = user_data['id']
@@ -64,7 +69,7 @@ def token_valid_check(token):
     valid = True
     error_message = ''
     try:
-        jwt.decode(token, KEY, ALGORITHM)
+        jwt.decode(token, KEY, algorithms=[ALGORITHM])
     except jwt.ExpiredSignatureError:
         valid = False
         error_message = 'Token has expired'
@@ -72,9 +77,10 @@ def token_valid_check(token):
     except jwt.DecodeError:
         valid = False
         error_message = 'Invalid token'
+
     if not valid:
         raise AccessError(error_message)
 
 def token_check_type(token):    
-    if isinstance(token, str) is not True:
+    if isinstance(token, int):
         raise InputError('Invalid token')

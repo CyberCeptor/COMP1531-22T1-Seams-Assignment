@@ -7,7 +7,7 @@ from json import dumps
 from flask import Flask, request
 from flask_cors import CORS
 from src.error import InputError, AccessError
-from src.token import token_remove, token_valid_check
+from src.token import token_remove, token_valid_check, reset_session_id
 from src import config
 
 from src.auth import auth_register_v1, auth_login_v1
@@ -36,7 +36,7 @@ APP.register_error_handler(Exception, defaultHandler)
 
 #### NO NEED TO MODIFY ABOVE THIS POINT, EXCEPT IMPORTS
 
-data_store = []
+data_store = {}
 try:
     data_store = pickle.load(open('datastore.p'), 'rb')
 except Exception:
@@ -44,6 +44,7 @@ except Exception:
 
 def get_data():
     global data_store
+    print(data_store)
     return data_store
 
 def save_data():
@@ -74,7 +75,8 @@ def register():
     data = request.get_json()
     user = auth_register_v1(data['email'], data['password'],
                             data['name_first'], data['name_last'])
-    save_data()
+    data_store = get_data()
+    print(data_store)
     return dumps({
         'token': user['token'],
         'auth_user_id': user['auth_user_id']
@@ -84,7 +86,8 @@ def register():
 def login():
     data = request.get_json()
     user = auth_login_v1(data['email'], data['password'])
-    save_data()
+    data_store = get_data()
+    print(data_store)
     return dumps({
         'token': user['token'],
         'auth_user_id': user['auth_user_id']
@@ -94,30 +97,40 @@ def login():
 def logout():
     data = request.get_json()
     token = data['token']
+    print(token)
     token_valid_check(token)
     token_remove(token)
-    save_data()
+    data_store = get_data()
+    print(data_store)
     return dumps({})
 
-# @APP.route('/users/all/v1', methods=['GET'])
-# def get_users():
-#     token = request.args.get('token')
-
-#     # check that token is valid
-#     return dumps({
-#         'users': [{k, data_store[k]} for k in
-#                   ['u_id', 'email', 'name_first', 'name_last', 'handle_str']
-#                   if k in data_store]
-#     })
+@APP.route('/users/all/v1', methods=['GET'])
+def get_users():
+    token = request.args.get('token')
+    token_valid_check(token)
+    to_return = []
+    for user in data_store['users']:
+        to_return.append({
+            'u_id': user['id'],
+            'email': user['email'],
+            'name_first': user['first'],
+            'name_last': user['last'],
+            'handle_str': user['handle'],
+        })
+    return dumps({
+        'users': to_return
+    })
 
 @APP.route('/clear/v1', methods=['DELETE'])
 def clear():
     clear_v1()
-    save_data()
+    reset_session_id()
+    data_store = get_data()
+    print(data_store)
     return dumps({})
 
 #### NO NEED TO MODIFY BELOW THIS POINT
 
 if __name__ == "__main__":
     signal.signal(signal.SIGINT, quit_gracefully) # For coverage
-    APP.run(port=config.port) # Do not edit this port
+    APP.run(port=config.port, debug=True) # Do not edit this port
