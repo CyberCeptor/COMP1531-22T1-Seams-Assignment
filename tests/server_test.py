@@ -40,12 +40,12 @@ def test_logout_invalid_token(clear_and_register):
     # access error: non-jwt token str is passed in as token
     resp1 = requests.post(config.url + 'auth/logout/v1',
                          json={'token': 'not a valid jwt token str'})
-    assert resp1.status_code == 400
+    assert resp1.status_code == 403
 
     # input error: bool is passed in as token
-    resp1 = requests.post(config.url + 'auth/logout/v1',
+    resp2 = requests.post(config.url + 'auth/logout/v1',
                          json={'token': True})
-    assert resp1.status_code == 400
+    assert resp2.status_code == 400
 
 # def test_users_return():
 #     requests.delete(config.url + 'clear/v1')
