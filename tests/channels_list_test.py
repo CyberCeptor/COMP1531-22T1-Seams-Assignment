@@ -6,7 +6,6 @@ Created: 28/02/2022 - 04/03/2022
 
 Description: pytests for channel_list_v1
 """
-import json
 import pytest
 import requests
 from src.auth import auth_register_v1
@@ -71,12 +70,7 @@ def test_channels_list():
                             json={'token': user1_json['token'], 'name': 'channel_name1', 'is_public': True})
 
     assert channel1.status_code == 200
-
-
     channel1_json = channel1.json()
-
-
-
 
 
     channel2 = requests.post(config.url + 'channels/create/v2', 
@@ -117,9 +111,9 @@ def test_channels_list():
     assert channels_list_json['channels'][0]['channel_id'] == channel1_json['channel_id']
     assert channels_list_json['channels'][1]['channel_id'] == channel2_json['channel_id']
     assert channels_list_json['channels'][2]['channel_id'] == channel3_json['channel_id']
-    assert channels_list_json['channels'][0]['name'] == channel1_json['name']
-    assert channels_list_json['channels'][1]['name'] == channel2_json['name']
-    assert channels_list_json['channels'][2]['name'] == channel3_json['name']
+    assert channels_list_json['channels'][0]['name'] == 'channel_name1'
+    assert channels_list_json['channels'][1]['name'] == 'channel_name2'
+    assert channels_list_json['channels'][2]['name'] == 'private_channel1'
 
 
     # clear_v1()

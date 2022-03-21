@@ -45,7 +45,7 @@ def token_generate(user_data):
 # given a token, returns the user_id
 def token_get_user_id(token):
     decoded = jwt.decode(token, KEY, ALGORITHM)
-    return int(decoded['user_id'])
+    return int(decoded['id'])
 
 # iterates through the token dictionary, and returns the dict of the token given.
 def token_locate_in_data_store(token):
