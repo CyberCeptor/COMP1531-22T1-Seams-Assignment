@@ -83,3 +83,8 @@ Meeting type: Lab
 - push regularly
 - create new http functions in server.py for now and we can separate later if needed
 - keeping Monday 8pm meeting, Wednesday standup, Friday meeting schedule unless we want more during flexi week
+
+21.03
+Members present: Aleesha, Aisha, Jenson, Van
+Meeting type: check-in
+- complete v2 pytests and implementations by tomorrow night

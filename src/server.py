@@ -7,10 +7,18 @@ from json import dumps
 from flask import Flask, request
 from flask_cors import CORS
 from src.error import InputError, AccessError
+
+from src.token import token_remove, token_valid_check, token_get_user_id
+
 from src import config
 
 from src.auth import auth_register_v1, auth_login_v1
+from src.channels import channels_create_v1, channels_list_v1
 from src.other import clear_v1
+
+from src.admin import admin_userpermission_change
+
+from src.data_store_pickle import pickle_data
 
 def quit_gracefully(*args):
     '''For coverage'''
@@ -35,20 +43,17 @@ APP.register_error_handler(Exception, defaultHandler)
 
 #### NO NEED TO MODIFY ABOVE THIS POINT, EXCEPT IMPORTS
 
-data_store = []
-try:
-    data = pickle.load(open('datastore.p'), 'rb')
-except Exception:
-    pass
+pickle_data()
+
+DATA_STORE = {}
 
 def get_data():
-    global data_store
-    return data_store
-
-def save_data():
-    data = get_data()
-    with open('datastore.p', 'wb') as FILE:
-        pickle.dump(data, FILE)
+    global DATA_STORE
+    try:
+        DATA_STORE = pickle.load(open('datastore.p', 'rb'))
+    except Exception:
+        pass
+    return DATA_STORE
 
 # Example
 # http://127.0.0.1:1337/hello
@@ -71,9 +76,9 @@ def echo():
 @APP.route('/auth/register/v2', methods=['POST'])
 def register():
     data = request.get_json()
-    print(data)
     user = auth_register_v1(data['email'], data['password'],
                             data['name_first'], data['name_last'])
+    save_data()
     return dumps({
         'token': user['token'],
         'auth_user_id': user['auth_user_id']
@@ -83,42 +88,90 @@ def register():
 def login():
     data = request.get_json()
     user = auth_login_v1(data['email'], data['password'])
+    save_data()
     return dumps({
         'token': user['token'],
         'auth_user_id': user['auth_user_id']
     })
 
-# @APP.route('/auth/logout/v1', methods=['POST'])
-# def logout():
-#     data = request.get_json()
-#     valid_token = False
-#     # check token is valid
-#     for saved_token in data_store['tokens']:
-#         if saved_token['token'] == data['token']:
-#             data_store.remove(saved_token)
-#             valid_token = True
-#     if valid_token is False:
-#         raise AccessError(description='Token is not valid')
-#     return dumps({})
+@APP.route('/auth/logout/v1', methods=['POST'])
+def logout():
+    data = request.get_json()
+    token = data['token']
+    token_valid_check(token)
+    token_remove(token)
+    save_data()
+    return dumps({})
 
-# @APP.route('/users/all/v1', methods=['GET'])
-# def get_users():
-#     token = request.args.get('token')
+@APP.route('/users/all/v1', methods=['GET'])
+def get_users():
+    global DATA_STORE
+    token = request.args.get('token')
+    token_valid_check(token)
+    to_return = []
+    for user in DATA_STORE['users']:
+        to_return.append({
+            'u_id': user['id'],
+            'email': user['email'],
+            'name_first': user['first'],
+            'name_last': user['last'],
+            'handle_str': user['handle'],
+        })
+    return dumps({
+        'users': to_return
+    })
 
-#     # check that token is valid
-#     return dumps({
-#         'users': [{k, data_store[k]} for k in
-#                   ['u_id', 'email', 'name_first', 'name_last', 'handle_str']
-#                   if k in data_store]
-#     })
+@APP.route('/admin/userpermission/change/v1', methods=['POST'])
+def change_perms():
+    data = request.get_json()
+    token = data['token']
+    token_valid_check(token)
+    admin_userpermission_change(token, data['u_id'], data['permission_id'])
+    save_data()
+    return dumps({})
+
+@APP.route("/channels/create/v2", methods=['POST'])
+def channel_create():
+    data = request.get_json()
+    token_valid_check(data['token'])
+    user_id = token_get_user_id(data['token'])
+    channel = channels_create_v1(user_id, data['name'], data['is_public'])
+    save_data()
+    return dumps(channel)
+
+@APP.route("/channels/list/v2", methods=['GET'])
+def channel_list():
+    token = request.args.get('token')
+    token_valid_check(token)
+    user_id = token_get_user_id(token)
+    channel_list = channels_list_v1(user_id)
+    save_data()
+    return dumps(channel_list)
+
 
 @APP.route('/clear/v1', methods=['DELETE'])
 def clear():
     clear_v1()
+    save_data()
     return dumps({})
+
+def save_data():
+    global DATA_STORE
+    pickle_data()
+    DATA_STORE = get_data()
+    with open('datastore.p', 'wb') as FILE:
+        pickle.dump(DATA_STORE, FILE)
+    return DATA_STORE
+
+
+
+
 
 #### NO NEED TO MODIFY BELOW THIS POINT
 
 if __name__ == "__main__":
     signal.signal(signal.SIGINT, quit_gracefully) # For coverage
-    APP.run(port=config.port) # Do not edit this port
+    APP.run(port=config.port, debug=True) # Do not edit this port
+
+
+

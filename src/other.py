@@ -12,6 +12,9 @@ Description: implementation for
         - checking if a user is a member of a channel
 """
 from src.error import InputError, AccessError
+
+from src.token import reset_session_id
+
 from src.data_store import data_store
 
 
@@ -27,9 +30,11 @@ def clear_v1():
     """
 
     store = data_store.get()
-    store['users'] = []
-    store['channels'] = []
+    store['users'].clear()
+    store['channels'].clear()
+    store['tokens'].clear()
     data_store.set(store)
+    reset_session_id()
 
 def check_valid_auth_id(auth_user_id):
     """
