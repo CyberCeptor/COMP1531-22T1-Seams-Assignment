@@ -111,7 +111,6 @@ def test_channels_list():
     assert channels_list_json['channels'][1]['name'] == channel2_json['name']
     assert channels_list_json['channels'][2]['name'] == channel3_json['name']
 
-    assert 
 
     # clear_v1()
     # user1 = auth_register_v1('abc@def.com', 'password', 'first', 'last')
@@ -157,11 +156,24 @@ def test_channels_list_invalid_token():
     requests.post(config.url + 'channels/create/v2', 
                             json={'token': user1_json['token'], 'name': 'priv_channel', 'is_public': False})
 
-    channels_list = requests.get(config.url + 'channels/list', params = {'token': '4444'})
-    channels_list_json = channels_list.json()
-
+    # passing incorrect string as token.
+    channels_list_json = requests.get(config.url + 'channels/list', params = {'token': '4444'}).json()
     assert channels_list_json.status_code == 400
 
+    # passing int as a token.
+    channels_list_json = requests.get(config.url + 'channels/list', params = {'token': 4444}).json()
+    assert channels_list_json.status_code == 400
+
+    # passing a True bool as a token
+    channels_list_json = requests.get(config.url + 'channels/list', params = {'token': True}).json()
+    assert channels_list_json.status_code == 400
+
+    # passing a False bool as a token
+    channels_list_json = requests.get(config.url + 'channels/list', params = {'token': False}).json()
+    assert channels_list_json.status_code == 400
+
+    # channels_list_json = channels_list.json()
+    # assert channels_list_json.status_code == 400
     # clear_v1()
     # user1 = auth_register_v1('abc@def.com', 'password', 'first', 'last')
     # id1 = user1['auth_user_id']
@@ -172,57 +184,3 @@ def test_channels_list_invalid_token():
     # with pytest.raises(AccessError):
     #     channels_list_v1(44444) # give incorrect auth_id.
 
-
-
-
-
-def test_channels_list_v1():
-    """
-    Test that the channels list is functionally with multiple channels being
-    created. This also tests for public and private channels.
-    Also tests that channel_list only returns the channel that the id is in.
-
-    Arguments:  N/A
-
-    Exceptions: N/A
-
-    Return Value:   N/A
-    """
-
-
-
-
-
-
-
-
-    clear_v1()
-    user1 = auth_register_v1('abc@def.com', 'password', 'first', 'last')
-    id1 = user1['auth_user_id']
-    chan1 = channels_create_v1(id1, 'test_channel_public1', True)
-    chan2 = channels_create_v1(id1, 'test_channel_public2', True)
-    chan3 = channels_create_v1(id1, 'test_channel_priv1', False)
-    chan4 = channels_create_v1(id1, 'test_channel_priv2', False)
-
-    # adding some random channels from another user to makes sure its not
-    # returning all channels, even those which the user isnt in.
-    user2 = auth_register_v1('def@abc.com', 'password', 'first', 'last')
-    id2 = user2['auth_user_id']
-    channels_create_v1(id2, 'test2_channel_pub', True)
-    channels_create_v1(id2, 'test2_channel_priv', False)
-    # returns a Dict containing 'channel_id' and 'name' of all channels the user
-    # is in.
-    channels_list = channels_list_v1(id1)
-    channels_list_v1(id2)
-
-    # check the first four channels in the dict, check that the channel_id
-    # matches what was created.
-    assert channels_list['channels'][0]['channel_id'] == chan1['channel_id']
-    assert channels_list['channels'][1]['channel_id'] == chan2['channel_id']
-    assert channels_list['channels'][2]['channel_id'] == chan3['channel_id']
-    assert channels_list['channels'][3]['channel_id'] == chan4['channel_id']
-
-    # Testing to make sure that only 4 channels have been created for that user.
-    assert len(channels_list['channels']) == 4
-
-clear_v1()
