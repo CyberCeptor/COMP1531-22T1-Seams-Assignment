@@ -54,7 +54,7 @@ def fixture_clear_and_register_and_create():
 
 
 
-def test_channel_details_invalid_user_id(clear_and_register_and_create):
+def test_channel_details_invalid_token(clear_and_register_and_create):
     """
     testing invalid user type to raise input error
 
@@ -65,22 +65,32 @@ def test_channel_details_invalid_user_id(clear_and_register_and_create):
 
     Return Value: N/A
     """
+    # pylint: disable=unused-argument
+
+
     chan_id1 = clear_and_register_and_create[1]
-    # no user input
-    with pytest.raises(InputError):
-        channel_details_v1('', chan_id1)
-    # wrong type user input
-    with pytest.raises(InputError):
-        channel_details_v1('not int', chan_id1)
-    # wrong type user input
-    with pytest.raises(InputError):
-        channel_details_v1(True, chan_id1)
-    # user is not in the channel
-    with pytest.raises(AccessError):
-        channel_details_v1(2, chan_id1)
-    # non exist user input
-    with pytest.raises(InputError):
-        channel_details_v1(-1, chan_id1)
+    resp0 = requests.post(config.url + 'channel/details/v2', 
+                          json={'token': 0, 'channel_id': chan_id1})
+    assert resp0.status_code == 400
+
+    resp1 = requests.post(config.url + 'channel/details/v2', 
+                          json={'token': True, 'channel_id': chan_id1})
+    assert resp0.status_code == 400
+    # # no user input
+    # with pytest.raises(InputError):
+    #     channel_details_v1('', chan_id1)
+    # # wrong type user input
+    # with pytest.raises(InputError):
+    #     channel_details_v1('not int', chan_id1)
+    # # wrong type user input
+    # with pytest.raises(InputError):
+    #     channel_details_v1(True, chan_id1)
+    # # user is not in the channel
+    # with pytest.raises(AccessError):
+    #     channel_details_v1(2, chan_id1)
+    # # non exist user input
+    # with pytest.raises(InputError):
+    #     channel_details_v1(-1, chan_id1)
 
 def test_channel_details_invalid_channel(clear_and_register_and_create):
     """
