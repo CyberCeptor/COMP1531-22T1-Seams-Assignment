@@ -13,7 +13,8 @@ from src.token import token_remove, token_valid_check, token_get_user_id
 from src import config
 
 from src.auth import auth_register_v1, auth_login_v1
-from src.channels import channels_create_v1, channels_list_v1
+from src.channels import channels_create_v1, channels_list_v1, channels_listall_v1
+from src.channel import channel_details_v1
 from src.other import clear_v1
 
 from src.admin import admin_userpermission_change
@@ -130,6 +131,10 @@ def change_perms():
     save_data()
     return dumps({})
 
+
+## CHANNELS ROUTES
+
+
 @APP.route("/channels/create/v2", methods=['POST'])
 def channel_create():
     data = request.get_json()
@@ -138,6 +143,7 @@ def channel_create():
     channel = channels_create_v1(user_id, data['name'], data['is_public'])
     save_data()
     return dumps(channel)
+
 
 @APP.route("/channels/list/v2", methods=['GET'])
 def channel_list():
@@ -148,6 +154,37 @@ def channel_list():
     save_data()
     return dumps(channel_list)
 
+@APP.route('/channels/listall/v2', methods=['GET'])
+def channel_listall():
+    token = request.args.get('token')
+    token_valid_check(token)
+    user_id = token_get_user_id(token)
+    channels_list = channels_listall_v1(user_id)
+    save_data()
+    return dumps(channels_list)
+
+
+## CHANNEL ROUTES
+
+@APP.route('/channel/details/v2', methods=['GET'])
+def channel_details():
+    token = request.args.get('token')
+    token_valid_check(token)
+    user_id = token_get_user_id(token)
+    channel_id = int(request.args.get("channel_id"))
+    channel_details = channel_details_v1(user_id, channel_id)
+    save_data()
+    return dumps(channel_details)
+
+
+## MESSAGE ROUTES
+
+@APP.route('/message/send/v1', methods=['POST'])
+def message_send():
+    data = request.get_json()
+    return dumps(message_send(**data))
+
+#### NO NEED TO MODIFY BELOW THIS POINT
 
 @APP.route('/clear/v1', methods=['DELETE'])
 def clear():
