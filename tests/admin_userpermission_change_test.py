@@ -4,6 +4,10 @@ import requests
 
 from src import config
 
+EXPIRED = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MSwic2Vzc2lvbl9pZCI6MSw\
+    iaGFuZGxlIjoiZmlyc3RsYXN0IiwiZXhwIjoxNTQ3OTc3ODgwfQ.366QLXfCURopcjJbAheQYLV\
+        NlGLX_INKVwr8_TVXYEQ'
+
 @pytest.fixture(name='clear_and_register')
 def fixture_clear_and_register():
     """ clears any data stored in data_store and registers a user with the
@@ -133,7 +137,7 @@ def test_admin_userpermission_change_not_global_owner(clear_and_register):
     token2 = user2['token']
 
     resp1 = requests.post(config.url + 'auth/register/v2', 
-                          json={'email': 'def@ghi.com', 'password': 'password',
+                          json={'email': 'ghi@jkl.com', 'password': 'password',
                                 'name_first': 'first', 'name_last': 'last'})
     assert resp1.status_code == 200
     user3 = resp0.json()
