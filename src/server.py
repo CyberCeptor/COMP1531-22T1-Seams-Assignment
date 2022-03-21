@@ -93,8 +93,8 @@ def login():
 def logout():
     data = request.get_json()
     token = data['token']
-    token_remove(token)
     token_valid_check(token)
+    token_remove(token)
     save_data()
     return dumps({})
 

@@ -88,3 +88,4 @@ def token_valid_check(token):
 
     if not valid:
         raise AccessError(error_message)
+    token_locate_in_data_store(token)
