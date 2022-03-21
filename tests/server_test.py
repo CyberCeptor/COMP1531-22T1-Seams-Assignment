@@ -4,6 +4,8 @@ import requests
 
 from src import config
 
+EXPIRED = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MSwic2Vzc2lvbl9pZCI6MSwiaGFuZGxlIjoiZmlyc3RsYXN0IiwiZXhwIjoxNTQ3OTc3ODgwfQ.366QLXfCURopcjJbAheQYLVNlGLX_INKVwr8_TVXYEQ'
+
 @pytest.fixture(name='clear_and_register')
 def fixture_clear_and_register():
     """ clears any data stored in data_store and registers a user with the
@@ -46,6 +48,11 @@ def test_logout_invalid_token(clear_and_register):
     resp2 = requests.post(config.url + 'auth/logout/v1',
                          json={'token': True})
     assert resp2.status_code == 400
+
+    # access error: expired, unsaved token
+    resp3 = requests.post(config.url + 'auth/logout/v1',
+                         json={'token': EXPIRED})
+    assert resp3.status_code == 403
 
 def test_users_return(clear_and_register):
     token1 = clear_and_register['token']
@@ -96,3 +103,9 @@ def test_users_invalid_token(clear_and_register):
     # input error: int is passed in as token
     resp2 = requests.get(config.url + 'users/all/v1', params={'token': True})
     assert resp2.status_code == 400
+
+    # access error: expired, unsaved token
+    resp3 = requests.get(config.url + 'users/all/v1', params={'token': EXPIRED})
+    assert resp3.status_code == 403
+
+requests.delete(config.url + 'clear/v1')

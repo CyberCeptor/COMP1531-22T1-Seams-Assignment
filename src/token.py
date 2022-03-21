@@ -67,16 +67,13 @@ def token_valid_check(token):
     # decode will check the current time againest the expiry time
     try:
         token = int(token)
+        raise InputError('Invalid token')
     except ValueError:
         pass
 
-    if token == 'True':
-        token = True
-    elif token == 'False':
-        token = False
+    if token == 'True' or token == 'False':
+        raise InputError('Invalid token')
 
-    token_check_type(token)
-    print('passed type check')
     valid = True
     error_message = ''
     try:
@@ -91,7 +88,3 @@ def token_valid_check(token):
 
     if not valid:
         raise AccessError(error_message)
-
-def token_check_type(token):
-    if isinstance(token, int):
-        raise InputError('Invalid token')
