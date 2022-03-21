@@ -6,8 +6,6 @@ Created: 24/02/2022 - 04/03/2022
 
 Description: pytests for auth_register_v1 and auth_login_v1
 """
-import json
-
 import pytest
 
 import requests
