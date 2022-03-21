@@ -84,7 +84,9 @@ def channel_details_v1(auth_user_id, channel_id):
     # find the channel information
     for channel in store['channels']:
         if channel['channel_id'] == channel_id:
-            channel_info = channel
+            for user in channel['users']:
+                if user[id] == auth_user_id:
+                    channel_info = channel
 
     #return requires keys and values from stored data
     return {
