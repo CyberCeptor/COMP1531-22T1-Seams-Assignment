@@ -7,7 +7,6 @@ Created: 09/03/2022
 Description: pytests for handle generation from auth_register_v1
 """
 
-from turtle import clear
 import pytest
 
 import requests
