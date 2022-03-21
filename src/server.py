@@ -7,10 +7,15 @@ from json import dumps
 from flask import Flask, request
 from flask_cors import CORS
 from src.error import InputError, AccessError
+<<<<<<< HEAD
 from src.token import token_remove, token_valid_check
+=======
+from src.token import token_remove, token_valid_check, reset_session_id, token_get_user_id
+>>>>>>> master
 from src import config
 
 from src.auth import auth_register_v1, auth_login_v1
+from src.channels import channels_create_v1, channels_list_v1
 from src.other import clear_v1
 
 from src.admin import count_global_owners
@@ -118,6 +123,7 @@ def get_users():
         'users': to_return
     })
 
+<<<<<<< HEAD
 @APP.route('/admin/userpermission/change/v1', methods=['POST'])
 def change_perms():
     global DATA_STORE
@@ -126,6 +132,33 @@ def change_perms():
     token_valid_check(token)
     print(count_global_owners)
     return dumps({})
+=======
+
+############################################################
+#            Channels
+@APP.route("/channels/create/v2", methods=['POST'])
+def channel_create():
+    data = request.get_json()
+    token_valid_check(data['token'])
+    user_id = token_get_user_id(data['token'])
+    channel = channels_create_v1(user_id, data['name'], data['is_public'])
+    save_data()
+    return dumps(channel)
+
+
+
+@APP.route("/channels/list/v2", methods=['GET'])
+def channel_list():
+    token = request.args.get('token')
+    token_valid_check(token)
+    user_id = token_get_user_id(token)
+    channel_list = channels_list_v1(user_id)
+    save_data()
+    return dumps(channel_list)
+
+
+
+>>>>>>> master
 
 @APP.route('/clear/v1', methods=['DELETE'])
 def clear():
@@ -141,8 +174,15 @@ def save_data():
         pickle.dump(DATA_STORE, FILE)
     return DATA_STORE
 
+
+
+
+
 #### NO NEED TO MODIFY BELOW THIS POINT
 
 if __name__ == "__main__":
     signal.signal(signal.SIGINT, quit_gracefully) # For coverage
     APP.run(port=config.port, debug=True) # Do not edit this port
+
+
+

@@ -28,6 +28,10 @@ def token_generate(user_data):
     expiry_time = datetime.datetime.now() + datetime.timedelta(hours=24)
     handle = user_data['handle']
     token = jwt.encode({'id': id, 'session_id': session_id, 'handle': handle, 'exp': expiry_time}, KEY, ALGORITHM)
+<<<<<<< HEAD
+=======
+
+>>>>>>> master
     token_dict = {
         'user_id': user_data['id'],
         'session_id': session_id,
@@ -43,7 +47,7 @@ def token_generate(user_data):
 # given a token, returns the user_id
 def token_get_user_id(token):
     decoded = jwt.decode(token, KEY, ALGORITHM)
-    return int(decoded['user_id'])
+    return int(decoded['id'])
 
 # iterates through the token dictionary, and returns the dict of the token given.
 def token_locate_in_data_store(token):
