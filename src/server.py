@@ -117,28 +117,6 @@ def get_users():
         'users': to_return
     })
 
-@APP.route('/clear/v1', methods=['DELETE'])
-def clear():
-    clear_v1()
-    reset_session_id()
-    save_data()
-    return dumps({})
-
-def save_data():
-    global DATA_STORE
-    pickle_data()
-    DATA_STORE = get_data()
-    with open('datastore.p', 'wb') as FILE:
-        pickle.dump(DATA_STORE, FILE)
-    return DATA_STORE
-
-#### NO NEED TO MODIFY BELOW THIS POINT
-
-if __name__ == "__main__":
-    signal.signal(signal.SIGINT, quit_gracefully) # For coverage
-    APP.run(port=config.port, debug=True) # Do not edit this port
-
-
 
 ############################################################
 #            Channels
@@ -155,3 +133,34 @@ def channel_list():
     channel_list = channels_list_v1(token)
     save_data()
     return dumps(channel_list)
+
+
+
+
+@APP.route('/clear/v1', methods=['DELETE'])
+def clear():
+    clear_v1()
+    reset_session_id()
+    save_data()
+    return dumps({})
+
+def save_data():
+    global DATA_STORE
+    pickle_data()
+    DATA_STORE = get_data()
+    with open('datastore.p', 'wb') as FILE:
+        pickle.dump(DATA_STORE, FILE)
+    return DATA_STORE
+
+
+
+
+
+#### NO NEED TO MODIFY BELOW THIS POINT
+
+if __name__ == "__main__":
+    signal.signal(signal.SIGINT, quit_gracefully) # For coverage
+    APP.run(port=config.port, debug=True) # Do not edit this port
+
+
+

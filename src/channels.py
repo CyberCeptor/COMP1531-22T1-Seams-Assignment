@@ -13,8 +13,9 @@ Description: implementation for
 from src.error import InputError
 from src.other import check_valid_auth_id, check_user_is_member
 from src.data_store import data_store
+from src.token import token_valid_check, token_get_user_id
 
-def channels_list_v1(auth_user_id):
+def channels_list_v1(token):
     """
     Provides a channel list of all the public channels
     the user is a member of.
@@ -30,7 +31,8 @@ def channels_list_v1(auth_user_id):
         the user is a member of
     """
 
-    check_valid_auth_id(auth_user_id)
+    token_valid_check(token)
+    auth_user_id = token_get_user_id(token)
 
     store = data_store.get()
     channels_list = []
@@ -47,7 +49,8 @@ def channels_list_v1(auth_user_id):
         'channels': channels_list
     }
 
-def channels_listall_v1(auth_user_id):
+
+def channels_listall_v1(token):
     """
     check if user is valid then provides lists of diictionaries containing all
     channel ids and channel names
@@ -65,8 +68,7 @@ def channels_listall_v1(auth_user_id):
 
     store = data_store.get()
 
-    # check that the auth_user_id exists
-    check_valid_auth_id(auth_user_id)
+    token_valid_check(token)
 
     # create list of dictionaries to store each channel_return
     dict_list = []
@@ -82,7 +84,12 @@ def channels_listall_v1(auth_user_id):
         'channels': dict_list
     }
 
-def channels_create_v1(auth_user_id, name, is_public):
+
+
+# NNNEEEEEEEDDDDD TO CHANGE TO TOKEN< NOT AUTH_USED_ID
+# LEAVING AS IS TO AVOID ERRORS IN OTHERS TESTS!!!!!
+
+def channels_create_v1(token, name, is_public):
     """
     Creates a new channel with the name and is_public status given.
     The creating member is an owner_member and has permissions to
@@ -111,7 +118,8 @@ def channels_create_v1(auth_user_id, name, is_public):
 
     store = data_store.get()
 
-    check_valid_auth_id(auth_user_id)
+    token_valid_check(token)
+    auth_user_id = token_get_user_id(token)
 
     if len(name) > 20:
         raise InputError('The channel name must be less than 20 characters')
