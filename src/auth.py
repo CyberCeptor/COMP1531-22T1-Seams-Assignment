@@ -15,6 +15,7 @@ import re
 import hashlib
 
 from src.error import InputError
+from src.token import token_generate
 
 from src.data_store import data_store
 from src.token import token_generate, token_remove, token_valid_check
@@ -55,7 +56,6 @@ def auth_login_v1(email, password):
             if stored_pw == encrypted_pw:
                 u_id = user['id']
                 token = token_generate(user)
-                token_valid_check(token)
             else: # email belongs to a user but incorrect password
                 raise InputError(description='Incorrect password')
 
@@ -63,10 +63,9 @@ def auth_login_v1(email, password):
     if u_id == -1:
         raise InputError(description='Email does not belong to a user')
 
-
     return {
-        'auth_user_id': u_id,
         'token': token,
+        'auth_user_id': u_id,
     }
 
 # based on code Haydon wrote in project starter video
@@ -116,19 +115,15 @@ def auth_register_v1(email, password, name_first, name_last):
         'handle': handle,
         'perm_id': 1 if u_id == 1 else 2,
     }
-    
+
     # store the user information into the list of users
     store['users'].append(user_dict)
     data_store.set(store)
 
-    token = token_generate(user_dict)
-    token_valid_check(token)
-
     return {
-        'token': token,
+        'token': token_generate(user_dict),
         'auth_user_id': u_id,
     }
-
 
 def check_invalid_email(store, valid_email_regex, email):
     """
@@ -227,7 +222,3 @@ def create_handle(store, full_name):
         handle = handle + str(duplicate_count)
 
     return handle
-
-# given an active token, invalidates the token to log the user out.
-def auth_logout_v1(token):
-    token_remove(token)

@@ -7,13 +7,18 @@ from src.error import InputError, AccessError
 from src.data_store import data_store
 # from flask import jsonify
 
-KEY = "hotpot"
-ALGORITHM = "HS256"
+KEY = 'hotpot'
+ALGORITHM = 'HS256'
 SESSION_ID_COUNTER = 0
 
 def token_new_session_id():
     global SESSION_ID_COUNTER
     SESSION_ID_COUNTER += 1
+    return SESSION_ID_COUNTER
+
+def reset_session_id():
+    global SESSION_ID_COUNTER
+    SESSION_ID_COUNTER = 0
     return SESSION_ID_COUNTER
 
 # called when a user logs in and registers.
@@ -57,27 +62,22 @@ def token_remove(token):
     store['tokens'].remove(token_to_remove)
     data_store.set(store)
 
-
 # checks that the created token matches the user information in their dictionary.
-# decode will check the current time againest the expiry time
 def token_valid_check(token):
-    # get converts everything given into a string. 
-    # tries to convert to an int, if its a string, it will pass, if its an int, will give an error.
+    # decode will check the current time againest the expiry time
     try:
         token = int(token)
+        raise InputError('Invalid token')
     except ValueError:
         pass
 
-    if token == 'True':
-        token = True
-    elif token == 'False':
-        token = False
-    
-    token_check_type(token)
+    if token == 'True' or token == 'False':
+        raise InputError('Invalid token')
+
     valid = True
     error_message = ''
     try:
-        jwt.decode(token, KEY, ALGORITHM)
+        jwt.decode(token, KEY, algorithms=[ALGORITHM])
     except jwt.ExpiredSignatureError:
         valid = False
         error_message = 'Token has expired'
@@ -85,10 +85,6 @@ def token_valid_check(token):
     except jwt.DecodeError:
         valid = False
         error_message = 'Invalid token'
-    
+
     if not valid:
         raise AccessError(error_message)
-
-def token_check_type(token):    
-    if isinstance(token, str) is not True:
-        raise InputError('Invalid token')
