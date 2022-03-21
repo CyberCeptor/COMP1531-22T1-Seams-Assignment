@@ -196,3 +196,19 @@ def test_channels_list_invalid_token():
     # with pytest.raises(AccessError):
     #     channels_list_v1(44444) # give incorrect auth_id.
 
+
+# def test_channels_logout():
+#     requests.delete(config.url + 'clear/v1')
+
+#     user = requests.post(config.url + 'auth/register/v2', 
+#                   json={'email': 'abc@def.com', 'password': 'password',
+#                         'name_first': 'first', 'name_last': 'last'})
+#     user_json = user.json()
+#     logout = requests.post(config.url + 'auth/logout/v1', user_json['token'])
+
+#     assert logout.status_code == 200
+
+#     channel = requests.post(config.url + 'channels/create/v2', 
+#                             json={'token': user_json['token'], 'name': 'public_channel', 'is_public': True})
+    
+#     assert channel.status_code == 403
