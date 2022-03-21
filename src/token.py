@@ -7,8 +7,8 @@ from src.error import InputError, AccessError
 from src.data_store import data_store
 # from flask import jsonify
 
-KEY = "hotpot"
-ALGORITHM = "HS256"
+KEY = 'hotpot'
+ALGORITHM = 'HS256'
 SESSION_ID_COUNTER = 0
 
 def token_new_session_id():
@@ -65,7 +65,18 @@ def token_remove(token):
 # checks that the created token matches the user information in their dictionary.
 def token_valid_check(token):
     # decode will check the current time againest the expiry time
+    try:
+        token = int(token)
+    except ValueError:
+        pass
+
+    if token == 'True':
+        token = True
+    elif token == 'False':
+        token = False
+
     token_check_type(token)
+    print('passed type check')
     valid = True
     error_message = ''
     try:
@@ -81,6 +92,6 @@ def token_valid_check(token):
     if not valid:
         raise AccessError(error_message)
 
-def token_check_type(token):    
+def token_check_type(token):
     if isinstance(token, int):
         raise InputError('Invalid token')

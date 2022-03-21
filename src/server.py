@@ -13,6 +13,8 @@ from src import config
 from src.auth import auth_register_v1, auth_login_v1
 from src.other import clear_v1
 
+from src.data_store_pickle import pickle_data
+
 def quit_gracefully(*args):
     '''For coverage'''
     exit(0)
@@ -36,21 +38,17 @@ APP.register_error_handler(Exception, defaultHandler)
 
 #### NO NEED TO MODIFY ABOVE THIS POINT, EXCEPT IMPORTS
 
-data_store = {}
-try:
-    data_store = pickle.load(open('datastore.p'), 'rb')
-except Exception:
-    pass
+pickle_data()
+
+DATA_STORE = {}
 
 def get_data():
-    global data_store
-    print(data_store)
-    return data_store
-
-def save_data():
-    data_store = get_data()
-    with open('datastore.p', 'wb') as FILE:
-        pickle.dump(data_store, FILE)
+    global DATA_STORE
+    try:
+        DATA_STORE = pickle.load(open('datastore.p', 'rb'))
+    except Exception:
+        pass
+    return DATA_STORE
 
 # Example
 # http://127.0.0.1:1337/hello
@@ -75,8 +73,7 @@ def register():
     data = request.get_json()
     user = auth_register_v1(data['email'], data['password'],
                             data['name_first'], data['name_last'])
-    data_store = get_data()
-    print(data_store)
+    save_data()
     return dumps({
         'token': user['token'],
         'auth_user_id': user['auth_user_id']
@@ -86,8 +83,7 @@ def register():
 def login():
     data = request.get_json()
     user = auth_login_v1(data['email'], data['password'])
-    data_store = get_data()
-    print(data_store)
+    save_data()
     return dumps({
         'token': user['token'],
         'auth_user_id': user['auth_user_id']
@@ -97,19 +93,18 @@ def login():
 def logout():
     data = request.get_json()
     token = data['token']
-    print(token)
     token_valid_check(token)
     token_remove(token)
-    data_store = get_data()
-    print(data_store)
+    save_data()
     return dumps({})
 
 @APP.route('/users/all/v1', methods=['GET'])
 def get_users():
+    global DATA_STORE
     token = request.args.get('token')
     token_valid_check(token)
     to_return = []
-    for user in data_store['users']:
+    for user in DATA_STORE['users']:
         to_return.append({
             'u_id': user['id'],
             'email': user['email'],
@@ -125,9 +120,16 @@ def get_users():
 def clear():
     clear_v1()
     reset_session_id()
-    data_store = get_data()
-    print(data_store)
+    save_data()
     return dumps({})
+
+def save_data():
+    global DATA_STORE
+    pickle_data()
+    DATA_STORE = get_data()
+    with open('datastore.p', 'wb') as FILE:
+        pickle.dump(DATA_STORE, FILE)
+    return DATA_STORE
 
 #### NO NEED TO MODIFY BELOW THIS POINT
 

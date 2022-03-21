@@ -47,31 +47,24 @@ def test_logout_invalid_token(clear_and_register):
                          json={'token': True})
     assert resp2.status_code == 400
 
-def test_users_return():
-    requests.delete(config.url + 'clear/v1')
+def test_users_return(clear_and_register):
+    token1 = clear_and_register['token']
+    id1 = clear_and_register['auth_user_id']
 
     resp0 = requests.post(config.url + 'auth/register/v2', 
-                  json={'email': 'abc@def.com', 'password': 'password',
-                        'name_first': 'first', 'name_last': 'last'})
-    assert resp0.status_code == 200
-    user1 = resp0.json()
-    token1 = user1['token']
-    id1 = user1['auth_user_id']
-
-    resp1 = requests.post(config.url + 'auth/register/v2', 
                   json={'email': 'def@ghi.com', 'password': 'password',
                         'name_first': 'first', 'name_last': 'last'})
-    assert resp1.status_code == 200
-    user2 = resp1.json()
+    assert resp0.status_code == 200
+    user2 = resp0.json()
     token2 = user2['token']
     id2 = user2['auth_user_id']
 
-    resp2 = requests.get(config.url + 'users/all/v1', params={'token': token1})
-    assert resp2.status_code == 200
-    get1 = resp2.json()
-    print(get1)
-    assert len(get1) == 2
-    assert get1 == [{
+    resp1 = requests.get(config.url + 'users/all/v1', params={'token': token1})
+    assert resp1.status_code == 200
+    get1 = resp1.json()
+
+    assert len(get1['users']) == 2
+    assert get1['users'] == [{
         'u_id': id1,
         'email': 'abc@def.com',
         'name_first': 'first',
@@ -85,7 +78,21 @@ def test_users_return():
         'handle_str': 'firstlast0'
     }]
 
-    resp3 = requests.get(config.url + 'users/all/v1', params={'token': token2})
-    assert resp3.status_code == 200
-    get2 = resp3.json()
+    resp2 = requests.get(config.url + 'users/all/v1', params={'token': token2})
+    assert resp2.status_code == 200
+    get2 = resp2.json()
     assert get1 == get2
+
+def test_users_invalid_token(clear_and_register):
+    # input error: int is passed in as token
+    resp0 = requests.get(config.url + 'users/all/v1', params={'token': 1})
+    assert resp0.status_code == 400
+
+    # input error: int is passed in as token
+    resp1 = requests.get(config.url + 'users/all/v1',
+                         params={'token': 'not a valid jwt token str'})
+    assert resp1.status_code == 403
+
+    # input error: int is passed in as token
+    resp2 = requests.get(config.url + 'users/all/v1', params={'token': True})
+    assert resp2.status_code == 400
