@@ -7,11 +7,13 @@ from json import dumps
 from flask import Flask, request
 from flask_cors import CORS
 from src.error import InputError, AccessError
-from src.token import token_remove, token_valid_check, reset_session_id
+from src.token import token_remove, token_valid_check
 from src import config
 
 from src.auth import auth_register_v1, auth_login_v1
 from src.other import clear_v1
+
+from src.admin import count_global_owners
 
 from src.data_store_pickle import pickle_data
 
@@ -116,10 +118,18 @@ def get_users():
         'users': to_return
     })
 
+@APP.route('/admin/userpermission/change/v1', methods=['POST'])
+def change_perms():
+    global DATA_STORE
+    data = request.get_json()
+    token = data['token']
+    token_valid_check(token)
+    print(count_global_owners)
+    return dumps({})
+
 @APP.route('/clear/v1', methods=['DELETE'])
 def clear():
     clear_v1()
-    reset_session_id()
     save_data()
     return dumps({})
 

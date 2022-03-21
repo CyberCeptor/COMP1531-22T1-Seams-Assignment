@@ -108,4 +108,13 @@ def test_users_invalid_token(clear_and_register):
     resp3 = requests.get(config.url + 'users/all/v1', params={'token': EXPIRED})
     assert resp3.status_code == 403
 
+# def test_users_all_logged_out_user(clear_and_register):
+#     token = clear_and_register['token']
+
+#     resp0 = requests.post(config.url + 'auth/logout/v1', json={'token': token})
+#     assert resp0.status_code == 200
+
+#     resp3 = requests.get(config.url + 'users/all/v1', params={'token': token})
+#     assert resp3.status_code == 403
+
 requests.delete(config.url + 'clear/v1')
