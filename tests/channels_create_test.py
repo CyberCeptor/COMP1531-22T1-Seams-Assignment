@@ -42,6 +42,11 @@ def fixture_clear_and_register():
     token = data['token']
     return token
 
+
+
+#   NOT USED ANYMORE.
+########################################################################
+
 # def test_channels_create_valid_auth_id(clear_and_register):
 #     """
 #     Registers a valid user, and them
@@ -70,6 +75,8 @@ def fixture_clear_and_register():
 #         channels_create_v1('not int', 'test_channel_private2', False)
 #     with pytest.raises(InputError):
 #         channels_create_v1(True, 'test_channel_private2', False)
+###################################################################################
+
 
 # def test_channels_create_valid_token(clear_and_register):
 #     """
@@ -119,6 +126,15 @@ def fixture_clear_and_register():
 #                                 'name': 'test_channel_private',
 #                                 'is_public': False})
 #     assert resp5.status_code == 403
+    # expired_token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MSwic2Vzc\
+    #     2lvbl9pZCI6MSwiaGFuZGxlIjoiZmlyc3RsYXN0IiwiZXhwIjoxNTQ3\
+    #         OTc3ODgwfQ.366QLXfCURopcjJbAheQYLVNlGLX_INKVwr8_TVXYEQ'
+            
+    # resp6 = requests.post(config.url + 'channels/create/v2', 
+    #                         json={'token': expired_token,
+    #                              'name': 'test_channel_private',
+    #                              'is_public': False})
+    # assert resp6.status_code == 403
 
 # def test_channels_create_too_short(clear_and_register):
 #     """

@@ -80,11 +80,6 @@ def test_channels_list():
                             json={'token': user1_json['token'], 'name': 'private_channel1', 'is_public': False})
     channel3_json = channel3.json()
 
-    # channel_list for user 1.
-    channels_list = requests.get(config.url + 'channels/list/v2', params = {'token': user1_json['token']})
-    channels_list_json = channels_list.json()
-
-
     # create user2.
     user2 = requests.post(config.url + 'auth/register/v2', 
                             json={'email': 'def@abc.com', 'password': 'password',
@@ -96,6 +91,12 @@ def test_channels_list():
     # Private channel for other user.
     requests.post(config.url + 'channels/create/v2', 
                             json={'token': user2_json['token'], 'name': 'test_pri_channel', 'is_public': False})
+
+
+
+    # channel_list for user 1.
+    channels_list = requests.get(config.url + 'channels/list/v2', params = {'token': user1_json['token']})
+    channels_list_json = channels_list.json()
 
     # creating the channel list for the second user.
     requests.get(config.url + 'channels/list', params = {'token': user2_json['token']})
@@ -178,7 +179,7 @@ def test_channels_list_invalid_token():
         c3RsYXN0IiwiZXhwIjoxNTQ3OTc3ODgwfQ.366QLXfCURopcjJbAheQYLVNlGLX_INKVwr8_TVXYEQ'
 
     channels_list_json = requests.get(config.url + 'channels/list/v2', params = {'token': expired_token}).json()
-    assert channels_list_json.status_code == 400
+    assert channels_list_json.status_code == 403
 
 
     # channels_list_json = channels_list.json()
