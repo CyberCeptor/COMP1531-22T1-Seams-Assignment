@@ -59,8 +59,20 @@ def token_remove(token):
 
 
 # checks that the created token matches the user information in their dictionary.
+# decode will check the current time againest the expiry time
 def token_valid_check(token):
-    # decode will check the current time againest the expiry time
+    # get converts everything given into a string. 
+    # tries to convert to an int, if its a string, it will pass, if its an int, will give an error.
+    try:
+        token = int(token)
+    except ValueError:
+        pass
+
+    if token == 'True':
+        token = True
+    elif token == 'False':
+        token = False
+    
     token_check_type(token)
     valid = True
     error_message = ''
@@ -69,9 +81,11 @@ def token_valid_check(token):
     except jwt.ExpiredSignatureError:
         valid = False
         error_message = 'Token has expired'
+        token_remove(token)
     except jwt.DecodeError:
         valid = False
         error_message = 'Invalid token'
+    
     if not valid:
         raise AccessError(error_message)
 
