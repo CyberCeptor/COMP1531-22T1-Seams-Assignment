@@ -11,6 +11,7 @@ from src.token import token_remove, token_valid_check, reset_session_id
 from src import config
 
 from src.auth import auth_register_v1, auth_login_v1
+from src.channels import channels_create_v1, channels_list_v1
 from src.other import clear_v1
 
 from src.data_store_pickle import pickle_data
@@ -136,3 +137,21 @@ def save_data():
 if __name__ == "__main__":
     signal.signal(signal.SIGINT, quit_gracefully) # For coverage
     APP.run(port=config.port, debug=True) # Do not edit this port
+
+
+
+############################################################
+#            Channels
+@APP.route("/channels/create/v2", methods=['POST'])
+def channel_create():
+    data = request.get_json()
+    channel = channels_create_v1(data['token'], data['name'], data['is_public'])
+    save_data()
+    return dumps(channel)
+
+@APP.route("/channels/list/v2", methods=['GET'])
+def channel_list():
+    token = request.args.get('token')
+    channel_list = channels_list_v1(token)
+    save_data()
+    return dumps(channel_list)
