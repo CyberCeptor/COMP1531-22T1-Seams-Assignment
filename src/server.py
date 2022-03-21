@@ -7,7 +7,7 @@ from json import dumps
 from flask import Flask, request
 from flask_cors import CORS
 from src.error import InputError, AccessError
-from src.token import token_remove, token_valid_check, reset_session_id
+from src.token import token_remove, token_valid_check, reset_session_id, token_get_user_id
 from src import config
 
 from src.auth import auth_register_v1, auth_login_v1
@@ -123,14 +123,18 @@ def get_users():
 @APP.route("/channels/create/v2", methods=['POST'])
 def channel_create():
     data = request.get_json()
-    channel = channels_create_v1(data['token'], data['name'], data['is_public'])
+    token_valid_check(data['token'])
+    user_id = token_get_user_id(data['token'])
+    channel = channels_create_v1(user_id, data['name'], data['is_public'])
     save_data()
     return dumps(channel)
 
 @APP.route("/channels/list/v2", methods=['GET'])
 def channel_list():
     token = request.args.get('token')
-    channel_list = channels_list_v1(token)
+    token_valid_check(token)
+    user_id = token_get_user_id(token)
+    channel_list = channels_list_v1(user_id)
     save_data()
     return dumps(channel_list)
 

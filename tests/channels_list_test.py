@@ -6,7 +6,7 @@ Created: 28/02/2022 - 04/03/2022
 
 Description: pytests for channel_list_v1
 """
-
+import json
 import pytest
 import requests
 from src.auth import auth_register_v1
@@ -69,7 +69,15 @@ def test_channels_list():
     # create the 3 channels for user1.
     channel1 = requests.post(config.url + 'channels/create/v2', 
                             json={'token': user1_json['token'], 'name': 'channel_name1', 'is_public': True})
+
+    assert channel1.status_code == 200
+
+
     channel1_json = channel1.json()
+
+
+
+
 
     channel2 = requests.post(config.url + 'channels/create/v2', 
                             json={'token': user1_json['token'], 'name': 'channel_name2', 'is_public': True})
@@ -159,26 +167,26 @@ def test_channels_list_invalid_token():
                             json={'token': user1_json['token'], 'name': 'priv_channel', 'is_public': False})
 
     # passing incorrect string as token.
-    channels_list_json = requests.get(config.url + 'channels/list/v2', params = {'token': 'SomeWordsHere'}).json()
+    channels_list_json = requests.get(config.url + 'channels/list/v2', params = {'token': 'SomeWordsHere'})
     assert channels_list_json.status_code == 403 # AccessError
 
     # passing int as a token.
-    channels_list_json = requests.get(config.url + 'channels/list/v2', params = {'token': 4444}).json()
+    channels_list_json = requests.get(config.url + 'channels/list/v2', params = {'token': 4444})
     assert channels_list_json.status_code == 400
 
     # passing a True bool as a token
-    channels_list_json = requests.get(config.url + 'channels/list/v2', params = {'token': True}).json()
+    channels_list_json = requests.get(config.url + 'channels/list/v2', params = {'token': True})
     assert channels_list_json.status_code == 400
 
     # passing a False bool as a token
-    channels_list_json = requests.get(config.url + 'channels/list/v2', params = {'token': False}).json()
+    channels_list_json = requests.get(config.url + 'channels/list/v2', params = {'token': False})
     assert channels_list_json.status_code == 400
 
     # an expired token passed to channels list.
     expired_token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MSwic2Vzc2lvbl9pZCI6MSwiaGFuZGxlIjoiZmly\
         c3RsYXN0IiwiZXhwIjoxNTQ3OTc3ODgwfQ.366QLXfCURopcjJbAheQYLVNlGLX_INKVwr8_TVXYEQ'
 
-    channels_list_json = requests.get(config.url + 'channels/list/v2', params = {'token': expired_token}).json()
+    channels_list_json = requests.get(config.url + 'channels/list/v2', params = {'token': expired_token})
     assert channels_list_json.status_code == 403
 
 
