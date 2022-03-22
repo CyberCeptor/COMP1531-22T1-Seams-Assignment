@@ -148,7 +148,7 @@ def test_channel_join_private_channel():
     """
     clears any data stored in data_store and registers a invitee, a inviter
     with given information, create a channel with user id, testing the channel
-    is private to raise access error
+    is private to raise a access error
 
     Arguments: N/A
 
