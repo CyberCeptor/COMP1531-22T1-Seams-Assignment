@@ -7,6 +7,7 @@ Created: 28/02/2022 - 06/03/2022
 Description: pytests for channel_invite_v1
 """
 
+from lib2to3.pgen2 import token
 import pytest
 import requests
 from src import config
@@ -92,12 +93,12 @@ def test_channel_invite_self(clear_and_register_and_create):
 
     Return Value: N/A
     """
-    id1 = clear_and_register_and_create[0]
+    token = clear_and_register_and_create[0]
     chan_id1 = clear_and_register_and_create[1]
-    id2 = clear_and_register_and_create[2]
+    id = clear_and_register_and_create[2]
     add = requests.post(config.url + 'channel/invite/v2', 
-                        json={'token': id1, 'channel_id': chan_id1,
-                                'u_id': id2})
+                        json={'token': token, 'channel_id': chan_id1,
+                                'u_id': id})
     assert add.status_code == 400
 
 def test_channel_invite_invalid_inviter(clear_and_register_and_create):
@@ -130,9 +131,9 @@ def test_channel_invite_invalid_inviter(clear_and_register_and_create):
     assert add.status_code == 400
 
     add = requests.post(config.url + 'channel/invite/v2', 
-                        json={'token': '5', 'channel_id': chan_id1,
+                        json={'token': 'goood', 'channel_id': chan_id1,
                                 'u_id': id1})
-    assert add.status_code == 400
+    assert add.status_code == 403
 
     add = requests.post(config.url + 'channel/invite/v2', 
                         json={'token': '', 'channel_id': chan_id1,
@@ -209,29 +210,21 @@ def test_channel_invite_invitee_already_joined(clear_and_register_and_create):
                                 'u_id': data['auth_user_id']})
     assert add.status_code == 400
 
-def test_channel_invite_inviter_not_in_channel():
+def test_channel_invite_inviter_not_in_channel(clear_and_register_and_create):
     """
     clears any data stored in data_store and registers a inviter, a invitee,
     the owner of channel with the given information,
     create a channel with user id, and then use the inviter(is not in channel)
     to add the invitee to raise a access error
 
-    Arguments: N/A
+    Arguments: clear_and_register_and_create(fixture)
 
     Exceptions:
         AccessError: Raised for a invter(not in channel) add the invitee
 
     Return Value: N/A
     """
-    requests.delete(config.url + 'clear/v1')
-    resp = requests.post(config.url + 'auth/register/v2', 
-                        json={'email': 'abc@def.com', 'password': 'password',
-                                'name_first': 'first', 'name_last': 'last'})
-    data = resp.json()
-    chan = requests.post(config.url + 'channels/create/v2',
-                        json={'token': data['token'], 'name': 'channel_name',
-                            'is_public': True})
-    data1 = chan.json()
+    chan1_id = clear_and_register_and_create[1]
     resp1 = requests.post(config.url + 'auth/register/v2', 
                         json={'email': 'xue2@gmail.com', 'password': 'xzq19112',
                                 'name_first': 'Xue', 'name_last':'zhiqian'})
@@ -242,7 +235,7 @@ def test_channel_invite_inviter_not_in_channel():
     data3 = resp2.json()
     add = requests.post(config.url + 'channel/invite/v2', 
                         json={'token': data3['token'],
-                                'channel_id': data1['channel_id'],
+                                'channel_id': chan1_id,
                                 'u_id': data2['auth_user_id']})
     assert add.status_code == 403
 
