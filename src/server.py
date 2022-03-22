@@ -4,7 +4,7 @@ import pickle
 from json import dumps
 from flask import Flask, request
 from flask_cors import CORS
-from src.error import InputError, AccessError
+from src.error import InputError
 from src.token import token_remove, token_valid_check, reset_session_id, token_get_user_id
 from src import config
 from src.auth import auth_register_v1, auth_login_v1
