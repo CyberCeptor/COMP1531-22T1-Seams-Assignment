@@ -8,11 +8,8 @@ Description: pytests for channel_invite_v1
 """
 
 import pytest
-from src.auth import auth_register_v1
-from src.other import clear_v1
-from src.error import InputError, AccessError
-from src.channel import channel_invite_v2, channel_join_v2
-from src.channels import channels_create_v1
+import requests
+from src import config
 
 @pytest.fixture(name='clear_and_register_and_create')
 def fixture_clear_and_register_and_create():
@@ -27,10 +24,17 @@ def fixture_clear_and_register_and_create():
     Return Value: N/A
     """
 
-    clear_v1()
-    user1 = auth_register_v1('abc@def.com', 'password', 'first', 'last')
-    chan1 = channels_create_v1(user1['token'], 'channel_name', True)
-    return [user1['token'], chan1['channel_id'], user1['auth_user_id']]
+    requests.delete(config.url + 'clear/v1')
+    resp = requests.post(config.url + 'auth/register/v2', 
+                        json={'email': 'abc@def.com', 'password': 'password',
+                                'name_first': 'first', 'name_last': 'last'})
+    data = resp.json()
+    chan = requests.post(config.url + 'channels/create/v2',
+                        json={'token': data['token'], 'name': 'channel_name',
+                            'is_public': True})
+
+    data1 = chan.json()
+    return [data['token'], data1['channel_id'], data['auth_user_id']]
 
 def test_channel_invite_invalid_channel(clear_and_register_and_create):
     """
@@ -45,11 +49,36 @@ def test_channel_invite_invalid_channel(clear_and_register_and_create):
 
     Return Value: N/A
     """
-    user2 = auth_register_v1('xue2@gmail.com', 'xzq191123', 'Xue', 'zhiqian')
-    id1 = clear_and_register_and_create[0]
-    id2 = user2['auth_user_id']
-    with pytest.raises(InputError):
-        channel_invite_v2(id1, 0, id2)
+    resp1 = requests.post(config.url + 'auth/register/v2', 
+                        json={'email': 'xue2@gmail.com', 'password': 'xzq19112',
+                                'name_first': 'Xue', 'name_last':'zhiqian'})
+    data = resp1.json()
+    token = clear_and_register_and_create[0]
+    id2 = data['auth_user_id']
+    add = requests.post(config.url + 'channel/invite/v2', 
+                        json={'token': token, 'channel_id': 44,
+                                'u_id': id2})
+    assert add.status_code == 400
+
+    add = requests.post(config.url + 'channel/invite/v2', 
+                        json={'token': token, 'channel_id': False,
+                                'u_id': id2})
+    assert add.status_code == 400
+
+    add = requests.post(config.url + 'channel/invite/v2', 
+                        json={'token': token, 'channel_id': -34,
+                                'u_id': id2})
+    assert add.status_code == 400
+
+    add = requests.post(config.url + 'channel/invite/v2', 
+                        json={'token': token, 'channel_id': '',
+                                'u_id': id2})
+    assert add.status_code == 400
+
+    add = requests.post(config.url + 'channel/invite/v2', 
+                        json={'token': token, 'channel_id': '5',
+                                'u_id': id2})
+    assert add.status_code == 400
 
 def test_channel_invite_self(clear_and_register_and_create):
     """
@@ -66,10 +95,12 @@ def test_channel_invite_self(clear_and_register_and_create):
     id1 = clear_and_register_and_create[0]
     chan_id1 = clear_and_register_and_create[1]
     id2 = clear_and_register_and_create[2]
-    with pytest.raises(InputError):
-        channel_invite_v2(id1, chan_id1, id2)
+    add = requests.post(config.url + 'channel/invite/v2', 
+                        json={'token': id1, 'channel_id': chan_id1,
+                                'u_id': id2})
+    assert add.status_code == 400
 
-def test_channel_invite_invalid_token(clear_and_register_and_create):
+def test_channel_invite_invalid_inviter(clear_and_register_and_create):
     """
     clears any data stored in data_store and registers a invitee
     with given information, testing invalid token to raise input error
@@ -83,14 +114,30 @@ def test_channel_invite_invalid_token(clear_and_register_and_create):
     """
     id1 = clear_and_register_and_create[2]
     chan_id1 = clear_and_register_and_create[1]
-    with pytest.raises(AccessError):
-        channel_invite_v2(2, chan_id1, id1)
-    with pytest.raises(InputError):
-        channel_invite_v2(-2, chan_id1, id1)
-    with pytest.raises(InputError):
-        channel_invite_v2(True, chan_id1, id1)
-    with pytest.raises(InputError):
-        channel_invite_v2('3', chan_id1, id1)
+    add = requests.post(config.url + 'channel/invite/v2', 
+                        json={'token': -2, 'channel_id': chan_id1,
+                                'u_id': id1})
+    assert add.status_code == 400
+
+    add = requests.post(config.url + 'channel/invite/v2', 
+                        json={'token': 2, 'channel_id': chan_id1,
+                                'u_id': id1})
+    assert add.status_code == 400
+
+    add = requests.post(config.url + 'channel/invite/v2', 
+                        json={'token': True, 'channel_id': chan_id1,
+                                'u_id': id1})
+    assert add.status_code == 400
+
+    add = requests.post(config.url + 'channel/invite/v2', 
+                        json={'token': '5', 'channel_id': chan_id1,
+                                'u_id': id1})
+    assert add.status_code == 400
+
+    add = requests.post(config.url + 'channel/invite/v2', 
+                        json={'token': '', 'channel_id': chan_id1,
+                                'u_id': id1})
+    assert add.status_code == 403
 
 def test_channel_invite_invalid_invitee(clear_and_register_and_create):
     """
@@ -106,6 +153,26 @@ def test_channel_invite_invalid_invitee(clear_and_register_and_create):
     """
     id1 = clear_and_register_and_create[0]
     chan_id1 = clear_and_register_and_create[1]
+    add = requests.post(config.url + 'channel/invite/v2', 
+                        json={'token': id1, 'channel_id': chan_id1,
+                                'u_id': -2})
+    assert add.status_code == 400
+
+    add = requests.post(config.url + 'channel/invite/v2', 
+                        json={'token': id1, 'channel_id': chan_id1,
+                                'u_id': 2})
+    assert add.status_code == 403
+
+    add = requests.post(config.url + 'channel/invite/v2', 
+                        json={'token': id1, 'channel_id': chan_id1,
+                                'u_id': True})
+    assert add.status_code == 400
+
+    add = requests.post(config.url + 'channel/invite/v2', 
+                        json={'token': id1, 'channel_id': chan_id1,
+                                'u_id': '3'})
+    assert add.status_code == 400
+'''
     with pytest.raises(AccessError):
         channel_invite_v2(id1, chan_id1, 2)
     with pytest.raises(InputError):
@@ -114,6 +181,7 @@ def test_channel_invite_invalid_invitee(clear_and_register_and_create):
         channel_invite_v2(id1, chan_id1, True)
     with pytest.raises(InputError):
         channel_invite_v2(id1, chan_id1, '3')
+    '''
 
 def test_channel_invite_invitee_already_joined(clear_and_register_and_create):
     """
@@ -130,13 +198,16 @@ def test_channel_invite_invitee_already_joined(clear_and_register_and_create):
     """
     id1 = clear_and_register_and_create[0]
     chan_id1 = clear_and_register_and_create[1]
-
-    user2 = auth_register_v1('xue2@gmail.com', 'xzq191123', 'Xue', 'zhan')
-    id2 = user2['token']
-    id3 = user2['auth_user_id']
-    channel_join_v2(id2, chan_id1)
-    with pytest.raises(InputError):
-        channel_invite_v2(id1, chan_id1, id3)
+    resp1 = requests.post(config.url + 'auth/register/v2', 
+                        json={'email': 'xue2@gmail.com', 'password': 'xzq19112',
+                                'name_first': 'Xue', 'name_last':'zhiqian'})
+    data = resp1.json()
+    requests.post(config.url + 'channel/join/v2',
+                json={'token': data['token'], 'channel_id': chan_id1})   
+    add = requests.post(config.url + 'channel/invite/v2', 
+                        json={'token': id1, 'channel_id': chan_id1,
+                                'u_id': data['auth_user_id']})
+    assert add.status_code == 400
 
 def test_channel_invite_inviter_not_in_channel():
     """
@@ -152,43 +223,27 @@ def test_channel_invite_inviter_not_in_channel():
 
     Return Value: N/A
     """
+    requests.delete(config.url + 'clear/v1')
+    resp = requests.post(config.url + 'auth/register/v2', 
+                        json={'email': 'abc@def.com', 'password': 'password',
+                                'name_first': 'first', 'name_last': 'last'})
+    data = resp.json()
+    chan = requests.post(config.url + 'channels/create/v2',
+                        json={'token': data['token'], 'name': 'channel_name',
+                            'is_public': True})
+    data1 = chan.json()
+    resp1 = requests.post(config.url + 'auth/register/v2', 
+                        json={'email': 'xue2@gmail.com', 'password': 'xzq19112',
+                                'name_first': 'Xue', 'name_last':'zhiqian'})
+    data2 = resp1.json()
+    resp2 = requests.post(config.url + 'auth/register/v2', 
+                        json={'email': 'wan3@gmail.com', 'password': 'wky19112',
+                                'name_first': 'Wang', 'name_last':'kaiyan'})
+    data3 = resp2.json()
+    add = requests.post(config.url + 'channel/invite/v2', 
+                        json={'token': data3['token'],
+                                'channel_id': data1['channel_id'],
+                                'u_id': data2['auth_user_id']})
+    assert add.status_code == 403
 
-    clear_v1()
-    user1 = auth_register_v1('li@gmail.com', 'lmz191123', 'Li', 'minge')
-    id1 = user1['token']
-    chan1 = channels_create_v1(id1, 'namelwky', True)
-    chan_id1 = chan1['channel_id']
-
-    user2 = auth_register_v1('xue4@gmail.com', 'xzq19991123', 'Xue', 'zhan')
-    id2 = user2['auth_user_id']
-
-    user3 = auth_register_v1('wan3@gmail.com', 'wky191123', 'Wang', 'kaan')
-    id3 = user3['token']
-    with pytest.raises(AccessError):
-        channel_invite_v2(id3, chan_id1, id2)
-
-def test_channel_join_invalid_token(clear_and_register_and_create):
-    """
-    clears any data stored in data_store and registers a inviter
-    with given information, testing invalid inviter to raise input error
-
-    Arguments: clear_and_register_and_create (fixture)
-
-    Exceptions:
-        InputError - Raised for an invlaid inviter
-
-    Return Value: N/A
-    """
-    chan_id1 = clear_and_register_and_create[1]
-    with pytest.raises(AccessError):
-        channel_join_v2(2, chan_id1)
-    with pytest.raises(InputError):
-        channel_join_v2(-2, chan_id1)
-    with pytest.raises(InputError):
-        channel_join_v2(True, chan_id1)
-    with pytest.raises(InputError):
-        channel_join_v2('3', chan_id1)
-    with pytest.raises(InputError):
-        channel_join_v2('', chan_id1)
-
-clear_v1()
+requests.delete(config.url + 'clear/v1')

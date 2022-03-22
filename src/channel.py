@@ -18,16 +18,15 @@ from src.error import InputError, AccessError
 from src.other import check_valid_auth_id
 from src.other import check_user_is_member, check_valid_channel_id
 from src.data_store import data_store
-from src.token import token_get_user_id, token_valid_check
 
-def channel_invite_v2(token, channel_id, u_id):
+def channel_invite_v1(auth_user_id, channel_id, u_id):
     """
     check if given user id and channel id are valid,
     and then add the user into the channel with u_id, channel_id
     return nothing
 
     Arguments:
-        token (str)    - an string that specifies user
+        auth_user_id (int)    - an integer that specifies user(inviter) id
         channel_id (int) - an integer that specifies channel id
         u_id (int) - an integer that specifies user(invitee) id
 
@@ -37,13 +36,12 @@ def channel_invite_v2(token, channel_id, u_id):
 
     Return Value: N/A
     """
-    token_valid_check(token) # check the token is valid or not
+    check_valid_auth_id(auth_user_id) # check the inviter is valid or not
     check_valid_auth_id(u_id)# check the invitee is valid or not
     check_valid_channel_id(channel_id) # check the channel is valid or not
     # if auth_user_id is a member of the channel and u_id isn't
     # then add u_id into the channel
-    inviter_id = token_get_user_id(token)
-    if check_user_is_member(inviter_id, channel_id) is False:
+    if check_user_is_member(auth_user_id, channel_id) is False:
         raise AccessError('Inviter is not in the channel')
     
     if check_user_is_member(u_id, channel_id) is True:
@@ -175,14 +173,14 @@ def channel_messages_v1(auth_user_id, channel_id, start):
         'end': end,
     }
 
-def channel_join_v2(token, channel_id):
+def channel_join_v1(auth_user_id, channel_id):
     """
     check if given user id and channel id are valid,
     and then add the user into the channel with channel_id
     return nothing
 
     Arguments:
-        token (str)    - a string that specifies user
+        auth_user_id (int)    - an integer that specifies user(inviter) id
         channel_id (int) - an integer that specifies channel id
 
     Exceptions:
@@ -190,21 +188,21 @@ def channel_join_v2(token, channel_id):
 
     Return Value: N/A
     """
-    token_valid_check(token)   #check the invitee is valid or not
+    check_valid_auth_id(auth_user_id)   #check the invitee is valid or not
     check_valid_channel_id(channel_id)  #check the channle is valid or not
-    invitee_id = token_get_user_id(token)
+
     #check the invitee whether is already in the channel
-    if check_user_is_member(invitee_id, channel_id) is True:
+    if check_user_is_member(auth_user_id, channel_id) is True:
         raise InputError('Invitee is already in the channel')
 
     # check if the user is a global owner
     # if not, check if it is a private channel
-    if check_user_is_global_owner(invitee_id) is False:
+    if check_user_is_global_owner(auth_user_id) is False:
         check_private_channel(channel_id) #check the channel whether is public
     
     # if the user is a global owner and the channel is private, or if the user
     # is not a global owner and the channel is public, add them to the channel
-    add_invitee(invitee_id, channel_id) #add user
+    add_invitee(auth_user_id, channel_id) #add user
 
 def add_invitee(u_id, channel_id):
     """
