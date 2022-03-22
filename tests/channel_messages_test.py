@@ -61,7 +61,7 @@ def test_channel_messages_invalid_channel(clear_and_register_and_create):
     Return Value: N/A
     """
 
-    token = clear_and_register_and_create[0]
+    # token = clear_and_register_and_create[0]
     pass
     # # no channel id input
     # resp0 = requests.get(config.url + 'channel/messages/v2', 
