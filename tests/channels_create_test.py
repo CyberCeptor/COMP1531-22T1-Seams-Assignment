@@ -253,7 +253,7 @@ def test_channels_duplicate_name(clear_and_register):
     assert resp2.status_code == 200
 
     resp3 = requests.post(config.url + 'channels/create/v2', 
-                          json={'token': token, 'name': 'test_channel_public',
+                          json={'token': token, 'name': 'test_channel_private',
                                 'is_public': False})
     assert resp3.status_code == 400
 

@@ -222,4 +222,4 @@ def test_channel_details_return(clear_and_register_and_create):
     # }
 
 requests.delete(config.url + 'clear/v1')
-
+# clear_v1()

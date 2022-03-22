@@ -34,7 +34,7 @@ def fixture_clear_and_register_and_create():
     chan_id1 = channels_create_v1(1, 'channel_name', True)
     return [user1['auth_user_id'], chan_id1['channel_id']]
 
-def test_channels_listall_invalid_user_id(clear_and_register_and_create):
+def test_channels_listall_invalid_token(clear_and_register_and_create):
     """
     Testing invalid user id to raise input error
 
