@@ -4,9 +4,9 @@ import requests
 
 from src import config
 
-EXPIRED = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MSwic2Vzc2lvbl9pZCI6MSw\
-    iaGFuZGxlIjoiZmlyc3RsYXN0IiwiZXhwIjoxNTQ3OTc3ODgwfQ.366QLXfCURopcjJbAheQYLV\
-        NlGLX_INKVwr8_TVXYEQ'
+EXPIRED_UNSAVED = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MSwic2Vzc2lvbl9\
+                    pZCI6MSwiaGFuZGxlIjoiZmlyc3RsYXN0IiwiZXhwIjoxNTQ3OTc3ODgwfQ\
+                    .366QLXfCURopcjJbAheQYLVNlGLX_INKVwr8_TVXYEQ'
 
 @pytest.fixture(name='clear_and_register')
 def fixture_clear_and_register():
@@ -31,14 +31,21 @@ def fixture_clear_and_register():
 def test_logout_works(clear_and_register):
     token = clear_and_register['token']
 
-    resp = requests.post(config.url + 'auth/logout/v1',
-                         json={'token': token})
+    resp = requests.post(config.url + 'auth/logout/v1', json={'token': token})
     assert resp.status_code == 200
+
+def test_logout_user_logged_out(clear_and_register):
+    token = clear_and_register['token']
+
+    resp0 = requests.post(config.url + 'auth/logout/v1', json={'token': token})
+    assert resp0.status_code == 200
+
+    resp1 = requests.post(config.url + 'auth/logout/v1', json={'token': token})
+    assert resp1.status_code == 403
 
 def test_logout_invalid_token(clear_and_register):
     # input error: int is passed in as token
-    resp0 = requests.post(config.url + 'auth/logout/v1',
-                         json={'token': 1})
+    resp0 = requests.post(config.url + 'auth/logout/v1', json={'token': 1})
     assert resp0.status_code == 400
 
     # access error: non-jwt token str is passed in as token
@@ -47,13 +54,12 @@ def test_logout_invalid_token(clear_and_register):
     assert resp1.status_code == 403
 
     # input error: bool is passed in as token
-    resp2 = requests.post(config.url + 'auth/logout/v1',
-                         json={'token': True})
+    resp2 = requests.post(config.url + 'auth/logout/v1', json={'token': True})
     assert resp2.status_code == 400
 
     # access error: expired, unsaved token
     resp3 = requests.post(config.url + 'auth/logout/v1',
-                         json={'token': EXPIRED})
+                         json={'token': EXPIRED_UNSAVED})
     assert resp3.status_code == 403
 
 def test_users_all_return(clear_and_register):
@@ -107,7 +113,8 @@ def test_users_all_invalid_token(clear_and_register):
     assert resp2.status_code == 400
 
     # access error: expired, unsaved token
-    resp3 = requests.get(config.url + 'users/all/v1', params={'token': EXPIRED})
+    resp3 = requests.get(config.url + 'users/all/v1',
+                         params={'token': EXPIRED_UNSAVED})
     assert resp3.status_code == 403
 
 # def test_users_all_logged_out_user(clear_and_register):

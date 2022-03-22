@@ -14,10 +14,6 @@ import requests
 
 from src import config
 
-EXPIRED = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MSwic2Vzc2lvbl9pZCI6MSw\
-    iaGFuZGxlIjoiZmlyc3RsYXN0IiwiZXhwIjoxNTQ3OTc3ODgwfQ.366QLXfCURopcjJbAheQYLV\
-        NlGLX_INKVwr8_TVXYEQ'
-
 @pytest.fixture(name='clear_and_register')
 def fixture_clear_and_register():
     """ clears any data stored in data_store and registers a user with the
@@ -79,11 +75,34 @@ def test_admin_userpermission_change_invalid_token(clear_and_register):
                                 'permission_id': 1})
     assert resp3.status_code == 400
 
+    expired_unsaved = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MSwic2Vzc2l\
+                        vbl9pZCI6MSwiaGFuZGxlIjoiZmlyc3RsYXN0IiwiZXhwIjoxNTQ3OT\
+                        c3ODgwfQ.366QLXfCURopcjJbAheQYLVNlGLX_INKVwr8_TVXYEQ'
+
     # access error: expired, unsaved token
     resp4 = requests.post(config.url + 'admin/userpermission/change/v1',
-                          json={'token': EXPIRED, 'u_id': id2,
+                          json={'token': expired_unsaved, 'u_id': id2,
                                 'permission_id': 1})
     assert resp4.status_code == 403
+
+def test_admin_userpermission_change_user_logged_out(clear_and_register):
+    token = clear_and_register['token']
+
+    resp0 = requests.post(config.url + 'auth/register/v2', 
+                          json={'email': 'def@ghi.com', 'password': 'password',
+                                'name_first': 'first', 'name_last': 'last'})
+    assert resp0.status_code == 200
+    user2 = resp0.json()
+    id2 = user2['auth_user_id']
+
+    # log user1 out and try to change user2's perm id using user1's token
+    resp1 = requests.post(config.url + 'auth/logout/v1', json={'token': token})
+    assert resp1.status_code == 200
+
+    resp2 = requests.post(config.url + 'admin/userpermission/change/v1',
+                          json={'token': token, 'u_id': id2,
+                                'permission_id': 1})
+    assert resp2.status_code == 403
 
 def test_admin_userpermission_change_invalid_u_id(clear_and_register):
     token = clear_and_register['token']
