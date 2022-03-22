@@ -66,9 +66,9 @@ def test_logout_invalid_token(clear_and_register):
     assert resp3.status_code == 403
 
     # access error: unexpired, unsaved token
-    resp3 = requests.post(config.url + 'auth/logout/v1',
+    resp4 = requests.post(config.url + 'auth/logout/v1',
                          json={'token': UNSAVED})
-    assert resp3.status_code == 403
+    assert resp4.status_code == 403
 
 def test_users_all_return(clear_and_register):
     token1 = clear_and_register['token']
@@ -130,7 +130,7 @@ def test_users_all_invalid_token(clear_and_register):
     assert resp3.status_code == 403
 
     # input error: empty str passed in as token 
-    resp3 = requests.get(config.url + 'users/all/v1', params={'token': ''})
-    assert resp3.status_code == 400
+    resp4 = requests.get(config.url + 'users/all/v1', params={'token': ''})
+    assert resp4.status_code == 400
 
 requests.delete(config.url + 'clear/v1')
