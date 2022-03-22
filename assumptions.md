@@ -8,6 +8,10 @@ channels.py
 - channel name can contain any character
 - two channels can have the same name if they have a different is_public value
 
-
+tokens.py
+- if a string containing only numbers is passed in as a token, it will be
+    converted to an integer and raise an InputError rather than an AccessError
+    like other strings do. This is so that integers in the query params of get
+    requests will not be considered as strings
 
 
