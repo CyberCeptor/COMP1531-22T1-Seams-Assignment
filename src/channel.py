@@ -138,8 +138,8 @@ def channel_messages_v1(auth_user_id, channel_id, start):
 
     try:
         start = int(start)
-    except ValueError:
-        raise InputError('START is not of a right type')
+    except ValueError as Start_not_valid_type:
+        raise InputError from Start_not_valid_type
         
     if start > total_messages:
         raise InputError('Invalid start, not enough messages')

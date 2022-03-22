@@ -84,8 +84,8 @@ def check_valid_channel_id(channel_id):
     """
     try:
         channel_id = int(channel_id)
-    except ValueError:
-        raise InputError('Channel id is not of a valid type')
+    except ValueError as channel_id_not_valid_type:
+        raise InputError from channel_id_not_valid_type
 
     if channel_id < 1:
         raise InputError('The channel id is not valid (out of bounds)')
