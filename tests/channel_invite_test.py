@@ -7,7 +7,6 @@ Created: 28/02/2022 - 06/03/2022
 Description: pytests for channel_invite_v1
 """
 
-from lib2to3.pgen2 import token
 import pytest
 import requests
 from src import config
