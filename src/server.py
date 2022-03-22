@@ -15,6 +15,7 @@ from src.channels import channels_create_v1, channels_list_v1
 from src.other import clear_v1
 from src.channel import channel_invite_v1, channel_join_v1
 from src.channels import channels_create_v1
+from src.user import user_profile_v1
 
 from src.admin import admin_userpermission_change
 
@@ -180,6 +181,13 @@ def save_data():
         pickle.dump(DATA_STORE, FILE)
     return DATA_STORE
 
+@APP.route('/user/profile/v1', methods=['GET'])
+def user_profile():
+    token = request.args.get('token')
+    u_id = int(request.args.get('u_id'))
+    profile = user_profile_v1(token, u_id)
+    save_data()
+    return dumps(profile)
 
 
 
