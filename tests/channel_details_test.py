@@ -45,10 +45,10 @@ def fixture_clear_and_register_and_create():
     user_data = resp.json()
     token = user_data['token']
     u_id = user_data['auth_user_id']
-    resp_2 = requests.post(config.url + 'channels/create/v2',
+    resp0 = requests.post(config.url + 'channels/create/v2',
                             json={'token': token, 'name': 'channel_name',
                                     'is_public': True})
-    channel_data = resp_2.json()
+    channel_data = resp0.json()
     channel_id = channel_data['channel_id']
     return [token, channel_id, u_id]
 
@@ -68,35 +68,33 @@ def test_channel_details_invalid_token(clear_and_register_and_create):
     """
     # pylint: disable=unused-argument
 
+
     # token is int
     token = clear_and_register_and_create[0]
     chan_id = clear_and_register_and_create[1]
-    resp0 = requests.post(config.url + 'channel/details/v2', 
-                          json={'token': 0, 'channel_id': chan_id})
+    resp0 = requests.get(config.url + 'channel/details/v2', 
+                          params = {'token': 0, 'channel_id': chan_id})
     assert resp0.status_code == 400
     # token is boo
-    resp1 = requests.post(config.url + 'channel/details/v2', 
-                          json={'token': True, 'channel_id': chan_id})
+    resp1 = requests.get(config.url + 'channel/details/v2', 
+                          params = {'token': True, 'channel_id': chan_id})
     assert resp1.status_code == 400
     # token input empty
-    resp2 = requests.post(config.url + 'channel/details/v2', 
-                          json={'token': '', 'channel_id': chan_id})
+    resp2 = requests.get(config.url + 'channel/details/v2', 
+                          params = {'token': '', 'channel_id': chan_id})
     assert resp2.status_code == 400
     # wrong token input
-    resp3 = requests.post(config.url + 'channel/details/v2', 
-                          json={'token': 'not right string', 'channel_id': chan_id})
+    resp3 = requests.get(config.url + 'channel/details/v2', 
+                          params = {'token': 'not right string', 'channel_id': chan_id})
     assert resp3.status_code == 403
     # expired token
     expired_token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MSwic2Vzc\
         2lvbl9pZCI6MSwiaGFuZGxlIjoiZmlyc3RsYXN0IiwiZXhwIjoxNTQ3\
             OTc3ODgwfQ.366QLXfCURopcjJbAheQYLVNlGLX_INKVwr8_TVXYEQ'
-    resp4 = requests.post(config.url + 'channel/details/v2', 
-                          json={'token': expired_token, 'channel_id': chan_id})
+    resp4 = requests.get(config.url + 'channel/details/v2', 
+                          params = {'token': expired_token, 'channel_id': chan_id})
     assert resp4.status_code == 403
-    # right token
-    resp5 = requests.post(config.url + 'channel/details/v2', 
-                          json={'token': token, 'channel_id': chan_id})
-    assert resp5.status_code == 200
+    
 
     # # no user input
     # with pytest.raises(InputError):
@@ -141,24 +139,24 @@ def test_channel_details_invalid_channel(clear_and_register_and_create):
     # # wrong type channel id input
     # with pytest.raises(InputError):
     #     channel_details_v1(id1, True)
-
+  
     token = clear_and_register_and_create[0]
     chan_id = clear_and_register_and_create[1]
     # no channel id input
-    resp0 = requests.post(config.url + 'channel/details/v2', 
-                          json={'token': token, 'channel_id': ''})
+    resp0 = requests.get(config.url + 'channel/details/v2', 
+                          params = {'token': token, 'channel_id': ''})
     assert resp0.status_code == 400
     # channel id is boo
-    resp1 = requests.post(config.url + 'channel/details/v2', 
-                          json={'token': token, 'channel_id': True})
+    resp1 = requests.get(config.url + 'channel/details/v2', 
+                          params = {'token': token, 'channel_id': True})
     assert resp1.status_code == 400
     # channel id is string
-    resp2 = requests.post(config.url + 'channel/details/v2', 
-                          json={'token': token, 'channel_id': 'str'})
+    resp2 = requests.get(config.url + 'channel/details/v2', 
+                          params = {'token': token, 'channel_id': 'str'})
     assert resp2.status_code == 400
     # wrong channel input
-    resp3 = requests.post(config.url + 'channel/details/v2', 
-                          json={'token': token, 'channel_id': 2})
+    resp3 = requests.get(config.url + 'channel/details/v2', 
+                          params = {'token': token, 'channel_id': 2})
     assert resp3.status_code == 403
     
 
@@ -173,12 +171,20 @@ def test_channel_details_return(clear_and_register_and_create):
 
     Return Value: N/A
     """
+    
+
     # pylint: disable=unused-argument
     token = clear_and_register_and_create[0]
     chan_id = clear_and_register_and_create[1]
     u_id = clear_and_register_and_create[2]
-    channel_detail = requests.get(config.url + 'channel/detail/v2', params =
-                    {'token': token, 'channel_id': chan_id})
+
+    # success run
+    resp = requests.get(config.url + 'channel/details/v2', 
+                          params = {'token': token, 'channel_id': chan_id})
+    assert resp.status_code == 200
+
+    channel_detail = requests.get(config.url + 'channel/detail/v2', 
+                    params = {'token': token, 'channel_id': chan_id})
     channel_details = channel_detail.json()
     owner_members = [{
             'u_id': u_id,
@@ -215,5 +221,4 @@ def test_channel_details_return(clear_and_register_and_create):
     #     }]
     # }
 
-requests.delete(config.url + 'clear/v1')
-# clear_v1()
+
