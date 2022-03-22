@@ -45,7 +45,7 @@ def fixture_clear_and_register_and_create():
     user_data = resp.json()
     token = user_data['token']
     u_id = user_data['auth_user_id']
-    resp_2 = requests.post(config.url + 'channel/create/v2',
+    resp_2 = requests.post(config.url + 'channels/create/v2',
                             json={'token': token, 'name': 'channel_name',
                                     'is_public': True})
     channel_data = resp_2.json()
@@ -176,7 +176,7 @@ def test_channel_details_return(clear_and_register_and_create):
     # pylint: disable=unused-argument
     token = clear_and_register_and_create[0]
     chan_id = clear_and_register_and_create[1]
-    u_id = clear_and_register_and_create[3]
+    u_id = clear_and_register_and_create[2]
     channel_detail = requests.get(config.url + 'channel/detail/v2', params =
                     {'token': token, 'channel_id': chan_id})
     channel_details = channel_detail.json()
@@ -187,19 +187,13 @@ def test_channel_details_return(clear_and_register_and_create):
             'name_last': 'last',
             'handle_str': 'firstlast'
         }]
-    all_members = [{
-            'u_id': u_id,
-            'email': 'abc@def.com',
-            'name_first': 'first',
-            'name_last': 'last',
-            'handle_str': 'firstlast'
-        }]
+    
     assert channel_detail.status_code == 200
     # check matching information
     assert channel_details[0]['name'] == 'channel_name'
     assert channel_details[0]['is_public'] == True
     assert channel_details[0]['owner_members'] == owner_members
-    assert channel_details[0]['all_members']== all_members
+    assert channel_details[0]['all_members']== owner_members
 
     
     # assert result == {
