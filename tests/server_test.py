@@ -4,7 +4,9 @@ import requests
 
 from src import config
 
-EXPIRED = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MSwic2Vzc2lvbl9pZCI6MSwiaGFuZGxlIjoiZmlyc3RsYXN0IiwiZXhwIjoxNTQ3OTc3ODgwfQ.366QLXfCURopcjJbAheQYLVNlGLX_INKVwr8_TVXYEQ'
+EXPIRED = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MSwic2Vzc2lvbl9pZCI6MSw\
+    iaGFuZGxlIjoiZmlyc3RsYXN0IiwiZXhwIjoxNTQ3OTc3ODgwfQ.366QLXfCURopcjJbAheQYLV\
+        NlGLX_INKVwr8_TVXYEQ'
 
 @pytest.fixture(name='clear_and_register')
 def fixture_clear_and_register():
@@ -29,9 +31,9 @@ def fixture_clear_and_register():
 def test_logout_works(clear_and_register):
     token = clear_and_register['token']
 
-    resp1 = requests.post(config.url + 'auth/logout/v1',
+    resp = requests.post(config.url + 'auth/logout/v1',
                          json={'token': token})
-    assert resp1.status_code == 200
+    assert resp.status_code == 200
 
 def test_logout_invalid_token(clear_and_register):
     # input error: int is passed in as token
@@ -54,7 +56,7 @@ def test_logout_invalid_token(clear_and_register):
                          json={'token': EXPIRED})
     assert resp3.status_code == 403
 
-def test_users_return(clear_and_register):
+def test_users_all_return(clear_and_register):
     token1 = clear_and_register['token']
     id1 = clear_and_register['auth_user_id']
 
@@ -90,7 +92,7 @@ def test_users_return(clear_and_register):
     get2 = resp2.json()
     assert get1 == get2
 
-def test_users_invalid_token(clear_and_register):
+def test_users_all_invalid_token(clear_and_register):
     # input error: int is passed in as token
     resp0 = requests.get(config.url + 'users/all/v1', params={'token': 1})
     assert resp0.status_code == 400
@@ -107,5 +109,16 @@ def test_users_invalid_token(clear_and_register):
     # access error: expired, unsaved token
     resp3 = requests.get(config.url + 'users/all/v1', params={'token': EXPIRED})
     assert resp3.status_code == 403
+
+# def test_users_all_logged_out_user(clear_and_register):
+#     token = clear_and_register['token']
+
+#     resp0 = requests.post(config.url + 'auth/logout/v1', json={'token': token})
+#     assert resp0.status_code == 200
+
+#     resp3 = requests.get(config.url + 'users/all/v1', params={'token': token})
+#     assert resp3.status_code == 403
+
+
 
 requests.delete(config.url + 'clear/v1')
