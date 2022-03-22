@@ -4,11 +4,8 @@ import pickle
 from json import dumps
 from flask import Flask, request
 from flask_cors import CORS
-<<<<<<< HEAD
+
 from src.error import InputError
-from src.token import token_remove, token_valid_check, reset_session_id, token_get_user_id
-=======
-from src.error import InputError, AccessError
 
 from src.token import token_remove, token_valid_check, token_get_user_id
 
@@ -125,8 +122,6 @@ def get_users():
         'users': to_return
     })
 
-<<<<<<< HEAD
-=======
 @APP.route('/admin/userpermission/change/v1', methods=['POST'])
 def change_perms():
     data = request.get_json()
@@ -136,7 +131,6 @@ def change_perms():
     save_data()
     return dumps({})
 
->>>>>>> master
 @APP.route("/channels/create/v2", methods=['POST'])
 def channel_create():
     data = request.get_json()
@@ -146,7 +140,6 @@ def channel_create():
     save_data()
     return dumps(channel)
 
-<<<<<<< HEAD
 @APP.route('/channel/invite/v2', methods=['POST'])
 def server_invite():
     data = request.get_json()
@@ -164,7 +157,7 @@ def server_join():
     channel_join_v1(user_id, data['channel_id'])
     save_data()
     return dumps({})
-=======
+
 @APP.route("/channels/list/v2", methods=['GET'])
 def channel_list():
     token = request.args.get('token')
@@ -173,8 +166,6 @@ def channel_list():
     channel_list = channels_list_v1(user_id)
     save_data()
     return dumps(channel_list)
-
->>>>>>> master
 
 @APP.route('/clear/v1', methods=['DELETE'])
 def clear():
