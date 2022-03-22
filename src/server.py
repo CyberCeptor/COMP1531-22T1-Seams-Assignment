@@ -148,7 +148,6 @@ def channel_list():
     save_data()
     return dumps(channel_list)
 
-
 @APP.route('/clear/v1', methods=['DELETE'])
 def clear():
     clear_v1()

@@ -1,3 +1,13 @@
+"""
+Filename: admin_userpermission_change_test.py
+
+Author: Aleesha, z5371516
+Created: 22/03/22
+
+Description: pytests for
+    - changing the permission of a specified user
+"""
+
 import pytest
 
 import requests

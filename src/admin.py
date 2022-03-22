@@ -1,3 +1,13 @@
+"""
+Filename: admin.py
+
+Author: Aleesha, z5371516
+Created: 22/03/22
+
+Description: implementation for
+    - changing the permission of a specified user
+    - helper functions for the above
+"""
 
 from src.data_store import data_store
 
@@ -19,6 +29,7 @@ def change_permission(auth_user_id, permission_id):
     for user in store['users']:
         if user['id'] == auth_user_id:
             user['perm_id'] = permission_id
+    data_store.set(store)
 
 def admin_userpermission_change(token, u_id, permission_id):
     store = data_store.get()
