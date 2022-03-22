@@ -14,7 +14,7 @@ from src import config
 
 from src.auth import auth_register_v1, auth_login_v1
 from src.channels import channels_create_v1, channels_list_v1, channels_listall_v1
-from src.channel import channel_details_v1
+from src.channel import channel_details_v1, channel_invite_v1, channel_join_v1
 from src.other import clear_v1
 
 from src.admin import admin_userpermission_change
@@ -171,11 +171,40 @@ def channel_details():
     token = request.args.get('token')
     token_valid_check(token)
     user_id = token_get_user_id(token)
-    channel_id = int(request.args.get("channel_id"))
+    channel_id = request.args.get('channel_id')
     channel_details = channel_details_v1(user_id, channel_id)
     save_data()
     return dumps(channel_details)
 
+
+@APP.route('/channel/invite/v2', methods=['POST'])
+def server_invite():
+    data = request.get_json()
+    token_valid_check(data['token'])
+    user_id = token_get_user_id(data['token'])
+    channel_invite_v1(user_id, data['channel_id'], data['u_id'])
+    save_data()
+    return dumps({})
+
+@APP.route('/channel/join/v2', methods=['POST'])
+def server_join():
+    data = request.get_json()
+    token_valid_check(data['token'])
+    user_id = token_get_user_id(data['token'])
+    channel_join_v1(user_id, data['channel_id'])
+    save_data()
+    return dumps({})
+
+@APP.route('/channel/messages/v2', methods=['GET'])
+def channel_messages():
+
+    token = request.args.get('token')
+    token_valid_check(token)
+    user_id = token_get_user_id(token)
+    channel_id = int(request.args.get('channel_id'))
+    channel_details = channel_details_v1(user_id, channel_id)
+    save_data()
+    return dumps(channel_details)
 
 ## MESSAGE ROUTES
 

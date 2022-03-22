@@ -74,6 +74,9 @@ def channel_details_v1(auth_user_id, channel_id):
 
     # see if given auth_user_id and channel_id are valid
     check_valid_auth_id(auth_user_id)
+
+    channel_id = check_valid_channel_id(channel_id)
+
     check_valid_channel_id(channel_id)
 
     # is_member is a bool to check whether given user is in the given channel
@@ -84,9 +87,8 @@ def channel_details_v1(auth_user_id, channel_id):
     # find the channel information
     for channel in store['channels']:
         if channel['channel_id'] == channel_id:
-            for user in channel['users']:
-                if user[id] == auth_user_id:
-                    channel_info = channel
+            channel_info = channel
+
 
     #return requires keys and values from stored data
     return {
@@ -134,6 +136,11 @@ def channel_messages_v1(auth_user_id, channel_id, start):
 
     total_messages = len(chan['messages'])
 
+    try:
+        start = int(start)
+    except ValueError:
+        raise InputError('START is not of a right type')
+        
     if start > total_messages:
         raise InputError('Invalid start, not enough messages')
 

@@ -82,8 +82,9 @@ def check_valid_channel_id(channel_id):
 
     Return Value: N/A
     """
-
-    if isinstance(channel_id, int) is False or type(channel_id) is bool:
+    try:
+        channel_id = int(channel_id)
+    except ValueError:
         raise InputError('Channel id is not of a valid type')
 
     if channel_id < 1:
@@ -98,6 +99,8 @@ def check_valid_channel_id(channel_id):
     # if the auth_user_id is not found, raise an AccessError
     if channel_exists is False:
         raise InputError('Channel does not exist in channels database')
+
+    return channel_id
 
 def check_user_is_member(auth_user_id, channel_id):
     """
@@ -123,4 +126,3 @@ def check_user_is_member(auth_user_id, channel_id):
                     return True
 
     return False
-
