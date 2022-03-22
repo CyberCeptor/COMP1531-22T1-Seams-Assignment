@@ -17,7 +17,6 @@ Description: implementation for
 from src.error import InputError, AccessError
 from src.other import check_valid_auth_id
 from src.other import check_user_is_member, check_valid_channel_id
-
 from src.data_store import data_store
 
 def channel_invite_v1(auth_user_id, channel_id, u_id):

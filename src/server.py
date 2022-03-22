@@ -1,20 +1,20 @@
 import sys
 import signal
-
 import pickle
-
 from json import dumps
 from flask import Flask, request
 from flask_cors import CORS
-from src.error import InputError, AccessError
+
+from src.error import InputError
 
 from src.token import token_remove, token_valid_check, token_get_user_id
 
 from src import config
-
 from src.auth import auth_register_v1, auth_login_v1
 from src.channels import channels_create_v1, channels_list_v1
 from src.other import clear_v1
+from src.channel import channel_invite_v1, channel_join_v1
+from src.channels import channels_create_v1
 
 from src.admin import admin_userpermission_change
 
@@ -138,6 +138,24 @@ def channel_create():
     channel = channels_create_v1(user_id, data['name'], data['is_public'])
     save_data()
     return dumps(channel)
+
+@APP.route('/channel/invite/v2', methods=['POST'])
+def server_invite():
+    data = request.get_json()
+    token_valid_check(data['token'])
+    user_id = token_get_user_id(data['token'])
+    channel_invite_v1(user_id, data['channel_id'], data['u_id'])
+    save_data()
+    return dumps({})
+
+@APP.route('/channel/join/v2', methods=['POST'])
+def server_join():
+    data = request.get_json()
+    token_valid_check(data['token'])
+    user_id = token_get_user_id(data['token'])
+    channel_join_v1(user_id, data['channel_id'])
+    save_data()
+    return dumps({})
 
 @APP.route("/channels/list/v2", methods=['GET'])
 def channel_list():
