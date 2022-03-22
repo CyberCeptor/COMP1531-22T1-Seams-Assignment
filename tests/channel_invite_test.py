@@ -216,7 +216,7 @@ def test_channel_invite_inviter_not_in_channel():
     create a channel with user id, and then use the inviter(is not in channel)
     to add the invitee to raise a access error
 
-    Arguments: clear_and_register_and_create (fixture)
+    Arguments: N/A
 
     Exceptions:
         AccessError: Raised for a invter(not in channel) add the invitee
