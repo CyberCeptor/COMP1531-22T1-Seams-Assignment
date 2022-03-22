@@ -254,7 +254,7 @@ def test_channels_duplicate_name(clear_and_register):
 
     resp3 = requests.post(config.url + 'channels/create/v2', 
                           json={'token': token, 'name': 'test_channel_public',
-                                'is_public': True})
+                                'is_public': False})
     assert resp3.status_code == 400
 
 # clear_v1()
