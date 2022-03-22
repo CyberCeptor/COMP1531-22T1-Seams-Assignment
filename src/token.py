@@ -71,10 +71,7 @@ def token_valid_check(token):
     except ValueError:
         pass
 
-    if token == 'True' or token == 'False':
-        raise InputError('Invalid token')
-
-    if token == '':
+    if token in ['True', 'False', '']:
         raise InputError('Invalid token')
 
     valid = True
