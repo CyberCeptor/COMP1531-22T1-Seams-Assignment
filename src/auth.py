@@ -18,7 +18,7 @@ from src.error import InputError
 from src.token import token_generate
 
 from src.data_store import data_store
-from src.token import token_generate, token_remove, token_valid_check
+from src.token import token_generate
 
 VALID_EMAIL_REGEX = r'^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}$'
 
