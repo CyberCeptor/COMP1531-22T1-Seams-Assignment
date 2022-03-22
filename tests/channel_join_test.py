@@ -81,8 +81,8 @@ def test_channel_join_invalid_token(clear_and_register_and_create):
     assert add.status_code == 400
 
     add = requests.post(config.url + 'channel/join/v2',
-                        json={'token': '3', 'channel_id': chan_id1})
-    assert add.status_code == 400
+                        json={'token': 'goood', 'channel_id': chan_id1})
+    assert add.status_code == 403
 
     add = requests.post(config.url + 'channel/join/v2',
                         json={'token': '', 'channel_id': chan_id1})
