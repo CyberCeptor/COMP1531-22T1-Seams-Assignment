@@ -138,7 +138,7 @@ def test_channel_invite_invalid_inviter(clear_and_register_and_create):
     add = requests.post(config.url + 'channel/invite/v2', 
                         json={'token': '', 'channel_id': chan_id1,
                                 'u_id': id1})
-    assert add.status_code == 403
+    assert add.status_code == 400
 
 def test_channel_invite_invalid_invitee(clear_and_register_and_create):
     """
