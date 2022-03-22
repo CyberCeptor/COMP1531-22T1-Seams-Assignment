@@ -98,7 +98,7 @@ def test_admin_userpermission_change_invalid_token(clear_and_register):
     # access error: empty str is passed in as token
     resp6 = requests.post(config.url + 'admin/userpermission/change/v1',
                           json={'token': '', 'u_id': id2, 'permission_id': 1})
-    assert resp6.status_code == 403
+    assert resp6.status_code == 400
 
 def test_admin_userpermission_change_user_logged_out(clear_and_register):
     token = clear_and_register['token']
