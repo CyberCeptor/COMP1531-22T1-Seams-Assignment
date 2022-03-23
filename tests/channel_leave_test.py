@@ -2,8 +2,6 @@ import pytest
 import requests
 import json
 from src import config
-from src.error import AccessError, InputError
-from src.channels import channels_create_v1
 
 
 @pytest.fixture(name='clear_and_register_create')
