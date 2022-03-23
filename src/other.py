@@ -11,7 +11,6 @@ Description: implementation for
         - checking if a channel_id is valid
         - checking if a user is a member of a channel
 """
-from scipy.fftpack import ifft2
 from src.error import InputError, AccessError
 
 from src.token import reset_session_id
