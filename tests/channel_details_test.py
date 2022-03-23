@@ -11,15 +11,6 @@ import pytest
 import requests
 
 from src import config
-from src.auth import auth_register_v1
-
-from src.other import clear_v1
-from src.error import InputError, AccessError
-
-from src.channel import channel_details_v1
-
-from src.channels import channels_create_v1
-
 
 @pytest.fixture(name='clear_and_register_and_create')
 def fixture_clear_and_register_and_create():

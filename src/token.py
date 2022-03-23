@@ -42,53 +42,105 @@ def token_generate(user_data):
 
     return token
 
-# given a token, returns the user_id
 def token_get_user_id(token):
+    """
+    returns the user_id encoded into the given valid token
+
+    Arguments:
+        token (str) - a valid jwt token string
+
+    Exceptions: N/A
+
+    Return Value: Returns the user id of the user that the token belongs to
+    """
+
     decoded = jwt.decode(token, KEY, ALGORITHM)
     return int(decoded['id'])
 
-# iterates through the token dictionary, and returns the dict of the token given.
 def token_locate_in_data_store(token):
+    """
+    iterates through the token dictionary and returns the dict of the token
+    given if it is found
+
+    Arguments:
+        token (str) - a valid jwt token string
+
+    Exceptions:
+        AccessError - Raised if token cannot be found in the tokens data
+
+    Return Value: Returns the dict of the stored token if it is found
+    """
+
     store = data_store.get()
     for stored_token in store['tokens']:
         if stored_token['token'] == token:
             return stored_token
     raise AccessError('Invalid token')
 
-# if the token is older then 24hours old, or the user logs out, the token is removed.
 def token_remove(token):
+    """
+    remove a token from the tokens data if it is expired or if a user logs out
+
+    Arguments:
+        token (str) - a valid jwt token string
+
+    Exceptions:
+        AccessError - Raised if token is not saved in the tokens data
+
+    Return Value: N/A
+    """
+
     token_to_remove = token_locate_in_data_store(token)
     store = data_store.get()
     store['tokens'].remove(token_to_remove)
     data_store.set(store)
 
-# checks that the created token matches the user information in their dictionary.
 def token_valid_check(token):
-    # decode will check the current time againest the expiry time
+    """
+    checks that the passed in token is of a valid type, is not expired, is a
+    valid jwt token string, and is stored in the tokens data
+
+    Arguments:
+        token (str) - a jwt token string
+
+    Exceptions:
+        InputError  - Raised if token is of an invalid type
+        AccessError - Raised if token is expired, is not a valid jwt token
+                      string, and is not saved in the tokens data
+
+    Return Value: N/A
+    """
+
+    # invalid input types for tokens
+    if token in ['True', 'False', '']:
+        raise InputError('Invalid token')
+
+    # if the token can be casted to an int, it is of the wrong type
     try:
         token = int(token)
         raise InputError('Invalid token')
     except ValueError:
         pass
 
-    if token in ['True', 'False', '']:
-        raise InputError('Invalid token')
-
-    if token == '':
-        raise InputError('Invalid token')
-
     valid = True
     error_message = ''
+    # decode will check the current time against the expiry time
     try:
         jwt.decode(token, KEY, algorithms=[ALGORITHM])
     except jwt.ExpiredSignatureError:
+        # remove the token if it is expired
         valid = False
         error_message = 'Token has expired'
         token_remove(token)
     except jwt.DecodeError:
+        # a string has been passed in but it's not a jwt token string or it's a
+        # normal string
         valid = False
         error_message = 'Invalid token'
 
+    # return the appropriate error message
     if not valid:
         raise AccessError(error_message)
+
+    # check if the valid token is stored in the data
     token_locate_in_data_store(token)
