@@ -150,7 +150,6 @@ def channels_create_v1(auth_user_id, name, is_public): # (token, name, is_public
     channel_data = {
         'channel_id': channel_id,
         'name': name,
-        'dm_id': -1,
         'owner_members': [{
             'u_id': user_info['id'],
             'email': user_info['email'],
