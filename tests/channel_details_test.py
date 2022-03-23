@@ -163,6 +163,33 @@ def test_channel_details_invalid_channel(clear_and_register_and_create):
                           params = {'token': token, 'channel_id': 2})
     assert resp3.status_code == 400
     
+def test_user_not_belong(clear_and_register_and_create):
+    """
+    testing if user belongs to the channel
+
+    Arguments: clear_and_register_and_create (fixture)
+
+    Exceptions: 
+        Access Error - Raised for all test cases below
+
+    Return Value: N/A
+    """
+    
+    token = clear_and_register_and_create[0]
+    chan_id = clear_and_register_and_create[1]
+
+    # create user 2
+    user2 = requests.post(config.url + 'auth/register/v2', 
+                            json={'email': 'def@abc.com', 'password': 'password',
+                               'name_first': 'first2', 'name_last': 'last2'}) 
+    user2_data = user2.json()
+    token_2 = user2_data['token']
+
+    resp0 = requests.get(config.url + 'channel/details/v2', 
+                          params = {'token': token_2, 'channel_id': chan_id})
+    assert resp0.status_code == 403
+    
+    requests.delete(config.url + 'clear/v1')
 
 
 def test_channel_details_return(clear_and_register_and_create):
