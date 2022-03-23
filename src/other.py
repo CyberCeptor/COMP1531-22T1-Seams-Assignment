@@ -33,6 +33,7 @@ def clear_v1():
     store['users'].clear()
     store['channels'].clear()
     store['tokens'].clear()
+    store['dms'].clear()
     data_store.set(store)
     reset_session_id()
 
