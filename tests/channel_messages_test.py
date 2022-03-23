@@ -133,7 +133,20 @@ def test_channel_messages_invalid_token(clear_and_register_and_create):
     resp4 = requests.get(config.url + 'channel/messages/v2', 
                           params = {'token': 0, 'channel_id': chan_id, 'start': 0})
     assert resp4.status_code == 400
-
+    # expired token
+    expired_token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MSwic2Vzc\
+        2lvbl9pZCI6MSwiaGFuZGxlIjoiZmlyc3RsYXN0IiwiZXhwIjoxNTQ3\
+            OTc3ODgwfQ.366QLXfCURopcjJbAheQYLVNlGLX_INKVwr8_TVXYEQ'
+    resp5 = requests.get(config.url + 'channel/messages/v2', 
+                          params = {'token': expired_token, 'channel_id': chan_id, 'start': 0})
+    assert resp5.status_code == 403
+    # unsaved token
+    unsaved_token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MSwic2Vzc2lvbl9pZ\
+        CI6MSwiaGFuZGxlIjoiZmlyc3RsYXN0IiwiZXhwIjoyNTQ3OTc3ODgwfQ.ckPPWiR-m6x0IRqpQt\
+        KmJgNLiD8eAEiTv2i8ToK3mkY'
+    resp6 = requests.get(config.url + 'channel/messages/v2', 
+                          params = {'token': unsaved_token, 'channel_id': chan_id, 'start': 0})
+    assert resp6.status_code == 403
     requests.delete(config.url + 'clear/v1')
 
     # # no user input

@@ -76,28 +76,30 @@ def test_channels_listall_invalid_token(clear_and_register_and_create):
      # passing incorrect string as token.
 
     # token is int
-    channels_listall = requests.get(config.url + 'channels/listall/v2', params = {'token': 0})
-    assert channels_listall.status_code == 400
+    resp0 = requests.get(config.url + 'channels/listall/v2', params = {'token': 0})
+    assert resp0.status_code == 400
 
     # token is bool
-    channels_listall = requests.get(config.url + 'channels/listall/v2', params = {'token': True})
-    assert channels_listall.status_code == 400
+    resp1 = requests.get(config.url + 'channels/listall/v2', params = {'token': True})
+    assert resp1.status_code == 400
     
-    channels_listall = requests.get(config.url + 'channels/listall/v2', params = {'token': False})
-    assert channels_listall.status_code == 400
+    resp2 = requests.get(config.url + 'channels/listall/v2', params = {'token': False})
+    assert resp2.status_code == 400
 
     # wrong string to raise access error
-    channels_listall = requests.get(config.url + 'channels/listall/v2', params = {'token': 'str'})
-    assert channels_listall.status_code == 403 
+    resp3 = requests.get(config.url + 'channels/listall/v2', params = {'token': 'str'})
+    assert resp3.status_code == 403 
 
     # token is expired
     expired_token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MSwic2Vzc2lvbl9pZCI6MSwiaGFuZGxlIjoiZmly\
         c3RsYXN0IiwiZXhwIjoxNTQ3OTc3ODgwfQ.366QLXfCURopcjJbAheQYLVNlGLX_INKVwr8_TVXYEQ'
-
-    channels_list_json = requests.get(config.url + 'channels/listall/v2', params = {'token': expired_token})
-    assert channels_list_json.status_code == 403
-
-
+    resp4 = requests.get(config.url + 'channels/listall/v2', params = {'token': expired_token})
+    assert resp4.status_code == 403
+    # token is unsaved
+    unsaved_token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MSwic2Vzc2lvbl9pZCI6MSwiaGFuZGxlIjoiZm\
+        lyc3RsYXN0IiwiZXhwIjoyNTQ3OTc3ODgwfQ.ckPPWiR-m6x0IRqpQtKmJgNLiD8eAEiTv2i8ToK3mkY'
+    resp5 = requests.get(config.url + 'channels/listall/v2', params = {'token': unsaved_token})
+    assert resp5.status_code == 403
 
 
 def test_channels_listall_v1_return():

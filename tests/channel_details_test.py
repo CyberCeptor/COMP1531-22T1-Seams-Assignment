@@ -93,7 +93,13 @@ def test_channel_details_invalid_token(clear_and_register_and_create):
     resp4 = requests.get(config.url + 'channel/details/v2', 
                           params = {'token': expired_token, 'channel_id': chan_id})
     assert resp4.status_code == 403
-    
+    # unsaved token
+    unsaved_token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MSwic2Vzc2lvbl9pZ\
+        CI6MSwiaGFuZGxlIjoiZmlyc3RsYXN0IiwiZXhwIjoyNTQ3OTc3ODgwfQ.ckPPWiR-m6x0IRqpQt\
+        KmJgNLiD8eAEiTv2i8ToK3mkY'
+    resp5 = requests.get(config.url + 'channel/details/v2', 
+                          params = {'token': unsaved_token, 'channel_id': chan_id})
+    assert resp5.status_code == 403
 
     # # no user input
     # with pytest.raises(InputError):
