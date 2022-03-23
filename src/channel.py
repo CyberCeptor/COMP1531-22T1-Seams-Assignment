@@ -18,6 +18,9 @@ from src.error import InputError, AccessError
 from src.other import check_valid_auth_id
 from src.other import check_user_is_member, check_valid_channel_id
 from src.data_store import data_store
+from src.token import token_valid_check, token_get_user_id
+
+from src.token import token_valid_check, token_get_user_id
 
 def channel_invite_v1(auth_user_id, channel_id, u_id):
     """
@@ -41,10 +44,10 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
     check_valid_channel_id(channel_id) # check the channel is valid or not
     # if auth_user_id is a member of the channel and u_id isn't
     # then add u_id into the channel
-    if check_user_is_member(auth_user_id, channel_id) is False:
+    if check_user_is_member(auth_user_id, channel_id) is None:
         raise AccessError('Inviter is not in the channel')
     
-    if check_user_is_member(u_id, channel_id) is True:
+    if check_user_is_member(u_id, channel_id) is not None:
         raise InputError('Invitee is already in the channel')
     else:
         add_invitee(u_id, channel_id) #add user
@@ -69,23 +72,21 @@ def channel_details_v1(auth_user_id, channel_id):
         owner members and all members if given user id and channel id are valid
     """
 
-    store = data_store.get()
+    # store = data_store.get()
 
     # see if given auth_user_id and channel_id are valid
     check_valid_auth_id(auth_user_id)
-
-    channel_id = check_valid_channel_id(channel_id)
+    channel_info = check_valid_channel_id(channel_id)
+    channel_id = channel_info['channel_id']
 
     # is_member is a bool to check whether given user is in the given channel
-    is_member = check_user_is_member(auth_user_id, channel_id)
-    if is_member is False:
+    if check_user_is_member(auth_user_id, channel_id) is None:
         raise AccessError('User does not exist in channel')
 
-    # find the channel information
-    for channel in store['channels']:
-        if channel['channel_id'] == channel_id:
-            channel_info = channel
-
+    # # find the channel information
+    # for channel in store['channels']:
+    #     if channel['channel_id'] == channel_data['channel_id']:
+    #         channel_info = channel
 
     #return requires keys and values from stored data
     return {
@@ -115,28 +116,26 @@ def channel_messages_v1(auth_user_id, channel_id, start):
         start and end if given user id and channel id are valid
     """
 
-    store = data_store.get()
-
     # see if given auth_user_id and channel_id are valid
     check_valid_auth_id(auth_user_id)
-    channel_id = check_valid_channel_id(channel_id)
+    channel_data = check_valid_channel_id(channel_id)
+    channel_id = channel_data['channel_id']
 
     # is_member is a bool to check whether given user is in the given channel
-    is_member = check_user_is_member(auth_user_id, channel_id)
-    if is_member is False:
+    if check_user_is_member(auth_user_id, channel_id) is None:
         raise AccessError('User does not exist in channel')
 
-    # get how many messages in the channel
-    for channel in store['channels']:
-        if channel['channel_id'] == channel_id:
-            chan = channel
+    total_messages = len(channel_data['messages'])
 
-    total_messages = len(chan['messages'])
+
+    if start in ['True', 'False', '']:
+        raise InputError('Invalid start')
 
     try:
         start = int(start)
     except ValueError as Start_not_valid_type:
         raise InputError from Start_not_valid_type
+
 
     if start > total_messages:
         raise InputError('Invalid start, not enough messages')
@@ -149,7 +148,7 @@ def channel_messages_v1(auth_user_id, channel_id, start):
         }
 
     # message starts
-    start_message = chan['messages'][start]
+    start_message = channel_data['messages'][start]
 
     # get end
     end = start + 50
@@ -166,11 +165,11 @@ def channel_messages_v1(auth_user_id, channel_id, start):
         if start == total_messages - 1: # if there is only 1 message
             messages_to_return.append(start_message)
         else:
-            for idx, message in chan['messages']:
+            for idx, message in channel_data['messages']:
                 if idx >= start:
                     messages_to_return.append(message)
     else:
-        for idx, message in chan['messages']:
+        for idx, message in channel_data['messages']:
             if start <= idx < end:
                 messages_to_return.append(message)
 
@@ -199,7 +198,7 @@ def channel_join_v1(auth_user_id, channel_id):
     check_valid_channel_id(channel_id)  #check the channle is valid or not
 
     #check the invitee whether is already in the channel
-    if check_user_is_member(auth_user_id, channel_id) is True:
+    if check_user_is_member(auth_user_id, channel_id) is not None:
         raise InputError('Invitee is already in the channel')
 
     # check if the user is a global owner
@@ -281,3 +280,39 @@ def check_private_channel(channel_id):
         if channel['channel_id'] == channel_id:
             if channel['is_public'] is False:
                 raise AccessError('Channel is private')
+
+
+def channel_leave_v1(token, channel_id):
+    """
+    Given a channel with ID channel_id that the authorised user is a member of, remove them as a member 
+    of the channel. Their messages should remain in the channel. If the only channel owner leaves, 
+    the channel will remain.
+
+    Arguments:
+        -   token (string)
+        -   channel_id  (int)
+
+    Exceptions:
+        AccessError - Occurs when the user_id returned from the token is not a member of
+            that channel.
+
+    Return Value: N/A
+    """
+
+    store = data_store.get()
+    channel_data = check_valid_channel_id(channel_id)
+    token_valid_check(token)
+    user_id = token_get_user_id(token)
+    user_data = check_user_is_member(user_id, channel_id)
+
+    # remove from the data_store
+    if user_data:
+        channel_data['all_members'].remove(user_data)
+        if user_data in channel_data['owner_members']:
+            channel_data['owner_members'].remove(user_data)
+    else:
+        raise AccessError('User is not a member of that channel')
+
+    data_store.set(store)
+
+    return {}
