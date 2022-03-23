@@ -27,7 +27,8 @@ def token_generate(user_data):
     session_id = token_new_session_id()
     expiry_time = datetime.datetime.now() + datetime.timedelta(hours=24)
     handle = user_data['handle']
-    token = jwt.encode({'id': id, 'session_id': session_id, 'handle': handle, 'exp': expiry_time}, KEY, ALGORITHM)
+    token = jwt.encode({'id': id, 'session_id': session_id, 'handle': handle,
+                        'exp': expiry_time}, KEY, ALGORITHM)
 
     token_dict = {
         'user_id': user_data['id'],
@@ -70,10 +71,7 @@ def token_valid_check(token):
     except ValueError:
         pass
 
-    if token == 'True' or token == 'False':
-        raise InputError('Invalid token')
-
-    if token == '':
+    if token in ['True', 'False', '']:
         raise InputError('Invalid token')
 
     valid = True
