@@ -8,17 +8,7 @@ def user_profile_v1(token, u_id):
     For a valid user, returns information about their user_id, firstname,
     last name, and handle
     """
-
-    # check the token is valid
     token_valid_check(token)
-    # check the user_id is valid
-    # valid = True
-    # try:
-    #     u_id = int(u_id)
-    # except ValueError:
-    #     valid = False
-    # if not valid:
-    #     raise InputError("User id is not of correct type.")
     try:
         u_id = int(u_id)
     except ValueError as auth_id_not_valid_type:

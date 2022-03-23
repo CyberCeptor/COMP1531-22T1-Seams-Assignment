@@ -25,6 +25,19 @@ def fixture_clear_and_register():
     user_json = user.json()
     return user_json
 
+def test_channel_leave_works(clear_and_register):
+    user1_json = clear_and_register
+
+    channel = requests.post(config.url + 'channels/create/v2', 
+                          json={'token': user1_json['token'], 'name': 'test_channel_public',
+                                'is_public': True})
+    assert channel.status_code == 200
+    channel_json = channel.json()
+
+    # Working test case
+    channel_leave = requests.post(config.url + 'channel/leave/v1', 
+                            json={'token': user1_json['token'], 'channel_id': channel_json['channel_id']})
+    assert channel_leave.status_code == 200
 
 
 def test_channel_leave_invalid_channel_id(clear_and_register):
@@ -34,6 +47,7 @@ def test_channel_leave_invalid_channel_id(clear_and_register):
 
 
     """
+    # creating 2 users and the channel.
     user1_json = clear_and_register
     user2 = requests.post(config.url + 'auth/register/v2', 
                   json={'email': 'abc2@def.com', 'password': 'password',
@@ -46,7 +60,6 @@ def test_channel_leave_invalid_channel_id(clear_and_register):
     assert channel.status_code == 200
     channel_json = channel.json()
 
-    ##################### Bad Channel id tests.
 
     # User NOT in the channel
     channel_leave = requests.post(config.url + 'channel/leave/v1', 
@@ -74,7 +87,7 @@ def test_channel_leave_invalid_channel_id(clear_and_register):
     assert channel_leave.status_code == 400
 
     
-    ################### Bad Token Tests
+    # bad token tests.
 def test_channel_leave_invalid_token(clear_and_register):
     user1_json = clear_and_register
 
@@ -123,19 +136,3 @@ def test_channel_leave_invalid_token(clear_and_register):
 
 
 
-def test_channel_leave_works(clear_and_register):
-    user1_json = clear_and_register
-
-    channel = requests.post(config.url + 'channels/create/v2', 
-                          json={'token': user1_json['token'], 'name': 'test_channel_public',
-                                'is_public': True})
-    assert channel.status_code == 200
-    channel_json = channel.json()
-
-    # Working test case
-    channel_leave = requests.post(config.url + 'channel/leave/v1', 
-                            json={'token': user1_json['token'], 'channel_id': channel_json['channel_id']})
-    assert channel_leave.status_code == 200
-
-    # Could check channel_details to ensure the user has been removed, 
-    # or that the channel has been removed if thats whats required when there are no users.

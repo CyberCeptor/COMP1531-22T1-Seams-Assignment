@@ -282,7 +282,18 @@ def channel_leave_v1(token, channel_id):
     Given a channel with ID channel_id that the authorised user is a member of, remove them as a member 
     of the channel. Their messages should remain in the channel. If the only channel owner leaves, 
     the channel will remain.
+
+    Arguments:
+        -   token (string)
+        -   channel_id  (int)
+
+    Exceptions:
+        AccessError - Occurs when the user_id returned from the token is not a member of
+            that channel.
+
+    Return Value: N/A
     """
+
     store = data_store.get()
     channel_data = check_valid_channel_id(channel_id)
     token_valid_check(token)
