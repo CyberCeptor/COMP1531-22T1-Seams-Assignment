@@ -13,7 +13,7 @@ from src.token import token_remove, token_valid_check, token_get_user_id
 from src import config
 from src.auth import auth_register_v1, auth_login_v1
 from src.channels import channels_create_v1, channels_list_v1, channels_listall_v1
-from src.channel import channel_details_v1, channel_invite_v1, channel_join_v1, channel_messages_v1
+from src.channel import channel_details_v1, channel_invite_v1, channel_join_v1, channel_messages_v1, channel_addowner_v1
 from src.other import clear_v1
 from src.channel import channel_invite_v1, channel_join_v1, channel_leave_v1
 from src.channels import channels_create_v1
@@ -195,6 +195,13 @@ def channel_join():
     token_valid_check(data['token'])
     user_id = token_get_user_id(data['token'])
     channel_join_v1(user_id, data['channel_id'])
+    save_data()
+    return dumps({})
+
+@APP.route('/channel/addowner/v1', methods=['POST'])
+def channel_addowner():
+    data = request.get.json()
+    channel_addowner_v1(data['token'], data['channel_id'], data['u_id'])
     save_data()
     return dumps({})
 
