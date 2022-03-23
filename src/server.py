@@ -145,7 +145,6 @@ def channel_create():
     save_data()
     return dumps(channel)
 
-
 @APP.route("/channels/list/v2", methods=['GET'])
 def channel_list():
     token = request.args.get('token')
@@ -214,7 +213,6 @@ def message_send():
     data = request.get_json()
     return dumps(message_send(**data))
 
-#### NO NEED TO MODIFY BELOW THIS POINT
 
 @APP.route('/clear/v1', methods=['DELETE'])
 def clear():
