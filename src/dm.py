@@ -7,13 +7,7 @@ def dm_create_v1(token, u_ids):
     store = data_store.get()
     token_valid_check(token)
     auth_id = token_get_user_id(token)
-    for user in store['users']:
-        if user['id'] == auth_id:
-            user_info = user
-
-    #check the duplicate ids in u_ids
-    check_duplicate_id(u_ids)
-    
+    user_info = check_valid_auth_id(auth_id)
     # Assume the dm id start at 1 and increase by adding 1
     # for any newdm created
     dm_id = len(store['dms']) + 1
@@ -26,46 +20,21 @@ def dm_create_v1(token, u_ids):
             if message['message_id'] > current_message_id:
                 current_message_id = message['message_id']
     new_message_id = current_message_id + 1
-    
-    #copy the u_ids list
-    new_u_ids = u_ids.copy()
-    #add the user who sent dm in new list
-    new_u_ids.append(auth_id)
     name_list = []
-    #add the handle in name list
-    for id in new_u_ids:
-        for user in store['users']:
-            if id == user['id']:
-                name_list.append(user['handle'])
-                break
+    all_member_list = []
+    
+    for u_id in u_ids:
+        if(u_ids.count(u_id) > 1):
+            raise InputError('There are duplicate u_ids')
+        user = check_valid_auth_id(u_id)
+        name_list.append(user['handle'])
+        all_member_list.append(user)
+    all_member_list.append(user_info)
+    
     #sort name list
     name_list.sort()
     #use , to separate
     dm_name = ",".join(name_list)
-    #create a all_member list to show all the members in dm including the owner
-    all_member_list = []
-    owner = {
-        'u_id': user_info['id'],
-        'email': user_info['email'],
-        'name_first': user_info['first'],
-        'name_last': user_info['last'],
-        'handle_str': user_info['handle']
-    }
-    #add the owner
-    all_member_list.append(owner)
-    #add the other members
-    for other in u_ids:
-        for user1 in store['users']:
-            if user1['id'] == other:
-                user_info1 = user1
-                other_user = {
-                    'u_id': user_info1['id'],
-                    'email': user_info1['email'],
-                    'name_first': user_info1['first'],
-                    'name_last': user_info1['last'],
-                    'handle_str': user_info1['handle']
-                }
-                all_member_list.append(other_user)
 
     new_dm = {
         'channel_id': -1, #assume a default value
@@ -90,23 +59,3 @@ def dm_create_v1(token, u_ids):
     data_store.set(store)
     
     return {'dm_id': dm_id}
-
-#create a function to check duplicate id in u_ids
-def check_duplicate_id(u_ids):
-    length_uids = len(u_ids)
-    i = 0
-    for id in u_ids:
-        check_valid_auth_id(id)
-        i += 1
-        if(i < length_uids):
-            if(id == u_ids[i]):
-                raise InputError('There are duplicate u_ids')
-
-
-
-
-
-
-
-
-   
