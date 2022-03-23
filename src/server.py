@@ -14,7 +14,7 @@ from src.token import token_remove, token_valid_check
 from src.admin import admin_userpermission_change
 from src.other import clear_v1
 
-from src.channel import channel_details_v2, channel_invite_v2
+from src.channel import channel_details_v2, channel_invite_v2, channel_addowner_v1
 from src.channel import channel_join_v2, channel_messages_v2, channel_leave_v1
 from src.channels import channels_create_v2
 from src.channels import channels_list_v2, channels_listall_v2
