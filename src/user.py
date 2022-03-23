@@ -14,13 +14,13 @@ def user_profile_v1(token, u_id):
     # check the token is valid
     token_valid_check(token)
     # check the user_id is valid
-    valid = True
-    try:
-        u_id = int(u_id)
-    except ValueError:
-        valid = False
-    if not valid:
-        raise InputError("User id is not of correct type.")
+    # valid = True
+    # try:
+    #     u_id = int(u_id)
+    # except ValueError:
+    #     valid = False
+    # if not valid:
+    #     raise InputError("User id is not of correct type.")
 
     check_valid_auth_id(u_id)
 

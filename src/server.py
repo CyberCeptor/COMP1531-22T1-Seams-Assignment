@@ -167,6 +167,21 @@ def channel_list():
     save_data()
     return dumps(channel_list)
 
+@APP.route('/channel/leave/v1', methods=['POST'])
+def channel_leave():
+    data = request.get_json()
+    channel_leave_v1(data['token'], data['channel_id'])
+    save_data()
+    return dumps({})
+
+@APP.route('/user/profile/v1', methods=['GET'])
+def user_profile():
+    token = request.args.get('token')
+    u_id = request.args.get('u_id')
+    profile = user_profile_v1(token, u_id)
+    save_data()
+    return dumps(profile)
+
 @APP.route('/clear/v1', methods=['DELETE'])
 def clear():
     clear_v1()
@@ -181,20 +196,7 @@ def save_data():
         pickle.dump(DATA_STORE, FILE)
     return DATA_STORE
 
-@APP.route('/user/profile/v1', methods=['GET'])
-def user_profile():
-    token = request.args.get('token')
-    u_id = request.args.get('u_id')
-    profile = user_profile_v1(token, u_id)
-    save_data()
-    return dumps(profile)
 
-@APP.route('/channel/leave/v1', methods=['POST'])
-def channel_leave():
-    data = request.get_json()
-    channel_leave_v1(data['token'], data['channel_id'])
-    save_data()
-    return dumps({})
 
 
 #### NO NEED TO MODIFY BELOW THIS POINT

@@ -274,3 +274,28 @@ def check_private_channel(channel_id):
         if channel['channel_id'] == channel_id:
             if channel['is_public'] is False:
                 raise AccessError('Channel is private')
+
+
+def channel_leave_v1(token, channel_id):
+    """
+    Given a channel with ID channel_id that the authorised user is a member of, remove them as a member 
+    of the channel. Their messages should remain in the channel. If the only channel owner leaves, 
+    the channel will remain.
+    """
+    data_store.get()
+    channel_data = check_valid_channel_id(channel_id)
+    token_valid_check(token)
+    user_id = token_get_user_id(token)
+    user_data = check_user_is_member(user_id, channel_id)
+
+    # remove from the data_store
+    if user_data:
+        channel_data['all_members'].remove(user_data)
+        if user_data in channel_data['owner_members']:
+            channel_data['owner_members'].remove(user_data)
+    else:
+        raise AccessError('User is not a member of that channel')
+
+    # Need to set the data?
+    data_store.set(channel_data)
+    return {}
