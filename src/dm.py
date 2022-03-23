@@ -1,4 +1,3 @@
-from operator import index
 from src.data_store import data_store
 from src.token import token_valid_check, token_get_user_id
 from src.other import check_valid_auth_id
@@ -17,11 +16,7 @@ def dm_create_v1(token, u_ids):
     
     # Assume the dm id start at 1 and increase by adding 1
     # for any newdm created
-    current_id = 0
-    for channel in store['channels']:
-        if channel['dm_id'] > current_id:
-            current_id = channel["dm_id"]
-    dm_id = current_id + 1
+    dm_id = len(store['dms']) + 1
     
     # Assume the new message id starts at 1 and increase by adding 1
     # for any new message created
@@ -47,15 +42,6 @@ def dm_create_v1(token, u_ids):
     name_list.sort()
     #use , to separate
     dm_name = ",".join(name_list)
-    #the user creates the dm is the owner
-    owner_list = [{
-        'u_id': user_info['id'],
-        'email': user_info['email'],
-        'name_first': user_info['first'],
-        'name_last': user_info['last'],
-        'handle_str': user_info['handle']
-    }]
-    
     #create a all_member list to show all the members in dm including the owner
     all_member_list = []
     owner = {
@@ -84,7 +70,6 @@ def dm_create_v1(token, u_ids):
     new_dm = {
         'channel_id': -1, #assume a default value
         'name': dm_name,
-        'owner_members': owner_list,
         'all_members': all_member_list,
         'is_public': False, # Assume false because it is a dm
         'dm_id': dm_id,
@@ -100,7 +85,7 @@ def dm_create_v1(token, u_ids):
 
     }
     # Add the dm channel to channels
-    store['channels'].append(new_dm)
+    store['dms'].append(new_dm)
     # Save data
     data_store.set(store)
     
@@ -109,12 +94,12 @@ def dm_create_v1(token, u_ids):
 #create a function to check duplicate id in u_ids
 def check_duplicate_id(u_ids):
     length_uids = len(u_ids)
-    index = 0
+    i = 0
     for id in u_ids:
         check_valid_auth_id(id)
-        index += 1
-        if(index < length_uids):
-            if(id == u_ids[index]):
+        i += 1
+        if(i < length_uids):
+            if(id == u_ids[i]):
                 raise InputError('There are duplicate u_ids')
 
 
