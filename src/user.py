@@ -21,7 +21,11 @@ def user_profile_v1(token, u_id):
     #     valid = False
     # if not valid:
     #     raise InputError("User id is not of correct type.")
-
+    try:
+        u_id = int(u_id)
+    except ValueError as auth_id_not_valid_type:
+        raise InputError from auth_id_not_valid_type
+    
     check_valid_auth_id(u_id)
 
     store = data_store.get()
