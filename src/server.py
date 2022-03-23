@@ -4,22 +4,17 @@ import pickle
 from json import dumps
 from flask import Flask, request
 from flask_cors import CORS
-
 from src.error import InputError
-
 from src.token import token_remove, token_valid_check, token_get_user_id
-
 from src import config
 from src.auth import auth_register_v1, auth_login_v1
 from src.channels import channels_create_v1, channels_list_v1
 from src.other import clear_v1
 from src.channel import channel_invite_v1, channel_join_v1
 from src.channels import channels_create_v1
-
 from src.admin import admin_userpermission_change
-
 from src.data_store_pickle import pickle_data
-
+from src.dm import dm_create_v1, dm_list_v1
 def quit_gracefully(*args):
     '''For coverage'''
     exit(0)
@@ -165,6 +160,23 @@ def channel_list():
     channel_list = channels_list_v1(user_id)
     save_data()
     return dumps(channel_list)
+
+@APP.route("/dm/create/v1", methods=['POST'])
+def dm_create_server():
+    store = request.get_json()
+    token = store["token"]
+    u_ids = store["u_ids"]
+    save_data()
+    return dumps(
+        dm_create_v1(token, u_ids)
+    )
+
+@APP.route("/dm/list/v1", methods=['GET'])
+def dm_list_server():
+    token = request.args.get('token')
+    dm_list_v1(token)
+    save_data()
+    return dumps({})
 
 @APP.route('/clear/v1', methods=['DELETE'])
 def clear():
