@@ -77,8 +77,6 @@ def channel_details_v1(auth_user_id, channel_id):
 
     channel_id = check_valid_channel_id(channel_id)
 
-    check_valid_channel_id(channel_id)
-
     # is_member is a bool to check whether given user is in the given channel
     is_member = check_user_is_member(auth_user_id, channel_id)
     if is_member is False:
@@ -122,7 +120,7 @@ def channel_messages_v1(auth_user_id, channel_id, start):
 
     # see if given auth_user_id and channel_id are valid
     check_valid_auth_id(auth_user_id)
-    check_valid_channel_id(channel_id)
+    channel_id = check_valid_channel_id(channel_id)
 
     # is_member is a bool to check whether given user is in the given channel
     is_member = check_user_is_member(auth_user_id, channel_id)
@@ -140,7 +138,7 @@ def channel_messages_v1(auth_user_id, channel_id, start):
         start = int(start)
     except ValueError as Start_not_valid_type:
         raise InputError from Start_not_valid_type
-        
+
     if start > total_messages:
         raise InputError('Invalid start, not enough messages')
 
