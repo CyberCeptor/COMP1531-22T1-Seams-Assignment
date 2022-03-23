@@ -184,11 +184,10 @@ def save_data():
 @APP.route('/user/profile/v1', methods=['GET'])
 def user_profile():
     token = request.args.get('token')
-    u_id = int(request.args.get('u_id'))
+    u_id = request.args.get('u_id')
     profile = user_profile_v1(token, u_id)
     save_data()
     return dumps(profile)
-
 
 
 

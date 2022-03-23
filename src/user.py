@@ -10,21 +10,21 @@ def user_profile_v1(token, u_id):
     For a valid user, returns information about their user_id, firstname,
     last name, and handle
     """
+
     # check the token is valid
     token_valid_check(token)
-    check_valid_auth_id(u_id)
-
-    valid = True
     # check the user_id is valid
+    valid = True
     try:
-        check_valid_auth_id(u_id)
-    except InputError:
+        u_id = int(u_id)
+    except ValueError:
         valid = False
     if not valid:
-        raise InputError("Invalid id")
+        raise InputError("User id is not of correct type.")
+
+    check_valid_auth_id(u_id)
 
     store = data_store.get()
-
     for users in store['users']:
         if users['id'] == u_id:
             user = {
