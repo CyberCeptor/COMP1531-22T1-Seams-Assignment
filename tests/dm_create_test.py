@@ -73,3 +73,5 @@ def test_dm_create_duplicate_uid():
     id2 = user2['auth_user_id']
     with pytest.raises(InputError):
         dm_create_v1(token, [id2, id2])
+
+clear_v1()
