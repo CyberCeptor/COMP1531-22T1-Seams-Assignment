@@ -65,14 +65,14 @@ def token_remove(token):
 # checks that the created token matches the user information in their dictionary.
 def token_valid_check(token):
     # decode will check the current time againest the expiry time
+    if token in ['True', 'False', '']:
+        raise InputError('Invalid token')
+    
     try:
         token = int(token)
         raise InputError('Invalid token')
     except ValueError:
         pass
-
-    if token in ['True', 'False', '']:
-        raise InputError('Invalid token')
 
     valid = True
     error_message = ''
