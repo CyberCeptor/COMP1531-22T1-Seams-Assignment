@@ -15,10 +15,10 @@ Description: implementation for
 """
 
 from src.error import InputError, AccessError
-from src.other import check_valid_auth_id
+from src.other import check_valid_auth_id, check_user_is_owner_member
 from src.other import check_user_is_member, check_valid_channel_id
 from src.data_store import data_store
-from src.token import token_valid_check, token_get_user_id
+from src.token import token_valid_check, token_get_user_id, token_locate_in_data_store
 
 from src.token import token_valid_check, token_get_user_id
 
@@ -343,7 +343,25 @@ AccessError:
 
 def channel_addowner_v1(token, channel_id, u_id):
 
+    check_valid_auth_id(u_id)
+    channel_data = check_valid_channel_id(channel_id)
 
+    member_data = check_user_is_member(u_id, channel_id)
+    if member_data == None:
+        raise InputError('User is not a valid member.')
 
+    # check the inviter, i.e. token, is logged in , i.e. token is in data_store
+    token_locate_in_data_store(token)
+    inviter_user_id = token_get_user_id(token)
+
+    # check that the inviter is an owner_member.
+    if check_user_is_owner_member(inviter_user_id, channel_id) is None:
+        raise AccessError('The invitee is not an owner_member')
+
+    # check that the user_id to add is already a owner_member
+    if check_user_is_owner_member(u_id, channel_id):
+        raise InputError('The user is already an owner_member')
+
+    channel_data['owner_members'].append(member_data)
 
     return {}

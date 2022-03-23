@@ -189,7 +189,7 @@ def channel_join():
 
 @APP.route('/channel/addowner/v1', methods=['POST'])
 def channel_addowner():
-    data = request.get.json()
+    data = request.get_json()
     channel_addowner_v1(data['token'], data['channel_id'], data['u_id'])
     save_data()
     return dumps({})
