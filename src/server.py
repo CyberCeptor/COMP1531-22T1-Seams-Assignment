@@ -15,8 +15,11 @@ from src.auth import auth_register_v1, auth_login_v1
 from src.channels import channels_create_v1, channels_list_v1, channels_listall_v1
 from src.channel import channel_details_v1, channel_invite_v1, channel_join_v1, channel_messages_v1
 from src.other import clear_v1
-from src.channel import channel_invite_v1, channel_join_v1
+from src.channel import channel_invite_v1, channel_join_v1, channel_leave_v1
 from src.channels import channels_create_v1
+from src.user import user_profile_v1
+
+from src.user import user_profile_v1
 
 from src.admin import admin_userpermission_change
 
@@ -178,7 +181,7 @@ def channel_details():
 
 
 @APP.route('/channel/invite/v2', methods=['POST'])
-def server_invite():
+def channel_invite():
     data = request.get_json()
     token_valid_check(data['token'])
     user_id = token_get_user_id(data['token'])
@@ -187,7 +190,7 @@ def server_invite():
     return dumps({})
 
 @APP.route('/channel/join/v2', methods=['POST'])
-def server_join():
+def channel_join():
     data = request.get_json()
     token_valid_check(data['token'])
     user_id = token_get_user_id(data['token'])
@@ -214,6 +217,21 @@ def message_send():
     return dumps(message_send(**data))
 
 
+@APP.route('/channel/leave/v1', methods=['POST'])
+def channel_leave():
+    data = request.get_json()
+    channel_leave_v1(data['token'], data['channel_id'])
+    save_data()
+    return dumps({})
+
+@APP.route('/user/profile/v1', methods=['GET'])
+def user_profile():
+    token = request.args.get('token')
+    u_id = request.args.get('u_id')
+    profile = user_profile_v1(token, u_id)
+    save_data()
+    return dumps(profile)
+
 @APP.route('/clear/v1', methods=['DELETE'])
 def clear():
     clear_v1()
@@ -227,7 +245,6 @@ def save_data():
     with open('datastore.p', 'wb') as FILE:
         pickle.dump(DATA_STORE, FILE)
     return DATA_STORE
-
 
 
 
