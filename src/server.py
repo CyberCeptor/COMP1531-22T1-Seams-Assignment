@@ -13,7 +13,7 @@ from src import config
 from src.auth import auth_register_v1, auth_login_v1
 from src.channels import channels_create_v1, channels_list_v1
 from src.other import clear_v1
-from src.channel import channel_invite_v1, channel_join_v1
+from src.channel import channel_invite_v1, channel_join_v1, channel_leave_v1
 from src.channels import channels_create_v1
 from src.user import user_profile_v1
 
@@ -189,6 +189,12 @@ def user_profile():
     save_data()
     return dumps(profile)
 
+@APP.route('/channel/leave/v1', methods=['POST'])
+def channel_leave():
+    data = request.get_json()
+    channel_leave_v1(data['token'], data['channel_id'])
+    save_data()
+    return dumps({})
 
 
 #### NO NEED TO MODIFY BELOW THIS POINT
