@@ -72,22 +72,21 @@ def channel_details_v1(auth_user_id, channel_id):
         owner members and all members if given user id and channel id are valid
     """
 
-    store = data_store.get()
+    # store = data_store.get()
 
     # see if given auth_user_id and channel_id are valid
     check_valid_auth_id(auth_user_id)
-
-    channel_id = check_valid_channel_id(channel_id)
+    channel_info = check_valid_channel_id(channel_id)
+    channel_id = channel_info['channel_id']
 
     # is_member is a bool to check whether given user is in the given channel
     if check_user_is_member(auth_user_id, channel_id) is None:
         raise AccessError('User does not exist in channel')
 
-    # find the channel information
-    for channel in store['channels']:
-        if channel['channel_id'] == channel_id:
-            channel_info = channel
-
+    # # find the channel information
+    # for channel in store['channels']:
+    #     if channel['channel_id'] == channel_data['channel_id']:
+    #         channel_info = channel
 
     #return requires keys and values from stored data
     return {
@@ -117,27 +116,26 @@ def channel_messages_v1(auth_user_id, channel_id, start):
         start and end if given user id and channel id are valid
     """
 
-    store = data_store.get()
-
     # see if given auth_user_id and channel_id are valid
     check_valid_auth_id(auth_user_id)
-    channel_id = check_valid_channel_id(channel_id)
+    channel_data = check_valid_channel_id(channel_id)
+    channel_id = channel_data['channel_id']
 
     # is_member is a bool to check whether given user is in the given channel
     if check_user_is_member(auth_user_id, channel_id) is None:
         raise AccessError('User does not exist in channel')
 
-    # get how many messages in the channel
-    for channel in store['channels']:
-        if channel['channel_id'] == channel_id:
-            chan = channel
+    total_messages = len(channel_data['messages'])
 
-    total_messages = len(chan['messages'])
+
+    if start in ['True', 'False', '']:
+        raise InputError('Invalid start')
 
     try:
         start = int(start)
     except ValueError as Start_not_valid_type:
         raise InputError from Start_not_valid_type
+
 
     if start > total_messages:
         raise InputError('Invalid start, not enough messages')
@@ -150,7 +148,7 @@ def channel_messages_v1(auth_user_id, channel_id, start):
         }
 
     # message starts
-    start_message = chan['messages'][start]
+    start_message = channel_data['messages'][start]
 
     # get end
     end = start + 50
@@ -167,11 +165,11 @@ def channel_messages_v1(auth_user_id, channel_id, start):
         if start == total_messages - 1: # if there is only 1 message
             messages_to_return.append(start_message)
         else:
-            for idx, message in chan['messages']:
+            for idx, message in channel_data['messages']:
                 if idx >= start:
                     messages_to_return.append(message)
     else:
-        for idx, message in chan['messages']:
+        for idx, message in channel_data['messages']:
             if start <= idx < end:
                 messages_to_return.append(message)
 

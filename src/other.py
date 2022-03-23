@@ -11,6 +11,7 @@ Description: implementation for
         - checking if a channel_id is valid
         - checking if a user is a member of a channel
 """
+from scipy.fftpack import ifft2
 from src.error import InputError, AccessError
 
 from src.token import reset_session_id
@@ -82,10 +83,18 @@ def check_valid_channel_id(channel_id):
 
     Return Value: N/A
     """
+    '''Bools are read as int's 0 & 1, so need to check prior. (Not for GET requests)'''
+    '''GET requests are read as a string.'''
+    if type(channel_id) == bool:
+        raise InputError('Invalid channel_id type')
+
+    '''For GET requests.'''
+    if channel_id in ['', 'True', 'False']:
+        raise InputError('Invalid channel_id')
     try:
         channel_id = int(channel_id)
-    except ValueError as channel_id_not_valid_type:
-        raise InputError from channel_id_not_valid_type
+    except ValueError:
+        raise InputError('Invalid channel id type') from InputError
 
     if channel_id < 1:
         raise InputError('The channel id is not valid (out of bounds)')
@@ -95,10 +104,8 @@ def check_valid_channel_id(channel_id):
         if channel['channel_id'] == channel_id:
             return channel
 
-    # if the auth_user_id is not found, raise an AccessError
     raise InputError('Channel does not exist in channels database')
 
-    return channel_id
 
 def check_user_is_member(auth_user_id, channel_id):
     """
