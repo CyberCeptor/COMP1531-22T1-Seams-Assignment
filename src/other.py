@@ -63,10 +63,12 @@ def check_valid_auth_id(auth_user_id):
     for user in store['users']:
         if user['id'] == auth_user_id:
             user_exists = True
-
+            return user
     # if the auth_user_id is not found, raise an AccessError
     if user_exists is False:
         raise AccessError('User does not exist in users database')
+
+
 
 def check_valid_channel_id(channel_id):
     """
