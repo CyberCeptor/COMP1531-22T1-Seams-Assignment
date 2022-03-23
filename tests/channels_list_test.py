@@ -101,7 +101,7 @@ def test_channels_list():
     channels_list_json = channels_list.json()
 
     # creating the channel list for the second user.
-    requests.get(config.url + 'channels/list', params = {'token': user2_json['token']})
+    requests.get(config.url + 'channels/list/v2', params = {'token': user2_json['token']})
 
     # check the channels_list function has worked.
     assert channels_list.status_code == 200

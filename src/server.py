@@ -2,6 +2,7 @@ import sys
 import signal
 import pickle
 from json import dumps
+from tracemalloc import start
 from flask import Flask, request
 from flask_cors import CORS
 
@@ -11,7 +12,8 @@ from src.token import token_remove, token_valid_check, token_get_user_id
 
 from src import config
 from src.auth import auth_register_v1, auth_login_v1
-from src.channels import channels_create_v1, channels_list_v1
+from src.channels import channels_create_v1, channels_list_v1, channels_listall_v1
+from src.channel import channel_details_v1, channel_invite_v1, channel_join_v1, channel_messages_v1
 from src.other import clear_v1
 from src.channel import channel_invite_v1, channel_join_v1, channel_leave_v1
 from src.channels import channels_create_v1
@@ -133,6 +135,10 @@ def change_perms():
     save_data()
     return dumps({})
 
+
+## CHANNELS ROUTES
+
+
 @APP.route("/channels/create/v2", methods=['POST'])
 def channel_create():
     data = request.get_json()
@@ -141,6 +147,38 @@ def channel_create():
     channel = channels_create_v1(user_id, data['name'], data['is_public'])
     save_data()
     return dumps(channel)
+
+@APP.route("/channels/list/v2", methods=['GET'])
+def channel_list():
+    token = request.args.get('token')
+    token_valid_check(token)
+    user_id = token_get_user_id(token)
+    channel_list = channels_list_v1(user_id)
+    save_data()
+    return dumps(channel_list)
+
+@APP.route('/channels/listall/v2', methods=['GET'])
+def channel_listall():
+    token = request.args.get('token')
+    token_valid_check(token)
+    user_id = token_get_user_id(token)
+    channels_list = channels_listall_v1(user_id)
+    save_data()
+    return dumps(channels_list)
+
+
+## CHANNEL ROUTES
+
+@APP.route('/channel/details/v2', methods=['GET'])
+def channel_details():
+    token = request.args.get('token')
+    token_valid_check(token)
+    user_id = token_get_user_id(token)
+    channel_id = request.args.get('channel_id')
+    channel_details = channel_details_v1(user_id, channel_id)
+    save_data()
+    return dumps(channel_details)
+
 
 @APP.route('/channel/invite/v2', methods=['POST'])
 def channel_invite():
@@ -160,14 +198,24 @@ def channel_join():
     save_data()
     return dumps({})
 
-@APP.route("/channels/list/v2", methods=['GET'])
-def channel_list():
+@APP.route('/channel/messages/v2', methods=['GET'])
+def channel_messages():
     token = request.args.get('token')
     token_valid_check(token)
     user_id = token_get_user_id(token)
-    channel_list = channels_list_v1(user_id)
+    channel_id = request.args.get('channel_id')
+    start = request.args.get('start')
+    channel_messages = channel_messages_v1(user_id, channel_id, start)
     save_data()
-    return dumps(channel_list)
+    return dumps(channel_messages)
+
+## MESSAGE ROUTES
+
+@APP.route('/message/send/v1', methods=['POST'])
+def message_send():
+    data = request.get_json()
+    return dumps(message_send(**data))
+
 
 @APP.route('/channel/leave/v1', methods=['POST'])
 def channel_leave():

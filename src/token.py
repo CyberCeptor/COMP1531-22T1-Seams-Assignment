@@ -74,6 +74,9 @@ def token_valid_check(token):
     if token in ['True', 'False', '']:
         raise InputError('Invalid token')
 
+    if token == '':
+        raise InputError('Invalid token')
+
     valid = True
     error_message = ''
     try:
