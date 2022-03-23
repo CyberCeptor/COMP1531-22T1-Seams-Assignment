@@ -118,8 +118,8 @@ def check_user_is_member(auth_user_id, channel_id):
     Exceptions: N/A
 
     Return Value:
-        Returns a Boolean depending on if the auth_user_id is found in the
-        channel members data
+        Returns a the channel member data if the auth_user_id is found in the
+        channel. Otherwise returns None
     """
 
     store = data_store.get()
@@ -130,4 +130,3 @@ def check_user_is_member(auth_user_id, channel_id):
                     return member
 
     return None
-

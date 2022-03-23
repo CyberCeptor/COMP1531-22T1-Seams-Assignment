@@ -22,7 +22,7 @@ from src.token import token_valid_check, token_get_user_id
 
 from src.token import token_valid_check, token_get_user_id
 
-def channel_invite_v1(auth_user_id, channel_id, u_id):
+def channel_invite_v2(token, channel_id, u_id):
     """
     check if given user id and channel id are valid,
     and then add the user into the channel with u_id, channel_id
@@ -39,6 +39,9 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
 
     Return Value: N/A
     """
+    token_valid_check(token)
+    auth_user_id = token_get_user_id(token)
+
     check_valid_auth_id(auth_user_id) # check the inviter is valid or not
     check_valid_auth_id(u_id)# check the invitee is valid or not
     check_valid_channel_id(channel_id) # check the channel is valid or not
@@ -54,7 +57,7 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
     return {
     }
 
-def channel_details_v1(auth_user_id, channel_id):
+def channel_details_v2(token, channel_id):
     """
     check if given user id and channel id are valid,
     return details about the channel including channel name, publicity, owner
@@ -72,7 +75,8 @@ def channel_details_v1(auth_user_id, channel_id):
         owner members and all members if given user id and channel id are valid
     """
 
-    # store = data_store.get()
+    token_valid_check(token)
+    auth_user_id = token_get_user_id(token)
 
     # see if given auth_user_id and channel_id are valid
     check_valid_auth_id(auth_user_id)
@@ -96,7 +100,7 @@ def channel_details_v1(auth_user_id, channel_id):
         'all_members': channel_info['all_members'],
     }
 
-def channel_messages_v1(auth_user_id, channel_id, start):
+def channel_messages_v2(token, channel_id, start):
     """
     check if given user id and channel id are valid,
     check start not overflow in channel,
@@ -115,6 +119,8 @@ def channel_messages_v1(auth_user_id, channel_id, start):
         Returns a dictionary containing message_id, u_id, message, time_sent,
         start and end if given user id and channel id are valid
     """
+    token_valid_check(token)
+    auth_user_id = token_get_user_id(token)
 
     # see if given auth_user_id and channel_id are valid
     check_valid_auth_id(auth_user_id)
@@ -129,15 +135,16 @@ def channel_messages_v1(auth_user_id, channel_id, start):
 
 
     if start in ['True', 'False', '']:
-        raise InputError('Invalid start')
+        raise InputError('Start is not of a valid type')
 
     try:
         start = int(start)
-    except ValueError as Start_not_valid_type:
-        raise InputError from Start_not_valid_type
+    except ValueError:
+        raise InputError('Start is not of a valid type') from InputError
 
-
-    if start > total_messages:
+    if start < 0:
+        raise InputError('Invalid start')
+    elif start > total_messages:
         raise InputError('Invalid start, not enough messages')
 
     if total_messages == 0:
@@ -179,7 +186,7 @@ def channel_messages_v1(auth_user_id, channel_id, start):
         'end': end,
     }
 
-def channel_join_v1(auth_user_id, channel_id):
+def channel_join_v2(token, channel_id):
     """
     check if given user id and channel id are valid,
     and then add the user into the channel with channel_id
@@ -194,6 +201,9 @@ def channel_join_v1(auth_user_id, channel_id):
 
     Return Value: N/A
     """
+    token_valid_check(token)
+    auth_user_id = token_get_user_id(token)
+
     check_valid_auth_id(auth_user_id)   #check the invitee is valid or not
     check_valid_channel_id(channel_id)  #check the channle is valid or not
 
