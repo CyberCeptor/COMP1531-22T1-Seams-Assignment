@@ -19,11 +19,6 @@ def fixture_clear_and_register_and_create():
 
     Return Value: N/A
     """
-
-    # clear_v1()
-    # user1 = auth_register_v1('abc@def.com', 'password', 'first', 'last')
-    # chan1 = channels_create_v1(1, 'channel_name', True)
-    # return [user1['auth_user_id'], chan1['channel_id']]
     requests.delete(config.url + 'clear/v1')
 
     user1 = requests.post(config.url + 'auth/register/v2', 
@@ -65,6 +60,21 @@ def test_channel_addowner_bad_channel_id(clear_and_register_and_create):
                         json={'token': user1_token, 'channel_id': 444, 'u_id': user2_id})
     assert addowner.status_code == 400
 
+    addowner = requests.post(config.url + 'channel/addowner/v1',
+                        json={'token': user1_token, 'channel_id': -4, 'u_id': user2_id})
+    assert addowner.status_code == 400
+
+    addowner = requests.post(config.url + 'channel/addowner/v1',
+                        json={'token': user1_token, 'channel_id': True, 'u_id': user2_id})
+    assert addowner.status_code == 400
+
+    addowner = requests.post(config.url + 'channel/addowner/v1',
+                        json={'token': user1_token, 'channel_id': '', 'u_id': user2_id})
+    assert addowner.status_code == 400
+
+    addowner = requests.post(config.url + 'channel/addowner/v1',
+                        json={'token': user1_token, 'channel_id': 'string', 'u_id': user2_id})
+    assert addowner.status_code == 400
 
 
 def test_channel_addowner_bad_user_id(clear_and_register_and_create):
@@ -82,6 +92,24 @@ def test_channel_addowner_bad_user_id(clear_and_register_and_create):
                         json={'token': user2_token, 'channel_id': channel_id, 'u_id': 444})
     assert addowner.status_code == 400
 
+    addowner = requests.post(config.url + 'channel/addowner/v1',
+                        json={'token': user2_token, 'channel_id': channel_id, 'u_id': True})
+    assert addowner.status_code == 400  
+
+    addowner = requests.post(config.url + 'channel/addowner/v1',
+                        json={'token': user2_token, 'channel_id': channel_id, 'u_id': False})
+    assert addowner.status_code == 400  
+
+    addowner = requests.post(config.url + 'channel/addowner/v1',
+                        json={'token': user2_token, 'channel_id': channel_id, 'u_id': -1})
+    assert addowner.status_code == 400  
+    addowner = requests.post(config.url + 'channel/addowner/v1',
+                        json={'token': user2_token, 'channel_id': channel_id, 'u_id': 'string'})
+    assert addowner.status_code == 400  
+
+    addowner = requests.post(config.url + 'channel/addowner/v1',
+                        json={'token': user2_token, 'channel_id': channel_id, 'u_id': ''})
+    assert addowner.status_code == 400  
 
 
 def test_channel_addowner_not_a_member(clear_and_register_and_create):
@@ -122,7 +150,7 @@ def test_channel_addowner_already_an_owner(clear_and_register_and_create):
     assert addowner.status_code == 400
 
 
-def test_channel_owner_not_authorised(clear_and_register_and_create):
+def test_channel_addowner_not_authorised(clear_and_register_and_create):
     user2_id = clear_and_register_and_create[1]
     user2_token = clear_and_register_and_create[2]
     channel_id = clear_and_register_and_create[3]
@@ -138,8 +166,51 @@ def test_channel_owner_not_authorised(clear_and_register_and_create):
                         json={'token': user2_token, 'channel_id': channel_id, 'u_id': user2_id})
     assert addowner.status_code == 403
 
+    # Random user who isnt a member of the channel
+    user3 = requests.post(config.url + 'auth/register/v2', 
+                         json={'email': 'abc@def.com', 'password': 'password',
+                               'name_first': 'first', 'name_last': 'last'})
+    user_data3 = user3.json()
+    user3_token = user_data3['token']
 
-def test_channel_owner_working(clear_and_register_and_create):
+    addowner = requests.post(config.url + 'channel/addowner/v1',
+                        json={'token': user3_token, 'channel_id': channel_id, 'u_id': user2_id})
+    assert addowner.status_code == 403
+
+
+def test_channel_addowner_bad_tokens(clear_and_register_and_create):
+    user2_id = clear_and_register_and_create[1]
+    user2_token = clear_and_register_and_create[2]
+    channel_id = clear_and_register_and_create[3]
+
+    # add user2 to the channel
+    channel_join = requests.post(config.url + 'channel/join/v2',
+                        json={'token': user2_token,
+                        'channel_id': channel_id})
+    assert channel_join.status_code == 200
+
+    addowner = requests.post(config.url + 'channel/addowner/v1',
+                        json={'token': -1, 'channel_id': channel_id, 'u_id': user2_id})
+    assert addowner.status_code == 400
+
+    addowner = requests.post(config.url + 'channel/addowner/v1',
+                        json={'token': '', 'channel_id': channel_id, 'u_id': user2_id})
+    assert addowner.status_code == 400
+
+    addowner = requests.post(config.url + 'channel/addowner/v1',
+                        json={'token': 'string', 'channel_id': channel_id, 'u_id': user2_id})
+    assert addowner.status_code == 400
+
+    addowner = requests.post(config.url + 'channel/addowner/v1',
+                        json={'token': True, 'channel_id': channel_id, 'u_id': user2_id})
+    assert addowner.status_code == 400
+
+    addowner = requests.post(config.url + 'channel/addowner/v1',
+                        json={'token': False, 'channel_id': channel_id, 'u_id': user2_id})
+    assert addowner.status_code == 400
+
+
+def test_channel_addowner_working(clear_and_register_and_create):
     """
     Creates 2 users, creates a channel with user 1,
     adds user2 to the channel,
