@@ -141,7 +141,7 @@ def channel_create():
     return dumps(channel)
 
 @APP.route('/channel/invite/v2', methods=['POST'])
-def server_invite():
+def channel_invite():
     data = request.get_json()
     token_valid_check(data['token'])
     user_id = token_get_user_id(data['token'])
@@ -150,7 +150,7 @@ def server_invite():
     return dumps({})
 
 @APP.route('/channel/join/v2', methods=['POST'])
-def server_join():
+def channel_join():
     data = request.get_json()
     token_valid_check(data['token'])
     user_id = token_get_user_id(data['token'])
