@@ -17,6 +17,7 @@ from src.channel import channel_details_v1, channel_invite_v1, channel_join_v1, 
 from src.other import clear_v1
 from src.channel import channel_invite_v1, channel_join_v1, channel_leave_v1
 from src.channels import channels_create_v1
+from src.user import user_profile_v1
 
 from src.user import user_profile_v1
 
@@ -180,7 +181,7 @@ def channel_details():
 
 
 @APP.route('/channel/invite/v2', methods=['POST'])
-def server_invite():
+def channel_invite():
     data = request.get_json()
     token_valid_check(data['token'])
     user_id = token_get_user_id(data['token'])
@@ -189,7 +190,7 @@ def server_invite():
     return dumps({})
 
 @APP.route('/channel/join/v2', methods=['POST'])
-def server_join():
+def channel_join():
     data = request.get_json()
     token_valid_check(data['token'])
     user_id = token_get_user_id(data['token'])
@@ -244,7 +245,6 @@ def save_data():
     with open('datastore.p', 'wb') as FILE:
         pickle.dump(DATA_STORE, FILE)
     return DATA_STORE
-
 
 
 

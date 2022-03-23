@@ -1,12 +1,11 @@
 import pytest
+import requests
 import json
 from src.auth import auth_register_v1
 from src.user import user_profile_v1
 from src.error import AccessError, InputError
 from src.other import clear_v1
 from src import config
-
-import requests
 
 
 @pytest.fixture(name='clear_and_register')
@@ -18,23 +17,27 @@ def fixture_clear_and_register():
 
     Exceptions: N/A
 
-    Return Value: N/A """
-
+    Return Value: user_data in json form.
+    """
     requests.delete(config.url + 'clear/v1')
-
     user = requests.post(config.url + 'auth/register/v2', 
                   json={'email': 'abc@def.com', 'password': 'password',
                         'name_first': 'first', 'name_last': 'last'})
     user_json = user.json()
     return user_json
 
-
 def test_user_profile(clear_and_register):
     """
-    Create two users, 
-    then call user_profile_v1, with the token as the first user,
+    Create two users,
+    then calls user_profile_v1 with the token of the first user,
     and the id of the second user.
-    Returns the info of the ID given.
+    Returns the info of the ID given. (i.e., the second user)
+
+    Arguments: clear_and_register
+
+    Exceptions: N/A
+
+    Return Value: N/A
     """
 
     user0_json = clear_and_register
@@ -45,9 +48,6 @@ def test_user_profile(clear_and_register):
                     
     assert user1.status_code == 200
     user1_json = user1.json()
-
-    # returns the info for the user_id given.
-    #user_profile = user_profile_v1(user0['token'], user1_json['auth_user_id'])
 
     user_profile = requests.get(config.url + 'user/profile/v1', 
                     params={'token': user1_json['token'], 'u_id': user0_json['auth_user_id']})
@@ -64,19 +64,24 @@ def test_user_profile(clear_and_register):
 
 def test_profile_bad_token_input(clear_and_register):
     """
-    Calls user_profile with:
-        -   An invalid user_id, invalid token
-        -   An invalid user_id, valid token
-        -   A valid user_id, invalid token
+    Calls user_profile with a bad token:
+        -   a string
+        -   an int
+        -   a boolean
+        -   an empty string
+        -   an expired token
+        -   an unsaved token
 
     Arguments: 
         clear_and_register
 
     Exceptions: 
-        InputError - Raised for all tests below
+        InputError - Raised for int, bool, empty string
+        AccessError - Raised for invalid token (string)
 
     Return Value: N/A
     """
+
     '''Testing with a bad token'''
     user_json = clear_and_register
     user_profile = requests.get(config.url + 'user/profile/v1', 
@@ -119,9 +124,25 @@ def test_profile_bad_token_input(clear_and_register):
 
 
 
-
-
 def test_profile_bad_u_id_input(clear_and_register):
+    """
+    Calls user_profile with a bad user_id:
+        -   an invalid user_id, not in the data_store
+        -   a negative int
+        -   a boolean
+        -   an empty string
+        -   a string
+
+    Arguments: 
+        clear_and_register
+
+    Exceptions: 
+        InputError - Raised for neg-int, bool, strings
+        AccessError - Raised for invalid user_id (not in data)
+
+    Return Value: N/A
+    """
+
     user_json = clear_and_register
     '''tesing with a bad id as an int'''
     user_profile = requests.get(config.url + 'user/profile/v1', 
@@ -143,7 +164,6 @@ def test_profile_bad_u_id_input(clear_and_register):
                     params={'token': user_json['token'], 'u_id': False})
     assert user_profile.status_code == 400
 
-    
     '''tesing with a bad user_id as an empty string'''
     user_profile = requests.get(config.url + 'user/profile/v1', 
                     params={'token': user_json['token'], 'u_id': ''})
