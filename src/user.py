@@ -1,9 +1,7 @@
-
 from src.error import InputError, AccessError
 from src.data_store import data_store
 from src.token import token_valid_check
 from src.other import check_valid_auth_id
-
 
 def user_profile_v1(token, u_id):
     """
@@ -25,7 +23,7 @@ def user_profile_v1(token, u_id):
         u_id = int(u_id)
     except ValueError as auth_id_not_valid_type:
         raise InputError from auth_id_not_valid_type
-    
+
     check_valid_auth_id(u_id)
 
     store = data_store.get()

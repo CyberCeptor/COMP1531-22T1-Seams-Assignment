@@ -27,7 +27,7 @@ def fixture_clear_and_register():
 
 
 
-def test_channel_leave(clear_and_register):
+def test_channel_leave_invalid_channel_id(clear_and_register):
     """
     Create 2 users, first users creates a channel.
     the 2nd user tries to leave the channel, with an error.
@@ -46,8 +46,6 @@ def test_channel_leave(clear_and_register):
     assert channel.status_code == 200
     channel_json = channel.json()
 
-
-
     ##################### Bad Channel id tests.
 
     # User NOT in the channel
@@ -57,26 +55,34 @@ def test_channel_leave(clear_and_register):
 
     # Incorrect channel id
     channel_leave = requests.post(config.url + 'channel/leave/v1', 
-                            json={'token': user2_json['token'], 'channel_id': channel_json['channel_id'] + 4})
+                            json={'token': user1_json['token'], 'channel_id': channel_json['channel_id'] + 4})
     assert channel_leave.status_code == 400
 
     # Incorrect channel id, empty string
     channel_leave = requests.post(config.url + 'channel/leave/v1', 
-                            json={'token': user2_json['token'], 'channel_id': ''})
-    assert channel_leave.status_code == 403
+                            json={'token': user1_json['token'], 'channel_id': ''})
+    assert channel_leave.status_code == 400
 
     # Incorrect channel id as bool
     channel_leave = requests.post(config.url + 'channel/leave/v1', 
-                            json={'token': user2_json['token'], 'channel_id': True})
-    assert channel_leave.status_code == 403
+                            json={'token': user1_json['token'], 'channel_id': True})
+    assert channel_leave.status_code == 400
 
     # Incorrect channel id as negative number
     channel_leave = requests.post(config.url + 'channel/leave/v1', 
-                            json={'token': user2_json['token'], 'channel_id': -1})
-    assert channel_leave.status_code == 403
+                            json={'token': user1_json['token'], 'channel_id': -1})
+    assert channel_leave.status_code == 400
 
     
     ################### Bad Token Tests
+def test_channel_leave_invalid_token(clear_and_register):
+    user1_json = clear_and_register
+
+    channel = requests.post(config.url + 'channels/create/v2', 
+                          json={'token': user1_json['token'], 'name': 'test_channel_public',
+                                'is_public': True})
+    assert channel.status_code == 200
+    channel_json = channel.json()
 
     # expired token
     expired_token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6\
@@ -117,7 +123,14 @@ def test_channel_leave(clear_and_register):
 
 
 
+def test_channel_leave_works(clear_and_register):
+    user1_json = clear_and_register
 
+    channel = requests.post(config.url + 'channels/create/v2', 
+                          json={'token': user1_json['token'], 'name': 'test_channel_public',
+                                'is_public': True})
+    assert channel.status_code == 200
+    channel_json = channel.json()
 
     # Working test case
     channel_leave = requests.post(config.url + 'channel/leave/v1', 

@@ -17,6 +17,8 @@ from src.channel import channel_invite_v1, channel_join_v1, channel_leave_v1
 from src.channels import channels_create_v1
 from src.user import user_profile_v1
 
+from src.user import user_profile_v1
+
 from src.admin import admin_userpermission_change
 
 from src.data_store_pickle import pickle_data
