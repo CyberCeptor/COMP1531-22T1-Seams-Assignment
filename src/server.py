@@ -14,7 +14,8 @@ from src.token import token_remove, token_valid_check
 from src.admin import admin_userpermission_change
 from src.other import clear_v1
 
-from src.channel import channel_details_v2, channel_invite_v2, channel_addowner_v1
+from src.channel import channel_details_v2, channel_invite_v2
+from src.channel import channel_addowner_v1, channel_removeowner_v1
 from src.channel import channel_join_v2, channel_messages_v2, channel_leave_v1
 from src.channels import channels_create_v2
 from src.channels import channels_list_v2, channels_listall_v2
@@ -191,6 +192,13 @@ def channel_join():
 def channel_addowner():
     data = request.get_json()
     channel_addowner_v1(data['token'], data['channel_id'], data['u_id'])
+    save_data()
+    return dumps({})
+
+@APP.route('/channel/removeowner/v1', methods=['POST'])
+def channel_removeowner():
+    data = request.get_json()
+    channel_removeowner_v1(data['token'], data['channel_id'], data['u_id'])
     save_data()
     return dumps({})
 

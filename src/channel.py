@@ -331,14 +331,22 @@ def channel_leave_v1(token, channel_id):
 """
 Make user with user id u_id an owner of the channel.
 POST
-InputError:
-    - channel_id does not refer to valid channel
-    - u_id does not refer to a valid user
-    - u_id refers to a user who is not a member of the channel
-    - u_id refers to a user who is already an owner of the channel
+Arguments:
+        - token (of owner_member adding the other user)
+        - channel_id (the channel to add the owner too)
+        - u_id (the user_id of the member being added to owners)
 
-AccessError:
-    - channel_id is valid and the authorised user does not have permissions in the channel
+Exceptions:
+    InputError:
+        - channel_id does not refer to valid channel
+        - u_id does not refer to a valid user
+        - u_id refers to a user who is not a member of the channel
+        - u_id refers to a user who is already an owner of the channel
+
+    AccessError:
+        - channel_id is valid and the authorised user does not have permissions in the channel
+Return Value:
+        N/A - Returns an empty dict.
 """
 
 def channel_addowner_v1(token, channel_id, u_id):
@@ -358,10 +366,36 @@ def channel_addowner_v1(token, channel_id, u_id):
     if check_user_is_owner_member(inviter_user_id, channel_id) is None:
         raise AccessError('The invitee is not an owner_member')
 
-    # check that the user_id to add is already a owner_member
+    # check that the user_id isn't already a owner_member
     if check_user_is_owner_member(u_id, channel_id):
         raise InputError('The user is already an owner_member')
 
+    #add the member_data to the owner_members_dict
     channel_data['owner_members'].append(member_data)
+
+    return {}
+
+"""
+Remove user with user id u_id as an owner of the channel
+POST
+Arguments:
+        - token (the token of an authorised owner_members)
+        - channel_id (channel to remove the user_id from)
+        - u_id (id of member to remove from owner_members)
+
+Exceptions:
+    InputError:
+        - channel_id does not refer to valid channel
+        - u_id does not refer to a valid user
+        - u_id refers to a user who is not an owner of the channel
+        - u_id refers to a user who is currently the only owner of the channel
+    AccessError:
+        - channel_id is valid and the authorised user does not have owner permissions in the channel
+
+Return Value:
+    N/A
+"""
+
+def channel_removeowner_v1(token, channel_id, u_id):
 
     return {}
