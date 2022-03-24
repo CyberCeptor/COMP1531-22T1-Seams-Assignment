@@ -2,7 +2,7 @@ import pytest
 from src.error import InputError, AccessError
 from src.other import clear_v1
 from src.dm import dm_create_v1
-from src.auth import auth_register_v1
+from src.auth import auth_register_v2
 
 def test_dm_create_valid():
     """
@@ -19,9 +19,9 @@ def test_dm_create_valid():
     clear_v1()
 
     # Call other functions to create the data and store in data structure
-    user1 = auth_register_v1('wky@gmail.com', '547832', 'wang', 'kaiyan')
-    user2 = auth_register_v1('lmz@gmail.com', '893621', 'li', 'mingzhe')
-    user3 = auth_register_v1('hyf@gmail.com', 'hyf1234', 'huang', 'yifei')
+    user1 = auth_register_v2('wky@gmail.com', '547832', 'wang', 'kaiyan')
+    user2 = auth_register_v2('lmz@gmail.com', '893621', 'li', 'mingzhe')
+    user3 = auth_register_v2('hyf@gmail.com', 'hyf1234', 'huang', 'yifei')
 
     token1 = user1['token']
     id2 = user2['auth_user_id']
@@ -48,8 +48,8 @@ def test_dm_create_invalid_uid():
     clear_v1()
 
     # Call other functions to create the data and store in data structure
-    user1 = auth_register_v1('wky@gmail.com', '547832', 'wang', 'kaiyan')
-    user2 = auth_register_v1('lmz@gmail.com', '893621', 'li', 'mingzhe')
+    user1 = auth_register_v2('wky@gmail.com', '547832', 'wang', 'kaiyan')
+    user2 = auth_register_v2('lmz@gmail.com', '893621', 'li', 'mingzhe')
     token1 = user1['token']
     id2 = user2['auth_user_id']
     
@@ -86,9 +86,9 @@ def test_dm_create_duplicate_uid():
     clear_v1()
 
     # Call other functions to create the data and store in data structure
-    user1 = auth_register_v1('wky@gmail.com', '547832', 'wang', 'kaiyan')
-    user2 = auth_register_v1('lmz@gmail.com', '893621', 'li', 'mingzhe')
-    user3 = auth_register_v1('hyf@gmail.com', 'hyf1234', 'huang', 'yifei')
+    user1 = auth_register_v2('wky@gmail.com', '547832', 'wang', 'kaiyan')
+    user2 = auth_register_v2('lmz@gmail.com', '893621', 'li', 'mingzhe')
+    user3 = auth_register_v2('hyf@gmail.com', 'hyf1234', 'huang', 'yifei')
     token1 = user1['token']
     id2 = user2['auth_user_id']
     id3 = user3['auth_user_id']
@@ -97,5 +97,4 @@ def test_dm_create_duplicate_uid():
     
     with pytest.raises(InputError):
         dm_create_v1(token1, [id3, id3])
-
 clear_v1()
