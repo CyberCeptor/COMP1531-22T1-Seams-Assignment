@@ -116,3 +116,4 @@ def test_dm_details_auth_notin_dm():
     dm_id = dm_dict["dm_id"]
     with pytest.raises(AccessError):
         dm_details_v1(token2, dm_id)
+clear_v1()
