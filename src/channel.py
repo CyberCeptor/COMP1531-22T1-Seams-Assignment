@@ -138,8 +138,10 @@ def channel_messages_v1(auth_user_id, channel_id, start):
     except ValueError as Start_not_valid_type:
         raise InputError from Start_not_valid_type
 
-    if start > total_messages:
+
+    if total_messages < start:
         raise InputError('Invalid start, not enough messages')
+
 
     if total_messages == 0:
         return {
@@ -161,6 +163,8 @@ def channel_messages_v1(auth_user_id, channel_id, start):
     # the messages list
     messages_to_return = []
 
+    
+        
     # if mesages not overflow
     if end == -1:
         if start == total_messages - 1: # if there is only 1 message

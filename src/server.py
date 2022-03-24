@@ -17,7 +17,7 @@ from src.channel import channel_details_v1, channel_invite_v1, channel_join_v1, 
 from src.other import clear_v1
 from src.channel import channel_invite_v1, channel_join_v1
 from src.channels import channels_create_v1
-
+from src.messages import message_send_v1
 from src.admin import admin_userpermission_change
 
 from src.data_store_pickle import pickle_data
@@ -208,11 +208,14 @@ def channel_messages():
 
 ## MESSAGE ROUTES
 
-@APP.route('/message/send/v1', methods=['POST'])
+@APP.route('/message/sned/v1', methods=['POST'])
 def message_send():
     data = request.get_json()
-    return dumps(message_send(**data))
-
+    token_valid_check(data['token'])
+    user_id = token_get_user_id(data['token'])
+    message_id = message_send_v1(user_id, data['channel_id'], data['message'])
+    save_data()
+    return dumps(message_id)
 
 @APP.route('/clear/v1', methods=['DELETE'])
 def clear():

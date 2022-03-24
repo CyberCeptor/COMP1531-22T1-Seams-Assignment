@@ -225,8 +225,7 @@ def test_user_not_belong(clear_and_register_and_create):
 
     resp0 = requests.get(config.url + 'message/send/v1', 
                           params = {'token': token_2, 'channel_id': chan_id, 'message': 'hewwo'})
-    assert resp0.status_code == 403
+    assert resp0.status_code == 403 #raise access error
 
     requests.delete(config.url + 'clear/v1')
 
-    
