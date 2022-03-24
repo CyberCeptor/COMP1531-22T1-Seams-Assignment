@@ -47,7 +47,7 @@ def test_admin_user_remove_works(clear_and_register):
     """
 
     token1 = clear_and_register[0]['token']
-    id1 = clear_and_register[0]['auth_user_id']
+    # id1 = clear_and_register[0]['auth_user_id']
 
     token2 = clear_and_register[1]['token']
     id2 = clear_and_register[1]['auth_user_id']
