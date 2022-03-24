@@ -39,7 +39,7 @@ def channels_list_v2(token):
     channels_list = []
 
     for channel in store['channels']:
-        if check_user_is_member(auth_user_id, channel['channel_id']):
+        if check_user_is_member(auth_user_id, channel):
             channel_data = {
                 'channel_id': channel['channel_id'],
                 'name': channel['name'],

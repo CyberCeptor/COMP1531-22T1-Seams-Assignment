@@ -84,16 +84,11 @@ def check_valid_channel_id(channel_id):
     """
     '''Bools are read as int's 0 & 1, so need to check prior. (Not for GET requests)'''
     '''GET requests are read as a string.'''
-    if type(channel_id) == bool:
+    if type(channel_id) is bool:
         raise InputError('Invalid channel_id type')
 
     '''For GET requests.'''
-    if channel_id in ['', 'True', 'False']:
-        raise InputError('Invalid channel_id')
-    try:
-        channel_id = int(channel_id)
-    except ValueError:
-        raise InputError('Invalid channel id type') from InputError
+    channel_id = cast_to_int_get_requests(channel_id, 'channel id')
 
     if channel_id < 1:
         raise InputError('The channel id is not valid (out of bounds)')
@@ -106,7 +101,7 @@ def check_valid_channel_id(channel_id):
     raise InputError('Channel does not exist in channels database')
 
 
-def check_user_is_member(auth_user_id, channel_id):
+def check_user_is_member(auth_user_id, channel):
     """
     checks if the given user is a member of the given channel by searching
     the stored channel member data
@@ -122,22 +117,15 @@ def check_user_is_member(auth_user_id, channel_id):
         channel. Otherwise returns None
     """
 
-    store = data_store.get()
-    for channel in store['channels']:
-        if channel['channel_id'] == channel_id:
-            for member in channel['all_members']:
-                if member['u_id'] == auth_user_id:
-                    return member
-
+    for member in channel['all_members']:
+        if member['u_id'] == auth_user_id:
+            return member
     return None
 
-def check_user_is_owner_member(auth_user_id, channel_id):
-    store = data_store.get()
-    for channel in store['channels']:
-        if channel['channel_id'] == channel_id:
-            for member in channel['owner_members']:
-                if member['u_id'] == auth_user_id:
-                    return member
+def check_user_is_owner_member(auth_user_id, channel):
+    for member in channel['owner_members']:
+        if member['u_id'] == auth_user_id:
+            return member
     return None
 
 def check_user_is_global_owner(auth_user_id):
@@ -157,3 +145,11 @@ def check_user_is_global_owner(auth_user_id):
         if user['id'] == auth_user_id and user['perm_id'] == 1:
             return True
     return False
+
+def cast_to_int_get_requests(variable, var_name):
+    try:
+        variable = int(variable)
+    except ValueError:
+        raise InputError(description=f'Invalid {var_name}') from InputError
+
+    return variable
