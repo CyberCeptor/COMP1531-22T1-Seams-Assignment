@@ -9,12 +9,7 @@ Description: pytests for channel_listall_v1
 
 import pytest
 import requests
-from src.auth import auth_register_v1
 
-from src.other import clear_v1
-from src.error import InputError, AccessError
-
-from src.channels import channels_create_v1, channels_listall_v1
 from src import config
 
 

@@ -48,17 +48,10 @@ def fixture_clear_and_register_and_create():
                             json={'token': token, 'name': 'channel_name',
                                     'is_public': True})
     channel_data = create_channel.json()
-    channel_id = channel_data['channel_id']
-
-    # create_message = requests.post(config.url + 'channel/message/v2',
-    #                         json={'token': token, 'channel_id': channel_id,
-    #                                 'start': 0})
-    # message_data = create_message.json()
-    # start = message_data['start']
-    # message = message_data['message']                                
+    channel_id = channel_data['channel_id']                             
 
     return [token, channel_id]
-
+    
 
 def test_message_send_invalid_token(clear_and_register_and_create):
     """
@@ -72,41 +65,41 @@ def test_message_send_invalid_token(clear_and_register_and_create):
     """
     # pylint: disable=unused-argument
 
-
     # token is int
     token = clear_and_register_and_create[1]
     chan_id = clear_and_register_and_create[1]
-    resp0 = requests.get(config.url + 'message/send/v1', 
-                          params = {'token': 0, 'channel_id': chan_id, 'message': 'hewwo'})
+    resp0 = requests.post(config.url + 'message/send/v1', 
+                          json = {'token': 0, 'channel_id': chan_id, 'message': 'hewwo'})
     assert resp0.status_code == 400
     # token is boo
-    resp1 = requests.get(config.url + 'message/send/v1', 
-                          params = {'token': True, 'channel_id': chan_id, 'message': 'hewwo'})
+    resp1 = requests.post(config.url + 'message/send/v1', 
+                          json = {'token': True, 'channel_id': chan_id, 'message': 'hewwo'})
     assert resp1.status_code == 400
     # token input empty
-    resp2 = requests.get(config.url + 'message/send/v1', 
-                          params = {'token': '', 'channel_id': chan_id, 'message': 'hewwo'})
+    resp2 = requests.post(config.url + 'message/send/v1', 
+                          json = {'token': '', 'channel_id': chan_id, 'message': 'hewwo'})
     assert resp2.status_code == 400
     # wrong token input
-    resp3 = requests.get(config.url + 'message/send/v1', 
-                          params = {'token': 'not right string', 'channel_id': chan_id, 'message': 'hewwo'})
+    resp3 = requests.post(config.url + 'message/send/v1', 
+                          json = {'token': 'not right string', 'channel_id': chan_id, 'message': 'hewwo'})
     assert resp3.status_code == 403
     # expired token
     expired_token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MSwic2Vzc\
         2lvbl9pZCI6MSwiaGFuZGxlIjoiZmlyc3RsYXN0IiwiZXhwIjoxNTQ3\
             OTc3ODgwfQ.366QLXfCURopcjJbAheQYLVNlGLX_INKVwr8_TVXYEQ'
-    resp4 = requests.get(config.url + 'message/send/v1', 
-                          params = {'token': expired_token, 'channel_id': chan_id, 'message': 'hewwo'})
+    resp4 = requests.post(config.url + 'message/send/v1', 
+                          json = {'token': expired_token, 'channel_id': chan_id, 'message': 'hewwo'})
     assert resp4.status_code == 403
     # unsaved token
     unsaved_token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MSwic2Vzc2lvbl9pZCI6MSw\
             iaGFuZGxlIjoiZmlyc3RsYXN0IiwiZXhwIjoyNTQ3OTc3ODgwfQ.ckPPWiR-m6x0IRq\
             pQtKmJgNLiD8eAEiTv2i8ToK3mkY'
-    resp5 = requests.get(config.url + 'message/send/v1', 
-                          params = {'token': unsaved_token, 'channel_id': chan_id, 'message': 'hewwo'})
+    resp5 = requests.post(config.url + 'message/send/v1', 
+                          json = {'token': unsaved_token, 'channel_id': chan_id, 'message': 'hewwo'})
     assert resp5.status_code == 403
-
     
+    requests.delete(config.url + 'clear/v1')
+
 def test_message_send_invalid_channel_id(clear_and_register_and_create):
     """
     test for invalid input of channel id
@@ -120,21 +113,23 @@ def test_message_send_invalid_channel_id(clear_and_register_and_create):
 
     token = clear_and_register_and_create[0]
     # no channel id input
-    resp0 = requests.get(config.url + 'message/send/v1', 
-                          params = {'token': token, 'channel_id': '', 'message': 'hewwo'})
+    resp0 = requests.post(config.url + 'message/send/v1', 
+                          json = {'token': token, 'channel_id': '', 'message': 'hewwo'})
     assert resp0.status_code == 400
     # channel id is boo
-    resp1 = requests.get(config.url + 'message/send/v1', 
-                          params = {'token': token, 'channel_id': True, 'message': 'hewwo'})
+    resp1 = requests.post(config.url + 'message/send/v1', 
+                          json = {'token': token, 'channel_id': True, 'message': 'hewwo'})
     assert resp1.status_code == 400
     # channel id is string
-    resp2 = requests.get(config.url + 'message/send/v1', 
-                          params = {'token': token, 'channel_id': 'str', 'message': 'hewwo'})
+    resp2 = requests.post(config.url + 'message/send/v1', 
+                          json = {'token': token, 'channel_id': 'str', 'message': 'hewwo'})
     assert resp2.status_code == 400
     # wrong channel input
-    resp3 = requests.get(config.url + 'message/send/v1', 
-                          params = {'token': token, 'channel_id': 2, 'message': 'hewwo'})
+    resp3 = requests.post(config.url + 'message/send/v1', 
+                          json = {'token': token, 'channel_id': 2, 'message': 'hewwo'})
     assert resp3.status_code == 400
+
+    requests.delete(config.url + 'clear/v1')
 
 def test_message_send_invalid_message(clear_and_register_and_create):
     """
@@ -150,14 +145,16 @@ def test_message_send_invalid_message(clear_and_register_and_create):
     token = clear_and_register_and_create[0]
     chan_id = clear_and_register_and_create[1]
     # message is int
-    resp0 = requests.get(config.url + 'message/send/v1', 
-                          params = {'token': token, 'channel_id': chan_id, 'message': 0})
+    resp0 = requests.post(config.url + 'message/send/v1', 
+                          json = {'token': token, 'channel_id': chan_id, 'message': 0})
     assert resp0.status_code == 400
 
     # message is boo
-    resp1 = requests.get(config.url + 'message/send/v1', 
-                          params = {'token': token, 'channel_id': chan_id, 'message': True})
+    resp1 = requests.post(config.url + 'message/send/v1', 
+                          json = {'token': token, 'channel_id': chan_id, 'message': True})
     assert resp1.status_code == 400
+
+    requests.delete(config.url + 'clear/v1')
 
 def test_message_send_invalid_length(clear_and_register_and_create):
     """
@@ -200,6 +197,7 @@ def test_message_send_invalid_length(clear_and_register_and_create):
                           'message': long_message})
     assert resp1.status_code == 400
 
+    requests.delete(config.url + 'clear/v1')
 
 def test_user_not_belong(clear_and_register_and_create):
     """
@@ -223,9 +221,34 @@ def test_user_not_belong(clear_and_register_and_create):
     user2_data = user2.json()
     token_2 = user2_data['token']
 
-    resp0 = requests.get(config.url + 'message/send/v1', 
-                          params = {'token': token_2, 'channel_id': chan_id, 'message': 'hewwo'})
+    resp0 = requests.post(config.url + 'message/send/v1', 
+                          json = {'token': token_2, 'channel_id': chan_id, 'message': 'hewwo'})
     assert resp0.status_code == 403 #raise access error
 
     requests.delete(config.url + 'clear/v1')
 
+def test_successful_message_send(clear_and_register_and_create):
+    """
+    testing gor successful run of message send v1 and return
+
+    Arguments: clear_and_register_and_create (fixture)
+
+    Exceptions: N/A
+
+    Return Value: N/A
+    """
+    token = clear_and_register_and_create[0]
+    chan_id = clear_and_register_and_create[1]
+    # success run
+    resp0 = requests.post(config.url + 'message/send/v1', 
+                          json={'token': token, 'channel_id': chan_id, 
+                          'message': 'hewwo'})
+    assert resp0.status_code == 200
+    requests.delete(config.url + 'clear/v1')
+
+    # create_message = requests.post(config.url + 'channel/message/v2',
+    #                         json={'token': token, 'channel_id': channel_id,
+    #                                 'start': 0})
+    # message_data = create_message.json()
+    # start = message_data['start']
+    # message = message_data['message']   
