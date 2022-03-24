@@ -60,7 +60,6 @@ def fixture_clear_and_register_and_create():
 
 
 def test_channel_removeowner_working(clear_and_register_and_create):
-    # user1_id = clear_and_register_and_create[0]
     user1_token = clear_and_register_and_create[1]
     user2_id = clear_and_register_and_create[2]
     user2_token = clear_and_register_and_create[3]
@@ -86,10 +85,8 @@ def test_channel_removeowner_working(clear_and_register_and_create):
 
 
 def test_channel_removeowner_not_an_owner(clear_and_register_and_create):
-    # user1_id = clear_and_register_and_create[0]
     user1_token = clear_and_register_and_create[1]
     user2_id = clear_and_register_and_create[2]
-    # user2_token = clear_and_register_and_create[3]
     channel_id = clear_and_register_and_create[4]
 
     # user1 is an owner
@@ -121,7 +118,6 @@ def test_channel_removeowner_only_owner_member(clear_and_register_and_create):
     user1_id = clear_and_register_and_create[0]
     user1_token = clear_and_register_and_create[1]
     user2_id = clear_and_register_and_create[2]
-    # user2_token = clear_and_register_and_create[3]
     channel_id = clear_and_register_and_create[4]
 
     # Remove user2 as an owner, and then try and remove user1 as an owner,
@@ -137,10 +133,7 @@ def test_channel_removeowner_only_owner_member(clear_and_register_and_create):
 
 # Channel ID is valid, Token is not authorised with owner permissions.
 def test_channel_removeowner_not_authorised(clear_and_register_and_create):
-    # user1_id = clear_and_register_and_create[0]
-    # user1_token = clear_and_register_and_create[1]
     user2_id = clear_and_register_and_create[2]
-    # user2_token = clear_and_register_and_create[3]
     channel_id = clear_and_register_and_create[4]
 
     # Create user3, join them to the channel, try and remove user2 with user3's ID
@@ -165,11 +158,8 @@ def test_channel_removeowner_not_authorised(clear_and_register_and_create):
 
 
 def test_channel_removeowner_bad_channel_id(clear_and_register_and_create):
-    # user1_id = clear_and_register_and_create[0]
-    # user1_token = clear_and_register_and_create[1]
     user2_id = clear_and_register_and_create[2]
     user2_token = clear_and_register_and_create[3]
-    # channel_id = clear_and_register_and_create[4]
 
     # Run removeowner with all potential inputs for channel_id
     remove = requests.post(config.url + 'channel/removeowner/v1', 
@@ -194,10 +184,7 @@ def test_channel_removeowner_bad_channel_id(clear_and_register_and_create):
 
 
 def test_channel_removeowner_bad_user_id(clear_and_register_and_create):
-    # user1_id = clear_and_register_and_create[0]
     user1_token = clear_and_register_and_create[1]
-    # user2_id = clear_and_register_and_create[2]
-    # user2_token = clear_and_register_and_create[3]
     channel_id = clear_and_register_and_create[4]
 
     # User 3 used to test a using not in the channel being removed.
@@ -234,10 +221,7 @@ def test_channel_removeowner_bad_user_id(clear_and_register_and_create):
     assert remove.status_code == 400
 
 def test_channel_removeowner_bad_token(clear_and_register_and_create):
-    # user1_id = clear_and_register_and_create[0]
-    # user1_token = clear_and_register_and_create[1]
     user2_id = clear_and_register_and_create[2]
-    # user2_token = clear_and_register_and_create[3]
     channel_id = clear_and_register_and_create[4]
 
     # Run removeowner with all potential inputs for token

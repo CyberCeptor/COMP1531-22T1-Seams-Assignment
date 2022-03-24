@@ -351,6 +351,10 @@ Return Value:
 
 def channel_addowner_v1(token, channel_id, u_id):
     store = data_store.get()
+
+    token_valid_check(token)
+    token_locate_in_data_store(token)
+
     check_valid_auth_id(u_id)
     channel_data = check_valid_channel_id(channel_id)
 
@@ -359,8 +363,7 @@ def channel_addowner_v1(token, channel_id, u_id):
         raise InputError('User is not a valid member.')
 
     # check the inviter, i.e. token, is logged in , i.e. token is in data_store
-    token_valid_check(token)
-    token_locate_in_data_store(token)
+
     inviter_user_id = token_get_user_id(token)
 
     # check that the inviter is an owner_member.
