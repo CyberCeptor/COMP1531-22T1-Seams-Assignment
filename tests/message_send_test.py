@@ -237,5 +237,21 @@ def test_successful_message_send(clear_and_register_and_create):
     message = send_message.json()
     message_id = message['message_id']
     assert message_id == 1
+    # create a second channel to send message
+    create_2_channel = requests.post(config.url + 'channels/create/v2',
+                            json={'token': token, 'name': 'channel_2',
+                                    'is_public': True})
+    assert create_2_channel.status_code == 200                               
+    channel_2_data = create_2_channel.json()
+    channel_2_id = channel_2_data['channel_id']
+    # send second message in a different channel
+    send_2_message = requests.post(config.url + 'message/send/v1', 
+                          json={'token': token, 'channel_id': channel_2_id, 
+                          'message': 'hewwoagain'})
+    assert send_2_message.status_code == 200
+    message2 = send_2_message.json()
+    message_2_id = message2['message_id']
+    assert message_2_id == 2
+    
     requests.delete(config.url + 'clear/v1')
 

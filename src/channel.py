@@ -15,10 +15,10 @@ Description: implementation for
 """
 
 from src.error import InputError, AccessError
-from src.other import check_valid_auth_id
+from src.other import check_valid_auth_id, check_user_is_owner_member
 from src.other import check_user_is_member, check_valid_channel_id
 from src.data_store import data_store
-from src.token import token_valid_check, token_get_user_id
+from src.token import token_valid_check, token_get_user_id, token_locate_in_data_store
 
 from src.token import token_valid_check, token_get_user_id
 
@@ -329,4 +329,107 @@ def channel_leave_v1(token, channel_id):
 
     data_store.set(store)
 
+    return {}
+
+
+"""
+Make user with user id u_id an owner of the channel.
+POST
+Arguments:
+        - token (of owner_member adding the other user)
+        - channel_id (the channel to add the owner too)
+        - u_id (the user_id of the member being added to owners)
+
+Exceptions:
+    InputError:
+        - channel_id does not refer to valid channel
+        - u_id does not refer to a valid user
+        - u_id refers to a user who is not a member of the channel
+        - u_id refers to a user who is already an owner of the channel
+
+    AccessError:
+        - channel_id is valid and the authorised user does not have permissions in the channel
+Return Value:
+        N/A - Returns an empty dict.
+"""
+
+def channel_addowner_v1(token, channel_id, u_id):
+    store = data_store.get()
+
+    token_valid_check(token)
+    token_locate_in_data_store(token)
+
+    check_valid_auth_id(u_id)
+    channel_data = check_valid_channel_id(channel_id)
+
+    member_data = check_user_is_member(u_id, channel_id)
+    if member_data == None:
+        raise InputError('User is not a valid member.')
+
+    # check the inviter, i.e. token, is logged in , i.e. token is in data_store
+
+    inviter_user_id = token_get_user_id(token)
+
+    # check that the inviter is an owner_member.
+    if check_user_is_owner_member(inviter_user_id, channel_id) is None:
+        raise AccessError('The inviter is not an owner_member')
+
+    # check that the user_id isn't already a owner_member
+    if check_user_is_owner_member(u_id, channel_id):
+        raise InputError('The user is already an owner_member')
+
+    #add the member_data to the owner_members_dict
+    channel_data['owner_members'].append(member_data)
+    data_store.set(store)
+    return {}
+
+"""
+Remove user with user id u_id as an owner of the channel
+POST
+Arguments:
+        - token (the token of an authorised owner_members)
+        - channel_id (channel to remove the user_id from)
+        - u_id (id of member to remove from owner_members)
+
+Exceptions:
+    InputError:
+        - channel_id does not refer to valid channel
+        - u_id does not refer to a valid user
+        - u_id refers to a user who is not an owner of the channel
+        - u_id refers to a user who is currently the only owner of the channel
+    AccessError:
+        - channel_id is valid and the authorised user does not have owner permissions in the channel
+
+Return Value:
+    N/A
+"""
+
+def channel_removeowner_v1(token, channel_id, u_id):
+    store = data_store.get()
+    token_valid_check(token)
+    channel_data = check_valid_channel_id(channel_id)
+    check_valid_auth_id(u_id)
+
+    # check the inviter, i.e. token, is logged in , i.e. token is in data_store
+    inviter_user_id = token_get_user_id(token)
+
+    member_data = check_user_is_member(u_id, channel_id)
+    if member_data == None:
+        raise InputError('User is not a valid member.')
+
+    # check the inviter is an owner member
+    if check_user_is_owner_member(inviter_user_id, channel_id) is None:
+        raise AccessError('The inviter is not an owner_member')
+
+    # check the invitee is an owner member
+    if check_user_is_owner_member(u_id, channel_id) is None:
+        raise InputError('The invitee is not an owner_member') 
+
+    # Need to check the number of members in owner_members,
+    # if the member being removed is the only member, raise InputError.
+    if len(channel_data['owner_members']) == 1:
+        raise InputError('This is the only owner_member left in the channel')
+
+    channel_data['owner_members'].remove(member_data)
+    data_store.set(store)
     return {}

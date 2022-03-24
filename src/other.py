@@ -130,3 +130,14 @@ def check_user_is_member(auth_user_id, channel_id):
                     return member
 
     return None
+
+
+def check_user_is_owner_member(auth_user_id, channel_id):
+    store = data_store.get()
+    for channel in store['channels']:
+        if channel['channel_id'] == channel_id:
+            for member in channel['owner_members']:
+                if member['u_id'] == auth_user_id:
+                    return member
+
+    return None
