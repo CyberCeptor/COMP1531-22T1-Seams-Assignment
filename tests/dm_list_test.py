@@ -21,9 +21,7 @@ def test_dm_list_valid():
 
     Return Value: N/A
     """
-    # Clear the data structure
     clear_v1()
-    # Call other functions to create the data and store in data structure
     user1 = auth_register_v2('wky@gmail.com', '547832', 'wang', 'kaiyan')
     user2 = auth_register_v2('lmz@gmail.com', '893621', 'li', 'mingzhe')
     user3 = auth_register_v2('hyf@gmail.com', 'hyf1234', 'huang', 'yifei')
