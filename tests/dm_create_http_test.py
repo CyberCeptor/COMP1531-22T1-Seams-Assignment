@@ -80,7 +80,7 @@ def test_dm_create_invalid_uid(clear_and_register):
     assert create.status_code == 403
 
     create = requests.post(config.url + 'dm/create/v1', 
-                        json={'token': token1, 'u_ids': [id1,True]})
+                        json={'token': token1, 'u_ids': [id1,False]})
     assert create.status_code == 400
 
     create = requests.post(config.url + 'dm/create/v1', 
