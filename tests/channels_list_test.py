@@ -8,10 +8,7 @@ Description: pytests for channel_list_v1
 """
 import pytest
 import requests
-from src.auth import auth_register_v1
-from src.other import clear_v1
-from src.error import InputError, AccessError
-from src.channels import channels_create_v1, channels_list_v1
+
 from src import config
 
 @pytest.fixture(name='clear_and_register')
@@ -101,7 +98,7 @@ def test_channels_list():
     channels_list_json = channels_list.json()
 
     # creating the channel list for the second user.
-    requests.get(config.url + 'channels/list', params = {'token': user2_json['token']})
+    requests.get(config.url + 'channels/list/v2', params = {'token': user2_json['token']})
 
     # check the channels_list function has worked.
     assert channels_list.status_code == 200
