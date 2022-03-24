@@ -254,5 +254,3 @@ def test_channel_messages_return(clear_and_register_and_create):
     assert channel_messages['end'] == -1
    
 
-# channel message to return
-# id and time as well

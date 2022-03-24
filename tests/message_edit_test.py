@@ -1,11 +1,11 @@
 """
-Filename: message_send_test.py
+Filename: message_edit_test.py
 
 Author: Yangjun Yue, z5317840
 Created: 23/03/22
 
 Description: pytests for
-    - sending message to a specified channel
+    - editing message given a message id
 """
 
 import pytest
@@ -14,11 +14,11 @@ import requests
 
 from src import config
 
-@pytest.fixture(name='clear_and_register_and_create')
-def fixture_clear_and_register_and_create():
+@pytest.fixture(name='create_message')
+def fixture_create_message():
     """
     clears any data stored in data_store and registers a user with the
-    given information, create a channel using user id
+    given information, create a channel using user id, send a message to channel
 
     Arguments: N/A
 
@@ -38,17 +38,30 @@ def fixture_clear_and_register_and_create():
                             json={'token': token, 'name': 'channel_name',
                                     'is_public': True})
     channel_data = create_channel.json()
-    channel_id = channel_data['channel_id']                             
+    channel_id = channel_data['channel_id'] 
 
-    return [token, channel_id]
+    send_message = requests.post(config.url + 'message/send/v1', 
+                          json={'token': token, 'channel_id': channel_id, 
+                          'message': 'hewwo'})
+    message = send_message.json()
+    message_id = message['message_id']
+ 
+    return [token, channel_id, message_id]
 
+# length of message is over 1000 characters
+#         message_id does not refer to a valid message within a channel/DM that the authorised user has joined
+      
+#       AccessError when message_id refers to a valid message in a joined channel/DM and none of the following are true:
+      
+#         the message was sent by the authorised user making this request
+#         the authorised user has owner permissions in the channel/DM
+# Parameters:{ token, message_id, message }Return Type:{}
 
-def test_message_send_invalid_token(clear_and_register_and_create):
+def test_message_send_invalid_token(create_message):
     """
     test for invalid input of token
 
-    Arguments: clear_and_register_and_create
-
+    Arguments: create_message
     Exceptions: N/A
 
     Return Value: N/A
@@ -56,7 +69,7 @@ def test_message_send_invalid_token(clear_and_register_and_create):
     # pylint: disable=unused-argument
 
     # token is int
-    chan_id = clear_and_register_and_create[1]
+    chan_id = create_message[1]
     resp0 = requests.post(config.url + 'message/send/v1', 
                           json = {'token': 0, 'channel_id': chan_id, 'message': 'hewwo'})
     assert resp0.status_code == 400
@@ -214,28 +227,3 @@ def test_user_not_belong(clear_and_register_and_create):
     assert resp0.status_code == 403 #raise access error
 
     requests.delete(config.url + 'clear/v1')
-
-def test_successful_message_send(clear_and_register_and_create):
-    """
-    testing gor successful run of message send v1 and return
-
-    Arguments: clear_and_register_and_create (fixture)
-
-    Exceptions: N/A
-
-    Return Value: N/A
-    """
-    
-    token = clear_and_register_and_create[0]
-    chan_id = clear_and_register_and_create[1]
-
-    send_message = requests.post(config.url + 'message/send/v1', 
-                          json={'token': token, 'channel_id': chan_id, 
-                          'message': 'hewwo'})
-    assert send_message.status_code == 200
-    
-    message = send_message.json()
-    message_id = message['message_id']
-    assert message_id == 1
-    requests.delete(config.url + 'clear/v1')
-

@@ -62,7 +62,6 @@ def message_send_v1(token, channel_id, message):
 
     # increament message id for the store message
     message_id = new_message_id()
-    print(message_id)
 
     for user in store['users']:
         if user['id'] == auth_user_id:
@@ -81,5 +80,5 @@ def message_send_v1(token, channel_id, message):
     data_store.set(store)
 
     return {
-        'channel_id': message_id
+        'message_id': message_id
     }

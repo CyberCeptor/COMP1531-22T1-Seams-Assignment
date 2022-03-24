@@ -220,6 +220,7 @@ def message_send():
     return dumps(message_id)
 
 
+
 @APP.route('/clear/v1', methods=['DELETE'])
 def clear():
     clear_v1()
