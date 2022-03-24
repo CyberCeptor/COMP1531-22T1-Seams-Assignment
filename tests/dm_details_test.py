@@ -22,17 +22,11 @@ def test_dm_details_valid():
 
     Return Value: N/A
     """
-    # Clear the data structure
     clear_v1()
-
-    # Call other functions to create the data and store in data structure
     user1 = auth_register_v2('wky@gmail.com', '547832', 'wang', 'kaiyan')
     user2 = auth_register_v2('lmz@gmail.com', '893621', 'li', 'mingzhe')
-
-
     token1 = user1['token']
     id2 = user2['auth_user_id']
-
     dm_dict = dm_create_v1(token1, [id2])
     dm_id = dm_dict['dm_id']
     assert dm_details_v1(token1, dm_id) == {
@@ -66,10 +60,7 @@ def test_dm_details_invalid_dm():
 
     Return Value: N/A
     """
-    # Clear the data structure
     clear_v1()
-
-    # Call other functions to create the data and store in data structure
     user1 = auth_register_v2('wky@gmail.com', '547832', 'wang', 'kaiyan')
     user2 = auth_register_v2('lmz@gmail.com', '893621', 'li', 'mingzhe')
 
@@ -103,10 +94,7 @@ def test_dm_details_auth_notin_dm():
 
     Return Value: N/A
     """
-    # Clear the data structure
     clear_v1()
-
-    # Call other functions to create the data and store in data structure
     user1 = auth_register_v2('wky@gmail.com', '547832', 'wang', 'kaiyan')
     user2 = auth_register_v2('lmz@gmail.com', '893621', 'li', 'mingzhe')
     token1 = user1['token']
