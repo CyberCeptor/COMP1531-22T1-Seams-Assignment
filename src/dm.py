@@ -1,6 +1,15 @@
+"""
+Filename: dm.py
+
+Author: Zefan Cao(z5237177)
+Created: 14/03/2022 - 24/03/2022
+
+Description: dm functions
+"""
 from src.data_store import data_store
 from src.token import token_valid_check, token_get_user_id
-from src.other import check_valid_auth_id
+from src.other import (check_valid_auth_id, cast_to_int_get_requests,
+                    check_user_is_member)
 from src.error import InputError, AccessError
 def dm_create_v1(token, u_ids):
     """
@@ -30,12 +39,10 @@ def dm_create_v1(token, u_ids):
     # Assume the dm id start at 1 and increase by adding 1
     # for any newdm created
     dm_id = len(store['dms']) + 1
-    creator_list = []
     name_list = []
     all_member_list = []
     all_member_list.append(owner)
     name_list.append(user_info['handle'])
-    creator_list.append(owner)
     for u_id in u_ids:
         if(u_ids.count(u_id) > 1):
             raise InputError('There are duplicate u_ids')
@@ -58,7 +65,7 @@ def dm_create_v1(token, u_ids):
         'name': dm_name,
         'members': all_member_list,
         'dm_id': dm_id,
-        'creator': creator_list,
+        'creator': owner,
         'messages': []
     }
     # Add the dm channel to channels
@@ -79,13 +86,82 @@ def dm_list_v1(token):
 
     Return Value: N/A
     """
+    token_valid_check(token)
     auth_id = token_get_user_id(token)
     dm_list = []
     store = data_store.get()
     for dm in store['dms']:
-        for member in dm['members']:
-            if auth_id == member['u_id']:
-                new_dict = {"dm_id": dm['dm_id'], "name": dm['name']}
-                dm_list.append(new_dict)
+        check_user_is_member(auth_id, dm, 'members')
+        new_dict = {"dm_id": dm['dm_id'], "name": dm['name']}
+        dm_list.append(new_dict)
 
     return {"dms": dm_list}
+
+def dm_remove_v1(token, dm_id):
+    """
+    clears any data stored in data_store and registers users with the
+    given information, create the dm with token and u_ids
+
+    Arguments: token
+               u_ids
+
+    Exceptions: InputError - raised by duplicate ids
+                InputError - raised by invalid ids
+
+    Return Value: dm_id
+    """
+    store = data_store.get()
+    token_valid_check(token)
+    # Call helper function to check for valid dm
+    dm = check_valid_dm_id(dm_id)
+    # Call helper function to check valid token
+    auth_id = token_get_user_id(token)
+    if(dm['creator'] == {}):
+        raise AccessError('The authorised user is no longer in dm')
+    elif(dm['creator']['u_id'] != auth_id):
+        raise AccessError('The auth user is not original dm creator')
+    else:
+        store['dms'].remove(dm)
+    data_store.set(store)
+
+def dm_details_v1(token, dm_id):
+    token_valid_check(token)
+    auth_id = token_get_user_id(token)
+    dm = check_valid_dm_id(dm_id)
+    dm_auth_user = False
+    if check_user_is_member(auth_id, dm, 'members'):
+        dm_auth_user = True
+        return {
+            'name': dm['name'],
+            'members': dm['members']
+        }
+    if not dm_auth_user:
+        raise AccessError('The authorised user is no longer in dm')
+
+def check_valid_dm_id(dm_id):
+    """
+    clears any data stored in data_store and registers users with the
+    given information, create the dm with token and u_ids
+
+    Arguments: token
+               u_ids
+
+    Exceptions: InputError - raised by duplicate ids
+                InputError - raised by invalid ids
+
+    Return Value: dm_id
+    """
+    if type(dm_id) is bool:
+        raise InputError('dm id is not of a valid type')
+
+    dm_id = cast_to_int_get_requests(dm_id, 'dm id')
+
+    if dm_id < 1:
+        raise InputError('The dm id is not valid (out of bounds)')
+
+    store = data_store.get()
+    for dm in store['dms']:
+       if dm['dm_id'] == dm_id:
+            return dm
+    # if the dm_id is not found, raise an AccessError
+    raise InputError('dm does not exist in dms')
