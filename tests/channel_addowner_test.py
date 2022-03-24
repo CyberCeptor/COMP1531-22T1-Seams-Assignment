@@ -192,11 +192,11 @@ def test_channel_addowner_bad_tokens(clear_and_register_and_create):
 
     addowner = requests.post(config.url + 'channel/addowner/v1',
                         json={'token': -1, 'channel_id': channel_id, 'u_id': user2_id})
-    assert addowner.status_code == 403
+    assert addowner.status_code == 400
 
     addowner = requests.post(config.url + 'channel/addowner/v1',
                         json={'token': '', 'channel_id': channel_id, 'u_id': user2_id})
-    assert addowner.status_code == 403
+    assert addowner.status_code == 400
 
     addowner = requests.post(config.url + 'channel/addowner/v1',
                         json={'token': 'string', 'channel_id': channel_id, 'u_id': user2_id})
@@ -204,11 +204,11 @@ def test_channel_addowner_bad_tokens(clear_and_register_and_create):
 
     addowner = requests.post(config.url + 'channel/addowner/v1',
                         json={'token': True, 'channel_id': channel_id, 'u_id': user2_id})
-    assert addowner.status_code == 403
+    assert addowner.status_code == 400
 
     addowner = requests.post(config.url + 'channel/addowner/v1',
                         json={'token': False, 'channel_id': channel_id, 'u_id': user2_id})
-    assert addowner.status_code == 403
+    assert addowner.status_code == 400
 
 
 def test_channel_addowner_working(clear_and_register_and_create):
