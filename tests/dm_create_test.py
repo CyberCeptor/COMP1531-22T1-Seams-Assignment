@@ -1,3 +1,11 @@
+"""
+Filename: dm_create_test.py
+
+Author: Zefan Cao(z5237177)
+Created: 14/03/2022 - 24/03/2022
+
+Description: pytest for dm_create
+"""
 import pytest
 from src.error import InputError, AccessError
 from src.other import clear_v1
@@ -56,7 +64,7 @@ def test_dm_create_invalid_uid():
     with pytest.raises(InputError):
         dm_create_v1(token1, [id2, -500])
     
-    with pytest.raises(AccessError):
+    with pytest.raises(InputError):
         dm_create_v1(token1, [id2, 500])
 
     with pytest.raises(InputError):
