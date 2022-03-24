@@ -350,7 +350,7 @@ Return Value:
 """
 
 def channel_addowner_v1(token, channel_id, u_id):
-
+    store = data_store.get()
     check_valid_auth_id(u_id)
     channel_data = check_valid_channel_id(channel_id)
 
@@ -359,6 +359,7 @@ def channel_addowner_v1(token, channel_id, u_id):
         raise InputError('User is not a valid member.')
 
     # check the inviter, i.e. token, is logged in , i.e. token is in data_store
+    token_valid_check(token)
     token_locate_in_data_store(token)
     inviter_user_id = token_get_user_id(token)
 
@@ -372,7 +373,7 @@ def channel_addowner_v1(token, channel_id, u_id):
 
     #add the member_data to the owner_members_dict
     channel_data['owner_members'].append(member_data)
-
+    data_store.set(store)
     return {}
 
 """
@@ -397,12 +398,12 @@ Return Value:
 """
 
 def channel_removeowner_v1(token, channel_id, u_id):
-
+    store = data_store.get()
+    token_valid_check(token)
     channel_data = check_valid_channel_id(channel_id)
     check_valid_auth_id(u_id)
 
     # check the inviter, i.e. token, is logged in , i.e. token is in data_store
-    token_locate_in_data_store(token)
     inviter_user_id = token_get_user_id(token)
 
     member_data = check_user_is_member(u_id, channel_id)
@@ -423,5 +424,5 @@ def channel_removeowner_v1(token, channel_id, u_id):
         raise InputError('This is the only owner_member left in the channel')
 
     channel_data['owner_members'].remove(member_data)
-
+    data_store.set(store)
     return {}
