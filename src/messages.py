@@ -75,10 +75,8 @@ def message_send_v1(token, channel_id, message):
         'time_sent': datetime.datetime.now()
     }
 
-    store['channels']['messages'].insert(0, message_data)
-
-    # for channel_info in store['channels']:
-    #     channel_info['messages'].append(message_data)
+    for channel in store['channels']:
+        channel['messages'].insert(0, message_data)
 
     data_store.set(store)
 
