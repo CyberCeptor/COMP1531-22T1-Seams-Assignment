@@ -1,11 +1,6 @@
 import pytest
 import requests
-import json
 
-from src.auth import auth_register_v2
-from src.user import user_profile_v1
-from src.error import AccessError, InputError
-from src.other import clear_v1
 from src import config
 
 @pytest.fixture(name='clear_and_register_and_create')
@@ -219,7 +214,7 @@ def test_channel_removeowner_bad_user_id(clear_and_register_and_create):
 
     remove = requests.post(config.url + 'channel/removeowner/v1', 
                         json={'token': user1_token, 'channel_id': channel_id, 'u_id': 444})
-    assert remove.status_code == 403
+    assert remove.status_code == 400
 
     remove = requests.post(config.url + 'channel/removeowner/v1', 
                         json={'token': user1_token, 'channel_id': channel_id, 'u_id': -1})

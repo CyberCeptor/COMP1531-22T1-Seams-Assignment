@@ -117,7 +117,7 @@ def test_admin_userpermission_change_invalid_u_id(clear_and_register):
     # input error: non-existant u_id
     resp1 = requests.post(config.url + 'admin/userpermission/change/v1',
                           json={'token': token, 'u_id': 44, 'permission_id': 1})
-    assert resp1.status_code == 403
+    assert resp1.status_code == 400
 
     # input error: bool
     resp2 = requests.post(config.url + 'admin/userpermission/change/v1',
