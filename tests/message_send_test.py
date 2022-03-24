@@ -51,7 +51,7 @@ def fixture_clear_and_register_and_create():
     channel_id = channel_data['channel_id']                             
 
     return [token, channel_id]
-    
+
 
 def test_message_send_invalid_token(clear_and_register_and_create):
     """
@@ -66,7 +66,7 @@ def test_message_send_invalid_token(clear_and_register_and_create):
     # pylint: disable=unused-argument
 
     # token is int
-    token = clear_and_register_and_create[1]
+    token = clear_and_register_and_create[0]
     chan_id = clear_and_register_and_create[1]
     resp0 = requests.post(config.url + 'message/send/v1', 
                           json = {'token': 0, 'channel_id': chan_id, 'message': 'hewwo'})
