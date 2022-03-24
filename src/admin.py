@@ -11,18 +11,11 @@ Description: implementation for
 
 from src.data_store import data_store
 
-from src.other import check_valid_auth_id
+from src.other import check_valid_auth_id, check_user_is_global_owner
 
 from src.token import token_valid_check, token_get_user_id
 
 from src.error import AccessError, InputError
-
-def check_user_is_global_owner(auth_user_id):
-    store = data_store.get()
-    for user in store['users']:
-        if user['id'] == auth_user_id and user['perm_id'] == 1:
-            return True
-    return False
 
 def change_permission(auth_user_id, permission_id):
     store = data_store.get()
@@ -59,3 +52,6 @@ def admin_userpermission_change(token, u_id, permission_id):
         raise InputError(description='User is already a member')
 
     change_permission(u_id, permission_id)
+
+# def admin_user_remove(token, u_id):
+

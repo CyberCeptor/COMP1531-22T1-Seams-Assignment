@@ -131,7 +131,6 @@ def check_user_is_member(auth_user_id, channel_id):
 
     return None
 
-
 def check_user_is_owner_member(auth_user_id, channel_id):
     store = data_store.get()
     for channel in store['channels']:
@@ -139,5 +138,22 @@ def check_user_is_owner_member(auth_user_id, channel_id):
             for member in channel['owner_members']:
                 if member['u_id'] == auth_user_id:
                     return member
-
     return None
+
+def check_user_is_global_owner(auth_user_id):
+    """
+    check the user whether is a global owner with auth user id
+
+    Arguments:
+        auth_user_id (int) - an integer that specifies user id
+
+    Exceptions: N/A
+
+    Return Value: True if the user is a global owner, False otherwise
+    """
+
+    store = data_store.get()
+    for user in store['users']:
+        if user['id'] == auth_user_id and user['perm_id'] == 1:
+            return True
+    return False

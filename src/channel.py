@@ -16,7 +16,7 @@ Description: implementation for
 
 from src.error import InputError, AccessError
 from src.other import check_valid_auth_id, check_user_is_owner_member
-from src.other import check_user_is_member, check_valid_channel_id
+from src.other import check_user_is_member, check_valid_channel_id, check_user_is_global_owner
 from src.data_store import data_store
 from src.token import token_valid_check, token_get_user_id, token_locate_in_data_store
 
@@ -205,7 +205,8 @@ def channel_join_v2(token, channel_id):
     auth_user_id = token_get_user_id(token)
 
     check_valid_auth_id(auth_user_id)   #check the invitee is valid or not
-    check_valid_channel_id(channel_id)  #check the channle is valid or not
+    # check the channle is valid or not
+    channel = check_valid_channel_id(channel_id)
 
     #check the invitee whether is already in the channel
     if check_user_is_member(auth_user_id, channel_id) is not None:
@@ -214,13 +215,14 @@ def channel_join_v2(token, channel_id):
     # check if the user is a global owner
     # if not, check if it is a private channel
     if check_user_is_global_owner(auth_user_id) is False:
-        check_private_channel(channel_id) #check the channel whether is public
+        if channel['is_public'] is False:
+            raise AccessError('Channel is private')
     
     # if the user is a global owner and the channel is private, or if the user
     # is not a global owner and the channel is public, add them to the channel
-    add_invitee(auth_user_id, channel_id) #add user
+    add_invitee(auth_user_id, channel) #add user
 
-def add_invitee(u_id, channel_id):
+def add_invitee(u_id, channel):
     """
     add the user into the channel with channel_id
 
@@ -246,51 +248,8 @@ def add_invitee(u_id, channel_id):
         'handle_str': user_info['handle']
     }
 
-    for channel in store['channels']:
-        if channel['channel_id'] == channel_id:
-            channel['all_members'].append(new_member)
+    channel['all_members'].append(new_member)
     data_store.set(store)
-
-def check_user_is_global_owner(auth_user_id):
-    """
-    check the user whether is a global owner with auth user id and channel id,
-    return nothing
-
-    Arguments:
-        auth_user_id (int)    - an integer that specifies user(inviter) id
-        channel_id (int) - an integer that specifies channel id
-
-    Exceptions: N/A
-
-    Return Value: N/A
-    """
-    store = data_store.get()
-    for user in store['users']:
-        if user['id'] == auth_user_id:
-            if user['perm_id'] == 1:
-                return True
-    return False
-
-def check_private_channel(channel_id):
-    """
-    check the channel is public or not with channel id
-    return nothing
-
-    Arguments:
-        channel_id (int) - an integer that specifies channel id
-
-    Exceptions:
-        AccessError - Occurs if the channel(channel id == False) is private
-
-    Return Value: N/A
-    """
-    store = data_store.get()
-
-    for channel in store['channels']:
-        if channel['channel_id'] == channel_id:
-            if channel['is_public'] is False:
-                raise AccessError('Channel is private')
-
 
 def channel_leave_v1(token, channel_id):
     """
