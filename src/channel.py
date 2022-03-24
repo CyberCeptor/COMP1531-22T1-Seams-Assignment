@@ -364,7 +364,7 @@ def channel_addowner_v1(token, channel_id, u_id):
 
     # check that the inviter is an owner_member.
     if check_user_is_owner_member(inviter_user_id, channel_id) is None:
-        raise AccessError('The invitee is not an owner_member')
+        raise AccessError('The inviter is not an owner_member')
 
     # check that the user_id isn't already a owner_member
     if check_user_is_owner_member(u_id, channel_id):
@@ -397,5 +397,31 @@ Return Value:
 """
 
 def channel_removeowner_v1(token, channel_id, u_id):
+
+    channel_data = check_valid_channel_id(channel_id)
+    check_valid_auth_id(u_id)
+
+    # check the inviter, i.e. token, is logged in , i.e. token is in data_store
+    token_locate_in_data_store(token)
+    inviter_user_id = token_get_user_id(token)
+
+    member_data = check_user_is_member(u_id, channel_id)
+    if member_data == None:
+        raise InputError('User is not a valid member.')
+
+    # check the inviter is an owner member
+    if check_user_is_owner_member(inviter_user_id, channel_id) is None:
+        raise AccessError('The inviter is not an owner_member')
+
+    # check the invitee is an owner member
+    if check_user_is_owner_member(u_id, channel_id) is None:
+        raise InputError('The invitee is not an owner_member') 
+
+    # Need to check the number of members in owner_members,
+    # if the member being removed is the only member, raise InputError.
+    if len(channel_data['owner_members']) == 1:
+        raise InputError('This is the only owner_member left in the channel')
+
+    channel_data['owner_members'].remove(member_data)
 
     return {}

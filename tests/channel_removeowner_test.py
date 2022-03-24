@@ -159,7 +159,7 @@ def test_channel_removeowner_not_authorised(clear_and_register_and_create):
     # user3 is only a member, NOT an owner.
     remove = requests.post(config.url + 'channel/removeowner/v1', 
                         json={'token': user3_token, 'channel_id': channel_id, 'u_id': user2_id})
-    assert remove.status_code == 400
+    assert remove.status_code == 403
 
 
 
@@ -209,23 +209,23 @@ def test_channel_removeowner_bad_user_id(clear_and_register_and_create):
     # user2 being removed as owner_member with user1's token
     remove = requests.post(config.url + 'channel/removeowner/v1', 
                         json={'token': user1_token, 'channel_id': channel_id, 'u_id': ''})
-    assert remove.status_code == 200
+    assert remove.status_code == 400
 
     remove = requests.post(config.url + 'channel/removeowner/v1', 
                         json={'token': user1_token, 'channel_id': channel_id, 'u_id': 'string'})
-    assert remove.status_code == 200
+    assert remove.status_code == 400
 
     remove = requests.post(config.url + 'channel/removeowner/v1', 
                         json={'token': user1_token, 'channel_id': channel_id, 'u_id': 444})
-    assert remove.status_code == 200
+    assert remove.status_code == 403
 
     remove = requests.post(config.url + 'channel/removeowner/v1', 
                         json={'token': user1_token, 'channel_id': channel_id, 'u_id': -1})
-    assert remove.status_code == 200
+    assert remove.status_code == 400
 
     remove = requests.post(config.url + 'channel/removeowner/v1', 
                         json={'token': user1_token, 'channel_id': channel_id, 'u_id': True})
-    assert remove.status_code == 200
+    assert remove.status_code == 400
 
     # Using an user_id of a user who isnt in the channel, (NOT in all_members or owner_members).
     remove = requests.post(config.url + 'channel/removeowner/v1', 
@@ -242,20 +242,20 @@ def test_channel_removeowner_bad_token(clear_and_register_and_create):
     # Run removeowner with all potential inputs for token
     remove = requests.post(config.url + 'channel/removeowner/v1', 
                         json={'token': '', 'channel_id': channel_id, 'u_id': user2_id})
-    assert remove.status_code == 400
+    assert remove.status_code == 403
 
     remove = requests.post(config.url + 'channel/removeowner/v1', 
                         json={'token': 'string', 'channel_id': channel_id, 'u_id': user2_id})
-    assert remove.status_code == 400
+    assert remove.status_code == 403
 
     remove = requests.post(config.url + 'channel/removeowner/v1', 
                         json={'token': 444, 'channel_id': channel_id, 'u_id': user2_id})
-    assert remove.status_code == 400
+    assert remove.status_code == 403
 
     remove = requests.post(config.url + 'channel/removeowner/v1', 
                         json={'token': -1, 'channel_id': channel_id, 'u_id': user2_id})
-    assert remove.status_code == 400
+    assert remove.status_code == 403
 
     remove = requests.post(config.url + 'channel/removeowner/v1', 
                         json={'token': True, 'channel_id': channel_id, 'u_id': user2_id})
-    assert remove.status_code == 400
+    assert remove.status_code == 403
