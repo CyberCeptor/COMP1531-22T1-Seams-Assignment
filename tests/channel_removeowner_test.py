@@ -259,3 +259,19 @@ def test_channel_removeowner_bad_token(clear_and_register_and_create):
     remove = requests.post(config.url + 'channel/removeowner/v1', 
                         json={'token': True, 'channel_id': channel_id, 'u_id': user2_id})
     assert remove.status_code == 403
+
+    # Expired Token
+    expired_token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6\
+        MSwic2Vzc2lvbl9pZCI6MSwiaGFuZGxlIjoiZmlyc3RsYXN0IiwiZXhwIjo\
+            xNTQ3OTc3ODgwfQ.366QLXfCURopcjJbAheQYLVNlGLX_INKVwr8_TVXYEQ'
+    remove = requests.post(config.url + 'channel/removeowner/v1', 
+                        json={'token': expired_token, 'channel_id': channel_id, 'u_id': user2_id})
+    assert remove.status_code == 403
+
+    # unsaved token
+    unsaved_token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.\
+        eyJpZCI6MSwic2Vzc2lvbl9pZCI6MSwiaGFuZGxlIjoiZmlyc3RsYXN\
+            0IiwiZXhwIjoyNTQ3OTc3ODgwfQ.ckPPWiR-m6x0IRqpQtKmJgNLiD8eAEiTv2i8ToK3mkY'
+    remove = requests.post(config.url + 'channel/removeowner/v1', 
+                        json={'token': unsaved_token, 'channel_id': channel_id, 'u_id': user2_id})
+    assert remove.status_code == 403
