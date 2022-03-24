@@ -60,6 +60,7 @@ def fixture_clear_and_register_and_create():
 
 
 def test_channel_removeowner_working(clear_and_register_and_create):
+    user1_id = clear_and_register_and_create[0]
     user1_token = clear_and_register_and_create[1]
     user2_id = clear_and_register_and_create[2]
     user2_token = clear_and_register_and_create[3]
@@ -83,6 +84,19 @@ def test_channel_removeowner_working(clear_and_register_and_create):
                         json={'token': user1_token, 'channel_id': channel_id, 'u_id': user2_id})
     assert remove.status_code == 200
 
+    # check the data in the channel is correct
+    channels_details = requests.get(config.url + 'channel/details/v2', 
+                            params={'token': user1_token, 'channel_id': channel_id})
+    channels_json = channels_details.json()
+
+    assert len(channels_json['owner_members']) == 1
+    assert channels_json['owner_members'] == [{
+        'u_id': user1_id,
+        'email': 'abc@def.com',
+        'name_first': 'first',
+        'name_last': 'last',
+        'handle_str': 'firstlast'
+    }]
 
 def test_channel_removeowner_not_an_owner(clear_and_register_and_create):
     user1_token = clear_and_register_and_create[1]
