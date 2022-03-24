@@ -83,7 +83,7 @@ def test_admin_userpermission_change_invalid_token(clear_and_register):
                                 'permission_id': 1})
     assert resp4.status_code == 403
 
-    # access error: empty str is passed in as token
+    # input error: empty str is passed in as token
     resp5 = requests.post(config.url + 'admin/userpermission/change/v1',
                           json={'token': '', 'u_id': id2, 'permission_id': 1})
     assert resp5.status_code == 400

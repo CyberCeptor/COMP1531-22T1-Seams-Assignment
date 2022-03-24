@@ -114,6 +114,7 @@ def auth_register_v2(email, password, name_first, name_last):
         'last': name_last,
         'handle': handle,
         'perm_id': 1 if u_id == 1 else 2,
+        'removed': False,
     }
 
     # store the user information into the list of users

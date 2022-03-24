@@ -147,6 +147,19 @@ def check_user_is_global_owner(auth_user_id):
     return False
 
 def cast_to_int_get_requests(variable, var_name):
+    """
+    casts the given variable from a get request into an int
+
+    Arguments:
+        variable (any type) - a variable to be cast to an int
+        var_name (str)      - a string used to print out any error messages if
+                              InputError is raised
+    Exceptions:
+        InputError - Raised if the variable can't be turned into an int
+
+    Return Value: Returns the variable casted to an int
+    """
+
     try:
         variable = int(variable)
     except ValueError:
