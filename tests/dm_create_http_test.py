@@ -1,3 +1,11 @@
+"""
+Filename: dm_create_http_test.py
+
+Author: Zefan Cao(z5237177)
+Created: 14/03/2022 - 24/03/2022
+
+Description: pytest for dm_create
+"""
 import pytest
 import requests
 from src import config
@@ -77,7 +85,7 @@ def test_dm_create_invalid_uid(clear_and_register):
     
     create = requests.post(config.url + 'dm/create/v1', 
                         json={'token': token1, 'u_ids': [id1,500]})
-    assert create.status_code == 403
+    assert create.status_code == 400
 
     create = requests.post(config.url + 'dm/create/v1', 
                         json={'token': token1, 'u_ids': [id1,False]})
