@@ -44,8 +44,7 @@ def dm_create_v1(token, u_ids):
     all_member_list.append(owner)
     name_list.append(user_info['handle'])
     for u_id in u_ids:
-        if(u_ids.count(u_id) > 1):
-            raise InputError('There are duplicate u_ids')
+        check_creator_notin_u_ids_duplicate(auth_id, u_id, u_ids)
         user = check_valid_auth_id(u_id)
         user1 = {
             'u_id': user['id'],
@@ -165,3 +164,9 @@ def check_valid_dm_id(dm_id):
             return dm
     # if the dm_id is not found, raise an AccessError
     raise InputError('dm does not exist in dms')
+
+def check_creator_notin_u_ids_duplicate(u_id, id, u_ids):
+    if u_id == id:
+        raise InputError('Creator can not dm himself')
+    elif(u_ids.count(id) > 1):
+        raise InputError('There are duplicate u_ids')
