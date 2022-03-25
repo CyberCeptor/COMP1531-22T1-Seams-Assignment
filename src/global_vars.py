@@ -1,3 +1,4 @@
+
 """
 File: globals.py
 
@@ -11,7 +12,20 @@ unsaved_token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MSwic2Vzc2lvbl9pZ\
                 CI6MSwiaGFuZGxlIjoiZmlyc3RsYXN0IiwiZXhwIjoyNTQ3OTc3ODgwfQ.ckPPW\
                 iR-m6x0IRqpQtKmJgNLiD8eAEiTv2i8ToK3mkY'
 
+<<<<<<< HEAD
 valid_email_regex = r'^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}$'
+=======
+MESSAGE_ID_COUNTER = 0
+def new_message_id():
+    global MESSAGE_ID_COUNTER 
+    MESSAGE_ID_COUNTER  += 1
+    return MESSAGE_ID_COUNTER 
+
+def reset_message_id():
+    global MESSAGE_ID_COUNTER
+    MESSAGE_ID_COUNTER = 0
+    return MESSAGE_ID_COUNTER
+>>>>>>> master
 
 DM_ID_COUNTER = 0
 
@@ -24,3 +38,4 @@ def reset_dm_id():
     global DM_ID_COUNTER
     DM_ID_COUNTER = 0
     return DM_ID_COUNTER
+

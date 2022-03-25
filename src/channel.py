@@ -135,6 +135,7 @@ def channel_messages_v2(token, channel_id, start):
     elif start > total_messages:
         raise InputError('Invalid start, not enough messages')
 
+
     if total_messages == 0:
         return {
             'messages': [],
@@ -155,6 +156,8 @@ def channel_messages_v2(token, channel_id, start):
     # the messages list
     messages_to_return = []
 
+    
+        
     # if mesages not overflow
     if end == -1:
         if start == total_messages - 1: # if there is only 1 message
