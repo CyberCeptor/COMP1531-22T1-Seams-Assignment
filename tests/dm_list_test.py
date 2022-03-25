@@ -6,7 +6,6 @@ Created: 14/03/2022 - 24/03/2022
 
 Description: pytest for dm_list
 """
-from src.error import InputError, AccessError
 from src.other import clear_v1
 from src.dm import dm_create_v1, dm_list_v1
 from src.auth import auth_register_v2

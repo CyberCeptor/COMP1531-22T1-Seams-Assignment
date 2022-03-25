@@ -9,7 +9,7 @@ Description: dm functions
 from src.data_store import data_store
 from src.token import token_valid_check, token_get_user_id
 from src.other import (check_valid_auth_id, cast_to_int_get_requests,
-                    check_user_is_member)
+                        check_user_is_member)
 from src.error import InputError, AccessError
 def dm_create_v1(token, u_ids):
     """
@@ -38,7 +38,7 @@ def dm_create_v1(token, u_ids):
     }
     # Assume the dm id start at 1 and increase by adding 1
     # for any newdm created
-    dm_id = len(store['dms']) + 1
+    dm_id = new_dm_id()
     name_list = []
     all_member_list = []
     all_member_list.append(owner)
@@ -186,3 +186,14 @@ def check_creator_notin_u_ids_duplicate(u_id, id, u_ids):
         raise InputError('Creator can not dm himself')
     elif(u_ids.count(id) > 1):
         raise InputError('There are duplicate u_ids')
+
+DM_ID_COUNTER = 0
+def new_dm_id():
+    global DM_ID_COUNTER
+    DM_ID_COUNTER += 1
+    return DM_ID_COUNTER
+
+def reset_dm_id():
+    global DM_ID_COUNTER
+    DM_ID_COUNTER = 0
+    return DM_ID_COUNTER
