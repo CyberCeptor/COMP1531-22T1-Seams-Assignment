@@ -15,7 +15,7 @@ Description: implementation for
 """
 
 from src.error import InputError, AccessError
-from src.other import check_valid_auth_id, cast_to_int_get_requests
+from src.other import check_valid_auth_id, get_messages
 from src.other import check_user_is_member, check_valid_channel_id, check_user_is_global_owner
 from src.data_store import data_store
 from src.token import token_valid_check, token_get_user_id, token_locate_in_data_store
@@ -120,59 +120,8 @@ def channel_messages_v2(token, channel_id, start):
     # see if given auth_user_id and channel_id are valid
     check_valid_auth_id(auth_user_id)
     channel_data = check_valid_channel_id(channel_id)
-    channel_id = channel_data['channel_id']
 
-    # is_member is a bool to check whether given user is in the given channel
-    if check_user_is_member(auth_user_id, channel_data, 'all_members') is None:
-        raise AccessError('User does not exist in channel')
-
-    total_messages = len(channel_data['messages'])
-
-    start = cast_to_int_get_requests(start, 'start')
-
-    if start < 0:
-        raise InputError('Invalid start')
-    elif start > total_messages:
-        raise InputError('Invalid start, not enough messages')
-
-    if total_messages == 0:
-        return {
-            'messages': [],
-            'start': start,
-            'end': -1,
-        }
-
-    # message starts
-    start_message = channel_data['messages'][start]
-
-    # get end
-    end = start + 50
-
-    # make sure end is suitable index place
-    if end >= total_messages:
-        end = -1
-
-    # the messages list
-    messages_to_return = []
-
-    # if mesages not overflow
-    if end == -1:
-        if start == total_messages - 1: # if there is only 1 message
-            messages_to_return.append(start_message)
-        else:
-            for idx, message in channel_data['messages']:
-                if idx >= start:
-                    messages_to_return.append(message)
-    else:
-        for idx, message in channel_data['messages']:
-            if start <= idx < end:
-                messages_to_return.append(message)
-
-    return {
-        'messages': messages_to_return,
-        'start': start,
-        'end': end,
-    }
+    get_messages(auth_user_id, channel_data, start, "channel")
 
 def channel_join_v2(token, channel_id):
     """
