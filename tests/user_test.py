@@ -143,7 +143,7 @@ def test_profile_bad_u_id_input(clear_and_register):
     '''tesing with a bad id as an int'''
     user_profile = requests.get(config.url + 'user/profile/v1', 
                     params={'token': user_json['token'], 'u_id': 100})
-    assert user_profile.status_code == 403
+    assert user_profile.status_code == 400
 
     '''tesing with a bad id as a negative int'''
     user_profile = requests.get(config.url + 'user/profile/v1', 

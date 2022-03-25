@@ -1,8 +1,8 @@
-from src.error import InputError, AccessError
 from src.data_store import data_store
 from src.token import token_valid_check, token_locate_in_data_store, token_get_user_id
-from src.other import check_valid_auth_id
+from src.other import check_valid_auth_id, cast_to_int_get_requests
 from src.auth import check_invalid_email
+from src.error import InputError
 
 VALID_EMAIL_REGEX = r'^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}$'
 
@@ -13,10 +13,7 @@ def user_profile_v1(token, u_id):
     last name, and handle
     """
     token_valid_check(token)
-    try:
-        u_id = int(u_id)
-    except ValueError as auth_id_not_valid_type:
-        raise InputError from auth_id_not_valid_type
+    u_id = cast_to_int_get_requests(u_id, 'user id')
 
     check_valid_auth_id(u_id)
 

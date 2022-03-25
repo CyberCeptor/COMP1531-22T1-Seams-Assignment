@@ -1,11 +1,6 @@
 import pytest
 import requests
-import json
 
-from src.auth import auth_register_v2
-from src.user import user_profile_v1
-from src.error import AccessError, InputError
-from src.other import clear_v1
 from src import config
 
 @pytest.fixture(name='clear_and_register_and_create')
@@ -60,6 +55,7 @@ def fixture_clear_and_register_and_create():
 
 
 def test_channel_removeowner_working(clear_and_register_and_create):
+    user1_id = clear_and_register_and_create[0]
     user1_token = clear_and_register_and_create[1]
     user2_id = clear_and_register_and_create[2]
     user2_token = clear_and_register_and_create[3]
@@ -83,6 +79,19 @@ def test_channel_removeowner_working(clear_and_register_and_create):
                         json={'token': user1_token, 'channel_id': channel_id, 'u_id': user2_id})
     assert remove.status_code == 200
 
+    # check the data in the channel is correct
+    channels_details = requests.get(config.url + 'channel/details/v2', 
+                            params={'token': user1_token, 'channel_id': channel_id})
+    channels_json = channels_details.json()
+
+    assert len(channels_json['owner_members']) == 1
+    assert channels_json['owner_members'] == [{
+        'u_id': user1_id,
+        'email': 'abc@def.com',
+        'name_first': 'first',
+        'name_last': 'last',
+        'handle_str': 'firstlast'
+    }]
 
 def test_channel_removeowner_not_an_owner(clear_and_register_and_create):
     user1_token = clear_and_register_and_create[1]
@@ -205,7 +214,7 @@ def test_channel_removeowner_bad_user_id(clear_and_register_and_create):
 
     remove = requests.post(config.url + 'channel/removeowner/v1', 
                         json={'token': user1_token, 'channel_id': channel_id, 'u_id': 444})
-    assert remove.status_code == 403
+    assert remove.status_code == 400
 
     remove = requests.post(config.url + 'channel/removeowner/v1', 
                         json={'token': user1_token, 'channel_id': channel_id, 'u_id': -1})

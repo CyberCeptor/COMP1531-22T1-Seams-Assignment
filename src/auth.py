@@ -15,10 +15,9 @@ import re
 import hashlib
 
 from src.error import InputError
-from src.token import token_generate
 
 from src.data_store import data_store
-from src.token import token_generate
+from src.token import token_generate, token_valid_check, token_remove
 
 VALID_EMAIL_REGEX = r'^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}$'
 
@@ -114,6 +113,7 @@ def auth_register_v2(email, password, name_first, name_last):
         'last': name_last,
         'handle': handle,
         'perm_id': 1 if u_id == 1 else 2,
+        'removed': False,
     }
 
     # store the user information into the list of users
@@ -148,7 +148,7 @@ def check_invalid_email(store, valid_email_regex, email):
 
     # check for duplicate email
     for user in store['users']:
-        if user['email'] == email:
+        if user['email'] == email and user['removed'] is False:
             raise InputError(description='Email has already been taken')
 
 def check_invalid_name(name_first, name_last, full_name):
@@ -210,11 +210,12 @@ def create_handle(store, full_name):
     duplicate_count = -1
     for user in store['users']:
         to_compare = user['handle']
-        if to_compare[-1].isnumeric() is True:
-            if to_compare.rstrip(to_compare[-1]) == handle:
+        if user['removed'] is False:
+            if to_compare[-1].isnumeric() is True:
+                if to_compare.rstrip(to_compare[-1]) == handle:
+                    duplicate_count += 1
+            elif to_compare == handle:
                 duplicate_count += 1
-        elif to_compare == handle:
-            duplicate_count += 1
 
     # if there are duplicates, add the corresponding number to the end of
     # the handle, starts from 0
@@ -222,3 +223,7 @@ def create_handle(store, full_name):
         handle = handle + str(duplicate_count)
 
     return handle
+
+def auth_logout_v1(token):
+    token_valid_check(token)
+    token_remove(token)
