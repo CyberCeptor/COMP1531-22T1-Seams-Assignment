@@ -49,10 +49,9 @@ def user_profile_setemail_v1(token, email):
     # check that the email isn't already used by another user
     # both done by check_invalid_email.
     # need to check that the email is the correct format.
-    if token in ['True', 'False', '']:
-        raise InputError('Invalid email format')
+
     if type(email) != str:
-        raise InputError('Invalid channel_id type')
+        raise InputError('Invalid email format')
     
     check_invalid_email(store, VALID_EMAIL_REGEX, email)
 
