@@ -58,7 +58,7 @@ def dm_create_v1(token, u_ids):
     #sort name list
     name_list.sort()
     #use , to separate
-    dm_name = ",".join(name_list)
+    dm_name = ", ".join(name_list)
 
     new_dm = {
         'name': dm_name,
@@ -136,6 +136,22 @@ def dm_details_v1(token, dm_id):
         }
     if not dm_auth_user:
         raise AccessError('The authorised user is no longer in dm')
+
+def dm_leave_v1(token, dm_id):
+    token_valid_check(token)
+    auth_id = token_get_user_id(token)
+    dm = check_valid_dm_id(dm_id)
+    store = data_store.get()
+    dm_auth_user = False
+    if(dm['creator']['u_id'] == auth_id):
+        dm['creator'] = {}
+    for member in dm['members']:
+        if(auth_id == member['u_id']):
+            dm_auth_user = True
+            dm['members'].remove(member)
+    if not dm_auth_user:
+        raise AccessError('The authorised user is no longer in dm')
+    data_store.set(store)
 
 def check_valid_dm_id(dm_id):
     """
