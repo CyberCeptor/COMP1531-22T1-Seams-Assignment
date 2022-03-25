@@ -251,5 +251,3 @@ def test_channel_messages_return(clear_and_register_and_create):
     assert channel_messages['messages'] == []
     assert channel_messages['start'] == 0
     assert channel_messages['end'] == -1
-   
-

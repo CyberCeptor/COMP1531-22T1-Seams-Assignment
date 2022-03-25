@@ -1,3 +1,4 @@
+
 """
 File: globals.py
 
@@ -21,3 +22,15 @@ def reset_message_id():
     global MESSAGE_ID_COUNTER
     MESSAGE_ID_COUNTER = 0
     return MESSAGE_ID_COUNTER
+
+DM_ID_COUNTER = 0
+def new_dm_id():
+    global DM_ID_COUNTER
+    DM_ID_COUNTER += 1
+    return DM_ID_COUNTER
+
+def reset_dm_id():
+    global DM_ID_COUNTER
+    DM_ID_COUNTER = 0
+    return DM_ID_COUNTER
+
