@@ -15,7 +15,7 @@ from src.token import token_remove, token_valid_check, token_get_user_id
 
 from src import config
 from src.other import clear_v1
-from src.messages import message_send_v1
+from src.messages import message_send_v1, message_remove_v1
 from src.token import token_remove, token_valid_check
 from src.admin import admin_userpermission_change
 
@@ -234,7 +234,19 @@ def message_send():
     save_data()
     return dumps(message_id)
 
+@APP.route('/message/edit/v1', methods=['PUT'])
+def message_edit():
+    data = request.get_json()
+    message_edit_v1(data['token'], data['message_id'], data['message'])
+    save_data()
+    return dumps({})
 
+@APP.route('/message/remove/v1', methods=['DELETE'])
+def message_remove():
+    data = request.get_json()
+    message_remove_v1(data['token'], data['message_id'])
+    save_data()
+    return dumps({})
 
 @APP.route('/clear/v1', methods=['DELETE'])
 def clear():

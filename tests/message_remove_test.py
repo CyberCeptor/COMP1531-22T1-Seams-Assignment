@@ -76,7 +76,7 @@ def test_message_remove_invalid_token(create_message):
     # wrong token input
     resp3 = requests.delete(config.url + 'message/remove/v1', 
                           json = {'token': 'str', 'message_id': message_id})
-    assert resp3.status_code == 400
+    assert resp3.status_code == 403
     # expired token
     expired_token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MSwic2Vzc\
         2lvbl9pZCI6MSwiaGFuZGxlIjoiZmlyc3RsYXN0IiwiZXhwIjoxNTQ3\
@@ -129,9 +129,9 @@ def test_message_remove_invalid_message_id(create_message):
     requests.delete(config.url + 'clear/v1')
 
 
-def test_message_not_belong_to_channel(create_message):
+def test_message_remove_global_user(create_message):
     """
-    testing if message belongs to the channel
+    testing if global owner cannot remove message if not in that channel
 
     Arguments: clear_and_register_and_create (fixture)
 
@@ -141,7 +141,7 @@ def test_message_not_belong_to_channel(create_message):
     Return Value: N/A
     """
     
-    token = create_message[0]
+    token = create_message[0] # user 1 is global owner
     # create user2
     user2 = requests.post(config.url + 'auth/register/v2', 
                             json={'email': 'def@abc.com', 'password': 'password',
@@ -149,7 +149,51 @@ def test_message_not_belong_to_channel(create_message):
     user2_json = user2.json()
     token_2 = user2_json['token']
 
-    # user2 creates private channel 2
+    # user2 creates private channel 2 and becomes owner of that channel
+    create_channel_2 = requests.post(config.url + 'channels/create/v2',
+                            json={'token': token_2, 'name': 'channel_2',
+                                    'is_public': False})
+    channel_2_data = create_channel_2.json()
+    channel_id_2 = channel_2_data['channel_id'] 
+
+    # global owner join channel 2
+    requests.post(config.url + 'channel/join/v2',
+                        json = {'token': token,
+                        'channel_id': channel_id_2})
+
+    # user 2 sends a message in channel 2
+    send_message = requests.post(config.url + 'message/send/v1', 
+                          json={'token': token_2, 'channel_id': channel_id_2, 
+                          'message': 'hewwoagain'})
+    message = send_message.json()
+    message_id_2 = message['message_id']
+
+    # global owner(user1) is able to message upon joinging the channel(has owner permission if is a member)
+    resp = requests.delete(config.url + 'message/remove/v1', 
+                          json = {'token': token, 'message_id': message_id_2})
+    assert resp.status_code == 200
+
+def test_message_remove_global_user_fail(create_message):
+    """
+    testing if global owner cannot remove message if not in that channel
+
+    Arguments: clear_and_register_and_create (fixture)
+
+    Exceptions: 
+        Input Error - Raised for all test cases below
+
+    Return Value: N/A
+    """
+    
+    token = create_message[0] # user 1 is global owner
+    # create user2
+    user2 = requests.post(config.url + 'auth/register/v2', 
+                            json={'email': 'def@abc.com', 'password': 'password',
+                               'name_first': 'first2', 'name_last': 'last2'}) 
+    user2_json = user2.json()
+    token_2 = user2_json['token']
+
+    # user2 creates private channel 2 and becomes owner of that channel
     create_channel_2 = requests.post(config.url + 'channels/create/v2',
                             json={'token': token_2, 'name': 'channel_2',
                                     'is_public': False})
@@ -163,18 +207,17 @@ def test_message_not_belong_to_channel(create_message):
     message = send_message.json()
     message_id_2 = message['message_id']
 
-    # message_id does not refer to a valid message within a 
-    # channel/DM that the authorised user has joined
+    # global owner(user1) cannot delete a message if not in channel
     resp = requests.delete(config.url + 'message/remove/v1', 
                           json = {'token': token, 'message_id': message_id_2})
-    assert resp.status_code == 400 
+    assert resp.status_code == 403
 
     requests.delete(config.url + 'clear/v1')
 
 
 def test_message_sent_not_belong_to_user(create_message):
     """
-    testing if message is sent by the user who makes the removing request
+    testing if message cannot be removed by different user
 
     Arguments: create_message(fixture)
 
@@ -198,15 +241,15 @@ def test_message_sent_not_belong_to_user(create_message):
                         'channel_id': channel_id})
 
     # raise access error if user2 is trying to remove user1's message
-    resp = requests.put(config.url + 'message/remove/v1', 
+    resp = requests.delete(config.url + 'message/remove/v1', 
                           json = {'token': token_2, 'message_id': message_id})
     assert resp.status_code == 403 # raise access error
 
     requests.delete(config.url + 'clear/v1')
 
-def test_successful_message_remove(create_message):
+def test_successful_message_remove_by_owner(create_message):
     """
-    testing if message removing is successful
+    testing if message removing is successful by channel owner
 
     Arguments: create_message(fixture)
 
@@ -243,8 +286,45 @@ def test_successful_message_remove(create_message):
                           json = {'token': token, 'message_id': message_id_2})
     assert resp.status_code == 200
 
-    # successful edit when user 2 tries to remove own message
-    resp1 = requests.delete(config.url + 'message/remove/v1', 
+    requests.delete(config.url + 'clear/v1')
+
+def test_successful_message_remove_by_user(create_message):
+    """
+    testing if message removing is successful by user who sent the message
+
+    Arguments: create_message(fixture)
+
+    Exceptions: 
+        Access Error - Raised for all test cases below
+
+    Return Value: N/A
+    """
+    
+
+    token = create_message[0]
+    channel_id = create_message[1]
+    # create user2
+    user2 = requests.post(config.url + 'auth/register/v2', 
+                            json={'email': 'def@abc.com', 'password': 'password',
+                               'name_first': 'first2', 'name_last': 'last2'}) 
+    user2_json = user2.json()
+    token_2 = user2_json['token']
+
+    # user 2 joins the channel 1
+    requests.post(config.url + 'channel/join/v2',
+                        json = {'token': token_2,
+                        'channel_id': channel_id})
+
+    # user 2 sends a message in the channel 
+    send_message = requests.post(config.url + 'message/send/v1', 
+                          json={'token': token_2, 'channel_id': channel_id, 
+                          'message': 'hewwoagain'})
+    message = send_message.json()
+    message_id_2 = message['message_id']
+
+    # successful removal when user 2 tries to remove own message
+    resp = requests.delete(config.url + 'message/remove/v1', 
                           json = {'token': token_2, 'message_id': message_id_2})
-    assert resp1.status_code == 200
+    assert resp.status_code == 200
+
     requests.delete(config.url + 'clear/v1')

@@ -16,3 +16,8 @@ def new_message_id():
     global MESSAGE_ID_COUNTER 
     MESSAGE_ID_COUNTER  += 1
     return MESSAGE_ID_COUNTER 
+
+def reset_message_id():
+    global MESSAGE_ID_COUNTER
+    MESSAGE_ID_COUNTER = 0
+    return MESSAGE_ID_COUNTER
