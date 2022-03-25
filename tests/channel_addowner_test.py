@@ -1,11 +1,6 @@
 import pytest
 import requests
-import json
 
-from src.auth import auth_register_v2
-from src.user import user_profile_v1
-from src.error import AccessError, InputError
-from src.other import clear_v1
 from src import config
 
 @pytest.fixture(name='clear_and_register_and_create')
@@ -91,7 +86,7 @@ def test_channel_addowner_bad_user_id(clear_and_register_and_create):
     # add user2 to be an owner, with a bad user_id
     addowner = requests.post(config.url + 'channel/addowner/v1',
                         json={'token': user2_token, 'channel_id': channel_id, 'u_id': 444})
-    assert addowner.status_code == 403
+    assert addowner.status_code == 400
 
     addowner = requests.post(config.url + 'channel/addowner/v1',
                         json={'token': user2_token, 'channel_id': channel_id, 'u_id': True})

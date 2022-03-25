@@ -4,7 +4,7 @@ Filename: channels.py
 Author: Jenson Morgan(z5360181), Yangjun Yue(z5317840)
 Created: 24/02/2022 - 04/03/2022
 from src.other import check_valid_auth_id
-from src.other import check_user_is_member
+from src.other import check_user_is_member_or_owner
 Description: implementation for
     - creating either a public or a private channel with given name
     - listing all channels the user is part of and gives the channel id and name
@@ -39,7 +39,7 @@ def channels_list_v2(token):
     channels_list = []
 
     for channel in store['channels']:
-        if check_user_is_member(auth_user_id, channel['channel_id']):
+        if check_user_is_member(auth_user_id, channel, 'all_members'):
             channel_data = {
                 'channel_id': channel['channel_id'],
                 'name': channel['name'],
