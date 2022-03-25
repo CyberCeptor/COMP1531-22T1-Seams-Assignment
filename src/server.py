@@ -14,11 +14,7 @@ from src.users import users_all_v1
 from src.admin import admin_userpermission_change, admin_user_remove
 from src.other import clear_v1
 from src.token import token_valid_check, token_get_user_id
-<<<<<<< HEAD
 from src.dm import dm_create_v1, dm_list_v1, dm_details_v1, dm_remove_v1, dm_leave_v1
-=======
-
->>>>>>> master
 from src.channel import channel_details_v2, channel_invite_v2
 from src.channel import channel_addowner_v1, channel_removeowner_v1
 from src.channel import channel_join_v2, channel_messages_v2, channel_leave_v1
@@ -131,7 +127,6 @@ def change_perms():
     data = request.get_json()
     admin_userpermission_change(data['token'], data['u_id'], 
                                 data['permission_id'])
-<<<<<<< HEAD
     save_data()
     return dumps({})
 
@@ -142,18 +137,6 @@ def remove_user():
     save_data()
     return dumps({})
 
-=======
-    save_data()
-    return dumps({})
-
-@APP.route('/admin/user/remove/v1', methods=['DELETE'])
-def remove_user():
-    data = request.get_json()
-    admin_user_remove(data['token'], data['u_id'])
-    save_data()
-    return dumps({})
-
->>>>>>> master
 ################################################################################
 ##                             CHANNELS ROUTES                                ##
 ################################################################################
@@ -209,7 +192,6 @@ def channel_join():
 def channel_addowner():
     data = request.get_json()
     channel_addowner_v1(data['token'], data['channel_id'], data['u_id'])
-<<<<<<< HEAD
     save_data()
     return dumps({})
 
@@ -290,45 +272,6 @@ def dm_leave():
     dm_id = store['dm_id']
     dm_leave_v1(token, dm_id)
     return dumps({})
-=======
-    save_data()
-    return dumps({})
-
-@APP.route('/channel/removeowner/v1', methods=['POST'])
-def channel_removeowner():
-    data = request.get_json()
-    channel_removeowner_v1(data['token'], data['channel_id'], data['u_id'])
-    save_data()
-    return dumps({})
-
-@APP.route('/channel/messages/v2', methods=['GET'])
-def channel_messages():
-    token = request.args.get('token')
-    channel_id = request.args.get('channel_id')
-    start = request.args.get('start')
-    channel_messages = channel_messages_v2(token, channel_id, start)
-    save_data()
-    return dumps(channel_messages)
-
-@APP.route('/channel/leave/v1', methods=['POST'])
-def channel_leave():
-    data = request.get_json()
-    token_valid_check(data['token'])
-    user_id = token_get_user_id(data['token'])
-    channel_leave_v1(user_id, data['channel_id'])
-    save_data()
-    return dumps({})
-
-################################################################################
-##                             MESSAGE ROUTES                                 ##
-################################################################################
-
-@APP.route('/message/send/v1', methods=['POST'])
-def message_send():
-    data = request.get_json()
-    return dumps(message_send(**data))
->>>>>>> master
-
 ################################################################################
 ##                               CLEAR ROUTE                                  ##
 ################################################################################
@@ -343,8 +286,4 @@ def clear():
 
 if __name__ == "__main__":
     signal.signal(signal.SIGINT, quit_gracefully) # For coverage
-<<<<<<< HEAD
     APP.run(port=config.port) # Do not edit this port
-=======
-    APP.run(port=config.port) # Do not edit this port
->>>>>>> master

@@ -377,8 +377,4 @@ def channel_removeowner_v1(token, channel_id, u_id):
 
     channel_data['owner_members'].remove(member_data)
     data_store.set(store)
-<<<<<<< HEAD
     return {}
-=======
-    return {}
->>>>>>> master
