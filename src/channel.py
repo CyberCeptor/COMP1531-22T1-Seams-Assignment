@@ -309,6 +309,7 @@ def channel_addowner_v1(token, channel_id, u_id):
     check_valid_auth_id(u_id)
     channel_data = check_valid_channel_id(channel_id)
 
+
     member_data = check_user_is_member(u_id, channel_data, 'all_members')
     if member_data is None:
         raise InputError('User is not a valid member.')
@@ -317,16 +318,9 @@ def channel_addowner_v1(token, channel_id, u_id):
 
     inviter_user_id = token_get_user_id(token)
 
-    '''check that the inviter is an owner_member. 
-    Need to check if the inviter/Setter, (person setting someone as an owner is a global owner)
-    
-    
-    Check the setter is a member, and they either have owner permissions, 
-    or are a global owner
-    '''
     # if check_user_is_member returns None, they are not a member of the channel, raise error
     # if they are, check if there perm_id == 1, if it is, they have permission to add user.
-    setter_channel_data = check_user_is_member(inviter_user_id, channel_id)
+    setter_channel_data = check_user_is_member(inviter_user_id, channel_data, 'all_members')
     if setter_channel_data == None:
         raise AccessError("Not a member of the channel")
 
@@ -336,10 +330,9 @@ def channel_addowner_v1(token, channel_id, u_id):
             setter_data = user
 
 
-    print('The Setter permission ID: ', setter_data['perm_id'])
     if setter_data['perm_id'] == 1:
         pass
-    elif check_user_is_owner_member(inviter_user_id, channel_id) is None:
+    elif check_user_is_member(inviter_user_id, channel_data, 'owner_members') is None:
         raise AccessError('The inviter is not an owner_member')
 
     # check that the user_id isn't already a owner_member

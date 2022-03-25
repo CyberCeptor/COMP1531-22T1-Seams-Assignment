@@ -47,10 +47,7 @@ def user_profile_setemail_v1(token, email):
     # both done by check_invalid_email.
     # need to check that the email is the correct format.
 
-    if type(email) != str:
-        raise InputError('Invalid email format')
-    
-    check_invalid_email(store, VALID_EMAIL_REGEX, email)
+    check_invalid_email(store, VALID_EMAIL_REGEX, str(email))
 
     # check the token is current and acceptable
     token_valid_check(token)
