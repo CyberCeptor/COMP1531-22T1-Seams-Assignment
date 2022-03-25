@@ -32,11 +32,11 @@ def test_dm_list_valid():
     dm_create_v1(token1, [id2])
     dm_dict = dm_list_v1(token1)
     assert len(dm_dict['dms']) == 1
-    assert dm_dict['dms'] == [{'dm_id':1, 'name': 'limingzhe,wangkaiyan'}]
+    assert dm_dict['dms'] == [{'dm_id':1, 'name': 'limingzhe, wangkaiyan'}]
 
     dm_create_v1(token1, [id3])
     dm_dict = dm_list_v1(token1)
     assert len(dm_dict["dms"]) == 2
-    assert dm_dict["dms"] == [{'dm_id':1, 'name': 'limingzhe,wangkaiyan'}, 
-    {'dm_id':2, 'name': 'huangyifei,wangkaiyan'}]
+    assert dm_dict["dms"] == [{'dm_id':1, 'name': 'limingzhe, wangkaiyan'}, 
+    {'dm_id':2, 'name': 'huangyifei, wangkaiyan'}]
 clear_v1()

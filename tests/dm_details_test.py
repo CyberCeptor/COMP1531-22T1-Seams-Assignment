@@ -30,7 +30,7 @@ def test_dm_details_valid():
     dm_dict = dm_create_v1(token1, [id2])
     dm_id = dm_dict['dm_id']
     assert dm_details_v1(token1, dm_id) == {
-        'name': 'limingzhe,wangkaiyan',
+        'name': 'limingzhe, wangkaiyan',
         'members':[
             {
                 'u_id': 1,
