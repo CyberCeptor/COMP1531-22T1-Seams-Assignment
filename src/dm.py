@@ -8,9 +8,10 @@ Description: dm functions
 """
 from src.data_store import data_store
 from src.token import token_valid_check, token_get_user_id
-from src.other import (check_valid_auth_id, cast_to_int_get_requests,
-                        check_user_is_member)
+from src.other import check_valid_auth_id, cast_to_int_get_requests, check_user_is_member
 from src.error import InputError, AccessError
+from src.global_vars import new_dm_id
+
 def dm_create_v1(token, u_ids):
     """
     clears any data stored in data_store and registers users with the
@@ -187,13 +188,3 @@ def check_creator_notin_u_ids_duplicate(u_id, id, u_ids):
     elif(u_ids.count(id) > 1):
         raise InputError('There are duplicate u_ids')
 
-DM_ID_COUNTER = 0
-def new_dm_id():
-    global DM_ID_COUNTER
-    DM_ID_COUNTER += 1
-    return DM_ID_COUNTER
-
-def reset_dm_id():
-    global DM_ID_COUNTER
-    DM_ID_COUNTER = 0
-    return DM_ID_COUNTER

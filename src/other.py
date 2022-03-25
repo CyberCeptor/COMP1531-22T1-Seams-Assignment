@@ -14,7 +14,8 @@ Description: implementation for
 from src.error import InputError
 from src.token import reset_session_id
 from src.data_store import data_store
-from src.dm import reset_dm_id
+from src.global_vars import reset_dm_id
+
 def clear_v1():
     """
     clears the stored data in data_store
@@ -25,7 +26,6 @@ def clear_v1():
 
     Return Value: N/A
     """
-
     store = data_store.get()
     store['users'].clear()
     store['channels'].clear()
