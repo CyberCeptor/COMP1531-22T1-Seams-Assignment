@@ -86,6 +86,7 @@ def auth_register_v2(email, password, name_first, name_last):
         Returns a dict containing the generated auth_user_id
     """
 
+
     store = data_store.get()
     # generate user id
     u_id = len(store['users']) + 1
