@@ -13,7 +13,7 @@ Description: implementation for
 from src.data_store import data_store
 
 from src.other import check_message_id_valid, check_valid_auth_id, check_valid_channel_id, \
-    check_user_is_member, check_message_id_valid, get_channel_id_with_message_id, check_user_is_owner_member
+    check_user_is_member, check_message_id_valid, get_channel_id_with_message_id
 from src.admin import check_user_is_global_owner
 
 from src.token import token_get_user_id, token_valid_check
@@ -52,7 +52,7 @@ def message_send_v1(token, channel_id, message):
     channel_data = check_valid_channel_id(channel_id)
     channel_id = channel_data['channel_id']
 
-    if check_user_is_member(auth_user_id, channel_id) is None:
+    if check_user_is_member(auth_user_id, channel_data, 'all_members') is None:
         raise AccessError('User does not exist in channel')
 
     if not isinstance(message, str):
@@ -175,9 +175,9 @@ def message_remove_v1(token, message_id):
     # is user is a global member and is member in the channel
 
     
-    if check_user_is_member(auth_user_id, channel_id) is not None:
+    if check_user_is_member(auth_user_id, channel, 'all_members') is not None:
         print(f'user {auth_user_id} is in channel {channel_id}')
-        if check_user_is_owner_member(auth_user_id, channel_id) is not None or global_owner is True or\
+        if check_user_is_member(auth_user_id, channel, 'owner_members') is not None or global_owner is True or\
             message_data['u_id'] == auth_user_id:
 
             channel['messages'].remove(message_data)
