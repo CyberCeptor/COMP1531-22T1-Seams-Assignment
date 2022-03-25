@@ -88,21 +88,6 @@ def test_admin_userpermission_change_invalid_token(clear_and_register):
                           json={'token': '', 'u_id': id2, 'permission_id': 1})
     assert resp5.status_code == 400
 
-def test_admin_userpermission_change_user_logged_out(clear_and_register):
-    """ a global owner who has logged out uses their now unsaved token to change
-    the permissions of another user """
-
-    token = clear_and_register[0]['token']
-    id2 = clear_and_register[1]['auth_user_id']
-
-    resp0 = requests.post(config.url + 'auth/logout/v1', json={'token': token})
-    assert resp0.status_code == 200
-
-    resp1 = requests.post(config.url + 'admin/userpermission/change/v1',
-                          json={'token': token, 'u_id': id2,
-                                'permission_id': 1})
-    assert resp1.status_code == 403
-
 def test_admin_userpermission_change_invalid_u_id(clear_and_register):
     """ invalid u_ids passed in """
 
