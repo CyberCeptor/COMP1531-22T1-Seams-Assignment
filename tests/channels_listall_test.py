@@ -200,18 +200,4 @@ def test_channels_listall_v1_return():
     #     "name": 'channel_name',
     # }
 requests.delete(config.url + 'clear/v1')
-<<<<<<< HEAD
 # clear_v1()
-=======
-# clear_v1()
-
-    
-
-    
-
-    
-
-
-
-    
->>>>>>> master

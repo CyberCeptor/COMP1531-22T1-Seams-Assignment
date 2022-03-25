@@ -226,8 +226,4 @@ def create_handle(store, full_name):
 
 def auth_logout_v1(token):
     token_valid_check(token)
-<<<<<<< HEAD
     token_remove(token)
-=======
-    token_remove(token)
->>>>>>> master

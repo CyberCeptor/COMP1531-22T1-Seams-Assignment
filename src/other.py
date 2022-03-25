@@ -12,10 +12,6 @@ Description: implementation for
         - checking if a user is a member of a channel
 """
 from src.error import InputError
-<<<<<<< HEAD
-=======
-
->>>>>>> master
 from src.token import reset_session_id
 from src.data_store import data_store
 from src.global_vars import reset_dm_id
@@ -125,8 +121,6 @@ def check_user_is_member(auth_user_id, data, key):
 def check_user_is_global_owner(auth_user_id):
     """
     check the user whether is a global owner with auth user id
-<<<<<<< HEAD
-
     Arguments:
         auth_user_id (int) - an integer that specifies user id
 
@@ -135,17 +129,6 @@ def check_user_is_global_owner(auth_user_id):
     Return Value: True if the user is a global owner, False otherwise
     """
 
-=======
-
-    Arguments:
-        auth_user_id (int) - an integer that specifies user id
-
-    Exceptions: N/A
-
-    Return Value: True if the user is a global owner, False otherwise
-    """
-
->>>>>>> master
     store = data_store.get()
     for user in store['users']:
         if user['id'] == auth_user_id and user['perm_id'] == 1:
