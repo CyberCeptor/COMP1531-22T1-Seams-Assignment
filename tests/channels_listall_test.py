@@ -201,13 +201,3 @@ def test_channels_listall_v1_return():
     # }
 requests.delete(config.url + 'clear/v1')
 # clear_v1()
-
-    
-
-    
-
-    
-
-
-
-    

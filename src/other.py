@@ -12,11 +12,9 @@ Description: implementation for
         - checking if a user is a member of a channel
 """
 from src.error import InputError
-
 from src.token import reset_session_id
-
 from src.data_store import data_store
-
+from src.global_vars import reset_dm_id
 
 def clear_v1():
     """
@@ -28,7 +26,6 @@ def clear_v1():
 
     Return Value: N/A
     """
-
     store = data_store.get()
     store['users'].clear()
     store['channels'].clear()
@@ -36,7 +33,8 @@ def clear_v1():
     store['dms'].clear()
     data_store.set(store)
     reset_session_id()
-
+    reset_dm_id()
+    
 def check_valid_auth_id(auth_user_id):
     """
     checks if the given auth_user_id is valid by checking if it is larger
@@ -123,7 +121,6 @@ def check_user_is_member(auth_user_id, data, key):
 def check_user_is_global_owner(auth_user_id):
     """
     check the user whether is a global owner with auth user id
-
     Arguments:
         auth_user_id (int) - an integer that specifies user id
 
