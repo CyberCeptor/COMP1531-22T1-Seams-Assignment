@@ -67,13 +67,9 @@ def message_send_v1(token, channel_id, message):
     # increament message id for the store message
     message_id = new_message_id()
 
-    for user in store['users']:
-        if user['id'] == auth_user_id:
-            user_info = user
-
     message_data = {
         'message_id': message_id, 
-        'u_id': user_info['id'], 
+        'u_id': auth_user_id, 
         'message': message, 
         'time_sent': datetime.datetime.now()
     }
@@ -88,57 +84,64 @@ def message_send_v1(token, channel_id, message):
     }
 
 
-# def message_edit_v1(token, channel_id, message):
-# """
-#     If token given is authorised user, updates the message
-#     specified by message id with input message
+def message_edit_v1(token, message_id, message):
+    """
+    If token given is authorised user, updates the message
+    specified by message id with input message
 
-#     Arguments:
-#         token (str)          - unique str representation of user
-#         message_id (int))    - integer sppcifies message
-#         message (str)        - message that the user wishes to send
+    Arguments:
+        token (str)          - unique str representation of user
+        message_id (int))    - integer sppcifies message
+        message (str)        - message that the user wishes to send
 
-#     Exceptions:
-#         AccessError - when message_id refers to a valid message in a joined channel/DM and none of the following are true:
-#             - the message was sent by the authorised user making this request
-#             - the authorised user has owner permissions in the channel/DM
-#         InputError  - channel_id does not refer to valid channel
-#                     - length of message is over 1000 characters
+    Exceptions:
+        AccessError - when message_id refers to a valid message in a joined channel/DM and none of the following are true:
+            - the message was sent by the authorised user making this request
+            - the authorised user has owner permissions in the channel/DM
+        InputError  - channel_id does not refer to valid channel
+                    - length of message is over 1000 characters
 
-#     Return Value: N/A
-#     """
-#     store = data_store.get()
+    Return Value: N/A
+    """
+    store = data_store.get()
 
-#     token_valid_check(token)
-#     auth_user_id = token_get_user_id(token)
-#     check_valid_auth_id(auth_user_id)
-#     # check input message_id is valid
-#     message_id = check_message_id_valid(message_id)
+    # check message input is valid, otherwise raise input errors
+    if not isinstance(message, str):
+        raise InputError('Message is a string')
 
-#     # check global owner case
-#     has_perm = False
-#     global_owner = check_user_is_global_owner(auth_user_id)
-#     channel_id = get_channel_id_with_message_id(message_id)
-#     # is user is a global member and is member in the channel
-#     if check_user_is_member(auth_user_id, channel_id) != None and global_owner is True:
-#         has_perm = True
+    if len(message) > 1000:
+        raise InputError('Message must not exceed 1000 characters')
 
-#     user_is_owner = False
-#     if check_user_is_owner_member(auth_user_id, channel_id) != None:
-#         user_is_owner = True
+    # check valid token and user
+    token_valid_check(token)
+    auth_user_id = token_get_user_id(token)
+    check_valid_auth_id(auth_user_id)
 
-#     for channel in store['channels']:
-#         for message_data in channel['messages']:
-#             if message_data['message_id'] == message_id:
-#                 # check if message is sent by the user or user is owner
-#                 if message_data['u_id'] == auth_user_id or has_perm is True or user_is_owner is True:
-#                     channel['messages'].remove(message_data)
-#                 else:
-#                     raise AccessError('User has no access to this specified message')
+    # check input message_id is valid and if exists
+    message_data = check_message_id_valid(message_id)
 
-#     data_store.set(store)
+    # check global owner case
+    global_owner = check_user_is_global_owner(auth_user_id)
+    channel = get_channel_id_with_message_id(message_id)
+    
+    # check is user is in the channel
+    if check_user_is_member(auth_user_id, channel, 'all_members') is not None:
+        if check_user_is_member(auth_user_id, channel, 'owner_members') is not None or \
+            global_owner is True or message_data['u_id'] == auth_user_id:
+            # if user is either owner or global owner or it's the user who sent the message
+            message_data['message'] = message
+            # delete message if input message is empty string
+            if message == '':
+                message_remove_v1(token, message_id)
+        else:
+            raise AccessError('User has no access to this specified message')
+    else:
+        raise AccessError('User has no access to this specified message')
 
-#     return {}
+    data_store.set(store)
+
+    return {}
+
 
 def message_remove_v1(token, message_id):
     """
@@ -171,15 +174,13 @@ def message_remove_v1(token, message_id):
     # check global owner case
     global_owner = check_user_is_global_owner(auth_user_id)
     channel = get_channel_id_with_message_id(message_id)
-    channel_id = channel['channel_id']
     # is user is a global member and is member in the channel
 
-    
+    # check is user is in the channel
     if check_user_is_member(auth_user_id, channel, 'all_members') is not None:
-        print(f'user {auth_user_id} is in channel {channel_id}')
-        if check_user_is_member(auth_user_id, channel, 'owner_members') is not None or global_owner is True or\
-            message_data['u_id'] == auth_user_id:
-
+        if check_user_is_member(auth_user_id, channel, 'owner_members') is not None or \
+            global_owner is True or message_data['u_id'] == auth_user_id:
+            # if user is either owner or global owner or it's the user who sent the message
             channel['messages'].remove(message_data)
         else:
             raise AccessError('User has no access to this specified message')
