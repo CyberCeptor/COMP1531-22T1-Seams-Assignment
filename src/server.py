@@ -7,7 +7,7 @@ from flask import Flask, request
 from flask_cors import CORS
 
 from src.auth import auth_register_v2, auth_login_v2
-from src.user import user_profile_v1
+from src.user import user_profile_v1, user_profile_setemail_v1
 
 from src.error import InputError
 from src.token import token_remove, token_valid_check
@@ -124,6 +124,15 @@ def user_profile():
     profile = user_profile_v1(token, u_id)
     save_data()
     return dumps(profile)
+
+@APP.route('/user/profile/setemail/v1', methods=['PUT'])
+def user_setemail():
+    email_data = request.get_json()
+    token = email_data['token']
+    email = email_data['email']
+    user_profile_setemail_v1(token, email)
+    save_data()
+    return dumps({})
 
 ################################################################################
 ##                              ADMIN ROUTES                                  ##
