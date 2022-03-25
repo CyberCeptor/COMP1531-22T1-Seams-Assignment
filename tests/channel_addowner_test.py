@@ -21,6 +21,7 @@ def fixture_clear_and_register_and_create():
                          json={'email': 'abc@def.com', 'password': 'password',
                                'name_first': 'first', 'name_last': 'last'})
     user_data1 = user1.json()
+    user_id1 = user_data1['auth_user_id']
     token1 = user_data1['token']
 
     user2 = requests.post(config.url + 'auth/register/v2', 
@@ -35,7 +36,38 @@ def fixture_clear_and_register_and_create():
                                     'is_public': True})
     channel_data = channel.json()
     channel_id = channel_data['channel_id']
-    return [token1, user_id2, user_token2, channel_id]
+    return [token1, user_id2, user_token2, channel_id, user_id1]
+
+
+def test_channel_addowner_permission_id(clear_and_register_and_create):
+    user1_token = clear_and_register_and_create[0]
+    user2_id = clear_and_register_and_create[1]
+    user2_token = clear_and_register_and_create[2]
+    channel_id = clear_and_register_and_create[3]
+    user1_id = clear_and_register_and_create[4]
+
+    # add user2 to the channel
+    channel_join = requests.post(config.url + 'channel/join/v2',
+                        json={'token': user2_token,
+                        'channel_id': channel_id})
+    assert channel_join.status_code == 200
+
+    # setting user2 to global owner
+    global_perm = requests.post(config.url + 'admin/userpermission/change/v1', 
+                        json={'token': user1_token, 'u_id': user2_id, 'permission_id': 1})
+    assert global_perm.status_code == 200
+
+    # user1 leaves the channel, removes both all_members and owner_members
+    channel_leave = requests.post(config.url + 'channel/leave/v1', 
+                            json={'token': user1_token, 'channel_id': channel_id})
+    assert channel_leave.status_code == 200
+
+    # user 1 has global
+    # try and add user1 back to the channel as owner directly, FAIL
+    # add user1 as global owner user1 back as owner with user2 token, which should fail because they arent a all_member.
+    addowner = requests.post(config.url + 'channel/addowner/v1',
+                        json={'token': user2_token, 'channel_id': channel_id, 'u_id': user1_id})
+    assert addowner.status_code == 400
 
 
 
