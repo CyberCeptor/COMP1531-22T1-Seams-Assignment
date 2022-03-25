@@ -123,8 +123,6 @@ def test_user_setemail_bad_email(clear_and_register):
     assert setemail.status_code == 400
 
 def test_user_setemail_bad_token(clear_and_register):
-    user1 = clear_and_register[0]
-
     setemail = requests.put(config.url + 'user/profile/setemail/v1', 
                             json={'token': '', 'email': 'abc2@def.com'})
     assert setemail.status_code == 400
