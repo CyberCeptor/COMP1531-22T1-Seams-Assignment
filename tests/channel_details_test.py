@@ -166,7 +166,6 @@ def test_user_not_belong(clear_and_register_and_create):
     Return Value: N/A
     """
     
-    token = clear_and_register_and_create[0]
     chan_id = clear_and_register_and_create[1]
 
     # create user 2

@@ -329,7 +329,6 @@ def test_successful_message_edit_global_owner(create_message):
 #         the authorised user has owner permissions in the channel/DM
 
     token = create_message[0]
-    channel_id = create_message[1]
     # create user2
     user2 = requests.post(config.url + 'auth/register/v2', 
                             json={'email': 'def@abc.com', 'password': 'password',

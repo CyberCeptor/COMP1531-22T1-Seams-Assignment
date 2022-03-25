@@ -300,8 +300,6 @@ def test_successful_message_remove_by_user(create_message):
     Return Value: N/A
     """
     
-
-    token = create_message[0]
     channel_id = create_message[1]
     # create user2
     user2 = requests.post(config.url + 'auth/register/v2', 
