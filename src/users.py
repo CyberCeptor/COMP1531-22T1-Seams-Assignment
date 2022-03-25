@@ -1,5 +1,3 @@
-
-
 from src.token import token_valid_check
 
 from src.data_store import data_store

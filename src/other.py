@@ -11,12 +11,16 @@ Description: implementation for
         - checking if a channel_id is valid
         - checking if a user is a member of a channel
 """
+<<<<<<< HEAD
 from src.error import InputError, AccessError
 
+=======
+from src.error import InputError
+>>>>>>> master
 from src.token import reset_session_id
-
 from src.data_store import data_store
-
+from src.global_vars import reset_message_id
+from src.global_vars import reset_dm_id
 
 def clear_v1():
     """
@@ -28,7 +32,6 @@ def clear_v1():
 
     Return Value: N/A
     """
-
     store = data_store.get()
     store['users'].clear()
     store['channels'].clear()
@@ -36,7 +39,9 @@ def clear_v1():
     store['dms'].clear()
     data_store.set(store)
     reset_session_id()
-
+    reset_message_id()
+    reset_dm_id()
+    
 def check_valid_auth_id(auth_user_id):
     """
     checks if the given auth_user_id is valid by checking if it is larger
@@ -123,7 +128,6 @@ def check_user_is_member(auth_user_id, data, key):
 def check_user_is_global_owner(auth_user_id):
     """
     check the user whether is a global owner with auth user id
-
     Arguments:
         auth_user_id (int) - an integer that specifies user id
 
@@ -137,6 +141,42 @@ def check_user_is_global_owner(auth_user_id):
         if user['id'] == auth_user_id and user['perm_id'] == 1:
             return True
     return False
+            
+def get_channel_id_with_message_id(message_id):
+    store = data_store.get()
+    for channel in store['channels']:
+        for message_data in channel['messages']:
+            if message_data['message_id'] == message_id:
+                return channel
+
+
+def check_message_id_valid(message_id):
+    """
+    checks if the given message_id is valid by checking if it exists in stored data
+
+    Arguments:
+        message_id (int) - a int that represents a channel
+
+    Exceptions:
+        InputError - 
+            raised for all cases below
+    Return Value: N/A
+    """
+
+    if isinstance(message_id, int) is False or type(message_id) == bool:
+        raise InputError('Message id is not of a valid type')
+
+    if message_id < 1:
+        raise InputError('The message id is not valid (out of bounds)')
+
+    store = data_store.get()
+    for channel in store['channels']:
+        for message_data in channel['messages']:
+            # check if message id exists
+            if message_data['message_id'] == message_id:
+                return message_data
+            
+    raise InputError('Message does not exist in channels database')
 
 def cast_to_int_get_requests(variable, var_name):
     """

@@ -139,6 +139,7 @@ def test_channel_messages_invalid_token(clear_and_register_and_create):
     resp6 = requests.get(config.url + 'channel/messages/v2', 
                           params = {'token': unsaved_token, 'channel_id': chan_id, 'start': 0})
     assert resp6.status_code == 403
+    
     requests.delete(config.url + 'clear/v1')
 
     # # no user input
@@ -173,14 +174,57 @@ def test_channel_messages_invalid_start(clear_and_register_and_create):
     '''
     token = clear_and_register_and_create[0]
     chan_id = clear_and_register_and_create[1]
-
-    resp1 = requests.get(config.url + 'channel/messages/v2', 
+    # start is bool
+    resp0 = requests.get(config.url + 'channel/messages/v2', 
                           params = {'token': token, 'channel_id': chan_id, 'start': True})
+    assert resp0.status_code == 400
+    resp1 = requests.get(config.url + 'channel/messages/v2', 
+                          params = {'token': token, 'channel_id': chan_id, 'start': False})
     assert resp1.status_code == 400
+    # start is str
+    resp2 = requests.get(config.url + 'channel/messages/v2', 
+                          params = {'token': token, 'channel_id': chan_id, 'start': ''})
+    assert resp2.status_code == 400
+    resp3 = requests.get(config.url + 'channel/messages/v2', 
+                          params = {'token': token, 'channel_id': chan_id, 'start': 'str'})
+    assert resp3.status_code == 400
+    # start is too big or negative
+    resp4 = requests.get(config.url + 'channel/messages/v2', 
+                          params = {'token': token, 'channel_id': chan_id, 'start': -5})
+    assert resp4.status_code == 400
+    resp5 = requests.get(config.url + 'channel/messages/v2', 
+                          params = {'token': token, 'channel_id': chan_id, 'start': 1000})
+    assert resp5.status_code == 400
 
     requests.delete(config.url + 'clear/v1')
 
+def test_user_not_belong(clear_and_register_and_create):
+    """
+    testing if user belongs to the channel
 
+    Arguments: clear_and_register_and_create (fixture)
+
+    Exceptions: 
+        Access Error - Raised for all test cases below
+
+    Return Value: N/A
+    """
+    
+    chan_id = clear_and_register_and_create[1]
+
+    # create user 2
+    user2 = requests.post(config.url + 'auth/register/v2', 
+                            json={'email': 'def@abc.com', 'password': 'password',
+                               'name_first': 'first2', 'name_last': 'last2'}) 
+    user2_data = user2.json()
+    token_2 = user2_data['token']
+
+    resp0 = requests.get(config.url + 'channel/messages/v2', 
+                          params = {'token': token_2, 'channel_id': chan_id, 'start': True})
+    assert resp0.status_code == 403
+
+    requests.delete(config.url + 'clear/v1')
+    
 def test_channel_messages_return(clear_and_register_and_create):
     '''
     testing channel_message returns empty if no message
@@ -207,4 +251,3 @@ def test_channel_messages_return(clear_and_register_and_create):
     assert channel_messages['messages'] == []
     assert channel_messages['start'] == 0
     assert channel_messages['end'] == -1
-   
