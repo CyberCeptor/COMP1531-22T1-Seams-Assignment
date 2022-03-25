@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+=======
+from src.error import InputError, AccessError
+>>>>>>> master
 from src.data_store import data_store
 from src.token import token_valid_check
 from src.other import check_valid_auth_id, cast_to_int_get_requests
@@ -23,4 +27,8 @@ def user_profile_v1(token, u_id):
                 'handle_str': users['handle'],
             }
 
+<<<<<<< HEAD
     return user
+=======
+    return user
+>>>>>>> master
