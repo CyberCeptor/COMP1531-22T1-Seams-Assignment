@@ -11,7 +11,7 @@ from src.auth import auth_register_v2, auth_login_v2, auth_logout_v1
 from src.user import user_profile_v1
 
 from src.users import users_all_v1
-from src.messages import message_send_v1, message_remove_v1, message_edit_v1
+from src.messages import message_send_v1, message_remove_v1, message_edit_v1, message_senddm_v1
 from src.admin import admin_userpermission_change, admin_user_remove
 from src.other import clear_v1
 from src.token import token_valid_check, token_get_user_id
@@ -245,6 +245,13 @@ def message_remove():
     message_remove_v1(data['token'], data['message_id'])
     save_data()
     return dumps({})
+
+@APP.route('/message/senddm/v1', methods=['POST'])
+def message_senddm():
+    data = request.get_json()
+    message_id = message_senddm_v1(data['token'], data['dm_id'], data['message'])
+    save_data()
+    return dumps(message_id)
 
 ################################################################################
 ##                             DM ROUTES                                      ##
