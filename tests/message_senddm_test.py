@@ -33,7 +33,6 @@ def fixture_register_and_create_dm():
                                'name_first': 'first', 'name_last': 'last'})
     user_1_data = register_user_1.json()
     token_1 = user_1_data['token']
-    id1 = user_1_data['auth_user_id']
     # create user 2
     register_user_2 = requests.post(config.url + 'auth/register/v2', 
                         json={'email': 'hyf@gmail.com', 'password': 'hyf1234',
