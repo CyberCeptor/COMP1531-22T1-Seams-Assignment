@@ -88,3 +88,17 @@ Meeting type: Lab
 Members present: Aleesha, Aisha, Jenson, Van
 Meeting type: check-in
 - complete v2 pytests and implementations by tomorrow night
+
+25.03
+Members present: Aleesha, Aisha, Van, Jed
+Meeting type: check-in
+- completing all functions implementation by tonight for autotest tomorrow
+
+for style (over the weekend):
+- implementation functions follow the docstring format of description, arguments, exceptions, return value
+- modules(files) follow docstring format of filename, author, created, description
+- pytests functions can just have one description at the top with comments throughout if theres a lot of tests
+- error messages should have description= in front of it 
+
+
+

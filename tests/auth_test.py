@@ -18,13 +18,7 @@ NAME_52_CHARS = 'abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz'
 @pytest.fixture(name='clear_and_register')
 def fixture_clear_and_register():
     """ clears any data stored in data_store and registers a user with the
-    given information
-
-    Arguments: N/A
-
-    Exceptions: N/A
-
-    Return Value: N/A """
+    given information """
 
     # clear_v1()
     # auth_register_v1('abc@def.com', 'password', 'first', 'last')

@@ -4,7 +4,7 @@ Filename: channels.py
 Author: Jenson Morgan(z5360181), Yangjun Yue(z5317840)
 Created: 24/02/2022 - 04/03/2022
 from src.other import check_valid_auth_id
-from src.other import check_user_is_member
+from src.other import check_user_is_member_or_owner
 Description: implementation for
     - creating either a public or a private channel with given name
     - listing all channels the user is part of and gives the channel id and name
@@ -15,7 +15,7 @@ from src.other import check_valid_auth_id, check_user_is_member
 from src.data_store import data_store
 from src.token import token_valid_check, token_get_user_id
 
-def channels_list_v1(auth_user_id): # (token):
+def channels_list_v2(token):
     """
     Provides a channel list of all the public channels
     the user is a member of.
@@ -30,8 +30,8 @@ def channels_list_v1(auth_user_id): # (token):
         Returns a dict containing the channel_id and name of the channels
         the user is a member of
     """
-    # token_valid_check(token)
-    # auth_user_id = token_get_user_id
+    token_valid_check(token)
+    auth_user_id = token_get_user_id(token)
 
     check_valid_auth_id(auth_user_id)
 
@@ -39,8 +39,7 @@ def channels_list_v1(auth_user_id): # (token):
     channels_list = []
 
     for channel in store['channels']:
-        is_member = check_user_is_member(auth_user_id, channel['channel_id'])
-        if is_member:
+        if check_user_is_member(auth_user_id, channel, 'all_members'):
             channel_data = {
                 'channel_id': channel['channel_id'],
                 'name': channel['name'],
@@ -50,7 +49,7 @@ def channels_list_v1(auth_user_id): # (token):
         'channels': channels_list
     }
 
-def channels_listall_v1(auth_user_id): # (token):
+def channels_listall_v2(token):
     """
     check if user is valid then provides lists of diictionaries containing all
     channel ids and channel names
@@ -68,8 +67,8 @@ def channels_listall_v1(auth_user_id): # (token):
 
     store = data_store.get()
 
-    # token_valid_check(token)
-    # auth_user_id = token_get_user_id(token)
+    token_valid_check(token)
+    auth_user_id = token_get_user_id(token)
 
     # check that the auth_user_id exists
     check_valid_auth_id(auth_user_id)
@@ -88,7 +87,7 @@ def channels_listall_v1(auth_user_id): # (token):
         'channels': dict_list
     }
 
-def channels_create_v1(auth_user_id, name, is_public): # (token, name, is_public):
+def channels_create_v2(token, name, is_public):
     """
     Creates a new channel with the name and is_public status given.
     The creating member is an owner_member and has permissions to
@@ -117,8 +116,8 @@ def channels_create_v1(auth_user_id, name, is_public): # (token, name, is_public
 
     store = data_store.get()
 
-    # token_valid_check(token)
-    # auth_user_id = token_get_user_id(token)
+    token_valid_check(token)
+    auth_user_id = token_get_user_id(token)
 
     check_valid_auth_id(auth_user_id)
 

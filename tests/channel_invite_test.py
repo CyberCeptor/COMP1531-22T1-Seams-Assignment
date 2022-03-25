@@ -7,7 +7,6 @@ Created: 28/02/2022 - 06/03/2022
 Description: pytests for channel_invite_v1
 """
 
-from lib2to3.pgen2 import token
 import pytest
 import requests
 from src import config
@@ -162,7 +161,7 @@ def test_channel_invite_invalid_invitee(clear_and_register_and_create):
     add = requests.post(config.url + 'channel/invite/v2', 
                         json={'token': id1, 'channel_id': chan_id1,
                                 'u_id': 2})
-    assert add.status_code == 403
+    assert add.status_code == 400
 
     add = requests.post(config.url + 'channel/invite/v2', 
                         json={'token': id1, 'channel_id': chan_id1,

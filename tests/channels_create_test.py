@@ -13,13 +13,6 @@ import requests
 
 from src import config
 
-from src.auth import auth_register_v1
-
-from src.other import clear_v1
-from src.error import InputError, AccessError
-
-from src.channels import channels_create_v1
-
 @pytest.fixture(name='clear_and_register')
 def fixture_clear_and_register():
     """
@@ -253,8 +246,8 @@ def test_channels_duplicate_name(clear_and_register):
     assert resp2.status_code == 200
 
     resp3 = requests.post(config.url + 'channels/create/v2', 
-                          json={'token': token, 'name': 'test_channel_public',
-                                'is_public': True})
+                          json={'token': token, 'name': 'test_channel_private',
+                                'is_public': False})
     assert resp3.status_code == 400
 
 # clear_v1()
