@@ -58,9 +58,7 @@ def test_dm_remove_invalid_dm():
     clear_v1()
     user1 = auth_register_v2('wky@gmail.com', '547832', 'wang', 'kaiyan')
     user2 = auth_register_v2('lmz@gmail.com', '893621', 'li', 'mingzhe')
-
     token1 = user1['token']
-    id1 = user1['auth_user_id']
     id2 = user2['auth_user_id']
 
     dm_create_v1(token1, [id2])
@@ -96,7 +94,6 @@ def test_dm_remove_not_creator():
 
     token1 = user1['token']
     token2 = user2['token']
-    id1 = user1['auth_user_id']
     id2 = user2['auth_user_id']
     dm_dict = dm_create_v1(token1, [id2])
     dm_id = dm_dict["dm_id"]
@@ -123,7 +120,6 @@ def test_dm_remove_not_in_dm():
     user2 = auth_register_v2('lmz@gmail.com', '893621', 'li', 'mingzhe')
 
     token1 = user1['token']
-    id1 = user1['auth_user_id']
     id2 = user2['auth_user_id']
 
     dm_dict = dm_create_v1(token1, [id2])
