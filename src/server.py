@@ -6,11 +6,12 @@ from json import dumps
 from flask import Flask, request
 from flask_cors import CORS
 
+
 from src.auth import auth_register_v2, auth_login_v2, auth_logout_v1
 from src.user import user_profile_v1, user_profile_setemail_v1
 
 from src.users import users_all_v1
-
+from src.messages import message_send_v1, message_remove_v1, message_edit_v1
 from src.admin import admin_userpermission_change, admin_user_remove
 from src.other import clear_v1
 from src.token import token_valid_check, token_get_user_id
@@ -20,8 +21,8 @@ from src.channel import channel_addowner_v1, channel_removeowner_v1
 from src.channel import channel_join_v2, channel_messages_v2, channel_leave_v1
 from src.channels import channels_create_v2
 from src.channels import channels_list_v2, channels_listall_v2
-
 from src.data_store_pickle import pickle_data
+
 
 def quit_gracefully(*args):
     '''For coverage'''
@@ -236,7 +237,23 @@ def channel_leave():
 @APP.route('/message/send/v1', methods=['POST'])
 def message_send():
     data = request.get_json()
-    return dumps(message_send(**data))
+    message_id = message_send_v1(data['token'], data['channel_id'], data['message'])
+    save_data()
+    return dumps(message_id)
+
+@APP.route('/message/edit/v1', methods=['PUT'])
+def message_edit():
+    data = request.get_json()
+    message_edit_v1(data['token'], data['message_id'], data['message'])
+    save_data()
+    return dumps({})
+
+@APP.route('/message/remove/v1', methods=['DELETE'])
+def message_remove():
+    data = request.get_json()
+    message_remove_v1(data['token'], data['message_id'])
+    save_data()
+    return dumps({})
 
 ################################################################################
 ##                             DM ROUTES                                      ##

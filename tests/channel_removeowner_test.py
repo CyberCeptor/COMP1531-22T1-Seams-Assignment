@@ -140,6 +140,7 @@ def test_channel_removeowner_only_owner_member(clear_and_register_and_create):
                         json={'token': user1_token, 'channel_id': channel_id, 'u_id': user1_id})
     assert remove.status_code == 400
 
+
 # Channel ID is valid, Token is not authorised with owner permissions.
 def test_channel_removeowner_not_authorised(clear_and_register_and_create):
     user2_id = clear_and_register_and_create[2]
