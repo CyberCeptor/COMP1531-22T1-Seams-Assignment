@@ -7,7 +7,7 @@ Created: 14/03/2022 - 24/03/2022
 Description: pytest for dm_remove
 """
 import pytest
-from src.dm import dm_create_v1, dm_list_v1, dm_remove_v1
+from src.dm import dm_create_v1, dm_list_v1, dm_remove_v1, dm_leave_v1
 from src.auth import auth_register_v2
 from src.error import InputError, AccessError
 from src.other import clear_v1
@@ -103,8 +103,7 @@ def test_dm_remove_not_creator():
 
     with pytest.raises(AccessError):
         dm_remove_v1(token2, dm_id)
-clear_v1()
-'''
+
 def test_dm_remove_not_in_dm():
     """
     clears any data stored in data_store and registers a user with the
@@ -127,9 +126,9 @@ def test_dm_remove_not_in_dm():
     id1 = user1['auth_user_id']
     id2 = user2['auth_user_id']
 
-    dm_dict = dm_create_v1(token1, [id1,id2])
+    dm_dict = dm_create_v1(token1, [id2])
     dm_id = dm_dict['dm_id']
     dm_leave_v1(token1, dm_id)
     with pytest.raises(AccessError):
         dm_remove_v1(token1, dm_id)
-'''
+clear_v1()
