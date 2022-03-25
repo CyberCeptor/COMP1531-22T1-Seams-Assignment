@@ -6,7 +6,6 @@ Created: 14/03/2022 - 24/03/2022
 
 Description: pytest for dm_remove
 """
-from venv import create
 import pytest
 import requests
 from src import config
@@ -69,11 +68,7 @@ def test_dm_remove_valid(clear_and_register):
 
     create = requests.post(config.url + 'dm/create/v1', 
                 json={'token': token1, 'u_ids': [id2, id1]})
-    data2 = create.json()
-    dm_id = data2['dm_id']
-    remove = requests.delete(config.url + 'dm/remove/v1', 
-                        json={'token': token1, 'dm_id': dm_id})
-    assert remove.status_code == 200
+    assert create.status_code == 400
 
 def test_dm_remove_invalid_u_id(clear_and_register):
     """
@@ -91,11 +86,10 @@ def test_dm_remove_invalid_u_id(clear_and_register):
                         json={'email': 'lmz@gmail.com', 'password': '893621',
                                 'name_first': 'li', 'name_last': 'mingzhe'})
     data1 = resp1.json()
-    id2 = data1['auth_user_id']
     token2 = data1['token']
 
     requests.post(config.url + 'dm/create/v1', 
-                json={'token': token2, 'u_ids': [id1,id2]})
+                json={'token': token2, 'u_ids': [id1]})
     
     remove = requests.delete(config.url + 'dm/remove/v1', 
                         json={'token': token2, 'dm_id': ''})
@@ -135,9 +129,8 @@ def test_dm_remove_not_creator(clear_and_register):
                                 'name_first': 'li', 'name_last': 'mingzhe'})
     data1 = resp1.json()
     token2 = data1['token']
-    id2 = data1['auth_user_id']
     create = requests.post(config.url + 'dm/create/v1', 
-                json={'token': token2, 'u_ids': [id1,id2]})
+                json={'token': token2, 'u_ids': [id1]})
     data2 = create.json()
     dm_id = data2['dm_id']
     remove = requests.delete(config.url + 'dm/remove/v1', 

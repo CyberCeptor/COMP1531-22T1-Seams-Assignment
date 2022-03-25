@@ -65,9 +65,8 @@ def test_dm_details_invalid_dm():
     user2 = auth_register_v2('lmz@gmail.com', '893621', 'li', 'mingzhe')
 
     token1 = user1['token']
-    id1 = user1['auth_user_id']
     id2 = user2['auth_user_id']
-    dm_create_v1(token1, [id1,id2])
+    dm_create_v1(token1, [id2])
     with pytest.raises(InputError):
         dm_details_v1(token1, 900)
 
@@ -97,11 +96,12 @@ def test_dm_details_auth_notin_dm():
     clear_v1()
     user1 = auth_register_v2('wky@gmail.com', '547832', 'wang', 'kaiyan')
     user2 = auth_register_v2('lmz@gmail.com', '893621', 'li', 'mingzhe')
+    user3 = auth_register_v2('hyf@gmail.com', 'hyf1234', 'huang', 'yifei')
     token1 = user1['token']
-    token2 = user2['token']
-    id1 = user1['auth_user_id']
-    dm_dict = dm_create_v1(token1, [id1])
+    token3 = user3['token']
+    id2 = user2['auth_user_id']
+    dm_dict = dm_create_v1(token1, [id2])
     dm_id = dm_dict["dm_id"]
     with pytest.raises(AccessError):
-        dm_details_v1(token2, dm_id)
+        dm_details_v1(token3, dm_id)
 clear_v1()

@@ -108,17 +108,21 @@ def tetest_dm_details_auth_notin_dm(clear_and_register):
     Return Value: N/A
     """
     token1 = clear_and_register[0]
-    id1 = clear_and_register[1]
     resp1 = requests.post(config.url + 'auth/register/v2', 
                         json={'email': 'lmz@gmail.com', 'password': '893621',
                                 'name_first': 'li', 'name_last': 'mingzhe'})
     data1 = resp1.json()
-    token2 = data1['token']
+    id2 = data1['auth_user_id']
+    resp2 = requests.post(config.url + 'auth/register/v2', 
+                        json={'email': 'hyf@gmail.com', 'password': 'hyf1234',
+                                'name_first': 'huang', 'name_last': 'yifei'})
+    data2 = resp2.json()
     create = requests.post(config.url + 'dm/create/v1', 
-                        json={'token': token1, 'u_ids': [id1]})
-    data2 = create.json()
-    dm_id = data2['dm_id']
+                        json={'token': token1, 'u_ids': [id2]})
+    token3 = data2['token']
+    data3 = create.json()
+    dm_id = data3['dm_id']
     detail = requests.get(config.url + 'dm/details/v1', 
-                        params={'token': token2, 'dm_id': dm_id})
+                        params={'token': token3, 'dm_id': dm_id})
     assert detail.status_code == 403
 requests.delete(config.url + 'clear/v1')

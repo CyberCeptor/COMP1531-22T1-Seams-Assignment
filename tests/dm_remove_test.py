@@ -44,12 +44,6 @@ def test_dm_remove_valid():
     dm_dict = dm_list_v1(token1)
     assert dm_dict['dms'] == []
 
-    dm_dict = dm_create_v1(token1, [id2,id1])
-    dm_id = dm_dict['dm_id']
-    dm_remove_v1(token1, dm_id)
-    dm_dict = dm_list_v1(token1)
-    assert dm_dict['dms'] == []
-
 def test_dm_remove_invalid_dm():
     """
     clears any data stored in data_store and registers a user with the
@@ -69,7 +63,7 @@ def test_dm_remove_invalid_dm():
     id1 = user1['auth_user_id']
     id2 = user2['auth_user_id']
 
-    dm_create_v1(token1, [id1,id2])
+    dm_create_v1(token1, [id2])
     with pytest.raises(InputError):
         dm_remove_v1(token1, 900)
 
@@ -104,7 +98,7 @@ def test_dm_remove_not_creator():
     token2 = user2['token']
     id1 = user1['auth_user_id']
     id2 = user2['auth_user_id']
-    dm_dict = dm_create_v1(token1, [id1,id2])
+    dm_dict = dm_create_v1(token1, [id2])
     dm_id = dm_dict["dm_id"]
 
     with pytest.raises(AccessError):
