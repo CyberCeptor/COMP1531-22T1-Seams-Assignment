@@ -212,14 +212,15 @@ def channel_leave_v1(auth_user_id, channel_id):
     owner_data = check_user_is_member(auth_user_id, channel_data, 
                                       'owner_members')
 
+
+    if owner_data:
+        channel_data['owner_members'].remove(owner_data)
+
     # remove from the data_store
     if member_data:
         channel_data['all_members'].remove(member_data)
     else:
         raise AccessError('User is not a member of that channel')
-
-    if owner_data:
-        channel_data['owner_members'].remove(owner_data)
 
     data_store.set(store)
 
@@ -306,7 +307,7 @@ def channel_addremove_owner_valid_check(token, channel_id, u_id, option):
             raise InputError('The user is already an owner_member')
         #add the member_data to the owner_members_dict
         channel_data['owner_members'].append(member_data)
-    elif option == 'remove':
+    if option == 'remove':
         if check_user_is_member(u_id, channel_data, 'owner_members') is None:
             raise InputError('The user is already an owner_member')
         # Need to check the number of members in owner_members,
