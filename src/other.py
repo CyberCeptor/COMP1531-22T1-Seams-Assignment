@@ -11,10 +11,7 @@ Description: implementation for
         - checking if a channel_id is valid
         - checking if a user is a member of a channel
 """
-<<<<<<< HEAD
 
-=======
->>>>>>> master
 from src.error import InputError, AccessError
 from src.token import reset_session_id
 from src.data_store import data_store
@@ -254,8 +251,5 @@ def get_messages(auth_user_id, data, start, data_str):
         'messages': messages_to_return,
         'start': start,
         'end': end,
-<<<<<<< HEAD
     }
-=======
-    }
->>>>>>> master
+    

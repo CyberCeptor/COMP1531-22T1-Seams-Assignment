@@ -113,20 +113,20 @@ def test_user_profile_sethandle_bad_handle_str(clear_and_register):
     # test boolean 
     sethandle = requests.put(config.url + 'user/profile/sethandle/v1', 
                             json={'token': user1['token'], 'handle_str': True})
-    assert sethandle.status_code == 500
+    assert sethandle.status_code == 400
 
     sethandle = requests.put(config.url + 'user/profile/sethandle/v1', 
                             json={'token': user1['token'], 'handle_str': False})
-    assert sethandle.status_code == 500
+    assert sethandle.status_code == 400
 
     # test < 3 int
     sethandle = requests.put(config.url + 'user/profile/sethandle/v1', 
                             json={'token': user1['token'], 'handle_str': 2})
-    assert sethandle.status_code == 500
+    assert sethandle.status_code == 400
 
     # test > 20 int
     sethandle = requests.put(config.url + 'user/profile/sethandle/v1', 
                             json={'token': user1['token'], 'handle_str': 21})
-    assert sethandle.status_code == 500
+    assert sethandle.status_code == 400
 
     requests.delete(config.url + 'clear/v1')

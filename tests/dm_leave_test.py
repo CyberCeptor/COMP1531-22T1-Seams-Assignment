@@ -127,7 +127,3 @@ def test_dm_leave_notin_dm(clear_and_register):
     assert leave.status_code == 403
 
 requests.delete(config.url + 'clear/v1')
-<<<<<<< HEAD
-=======
-
->>>>>>> master

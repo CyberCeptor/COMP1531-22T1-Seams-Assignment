@@ -159,10 +159,6 @@ def dm_leave_v1(auth_user_id, dm_id):
         if(auth_user_id == member['u_id']):
             dm['members'].remove(member)
             data_store.set(store)
-<<<<<<< HEAD
-=======
-
->>>>>>> master
 
 def check_valid_dm_id(dm_id):
     """
@@ -226,8 +222,4 @@ def dm_messages_v1(token, dm_id, start):
 
     messages = get_messages(auth_user_id, dm_data, start, "dm")
 
-<<<<<<< HEAD
     return messages
-=======
-    return(messages)
->>>>>>> master

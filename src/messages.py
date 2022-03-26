@@ -81,11 +81,7 @@ def message_send_v1(token, channel_id, message):
         'message': message, 
         'time_sent': utc_timestamp
     }
-<<<<<<< HEAD
 
-=======
-    
->>>>>>> master
     channel_data['messages'].insert(0, message_data)
 
     data_store.set(store)

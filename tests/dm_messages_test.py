@@ -35,10 +35,14 @@ def fixture_clear_and_register_and_create():
     user_data = resp.json()
     token = user_data['token']
     u_id = user_data['auth_user_id']
+    resp1 = requests.post(config.url + 'auth/register/v2', 
+                        json={'email': 'lmz@gmail.com', 'password': '893621',
+                                'name_first': 'li', 'name_last': 'mingzhe'})
+    data1 = resp1.json()
+    id2 = data1['auth_user_id']
 
     resp0 = requests.post(config.url + 'dm/create/v1',
-                            json={'token': token, 'name': 'dm_name',
-                                    'is_public': True})
+                            json={'token': token, 'u_ids': [id2]})
     dm_data = resp0.json()
     dm_id = dm_data['dm_id']
     return [token, dm_id, u_id]

@@ -28,41 +28,39 @@ def fixture_clear_and_register():
                         'name_first': 'first', 'name_last': 'last'})
     user_data = user.json()
     token = user_data['token']
-    name_first = user_data['name_first']
-    name_last = user_data['name_last']
 
-    return [token, name_first, name_last]
+    return [token]
 
 def test_user_profile_setname_bad_name_first(clear_and_register):
     token = clear_and_register[0]
 
     # test users name_first
     setname = requests.put(config.url + 'user/profile/setname/v1', 
-                            json={'token': token, 'name_first': 'first'})
-    assert setname.status_code == 400
+                            json={'token': token, 'name_first': 'first', 'name_last': 'last'})
+    assert setname.status_code == 200
 
     # test empty string
     setname = requests.put(config.url + 'user/profile/setname/v1', 
-                            json={'token': token, 'name_first': ''})
+                            json={'token': token, 'name_first': '', 'name_last': 'last'})
     assert setname.status_code == 400
 
     # test boolean 
     setname = requests.put(config.url + 'user/profile/setname/v1', 
-                            json={'token': token, 'name_first': True})
+                            json={'token': token, 'name_first': True, 'name_last': 'last'})
     assert setname.status_code == 400
 
     setname = requests.put(config.url + 'user/profile/setname/v1', 
-                            json={'token': token, 'name_first': False})
+                            json={'token': token, 'name_first': False, 'name_last': 'last'})
     assert setname.status_code == 400
 
     # test < 1 int
     setname = requests.put(config.url + 'user/profile/setname/v1', 
-                            json={'token': token, 'name_first': 0})
+                            json={'token': token, 'name_first': 0, 'name_last': 'last'})
     assert setname.status_code == 400
 
     # test > 50 int
     setname = requests.put(config.url + 'user/profile/setname/v1', 
-                            json={'token': token, 'name_first': 51})
+                            json={'token': token, 'name_first': 51, 'name_last': 'last'})
     assert setname.status_code == 400
 
     requests.delete(config.url + 'clear/v1')
@@ -73,31 +71,31 @@ def test_user_profile_setname_bad_name_last(clear_and_register):
 
     # test another users name_last
     setname = requests.put(config.url + 'user/profile/setname/v1', 
-                            json={'token': token, 'name_last': 'last'})
-    assert setname.status_code == 400
+                            json={'token': token, 'name_first': 'first', 'name_last': 'last'})
+    assert setname.status_code == 200
 
     # test empty string
     setname = requests.put(config.url + 'user/profile/setname/v1', 
-                            json={'token': token, 'name_last': ''})
+                            json={'token': token, 'name_first': 'first', 'name_last': ''})
     assert setname.status_code == 400
 
     # test boolean 
     setname = requests.put(config.url + 'user/profile/setname/v1', 
-                            json={'token': token, 'name_last': True})
+                            json={'token': token, 'name_first': 'first', 'name_last': True})
     assert setname.status_code == 400
 
     setname = requests.put(config.url + 'user/profile/setname/v1', 
-                            json={'token': token, 'name_last': False})
+                            json={'token': token, 'name_first': 'first', 'name_last': False})
     assert setname.status_code == 400
 
     # test < 1 int
     setname = requests.put(config.url + 'user/profile/setname/v1', 
-                            json={'token': token, 'name_last': 0})
+                            json={'token': token, 'name_first': 'first', 'name_last': 0})
     assert setname.status_code == 400
 
     # test > 50 int
     setname = requests.put(config.url + 'user/profile/setname/v1', 
-                            json={'token': token, 'name_last': 51})
+                            json={'token': token, 'name_first': 'first', 'name_last': 51})
     assert setname.status_code == 400
 
     requests.delete(config.url + 'clear/v1')

@@ -1,3 +1,4 @@
+from xmlrpc.client import boolean
 from src.data_store import data_store
 from src.token import token_valid_check, token_locate_in_data_store, token_get_user_id
 from src.other import check_valid_auth_id, cast_to_int_get_requests
@@ -75,8 +76,6 @@ def user_profile_setemail_v1(token, email):
             if user['u_id'] == user_id:
                 user['email'] = email
 
-<<<<<<< HEAD
-=======
     data_store.set(store)
     return {}
 
@@ -92,7 +91,13 @@ def user_profile_setname_v1(token, name_first, name_last):
     token_locate_in_data_store(token)
     user_id = token_get_user_id(token)
 
-    full_name = name_first + name_last
+    if type(name_first) is not str or type(name_first) is bool:
+        raise InputError(description='Invalid first name')
+
+    if type(name_last) is not str or type(name_last) is bool:
+        raise InputError(description='Invalid last name')
+
+    full_name = name_first + name_last    
     check_invalid_name(name_first, name_last, full_name)
 
     # set the user name to the new name
@@ -124,102 +129,10 @@ def user_profile_setname_v1(token, name_first, name_last):
     return {}
 
 def check_invalid_handle(store, handle_str):
-    # check for invalid handle_str
-    if len(handle_str) < 3 or len(handle_str) > 20:
-        raise InputError(description='Invalid handle_str')
-    
-    # check for invalid handle_str
-    if handle_str.isalnum() is False:
+
+    if type(handle_str) is not str or type(handle_str) is bool:
         raise InputError(description='Invalid handle_str')
 
-    # check for duplicate handle_str
-    for user in store['users']:
-        if user['handle'] == handle_str and user['removed'] is False:
-            raise InputError(description='Handle has already been taken')
-
-def user_profile_sethandle_v1(token, handle_str):
-    store = data_store.get()
-
-    # check the name is valid (i.e. usable name_first, name_last)
-    # both done by check_invalid_name.
-    # need to check that the name is the correct format.
-
-    # check the token is current and acceptable
-    token_valid_check(token)
-    token_locate_in_data_store(token)
-    user_id = token_get_user_id(token)
-
-    check_invalid_handle(store, handle_str)
-
-    # set the user name to the new name
-    for user in store['users']:
-        if user['id'] == user_id:
-            user['handle'] = handle_str
-
-    # iterate through all channels that the member is in and set 
-    # the name there aswell.
-
-    for channel in store['channels']:
-        for user in channel['all_members']:
-            if user['u_id'] == user_id:
-                user['handle_str'] = handle_str
-        for user in channel['owner_members']:
-            if user['u_id'] == user_id:
-                user['handle_str'] = handle_str
-
-    for dm in store['dms']:
-        for user in dm['members']:
-            if user['u_id'] == user_id:
-                user['handle_str'] = handle_str
-
->>>>>>> master
-    data_store.set(store)
-    return {}
-
-def user_profile_setname_v1(token, name_first, name_last):
-    store = data_store.get()
-
-    # check the name is valid (i.e. usable name_first, name_last)
-    # both done by check_invalid_name.
-    # need to check that the name is the correct format.
-
-    # check the token is current and acceptable
-    token_valid_check(token)
-    token_locate_in_data_store(token)
-    user_id = token_get_user_id(token)
-
-    full_name = name_first + name_last
-    check_invalid_name(name_first, name_last, full_name)
-
-    # set the user name to the new name
-    for user in store['users']:
-        if user['id'] == user_id:
-            user['first'] = name_first
-            user['last'] = name_last
-
-    # iterate through all channels that the member is in and set 
-    # the name there aswell.
-
-    for channel in store['channels']:
-        for user in channel['all_members']:
-            if user['u_id'] == user_id:
-                user['name_first'] = name_first
-                user['name_last'] = name_last
-        for user in channel['owner_members']:
-            if user['u_id'] == user_id:
-                user['name_first'] = name_first
-                user['name_last'] = name_last
-
-    for dm in store['dms']:
-        for user in dm['members']:
-            if user['u_id'] == user_id:
-                user['name_first'] = name_first
-                user['name_last'] = name_last
-
-    data_store.set(store)
-    return {}
-
-def check_invalid_handle(store, handle_str):
     # check for invalid handle_str
     if len(handle_str) < 3 or len(handle_str) > 20:
         raise InputError(description='Invalid handle_str')
