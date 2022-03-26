@@ -14,8 +14,8 @@ import requests
 from src import config
 
 
-@pytest.mark.usefixtures('clear_register_create_dm')
-def test_message_send_invalid_token(clear_register_create_dm):
+@pytest.mark.usefixtures('clear_register_createdm')
+def test_message_send_invalid_token(clear_register_createdm):
     """
     test for invalid input of token
 
@@ -28,7 +28,7 @@ def test_message_send_invalid_token(clear_register_create_dm):
     # pylint: disable=unused-argument
 
     # token is int
-    dm_id =  clear_register_create_dm[1]
+    dm_id =  clear_register_createdm[1]
     resp0 = requests.post(config.url + 'message/senddm/v1', 
                           json = {'token': 0, 'dm_id': dm_id, 'message': 'hewwo'})
     assert resp0.status_code == 400
@@ -61,8 +61,8 @@ def test_message_send_invalid_token(clear_register_create_dm):
     
     requests.delete(config.url + 'clear/v1')
 
-@pytest.mark.usefixtures('clear_register_create_dm')
-def test_message_send_invalid_channel_id( clear_register_create_dm):
+@pytest.mark.usefixtures('clear_register_createdm')
+def test_message_send_invalid_channel_id(clear_register_createdm):
     """
     test for invalid input of channel id
 
@@ -73,7 +73,7 @@ def test_message_send_invalid_channel_id( clear_register_create_dm):
     Return Value: N/A
     """
 
-    token =  clear_register_create_dm[0]
+    token =  clear_register_createdm[0]
     # no dm id input
     resp0 = requests.post(config.url + 'message/senddm/v1', 
                           json = {'token': token, 'dm_id': '', 'message': 'hewwo'})
@@ -93,8 +93,8 @@ def test_message_send_invalid_channel_id( clear_register_create_dm):
 
     requests.delete(config.url + 'clear/v1')
 
-@pytest.mark.usefixtures('clear_register_create_dm')
-def test_message_send_invalid_message( clear_register_create_dm):
+@pytest.mark.usefixtures('clear_register_createdm')
+def test_message_send_invalid_message(clear_register_createdm):
     """
     test for invalid input of message
 
@@ -105,8 +105,8 @@ def test_message_send_invalid_message( clear_register_create_dm):
     Return Value: N/A
     """
 
-    token =  clear_register_create_dm[0]
-    dm_id =  clear_register_create_dm[1]
+    token =  clear_register_createdm[0]
+    dm_id =  clear_register_createdm[1]
     # message is int
     resp0 = requests.post(config.url + 'message/senddm/v1', 
                           json = {'token': token, 'dm_id': dm_id, 'message': 0})
@@ -120,8 +120,8 @@ def test_message_send_invalid_message( clear_register_create_dm):
     requests.delete(config.url + 'clear/v1')
 
 
-@pytest.mark.usefixtures('clear_register_create_dm')
-def test_message_send_invalid_length( clear_register_create_dm):
+@pytest.mark.usefixtures('clear_register_createdm')
+def test_message_send_invalid_length(clear_register_createdm):
     """
     test if input message length is valid(less than 1, over 1000 char)
 
@@ -133,8 +133,8 @@ def test_message_send_invalid_length( clear_register_create_dm):
     Return Value:   N/A
     """
 
-    token =  clear_register_create_dm[0]
-    dm_id =  clear_register_create_dm[1]
+    token =  clear_register_createdm[0]
+    dm_id =  clear_register_createdm[1]
     # long_message is more than 1000 char
     long_message = 'MoreThanAthousandCharactersMoreThanAthousandCharactersMoreThanAt\
     housandCharactersMoreThanAthousandCharactersMoreThanAthousandCharactersMo\
@@ -165,8 +165,8 @@ def test_message_send_invalid_length( clear_register_create_dm):
     requests.delete(config.url + 'clear/v1')
 
 
-@pytest.mark.usefixtures('clear_register_create_dm')
-def test_user_not_belong( clear_register_create_dm):
+@pytest.mark.usefixtures('clear_register_createdm')
+def test_user_not_belong(clear_register_createdm):
     """
     testing if user belongs to the channel
 
@@ -178,7 +178,7 @@ def test_user_not_belong( clear_register_create_dm):
     Return Value: N/A
     """
     
-    dm_id =  clear_register_create_dm[1]
+    dm_id =  clear_register_createdm[1]
 
     # create user 3
     user3 = requests.post(config.url + 'auth/register/v2', 
@@ -195,8 +195,8 @@ def test_user_not_belong( clear_register_create_dm):
     requests.delete(config.url + 'clear/v1')
 
 
-@pytest.mark.usefixtures('clear_register_create_dm')
-def test_successful_message_send( clear_register_create_dm):
+@pytest.mark.usefixtures('clear_register_createdm')
+def test_successful_message_send(clear_register_createdm):
     """
     testing gor successful run of message send v1 and return
 
@@ -207,8 +207,8 @@ def test_successful_message_send( clear_register_create_dm):
     Return Value: N/A
     """
     
-    token =  clear_register_create_dm[0]
-    dm_id =  clear_register_create_dm[1]
+    token =  clear_register_createdm[0]
+    dm_id =  clear_register_createdm[1]
 
     send_message = requests.post(config.url + 'message/senddm/v1', 
                           json={'token': token, 'dm_id': dm_id, 

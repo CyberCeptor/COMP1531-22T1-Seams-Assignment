@@ -11,19 +11,19 @@ import pytest
 import requests
 from src import config
 
-@pytest.mark.usefixtures('clear_and_register_and_create_channel')
-def test_channel_messages_invalid_channel(clear_and_register_and_create_channel):
+@pytest.mark.usefixtures('clear_register_createchannel')
+def test_channel_messages_invalid_channel(clear_register_createchannel):
     """
     testing invalid channel id to raise input error
 
-    Arguments: clear_and_register_and_create_channel (fixture)
+    Arguments: clear_register_createchannel (fixture)
 
     Exceptions: InputError - Raised for all test cases listed below
 
     Return Value: N/A
     """
 
-    token = clear_and_register_and_create_channel[0]['token']
+    token = clear_register_createchannel[0]['token']
    
     # no channel id input
     resp0 = requests.get(config.url + 'channel/messages/v2', 
@@ -62,19 +62,19 @@ def test_channel_messages_invalid_channel(clear_and_register_and_create_channel)
     # with pytest.raises(InputError):
     #     channel_messages_v1(id1, True, 0)
 
-@pytest.mark.usefixtures('clear_and_register_and_create_channel')
-def test_channel_messages_invalid_token(clear_and_register_and_create_channel):
+@pytest.mark.usefixtures('clear_register_createchannel')
+def test_channel_messages_invalid_token(clear_register_createchannel):
     """
     testing invalid input of token
 
-    Arguments: clear_and_register_and_create_channel (fixture)
+    Arguments: clear_register_createchannel (fixture)
 
     Exceptions: InputError - Raised for all test cases listed below
 
     Return Value: N/A
 
     """
-    chan_id = clear_and_register_and_create_channel[1]
+    chan_id = clear_register_createchannel[1]
    
     # no token input
     resp0 = requests.get(config.url + 'channel/messages/v2', 
@@ -130,12 +130,12 @@ def test_channel_messages_invalid_token(clear_and_register_and_create_channel):
 
 # clear_v1()
 
-@pytest.mark.usefixtures('clear_and_register_and_create_channel')
-def test_channel_messages_invalid_start(clear_and_register_and_create_channel):
+@pytest.mark.usefixtures('clear_register_createchannel')
+def test_channel_messages_invalid_start(clear_register_createchannel):
     '''
     testing if start is int
 
-    Arguments: clear_and_register_and_create_channel (fixture)
+    Arguments: clear_register_createchannel (fixture)
 
     Exceptions: AccessError - Raised for all test cases listed below
 
@@ -143,8 +143,8 @@ def test_channel_messages_invalid_start(clear_and_register_and_create_channel):
     
     
     '''
-    token = clear_and_register_and_create_channel[0]['token']
-    chan_id = clear_and_register_and_create_channel[1]
+    token = clear_register_createchannel[0]['token']
+    chan_id = clear_register_createchannel[1]
     # start is bool
     resp0 = requests.get(config.url + 'channel/messages/v2', 
                           params = {'token': token, 'channel_id': chan_id, 'start': True})
@@ -169,12 +169,12 @@ def test_channel_messages_invalid_start(clear_and_register_and_create_channel):
 
     requests.delete(config.url + 'clear/v1')
 
-@pytest.mark.usefixtures('clear_and_register_and_create_channel')
-def test_user_not_belong(clear_and_register_and_create_channel):
+@pytest.mark.usefixtures('clear_register_createchannel')
+def test_user_not_belong(clear_register_createchannel):
     """
     testing if user belongs to the channel
 
-    Arguments: clear_and_register_and_create_channel (fixture)
+    Arguments: clear_register_createchannel (fixture)
 
     Exceptions: 
         Access Error - Raised for all test cases below
@@ -182,7 +182,7 @@ def test_user_not_belong(clear_and_register_and_create_channel):
     Return Value: N/A
     """
     
-    chan_id = clear_and_register_and_create_channel[1]
+    chan_id = clear_register_createchannel[1]
 
     # create user 2
     user2 = requests.post(config.url + 'auth/register/v2', 
@@ -197,12 +197,12 @@ def test_user_not_belong(clear_and_register_and_create_channel):
 
     requests.delete(config.url + 'clear/v1')
     
-@pytest.mark.usefixtures('clear_and_register_and_create_channel')
-def test_channel_messages_return(clear_and_register_and_create_channel):
+@pytest.mark.usefixtures('clear_register_createchannel')
+def test_channel_messages_return(clear_register_createchannel):
     '''
     testing channel_message returns empty if no message
 
-    Arguments: clear_and_register_and_create_channel (fixture)
+    Arguments: clear_register_createchannel (fixture)
 
     Exceptions: N/A
 
@@ -212,8 +212,8 @@ def test_channel_messages_return(clear_and_register_and_create_channel):
     '''
         # pylint: disable=unused-argument
 
-    token = clear_and_register_and_create_channel[0]['token']
-    chan_id = clear_and_register_and_create_channel[1]
+    token = clear_register_createchannel[0]['token']
+    chan_id = clear_register_createchannel[1]
 
     # test success run
     resp = requests.get(config.url + 'channel/messages/v2', 

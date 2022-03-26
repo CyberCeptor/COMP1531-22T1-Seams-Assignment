@@ -4,10 +4,10 @@ import requests
 from src import config
 
 
-@pytest.mark.usefixtures('clear_and_register_and_create_channel')
-def test_channel_leave_works(clear_and_register_and_create_channel):
-    token = clear_and_register_and_create_channel[0]['token']
-    channel_id = clear_and_register_and_create_channel[1]
+@pytest.mark.usefixtures('clear_register_createchannel')
+def test_channel_leave_works(clear_register_createchannel):
+    token = clear_register_createchannel[0]['token']
+    channel_id = clear_register_createchannel[1]
 
     create_user2 = requests.post(config.url + 'auth/register/v2', 
                         json={'email': 'xue2@gmail.com', 'password': 'xzq19112',
@@ -27,9 +27,9 @@ def test_channel_leave_works(clear_and_register_and_create_channel):
                             json={'token': token, 'channel_id': channel_id})
     assert channel_leave.status_code == 200
 
-@pytest.mark.usefixtures('clear_and_register_and_create_channel')
-def test_channel_leave_unknown_user(clear_and_register_and_create_channel):
-    channel_id = clear_and_register_and_create_channel[1]
+@pytest.mark.usefixtures('clear_register_createchannel')
+def test_channel_leave_unknown_user(clear_register_createchannel):
+    channel_id = clear_register_createchannel[1]
 
     user2 = requests.post(config.url + 'auth/register/v2', 
                   json={'email': 'abc2@def.com', 'password': 'password',
@@ -42,10 +42,10 @@ def test_channel_leave_unknown_user(clear_and_register_and_create_channel):
     assert channel_leave.status_code == 403
 
 
-@pytest.mark.usefixtures('clear_and_register_and_create_channel')
-def test_channel_leave_invalid_channel_id(clear_and_register_and_create_channel):
+@pytest.mark.usefixtures('clear_register_createchannel')
+def test_channel_leave_invalid_channel_id(clear_register_createchannel):
     # creating 2 users and the channel.
-    token = clear_and_register_and_create_channel[0]['token']
+    token = clear_register_createchannel[0]['token']
     # Incorrect channel id
     channel_leave = requests.post(config.url + 'channel/leave/v1', 
                             json={'token': token, 'channel_id': 444})
@@ -68,9 +68,9 @@ def test_channel_leave_invalid_channel_id(clear_and_register_and_create_channel)
 
     
     # bad token tests.
-@pytest.mark.usefixtures('clear_and_register_and_create_channel')
-def test_channel_leave_invalid_token(clear_and_register_and_create_channel):
-    channel_id = clear_and_register_and_create_channel[1]
+@pytest.mark.usefixtures('clear_register_createchannel')
+def test_channel_leave_invalid_token(clear_register_createchannel):
+    channel_id = clear_register_createchannel[1]
     # expired token
     expired_token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6\
         MSwic2Vzc2lvbl9pZCI6MSwiaGFuZGxlIjoiZmlyc3RsYXN0IiwiZXhwIjo\

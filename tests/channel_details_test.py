@@ -12,8 +12,8 @@ import requests
 
 from src import config
 
-@pytest.mark.usefixtures('clear_and_register_and_create_channel')
-def test_channel_details_invalid_token(clear_and_register_and_create_channel):
+@pytest.mark.usefixtures('clear_register_createchannel')
+def test_channel_details_invalid_token(clear_register_createchannel):
     """
     testing invalid user type to raise input error
 
@@ -28,7 +28,7 @@ def test_channel_details_invalid_token(clear_and_register_and_create_channel):
 
 
     # token is int
-    chan_id = clear_and_register_and_create_channel[1]
+    chan_id = clear_register_createchannel[1]
     resp0 = requests.get(config.url + 'channel/details/v2', 
                           params = {'token': 0, 'channel_id': chan_id})
     assert resp0.status_code == 400
@@ -76,8 +76,8 @@ def test_channel_details_invalid_token(clear_and_register_and_create_channel):
     #     channel_details_v1(-1, chan_id1)
 
 
-@pytest.mark.usefixtures('clear_and_register_and_create_channel')
-def test_channel_details_invalid_channel(clear_and_register_and_create_channel):
+@pytest.mark.usefixtures('clear_register_createchannel')
+def test_channel_details_invalid_channel(clear_register_createchannel):
     """
     testing invalid channel id to raise input error
 
@@ -105,7 +105,7 @@ def test_channel_details_invalid_channel(clear_and_register_and_create_channel):
     # with pytest.raises(InputError):
     #     channel_details_v1(id1, True)
   
-    token = clear_and_register_and_create_channel[0]['token']
+    token = clear_register_createchannel[0]['token']
     # no channel id input
     resp0 = requests.get(config.url + 'channel/details/v2', 
                           params = {'token': token, 'channel_id': ''})
@@ -124,8 +124,8 @@ def test_channel_details_invalid_channel(clear_and_register_and_create_channel):
     assert resp3.status_code == 400
     
 
-@pytest.mark.usefixtures('clear_and_register_and_create_channel')
-def test_user_not_belong(clear_and_register_and_create_channel):
+@pytest.mark.usefixtures('clear_register_createchannel')
+def test_user_not_belong(clear_register_createchannel):
     """
     testing if user belongs to the channel
 
@@ -137,7 +137,7 @@ def test_user_not_belong(clear_and_register_and_create_channel):
     Return Value: N/A
     """
     
-    chan_id = clear_and_register_and_create_channel[1]
+    chan_id = clear_register_createchannel[1]
 
     # create user 2
     user2 = requests.post(config.url + 'auth/register/v2', 
@@ -153,8 +153,8 @@ def test_user_not_belong(clear_and_register_and_create_channel):
     requests.delete(config.url + 'clear/v1')
 
 
-@pytest.mark.usefixtures('clear_and_register_and_create_channel')
-def test_channel_details_return(clear_and_register_and_create_channel):
+@pytest.mark.usefixtures('clear_register_createchannel')
+def test_channel_details_return(clear_register_createchannel):
     """
     testing if channel_details_v1 returns right values
 
@@ -167,9 +167,9 @@ def test_channel_details_return(clear_and_register_and_create_channel):
     
 
     # pylint: disable=unused-argument
-    token = clear_and_register_and_create_channel[0]['token']
-    chan_id = clear_and_register_and_create_channel[1]
-    u_id = clear_and_register_and_create_channel[0]['auth_user_id']
+    token = clear_register_createchannel[0]['token']
+    chan_id = clear_register_createchannel[1]
+    u_id = clear_register_createchannel[0]['auth_user_id']
 
     # success run
     resp = requests.get(config.url + 'channel/details/v2', 

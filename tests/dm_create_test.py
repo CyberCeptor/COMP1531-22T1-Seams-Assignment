@@ -10,8 +10,8 @@ import pytest
 import requests
 from src import config
 
-@pytest.mark.usefixtures('clear_and_register')
-def test_dm_create_valid(clear_and_register):
+@pytest.mark.usefixtures('clear_register')
+def test_dm_create_valid(clear_register):
     """
     clears any data stored in data_store and registers users with the
     given information, create the dm with token and u_ids
@@ -23,7 +23,7 @@ def test_dm_create_valid(clear_and_register):
     Return Value: N/A
     """
 
-    token1 = clear_and_register['token']
+    token1 = clear_register['token']
     resp1 = requests.post(config.url + 'auth/register/v2', 
                         json={'email': 'lmz@gmail.com', 'password': '893621',
                                 'name_first': 'li', 'name_last': 'mingzhe'})
@@ -43,8 +43,8 @@ def test_dm_create_valid(clear_and_register):
                         json={'token': token1, 'u_ids': [id2,id3]})
     assert create.status_code == 200
 
-@pytest.mark.usefixtures('clear_and_register')
-def test_dm_create_invalid_uid(clear_and_register):
+@pytest.mark.usefixtures('clear_register')
+def test_dm_create_invalid_uid(clear_register):
     """
     clears any data stored in data_store and registers users with the
     given information, create the dm with token and u_ids
@@ -55,7 +55,7 @@ def test_dm_create_invalid_uid(clear_and_register):
 
     Return Value: N/A
     """
-    token1 = clear_and_register['token']
+    token1 = clear_register['token']
     resp1 = requests.post(config.url + 'auth/register/v2', 
                         json={'email': 'lmz@gmail.com', 'password': '893621',
                                 'name_first': 'li', 'name_last': 'mingzhe'})
@@ -85,8 +85,8 @@ def test_dm_create_invalid_uid(clear_and_register):
                         json={'token': token1, 'u_ids': ['j',id1]})
     assert create.status_code == 400
 
-@pytest.mark.usefixtures('clear_and_register')
-def test_dm_create_duplicate_uid(clear_and_register):
+@pytest.mark.usefixtures('clear_register')
+def test_dm_create_duplicate_uid(clear_register):
     """
     clears any data stored in data_store and registers users with the
     given information, create the dm with token and u_ids
@@ -97,7 +97,7 @@ def test_dm_create_duplicate_uid(clear_and_register):
 
     Return Value: N/A
     """
-    token1 = clear_and_register['token']
+    token1 = clear_register['token']
     resp1 = requests.post(config.url + 'auth/register/v2', 
                         json={'email': 'lmz@gmail.com', 'password': '893621',
                                 'name_first': 'li', 'name_last': 'mingzhe'})

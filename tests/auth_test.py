@@ -15,8 +15,8 @@ from src import config
 
 from src.global_vars import expired_token, unsaved_token
 
-NAME_22_CHARS = 'abcdefghijklmnopqrstuv'
-NAME_52_CHARS = 'abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz'
+name_22_chars = 'abcdefghijklmnopqrstuv'
+name_52_chars = 'abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz'
 
 @pytest.mark.usefixtures('clear_register')
 def test_register_invalid_email(clear_register):
@@ -131,7 +131,7 @@ def test_register_invalid_name(clear_register):
     # first name too long
     resp2 = requests.post(config.url + 'auth/register/v2', 
                          json={'email': 'def@ghi.com', 'password': 'password',
-                               'name_first': NAME_52_CHARS, 'name_last': 'last'}
+                               'name_first': name_52_chars, 'name_last': 'last'}
                         )
     assert resp2.status_code == 400
 
@@ -139,7 +139,7 @@ def test_register_invalid_name(clear_register):
     resp3 = requests.post(config.url + 'auth/register/v2', 
                          json={'email': 'def@ghi.com', 'password': 'password',
                                'name_first': 'first',
-                               'name_last': NAME_52_CHARS})
+                               'name_last': name_52_chars})
     assert resp3.status_code == 400
 
     # name has no letters -> would create an empty handle

@@ -239,13 +239,15 @@ def get_messages(auth_user_id, data, start, data_str):
         if start == total_messages - 1: # if there is only 1 message
             messages_to_return.append(start_message)
         else:
-            for idx, message in data['messages']:
-                if idx >= start:
-                    messages_to_return.append(message)
+            messages_to_return = [data['messages'][index] for index in range(start, total_messages)]
+            # for idx, message in data['messages']:
+            #     if idx >= start:
+            #         messages_to_return.append(message)
     else:
-        for idx, message in data['messages']:
-            if start <= idx < end:
-                messages_to_return.append(message)
+        messages_to_return = [data['messages'][index] for index in range(start, end)]
+        # for idx, message in data['messages']:
+        #     if start <= idx < end:
+        #         messages_to_return.append(message)
 
     return {
         'messages': messages_to_return,

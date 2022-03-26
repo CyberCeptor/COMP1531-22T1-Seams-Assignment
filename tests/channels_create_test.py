@@ -1,8 +1,8 @@
 """
-Filename: channels_test.py
+Filename: channels_create_test.py
 
-Author: Jenson Morgan(z5360181)
-Created: 28/02/2022 - 04/03/2022
+Author: Jenson Morgan(z5360181), Aleesha Bunrith(z5371516)
+Created: 28/02/2022 - 27/03/2022
 
 Description: pytests for channels_create_v1
 """
@@ -13,54 +13,13 @@ import requests
 
 from src import config
 
+from src.global_vars import expired_token, unsaved_token
 
-#   NOT USED ANYMORE.
-########################################################################
-
-# def test_channels_create_valid_auth_id(clear_and_register):
-#     """
-#     Registers a valid user, and them
-#     attempts to create 4 channels with unregistered user_id's,
-#     both public and private channels.
-
-#     Arguments: clear_and_register
-
-#     Exceptions:
-#         AccessError - Raised for all tests below
-
-#     Return Value: N/A
-#     """
-#     # pylint: disable=unused-argument
-#     with pytest.raises(AccessError):
-#         channels_create_v1(2, 'test_channel_public', True)
-#     with pytest.raises(AccessError):
-#         channels_create_v1(2, 'test_channel_private', False)
-#     with pytest.raises(InputError):
-#         channels_create_v1(-2, 'test_channel_public2', True)
-#     with pytest.raises(InputError):
-#         channels_create_v1(-2, 'test_channel_private2', False)
-#     with pytest.raises(InputError):
-#         channels_create_v1('', 'test_channel_private2', False)
-#     with pytest.raises(InputError):
-#         channels_create_v1('not int', 'test_channel_private2', False)
-#     with pytest.raises(InputError):
-#         channels_create_v1(True, 'test_channel_private2', False)
-###################################################################################
-
-def test_channels_create_valid_token():
-    """
-    Registers a valid user, and them
-    attempts to create multipole channels with invalid token values,
-    both public and private channels.
-
-    Arguments: clear_and_register
-
-    Exceptions:
-        AccessError - Raised for all tests below
-
-    Return Value: N/A
-    """
-    # pylint: disable=unused-argument
+@pytest.mark.usefixtures('clear_register')
+def test_channels_create_valid_token(clear_register):
+    """ Registers a valid user, and them attempts to create multiple channels
+    with invalid token values, both public and private channels. """
+    
     # token is an integer value
     resp0 = requests.post(config.url + 'channels/create/v2', 
                           json={'token': 2, 'name': 'test_channel_public',
@@ -95,36 +54,39 @@ def test_channels_create_valid_token():
                                 'name': 'test_channel_private',
                                 'is_public': False})
     assert resp5.status_code == 403
-    expired_token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MSwic2Vzc\
-        2lvbl9pZCI6MSwiaGFuZGxlIjoiZmlyc3RsYXN0IiwiZXhwIjoxNTQ3\
-            OTc3ODgwfQ.366QLXfCURopcjJbAheQYLVNlGLX_INKVwr8_TVXYEQ'
-            
+        
+    # access error: an expired token
     resp6 = requests.post(config.url + 'channels/create/v2', 
+                            json={'token': expired_token,
+                                 'name': 'test_channel_public',
+                                 'is_public': True})
+    assert resp6.status_code == 403
+
+    resp7 = requests.post(config.url + 'channels/create/v2', 
                             json={'token': expired_token,
                                  'name': 'test_channel_private',
                                  'is_public': False})
-    assert resp6.status_code == 403
+    assert resp7.status_code == 403
 
-@pytest.mark.usefixtures('clear_and_register')
-def test_channels_create_too_short(clear_and_register):
-    """
-    Create a channel with no channel name given.
-        Tests both public and private channels.
+    # access error: an unsaved token
+    resp8 = requests.post(config.url + 'channels/create/v2', 
+                            json={'token': unsaved_token,
+                                 'name': 'test_channel_public',
+                                 'is_public': True})
+    assert resp8.status_code == 403
 
-    Arguments: clear_and_register
+    resp8 = requests.post(config.url + 'channels/create/v2', 
+                            json={'token': unsaved_token,
+                                 'name': 'test_channel_private',
+                                 'is_public': False})
+    assert resp8.status_code == 403
 
-    Exceptions:
-        InputError  - Raised for all cases below
-
-    Return Value:   N/A
-    """
-    # id1 = clear_and_register['auth_user_id']
-    # # Testing channel name is less than 1 character. Input Error
-    # with pytest.raises(InputError):
-    #     channels_create_v1(id1, '', True)
-    # with pytest.raises(InputError):
-    #     channels_create_v1(id1, '', False)
-    token = clear_and_register['token']
+@pytest.mark.usefixtures('clear_register')
+def test_channels_create_too_short(clear_register):
+    """ Create a channel with no channel name given. Tests both public and
+    private channels. """
+     
+    token = clear_register['token']
     resp0 = requests.post(config.url + 'channels/create/v2', 
                           json={'token': token, 'name': '', 'is_public': True})
     assert resp0.status_code == 400
@@ -133,24 +95,11 @@ def test_channels_create_too_short(clear_and_register):
                           json={'token': token, 'name': '', 'is_public': False})
     assert resp1.status_code == 400
 
-@pytest.mark.usefixtures('clear_and_register')
-def test_channels_create_invalid_name(clear_and_register):
-    """
-    Creates a public/private channel with names > 20 characters
-
-    Arguments:  clear_and_register
-
-    Exceptions:
-        InputError  -   Raised for all tests below
-
-    Return Value:   N/A
-    """
-    # id1 = clear_and_register['auth_user_id']
-    # with pytest.raises(InputError):
-    #     channels_create_v1(id1, 'MoreThan20CharPublic!', True)
-    # with pytest.raises(InputError):
-    #     channels_create_v1(id1, 'MoreThan20CharPrivate', False)
-    token = clear_and_register['token']
+@pytest.mark.usefixtures('clear_register')
+def test_channels_create_invalid_name(clear_register):
+    """ Creates a public/private channel with names > 20 characters """
+     
+    token = clear_register['token']
     resp0 = requests.post(config.url + 'channels/create/v2', 
                           json={'token': token, 'name': 'MoreThan20CharPublic!',
                                 'is_public': True})
@@ -161,55 +110,38 @@ def test_channels_create_invalid_name(clear_and_register):
                                 'is_public': False})
     assert resp1.status_code == 400
 
-@pytest.mark.usefixtures('clear_and_register')
-def test_channels_create_boolean(clear_and_register):
-    """
-    Creates a channel with a string as the is_public argument,
-        which should be a boolean.
+@pytest.mark.usefixtures('clear_register')
+def test_channels_create_boolean(clear_register):
+    """ Creates a channel with a string as the is_public argument, which should
+    be a boolean. """
+     
+    token = clear_register['token']
 
-    Arguments:  clear_and_register
-
-    Exceptions:
-        InputError - Raised for the case
-
-    Return Value:   N/A
-    """
-    # id1 = clear_and_register['auth_user_id']
-    # with pytest.raises(InputError):
-    #     channels_create_v1(id1, 'test_channel', 'Not a boolean')
-    # with pytest.raises(InputError):
-    #     channels_create_v1(id1, 'test_channel', 1)
-    token = clear_and_register['token']
+    # string
     resp0 = requests.post(config.url + 'channels/create/v2', 
                           json={'token': token, 'name': 'test_channel',
                                 'is_public': 'Not a boolean'})
     assert resp0.status_code == 400
 
+    # int
     resp1 = requests.post(config.url + 'channels/create/v2', 
                           json={'token': token, 'name': 'test_channel',
                                 'is_public': 1})
     assert resp1.status_code == 400
 
-@pytest.mark.usefixtures('clear_and_register')
-def test_channels_duplicate_name(clear_and_register):
+    # empty string
+    resp2 = requests.post(config.url + 'channels/create/v2', 
+                          json={'token': token, 'name': 'test_channel',
+                                'is_public': ''})
+    assert resp2.status_code == 400
+
+@pytest.mark.usefixtures('clear_register')
+def test_channels_duplicate_name(clear_register):
+    """ Creates a channel with an existing channel_name. Both public and private
     """
-    Creates a channel with an existing channel_name
-        Both public and private
+     
+    token = clear_register['token']
 
-    Arguments:  clear_and_register
-
-    Exceptions:
-        InputError  -   Raised for all test cases below
-    """
-    # id1 = clear_and_register['auth_user_id']
-    # channels_create_v1(id1, 'test_channel_public', True)
-    # with pytest.raises(InputError):
-    #     channels_create_v1(id1, 'test_channel_public', True)
-
-    # channels_create_v1(id1, 'test_channel_private', False)
-    # with pytest.raises(InputError):
-    #     channels_create_v1(id1, 'test_channel_private', False)
-    token = clear_and_register['token']
     resp0 = requests.post(config.url + 'channels/create/v2', 
                           json={'token': token, 'name': 'test_channel_public',
                                 'is_public': True})
@@ -230,5 +162,4 @@ def test_channels_duplicate_name(clear_and_register):
                                 'is_public': False})
     assert resp3.status_code == 400
 
-# clear_v1()
 requests.delete(config.url + 'clear/v1')

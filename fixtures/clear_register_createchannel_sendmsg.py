@@ -5,7 +5,7 @@ import requests
 from src import config
 
 @pytest.fixture
-def clear_register_createchannel_sendmsg (clear_and_register_and_create_channel):
+def clear_register_createchannel_sendmsg (clear_register_createchannel):
     """
     clears any data stored in data_store and registers a user with the
     given information, create a channel using user id, send a message to channel
