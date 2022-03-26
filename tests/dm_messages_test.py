@@ -11,8 +11,8 @@ import pytest
 import requests
 from src import config
 
-@pytest.fixture(name='clear_and_register_and_create')
-def fixture_clear_and_register_and_create():
+@pytest.fixture(name='clear_register_and_create')
+def fixture_clear_register_and_create():
     """
     clears any data stored in data_store and registers a user with the
     given information, create a dm using user id
@@ -47,18 +47,18 @@ def fixture_clear_and_register_and_create():
     dm_id = dm_data['dm_id']
     return [token, dm_id, u_id]
 
-def test_dm_messages_invalid_dm(clear_and_register_and_create):
+def test_dm_messages_invalid_dm(clear_register_and_create):
     """
     testing invalid dm id to raise input error
 
-    Arguments: clear_and_register_and_create (fixture)
+    Arguments: clear_register_and_create (fixture)
 
     Exceptions: InputError - Raised for all test cases listed below
 
     Return Value: N/A
     """
 
-    token = clear_and_register_and_create[0]
+    token = clear_register_and_create[0]
    
     # no dm id input
     resp0 = requests.get(config.url + 'dm/messages/v1', 
@@ -97,18 +97,18 @@ def test_dm_messages_invalid_dm(clear_and_register_and_create):
     # with pytest.raises(InputError):
     #     dm_messages_v1(id1, True, 0)
 
-def test_dm_messages_invalid_token(clear_and_register_and_create):
+def test_dm_messages_invalid_token(clear_register_and_create):
     """
     testing invalid input of token
 
-    Arguments: clear_and_register_and_create (fixture)
+    Arguments: clear_register_and_create (fixture)
 
     Exceptions: InputError - Raised for all test cases listed below
 
     Return Value: N/A
 
     """
-    dm_id = clear_and_register_and_create[1]
+    dm_id = clear_register_and_create[1]
    
     # no token input
     resp0 = requests.get(config.url + 'dm/messages/v1', 
@@ -164,11 +164,11 @@ def test_dm_messages_invalid_token(clear_and_register_and_create):
 
 # clear_v1()
 
-def test_dm_messages_invalid_start(clear_and_register_and_create):
+def test_dm_messages_invalid_start(clear_register_and_create):
     '''
     testing if start is int
 
-    Arguments: clear_and_register_and_create (fixture)
+    Arguments: clear_register_and_create (fixture)
 
     Exceptions: AccessError - Raised for all test cases listed below
 
@@ -176,8 +176,8 @@ def test_dm_messages_invalid_start(clear_and_register_and_create):
     
     
     '''
-    token = clear_and_register_and_create[0]
-    dm_id = clear_and_register_and_create[1]
+    token = clear_register_and_create[0]
+    dm_id = clear_register_and_create[1]
     # start is bool
     resp0 = requests.get(config.url + 'dm/messages/v1', 
                           params = {'token': token, 'dm_id': dm_id, 'start': True})
@@ -202,11 +202,11 @@ def test_dm_messages_invalid_start(clear_and_register_and_create):
 
     requests.delete(config.url + 'clear/v1')
 
-def test_user_not_belong(clear_and_register_and_create):
+def test_user_not_belong(clear_register_and_create):
     """
     testing if user belongs to the dm
 
-    Arguments: clear_and_register_and_create (fixture)
+    Arguments: clear_register_and_create (fixture)
 
     Exceptions: 
         Access Error - Raised for all test cases below
@@ -214,7 +214,7 @@ def test_user_not_belong(clear_and_register_and_create):
     Return Value: N/A
     """
     
-    dm_id = clear_and_register_and_create[1]
+    dm_id = clear_register_and_create[1]
 
     # create user 2
     user2 = requests.post(config.url + 'auth/register/v2', 
@@ -229,11 +229,11 @@ def test_user_not_belong(clear_and_register_and_create):
 
     requests.delete(config.url + 'clear/v1')
     
-def test_dm_messages_return(clear_and_register_and_create):
+def test_dm_messages_return(clear_register_and_create):
     '''
     testing dm_message returns empty if no message
 
-    Arguments: clear_and_register_and_create (fixture)
+    Arguments: clear_register_and_create (fixture)
 
     Exceptions: N/A
 
@@ -243,8 +243,8 @@ def test_dm_messages_return(clear_and_register_and_create):
     '''
         # pylint: disable=unused-argument
 
-    token = clear_and_register_and_create[0]
-    dm_id = clear_and_register_and_create[1]
+    token = clear_register_and_create[0]
+    dm_id = clear_register_and_create[1]
 
     # test success run
     resp = requests.get(config.url + 'dm/messages/v1', 

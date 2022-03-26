@@ -1,12 +1,10 @@
 """
-InputError when any of:
-      
-        u_id does not refer to a valid user
-        u_id refers to a user who is the only global owner
-      
-      AccessError when:
-      
-        the authorised user is not a global owner
+Filename: admin_user_remove_test.py
+
+Author: Aleesha Bunrith(z5371516)
+Created: 24/03/2022 - 27/03/2022
+
+Description: pytests for admin/user/remove/v1
 """
 
 import pytest
@@ -17,8 +15,8 @@ from src import config
 
 from src.global_vars import expired_token, unsaved_token
 
-@pytest.mark.usefixtures('clear_and_register_two')
-def test_admin_user_remove_works(clear_and_register_two):
+@pytest.mark.usefixtures('clear_register_two')
+def test_admin_user_remove_works(clear_register_two):
     """ user2 creates a channel and a dm and sends messages in both then gets
     removed by user1
     
@@ -26,11 +24,11 @@ def test_admin_user_remove_works(clear_and_register_two):
     replaced by 'Removed user' and their email and handle can be reused
     """
 
-    token1 = clear_and_register_two[0]['token']
-    id1 = clear_and_register_two[0]['auth_user_id']
+    token1 = clear_register_two[0]['token']
+    id1 = clear_register_two[0]['auth_user_id']
 
-    token2 = clear_and_register_two[1]['token']
-    id2 = clear_and_register_two[1]['auth_user_id']
+    token2 = clear_register_two[1]['token']
+    id2 = clear_register_two[1]['auth_user_id']
 
     # user2 creates a channel
     resp0 = requests.post(config.url + 'channels/create/v2', 
@@ -141,33 +139,33 @@ def test_admin_user_remove_works(clear_and_register_two):
         'handle_str': 'firstlast0',
     }
 
-@pytest.mark.usefixtures('clear_and_register_two')
-def test_admin_user_remove_only_one_global_owner(clear_and_register_two):
+@pytest.mark.usefixtures('clear_register_two')
+def test_admin_user_remove_only_one_global_owner(clear_register_two):
     """ the only global owner is trying to remove themselves """
 
-    token = clear_and_register_two[0]['token']
-    id = clear_and_register_two[0]['auth_user_id']
+    token = clear_register_two[0]['token']
+    id = clear_register_two[0]['auth_user_id']
 
     resp = requests.delete(config.url + 'admin/user/remove/v1', 
                           json={'token': token, 'u_id': id})
     assert resp.status_code == 400
 
-@pytest.mark.usefixtures('clear_and_register_two')
-def test_admin_user_remove_not_global_owner(clear_and_register_two):
+@pytest.mark.usefixtures('clear_register_two')
+def test_admin_user_remove_not_global_owner(clear_register_two):
     """ user 2, a normal user is trying to remove themselves """
 
-    token = clear_and_register_two[1]['token']
-    id = clear_and_register_two[1]['auth_user_id']
+    token = clear_register_two[1]['token']
+    id = clear_register_two[1]['auth_user_id']
 
     resp = requests.delete(config.url + 'admin/user/remove/v1', 
                           json={'token': token, 'u_id': id})
     assert resp.status_code == 403
 
-@pytest.mark.usefixtures('clear_and_register_two')
-def test_admin_user_remove_invalid_token(clear_and_register_two):
-    """ invalid tokens passed in """
+@pytest.mark.usefixtures('clear_register_two')
+def test_admin_user_remove_invalid_token(clear_register_two):
+    """ tests user/remove with invalid token inputs """
 
-    id2 = clear_and_register_two[1]['auth_user_id']
+    id2 = clear_register_two[1]['auth_user_id']
 
     # inpuot error: empty str is passed in as token
     resp0 = requests.delete(config.url + 'admin/user/remove/v1', 
@@ -199,11 +197,11 @@ def test_admin_user_remove_invalid_token(clear_and_register_two):
                           json={'token': expired_token, 'u_id': id2})
     assert resp5.status_code == 403
 
-@pytest.mark.usefixtures('clear_and_register_two')
-def test_admin_user_remove_invalid_u_id(clear_and_register_two):
-    """ invalid u_ids passed in """
+@pytest.mark.usefixtures('clear_register_two')
+def test_admin_user_remove_invalid_u_id(clear_register_two):
+    """ tests user/remove with invalid u_id inputs """
 
-    token = clear_and_register_two[0]['token']
+    token = clear_register_two[0]['token']
 
     # input error: empty str is passed in as u_id
     resp0 = requests.delete(config.url + 'admin/user/remove/v1', 

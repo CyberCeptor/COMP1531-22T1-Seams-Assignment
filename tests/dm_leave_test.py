@@ -10,8 +10,8 @@ import pytest
 import requests
 from src import config
 
-@pytest.fixture(name='clear_and_register')
-def fixture_clear_and_register():
+@pytest.fixture(name='clear_register')
+def fixture_clear_register():
     """
     clears any data stored in data_store and registers a user with the
     given information
@@ -30,18 +30,18 @@ def fixture_clear_and_register():
     data = resp.json()
     return [data['token'], data['auth_user_id']]
 
-def test_dm_leave_valid(clear_and_register):
+def test_dm_leave_valid(clear_register):
     """
     clears any data stored in data_store and registers a user with the
     given information, run dm details successful
 
-    Arguments: clear_and_register(fixture)
+    Arguments: clear_register(fixture)
 
     Exceptions: N/A
 
     Return Value: N/A
     """
-    token1 = clear_and_register[0]
+    token1 = clear_register[0]
     resp1 = requests.post(config.url + 'auth/register/v2', 
                         json={'email': 'lmz@gmail.com', 'password': '893621',
                                 'name_first': 'li', 'name_last': 'mingzhe'})
@@ -55,19 +55,19 @@ def test_dm_leave_valid(clear_and_register):
                         json={'token': token1, 'dm_id': dm_id})
     assert leave.status_code == 200
 
-def test_dm_leave_invalid_dm_id(clear_and_register):
+def test_dm_leave_invalid_dm_id(clear_register):
     """
     clears any data stored in data_store and registers a user with the
     given information, raised a inputerror by invalid dm id
 
-    Arguments: clear_and_register(fixture)
+    Arguments: clear_register(fixture)
 
     Exceptions: InputErroe - raised by invalid dm_id
 
     Return Value: N/A
     """
-    token1 = clear_and_register[0]
-    id1 = clear_and_register[1]
+    token1 = clear_register[0]
+    id1 = clear_register[1]
     resp1 = requests.post(config.url + 'auth/register/v2', 
                         json={'email': 'lmz@gmail.com', 'password': '893621',
                                 'name_first': 'li', 'name_last': 'mingzhe'})
@@ -96,18 +96,18 @@ def test_dm_leave_invalid_dm_id(clear_and_register):
                         json={'token': token1, 'dm_id': True})
     assert leave.status_code == 400
 
-def test_dm_leave_notin_dm(clear_and_register):
+def test_dm_leave_notin_dm(clear_register):
     """
     clears any data stored in data_store and registers a user with the
     given information, raise a access error by the auth not in dm
 
-    Arguments: clear_and_register(fixture)
+    Arguments: clear_register(fixture)
 
     Exceptions: AccessError - raised by auth not in dm
 
     Return Value: N/A
     """
-    token1 = clear_and_register[0]
+    token1 = clear_register[0]
     resp1 = requests.post(config.url + 'auth/register/v2', 
                         json={'email': 'lmz@gmail.com', 'password': '893621',
                                 'name_first': 'li', 'name_last': 'mingzhe'})

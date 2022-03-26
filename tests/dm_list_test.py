@@ -10,8 +10,8 @@ import pytest
 import requests
 from src import config
 
-@pytest.fixture(name='clear_and_register')
-def fixture_clear_and_register():
+@pytest.fixture(name='clear_register')
+def fixture_clear_register():
     """
     clears any data stored in data_store and registers a user with the
     given information
@@ -31,18 +31,18 @@ def fixture_clear_and_register():
     data = resp.json()
     return [data['token'], data['auth_user_id']]
 
-def test_dm_list_valid(clear_and_register):
+def test_dm_list_valid(clear_register):
     """
     clears any data stored in data_store and registers a user with the
     given information, create the dm with token and u_ids, list with token
 
-    Arguments: clear_and_register(fixture)
+    Arguments: clear_register(fixture)
 
     Exceptions: N/A
 
     Return Value: N/A
     """
-    token1 = clear_and_register[0]
+    token1 = clear_register[0]
     resp1 = requests.post(config.url + 'auth/register/v2', 
                         json={'email': 'lmz@gmail.com', 'password': '893621',
                                 'name_first': 'li', 'name_last': 'mingzhe'})

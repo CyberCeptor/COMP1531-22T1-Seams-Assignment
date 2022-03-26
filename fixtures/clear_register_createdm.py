@@ -6,7 +6,7 @@ import requests
 from src import config
 
 @pytest.fixture
-def clear_register_create_dm(clear_and_register_two):
+def clear_register_createdm(clear_register_two):
     """
     clears any data stored in data_store and registers a user with the
     given information, create a channel using user id

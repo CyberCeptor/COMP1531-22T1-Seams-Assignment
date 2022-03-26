@@ -102,7 +102,7 @@ def logout():
 ################################################################################
 
 @APP.route('/users/all/v1', methods=['GET'])
-def get_users():
+def get_all_users():
     token = request.args.get('token')
     users = users_all_v1(token)
     return dumps(users)
@@ -256,9 +256,9 @@ def channel_leave():
 @APP.route('/message/send/v1', methods=['POST'])
 def message_send():
     data = request.get_json()
-    message_id = message_send_v1(data['token'], data['channel_id'], data['message'])
+    msg_id = message_send_v1(data['token'], data['channel_id'], data['message'])
     save_data()
-    return dumps(message_id)
+    return dumps(msg_id)
 
 @APP.route('/message/edit/v1', methods=['PUT'])
 def message_edit():
@@ -277,22 +277,22 @@ def message_remove():
 @APP.route('/message/senddm/v1', methods=['POST'])
 def message_senddm():
     data = request.get_json()
-    message_id = message_senddm_v1(data['token'], data['dm_id'], data['message'])
+    msg_id = message_senddm_v1(data['token'], data['dm_id'], data['message'])
     save_data()
-    return dumps(message_id)
+    return dumps(msg_id)
 
 ################################################################################
 ##                             DM ROUTES                                      ##
 ################################################################################
+
 @APP.route('/dm/create/v1', methods=['POST'])
 def dm_create_server():
     store = request.get_json()
     token = store['token']
     u_ids = store['u_ids']
+    dm = dm_create_v1(token, u_ids)
     save_data()
-    return dumps(
-        dm_create_v1(token, u_ids)
-    )
+    return dumps(dm)
 
 @APP.route('/dm/list/v1', methods=['GET'])
 def dm_list_server():
@@ -305,9 +305,8 @@ def dm_list_server():
 def dm_details_server():
     token = request.args.get('token')
     dm_id = request.args.get('dm_id')
-    return dumps(
-        dm_details_v1(token,dm_id)
-    )
+    dm_details = dm_details_v1(token,dm_id)
+    return dumps(dm_details)
 
 @APP.route('/dm/remove/v1', methods=['DELETE'])
 def dm_remove_server():

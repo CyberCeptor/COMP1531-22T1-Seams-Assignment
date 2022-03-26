@@ -15,12 +15,12 @@ import requests
 from src import config
 
 
-@pytest.mark.usefixtures('clear_and_register_and_create_channel')
-def test_message_send_invalid_token(clear_and_register_and_create_channel):
+@pytest.mark.usefixtures('clear_register_createchannel')
+def test_message_send_invalid_token(clear_register_createchannel):
     """
     test for invalid input of token
 
-    Arguments: clear_and_register_and_create_channel
+    Arguments: clear_register_createchannel
 
     Exceptions: N/A
 
@@ -29,7 +29,7 @@ def test_message_send_invalid_token(clear_and_register_and_create_channel):
     # pylint: disable=unused-argument
 
     # token is int
-    chan_id = clear_and_register_and_create_channel[1]
+    chan_id = clear_register_createchannel[1]
     resp0 = requests.post(config.url + 'message/send/v1', 
                           json = {'token': 0, 'channel_id': chan_id, 'message': 'hewwo'})
     assert resp0.status_code == 400
@@ -62,19 +62,19 @@ def test_message_send_invalid_token(clear_and_register_and_create_channel):
     
     requests.delete(config.url + 'clear/v1')
 
-@pytest.mark.usefixtures('clear_and_register_and_create_channel')
-def test_message_send_invalid_channel_id(clear_and_register_and_create_channel):
+@pytest.mark.usefixtures('clear_register_createchannel')
+def test_message_send_invalid_channel_id(clear_register_createchannel):
     """
     test for invalid input of channel id
 
-    Arguments: clear_and_register_and_create_channel
+    Arguments: clear_register_createchannel
 
     Exceptions: N/A
 
     Return Value: N/A
     """
 
-    token = clear_and_register_and_create_channel[0]['token']
+    token = clear_register_createchannel[0]['token']
     # no channel id input
     resp0 = requests.post(config.url + 'message/send/v1', 
                           json = {'token': token, 'channel_id': '', 'message': 'hewwo'})
@@ -94,20 +94,20 @@ def test_message_send_invalid_channel_id(clear_and_register_and_create_channel):
 
     requests.delete(config.url + 'clear/v1')
 
-@pytest.mark.usefixtures('clear_and_register_and_create_channel')
-def test_message_send_invalid_message(clear_and_register_and_create_channel):
+@pytest.mark.usefixtures('clear_register_createchannel')
+def test_message_send_invalid_message(clear_register_createchannel):
     """
     test for invalid input of message
 
-    Arguments: clear_and_register_and_create_channel
+    Arguments: clear_register_createchannel
 
     Exceptions: N/A
 
     Return Value: N/A
     """
 
-    token = clear_and_register_and_create_channel[0]['token']
-    chan_id = clear_and_register_and_create_channel[1]
+    token = clear_register_createchannel[0]['token']
+    chan_id = clear_register_createchannel[1]
     # message is int
     resp0 = requests.post(config.url + 'message/send/v1', 
                           json = {'token': token, 'channel_id': chan_id, 'message': 0})
@@ -120,12 +120,12 @@ def test_message_send_invalid_message(clear_and_register_and_create_channel):
 
     requests.delete(config.url + 'clear/v1')
 
-@pytest.mark.usefixtures('clear_and_register_and_create_channel')
-def test_message_send_invalid_length(clear_and_register_and_create_channel):
+@pytest.mark.usefixtures('clear_register_createchannel')
+def test_message_send_invalid_length(clear_register_createchannel):
     """
     test if input message length is valid(less than 1, over 1000 char)
 
-    Arguments:  clear_and_register_and_create_channel
+    Arguments:  clear_register_createchannel
 
     Exceptions:
         InputError  -   Raised for all tests below
@@ -133,8 +133,8 @@ def test_message_send_invalid_length(clear_and_register_and_create_channel):
     Return Value:   N/A
     """
 
-    token = clear_and_register_and_create_channel[0]['token']
-    chan_id = clear_and_register_and_create_channel[1]
+    token = clear_register_createchannel[0]['token']
+    chan_id = clear_register_createchannel[1]
     # long_message is more than 1000 char
     long_message = 'MoreThanAthousandCharactersMoreThanAthousandCharactersMoreThanAt\
     housandCharactersMoreThanAthousandCharactersMoreThanAthousandCharactersMo\
@@ -164,12 +164,12 @@ def test_message_send_invalid_length(clear_and_register_and_create_channel):
 
     requests.delete(config.url + 'clear/v1')
 
-@pytest.mark.usefixtures('clear_and_register_and_create_channel')
-def test_user_not_belong(clear_and_register_and_create_channel):
+@pytest.mark.usefixtures('clear_register_createchannel')
+def test_user_not_belong(clear_register_createchannel):
     """
     testing if user belongs to the channel
 
-    Arguments: clear_and_register_and_create_channel (fixture)
+    Arguments: clear_register_createchannel (fixture)
 
     Exceptions: 
         Access Error - Raised for all test cases below
@@ -177,7 +177,7 @@ def test_user_not_belong(clear_and_register_and_create_channel):
     Return Value: N/A
     """
     
-    chan_id = clear_and_register_and_create_channel[1]
+    chan_id = clear_register_createchannel[1]
 
     # create user 2
     user2 = requests.post(config.url + 'auth/register/v2', 
@@ -192,20 +192,20 @@ def test_user_not_belong(clear_and_register_and_create_channel):
 
     requests.delete(config.url + 'clear/v1')
 
-@pytest.mark.usefixtures('clear_and_register_and_create_channel')
-def test_successful_message_send(clear_and_register_and_create_channel):
+@pytest.mark.usefixtures('clear_register_createchannel')
+def test_successful_message_send(clear_register_createchannel):
     """
     testing gor successful run of message send v1 and return
 
-    Arguments: clear_and_register_and_create_channel (fixture)
+    Arguments: clear_register_createchannel (fixture)
 
     Exceptions: N/A
 
     Return Value: N/A
     """
     
-    token = clear_and_register_and_create_channel[0]['token']
-    chan_id = clear_and_register_and_create_channel[1]
+    token = clear_register_createchannel[0]['token']
+    chan_id = clear_register_createchannel[1]
 
     send_message = requests.post(config.url + 'message/send/v1', 
                           json={'token': token, 'channel_id': chan_id, 
