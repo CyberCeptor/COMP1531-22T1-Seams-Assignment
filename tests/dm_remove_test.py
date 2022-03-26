@@ -1,5 +1,5 @@
 """
-Filename: dm_remove_test.py
+Filename: dm_remove_http_test.py
 
 Author: Zefan Cao(z5237177)
 Created: 14/03/2022 - 24/03/2022
@@ -7,12 +7,30 @@ Created: 14/03/2022 - 24/03/2022
 Description: pytest for dm_remove
 """
 import pytest
-from src.dm import dm_create_v1, dm_list_v1, dm_remove_v1, dm_leave_v1
-from src.auth import auth_register_v2
-from src.error import InputError, AccessError
-from src.other import clear_v1
+import requests
+from src import config
 
-def test_dm_remove_valid():
+@pytest.fixture(name='clear_and_register')
+def fixture_clear_and_register():
+    """
+    clears any data stored in data_store and registers a user with the
+    given information
+
+    Arguments: N/A
+
+    Exceptions: N/A
+
+    Return Value: data['token']
+                  data['auth_user_id']
+    """
+    requests.delete(config.url + 'clear/v1')
+    resp = requests.post(config.url + 'auth/register/v2', 
+                        json={'email': 'wky@gmail.com', 'password': '547832',
+                                'name_first': 'wang', 'name_last': 'kaiyan'})
+    data = resp.json()
+    return [data['token'], data['auth_user_id']]
+
+def test_dm_remove_valid(clear_and_register):
     """
     clears any data stored in data_store and registers a user with the
     given information, run dm remove successfully
@@ -23,28 +41,36 @@ def test_dm_remove_valid():
 
     Return Value: N/A
     """
-    clear_v1()
-    user1 = auth_register_v2('wky@gmail.com', '547832', 'wang', 'kaiyan')
-    user2 = auth_register_v2('lmz@gmail.com', '893621', 'li', 'mingzhe')
+    token1 = clear_and_register[0]
+    id1 = clear_and_register[1]
+    resp1 = requests.post(config.url + 'auth/register/v2', 
+                        json={'email': 'lmz@gmail.com', 'password': '893621',
+                                'name_first': 'li', 'name_last': 'mingzhe'})
+    data1 = resp1.json()
+    id2 = data1['auth_user_id']
+    token2 = data1['token']
+    
+    create = requests.post(config.url + 'dm/create/v1', 
+                json={'token': token2, 'u_ids': [id1]})
+    data2 = create.json()
+    dm_id = data2['dm_id']
+    remove = requests.delete(config.url + 'dm/remove/v1', 
+                        json={'token': token2, 'dm_id': dm_id})
+    assert remove.status_code == 200
 
-    token1 = user1['token']
-    token2 = user2['token']
-    id1 = user1["auth_user_id"]
-    id2 = user2["auth_user_id"]
+    create = requests.post(config.url + 'dm/create/v1', 
+                json={'token': token1, 'u_ids': [id2]})
+    data2 = create.json()
+    dm_id = data2['dm_id']
+    remove = requests.delete(config.url + 'dm/remove/v1', 
+                        json={'token': token1, 'dm_id': dm_id})
+    assert remove.status_code == 200
 
-    dm_dict = dm_create_v1(token2, [id1])
-    dm_id = dm_dict['dm_id']
-    dm_remove_v1(token2, dm_id)
-    dm_dict = dm_list_v1(token2) 
-    assert dm_dict['dms'] == []
+    create = requests.post(config.url + 'dm/create/v1', 
+                json={'token': token1, 'u_ids': [id2, id1]})
+    assert create.status_code == 400
 
-    dm_dict = dm_create_v1(token1, [id2])
-    dm_id = dm_dict['dm_id']
-    dm_remove_v1(token1, dm_id)
-    dm_dict = dm_list_v1(token1)
-    assert dm_dict['dms'] == []
-
-def test_dm_remove_invalid_dm():
+def test_dm_remove_invalid_u_id(clear_and_register):
     """
     clears any data stored in data_store and registers a user with the
     given information, raise inputerror by invalid u_id
@@ -55,29 +81,37 @@ def test_dm_remove_invalid_dm():
 
     Return Value: N/A
     """
-    clear_v1()
-    user1 = auth_register_v2('wky@gmail.com', '547832', 'wang', 'kaiyan')
-    user2 = auth_register_v2('lmz@gmail.com', '893621', 'li', 'mingzhe')
-    token1 = user1['token']
-    id2 = user2['auth_user_id']
+    id1 = clear_and_register[1]
+    resp1 = requests.post(config.url + 'auth/register/v2', 
+                        json={'email': 'lmz@gmail.com', 'password': '893621',
+                                'name_first': 'li', 'name_last': 'mingzhe'})
+    data1 = resp1.json()
+    token2 = data1['token']
 
-    dm_create_v1(token1, [id2])
-    with pytest.raises(InputError):
-        dm_remove_v1(token1, 900)
-
-    with pytest.raises(InputError):
-        dm_remove_v1(token1, -900)
+    requests.post(config.url + 'dm/create/v1', 
+                json={'token': token2, 'u_ids': [id1]})
     
-    with pytest.raises(InputError):
-        dm_remove_v1(token1, '')
+    remove = requests.delete(config.url + 'dm/remove/v1', 
+                        json={'token': token2, 'dm_id': ''})
+    assert remove.status_code == 400
 
-    with pytest.raises(InputError):
-        dm_remove_v1(token1, False)
-    
-    with pytest.raises(InputError):
-        dm_remove_v1(token1, 'sh')
+    remove = requests.delete(config.url + 'dm/remove/v1', 
+                        json={'token': token2, 'dm_id': 'dfg'})
+    assert remove.status_code == 400
 
-def test_dm_remove_not_creator():
+    remove = requests.delete(config.url + 'dm/remove/v1', 
+                        json={'token': token2, 'dm_id': True})
+    assert remove.status_code == 400
+
+    remove = requests.delete(config.url + 'dm/remove/v1', 
+                        json={'token': token2, 'dm_id': 900})
+    assert remove.status_code == 400
+
+    remove = requests.delete(config.url + 'dm/remove/v1', 
+                        json={'token': token2, 'dm_id': -900})
+    assert remove.status_code == 400
+
+def test_dm_remove_not_creator(clear_and_register):
     """
     clears any data stored in data_store and registers a user with the
     given information, raise accesserror by not a creator
@@ -88,20 +122,22 @@ def test_dm_remove_not_creator():
 
     Return Value: N/A
     """
-    clear_v1()
-    user1 = auth_register_v2('wky@gmail.com', '547832', 'wang', 'kaiyan')
-    user2 = auth_register_v2('lmz@gmail.com', '893621', 'li', 'mingzhe')
+    token1 = clear_and_register[0]
+    id1 = clear_and_register[1]
+    resp1 = requests.post(config.url + 'auth/register/v2', 
+                        json={'email': 'lmz@gmail.com', 'password': '893621',
+                                'name_first': 'li', 'name_last': 'mingzhe'})
+    data1 = resp1.json()
+    token2 = data1['token']
+    create = requests.post(config.url + 'dm/create/v1', 
+                json={'token': token2, 'u_ids': [id1]})
+    data2 = create.json()
+    dm_id = data2['dm_id']
+    remove = requests.delete(config.url + 'dm/remove/v1', 
+                        json={'token': token1, 'dm_id': dm_id})
+    assert remove.status_code == 403
 
-    token1 = user1['token']
-    token2 = user2['token']
-    id2 = user2['auth_user_id']
-    dm_dict = dm_create_v1(token1, [id2])
-    dm_id = dm_dict["dm_id"]
-
-    with pytest.raises(AccessError):
-        dm_remove_v1(token2, dm_id)
-
-def test_dm_remove_not_in_dm():
+def test_dm_remove_not_in_dm(clear_and_register):
     """
     clears any data stored in data_store and registers a user with the
     given information, raise accesserror by not in dm
@@ -112,19 +148,19 @@ def test_dm_remove_not_in_dm():
 
     Return Value: N/A
     """
-    # Clear the data structure
-    clear_v1()
-
-    # Call other functions to create the data and store in data structure
-    user1 = auth_register_v2('wky@gmail.com', '547832', 'wang', 'kaiyan')
-    user2 = auth_register_v2('lmz@gmail.com', '893621', 'li', 'mingzhe')
-
-    token1 = user1['token']
-    id2 = user2['auth_user_id']
-
-    dm_dict = dm_create_v1(token1, [id2])
-    dm_id = dm_dict['dm_id']
-    dm_leave_v1(token1, dm_id)
-    with pytest.raises(AccessError):
-        dm_remove_v1(token1, dm_id)
-clear_v1()
+    token1 = clear_and_register[0]
+    resp1 = requests.post(config.url + 'auth/register/v2', 
+                        json={'email': 'lmz@gmail.com', 'password': '893621',
+                                'name_first': 'li', 'name_last': 'mingzhe'})
+    data1 = resp1.json()
+    id2 = data1['auth_user_id']
+    create = requests.post(config.url + 'dm/create/v1', 
+                        json={'token': token1, 'u_ids': [id2]})
+    data2 = create.json()
+    dm_id = data2['dm_id']
+    requests.post(config.url + 'dm/leave/v1', 
+                json={'token': token1, 'dm_id': dm_id})
+    remove = requests.delete(config.url + 'dm/remove/v1', 
+                json={'token': token1, 'dm_id': dm_id})
+    assert remove.status_code == 403
+requests.delete(config.url + 'clear/v1')
