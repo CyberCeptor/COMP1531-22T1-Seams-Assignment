@@ -314,3 +314,5 @@ def test_channel_removeowner_bad_token(clear_and_register_and_create):
     remove = requests.post(config.url + 'channel/removeowner/v1', 
                         json={'token': unsaved_token, 'channel_id': channel_id, 'u_id': user2_id})
     assert remove.status_code == 403
+
+requests.delete(config.url + 'clear/v1')

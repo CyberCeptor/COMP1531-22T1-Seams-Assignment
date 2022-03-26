@@ -238,3 +238,5 @@ def test_channel_details_return(clear_and_register_and_create):
     #         'handle_str': 'firstlast'
     #     }]
     # }
+requests.delete(config.url + 'clear/v1')
+
