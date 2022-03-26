@@ -118,6 +118,4 @@ def test_channel_leave_invalid_token(clear_and_register_create):
                             json={'token': 'bad_token', 'channel_id': channel_id})
     assert channel_leave.status_code == 403
 
-
-
-
+requests.delete(config.url + 'clear/v1')

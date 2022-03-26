@@ -101,6 +101,11 @@ def auth_register_v2(email, password, name_first, name_last):
 
     # check for invalid name
     full_name = name_first + name_last
+    if type(name_first) is not str or type(name_first) is bool:
+        raise InputError(description='Invalid first name')
+    if type(name_last) is not str or type(name_last) is bool:
+        raise InputError(description='Invalid last name')
+
     check_invalid_name(name_first, name_last, full_name)
 
     handle = create_handle(store, full_name)
