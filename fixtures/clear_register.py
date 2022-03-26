@@ -13,8 +13,8 @@ import requests
 
 from src import config
 
-@pytest.fixture(name='clear_and_register')
-def fixture_clear_and_register():
+@pytest.fixture
+def clear_register():
     """ clears any data stored in data_store and registers a user with the
     given information """
 

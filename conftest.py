@@ -1,5 +1,5 @@
 import pytest
 
-from fixtures.clear_and_register import fixture_clear_and_register
-from fixtures.clear_and_register_two import clear_and_register_two
-from fixtures.clear_and_register_and_create_channel import clear_and_register_and_create_channel
+from fixtures.clear_register import clear_register
+from fixtures.clear_register_two import clear_register_two
+from fixtures.clear_register_createchannel import clear_register_createchannel
