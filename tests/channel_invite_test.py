@@ -243,6 +243,7 @@ def test_channel_invite_inviter_not_in_channel(clear_and_register_and_create):
     assert add.status_code == 403
 
 requests.delete(config.url + 'clear/v1')
+<<<<<<< HEAD
 
 def test_channel_invite_success(clear_and_register_and_create):
     """
@@ -270,3 +271,5 @@ def test_channel_invite_success(clear_and_register_and_create):
                         json={'token': id1, 'channel_id': chan_id1,
                                 'u_id': user2['auth_user_id']})
     assert add.status_code == 200
+=======
+>>>>>>> master

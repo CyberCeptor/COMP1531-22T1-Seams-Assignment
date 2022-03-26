@@ -255,7 +255,6 @@ def message_senddm_v1(token, dm_id, message):
         'time_sent': utc_timestamp
     }
 
-
     dm_info['messages'].insert(0, message_data)
 
     data_store.set(store)

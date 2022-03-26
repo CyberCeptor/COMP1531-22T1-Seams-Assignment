@@ -272,8 +272,4 @@ def test_channel_addowner_working(clear_and_register_and_create):
     assert channels_json['owner_members'][1]['name_last'] == 'last2'
     assert channels_json['owner_members'][1]['handle_str'] == 'first2last2'
 
-
-
-
-
-
+requests.delete(config.url + 'clear/v1')

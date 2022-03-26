@@ -14,4 +14,7 @@ tokens.py
     like other strings do. This is so that integers in the query params of get
     requests will not be considered as strings
 
-
+user.py
+- in setname, the user's name must follow the same restrictions as when the user
+    is first registered, including that their full name must have at least one char
+    that is alphanumeric

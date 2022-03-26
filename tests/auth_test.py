@@ -211,6 +211,11 @@ def test_register_invalid_name(clear_and_register):
                                'name_first': '-', 'name_last': ' '})
     assert resp4.status_code == 400
 
+    resp5 = requests.post(config.url + 'auth/register/v2', 
+                         json={'email': 'def@ghi.com', 'password': 'password',
+                               'name_first': True, 'name_last': ' '})
+    assert resp5.status_code == 400
+
 # based on code Hayden wrote in project starter video
 def test_register_works():
     """ tests if auth_register_v1 works by registering a user and logging them

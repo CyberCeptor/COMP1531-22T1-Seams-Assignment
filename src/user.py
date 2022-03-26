@@ -97,8 +97,7 @@ def user_profile_setname_v1(token, name_first, name_last):
     if type(name_last) is not str or type(name_last) is bool:
         raise InputError(description='Invalid last name')
 
-    full_name = name_first + name_last    
-    check_invalid_name(name_first, name_last, full_name)
+    check_invalid_name(name_first, name_last)
 
     # set the user name to the new name
     for user in store['users']:

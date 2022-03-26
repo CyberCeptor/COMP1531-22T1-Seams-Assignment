@@ -214,5 +214,4 @@ def test_create_handle_symbols():
 
     assert get['users'][0]['handle_str'] == 'bcdefghjklmnopqrst'
 
-# clear_v1()
 requests.delete(config.url + 'clear/v1')

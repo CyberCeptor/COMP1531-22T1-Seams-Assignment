@@ -209,3 +209,4 @@ def test_channels_list_invalid_token():
 #                             json={'token': user_json['token'], 'name': 'public_channel', 'is_public': True})
     
 #     assert channel.status_code == 403
+requests.delete(config.url + 'clear/v1')
