@@ -48,15 +48,14 @@ def dm_create_v1(token, u_ids):
     for u_id in u_ids:
         check_creator_notin_u_ids_duplicate(auth_id, u_id, u_ids)
         user = check_valid_auth_id(u_id)
-        user1 = {
+        name_list.append(user['handle'])
+        all_member_list.append({
             'u_id': user['id'],
             'email': user['email'],
             'name_first': user['first'],
             'name_last': user['last'],
             'handle_str': user['handle']
-        }
-        name_list.append(user['handle'])
-        all_member_list.append(user1)
+        })
     #sort name list
     name_list.sort()
     #use , to separate
@@ -73,7 +72,7 @@ def dm_create_v1(token, u_ids):
     store['dms'].append(new_dm)
     # Save data
     data_store.set(store)
-    
+
     return {'dm_id': dm_id}
 
 def dm_list_v1(token):
@@ -93,7 +92,10 @@ def dm_list_v1(token):
     store = data_store.get()
     for dm in store['dms']:
         check_user_is_member(auth_id, dm, 'members')
-        new_dict = {"dm_id": dm['dm_id'], "name": dm['name']}
+        new_dict = {
+            "dm_id": dm['dm_id'], 
+            "name": dm['name']
+        }
         dm_list.append(new_dict)
 
     return {"dms": dm_list}
@@ -157,6 +159,10 @@ def dm_leave_v1(auth_user_id, dm_id):
         if(auth_user_id == member['u_id']):
             dm['members'].remove(member)
             data_store.set(store)
+<<<<<<< HEAD
+=======
+
+>>>>>>> master
 
 def check_valid_dm_id(dm_id):
     """
@@ -220,4 +226,8 @@ def dm_messages_v1(token, dm_id, start):
 
     messages = get_messages(auth_user_id, dm_data, start, "dm")
 
+<<<<<<< HEAD
     return messages
+=======
+    return(messages)
+>>>>>>> master

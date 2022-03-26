@@ -18,6 +18,11 @@ from src.error import InputError, AccessError
 from src.other import check_valid_auth_id, get_messages
 from src.other import check_user_is_member, check_valid_channel_id, check_user_is_global_owner
 from src.data_store import data_store
+<<<<<<< HEAD
+=======
+from src.token import token_valid_check, token_get_user_id
+
+>>>>>>> master
 from src.token import token_valid_check, token_get_user_id
 
 def channel_invite_v2(token, channel_id, u_id):
@@ -121,7 +126,11 @@ def channel_messages_v2(token, channel_id, start):
 
     messages = get_messages(auth_user_id, channel_data, start, "channel")
 
+<<<<<<< HEAD
     return messages
+=======
+    return(messages)
+>>>>>>> master
 
 def channel_join_v2(token, channel_id):
     """
