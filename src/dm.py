@@ -8,7 +8,7 @@ Description: dm functions
 """
 from src.data_store import data_store
 from src.token import token_valid_check, token_get_user_id
-from src.other import check_valid_auth_id, cast_to_int_get_requests, check_user_is_member
+from src.other import check_valid_auth_id, cast_to_int_get_requests, check_user_is_member, get_messages
 from src.error import InputError, AccessError
 from src.global_vars import new_dm_id
 
@@ -47,15 +47,14 @@ def dm_create_v1(token, u_ids):
     for u_id in u_ids:
         check_creator_notin_u_ids_duplicate(auth_id, u_id, u_ids)
         user = check_valid_auth_id(u_id)
-        user1 = {
+        name_list.append(user['handle'])
+        all_member_list.append({
             'u_id': user['id'],
             'email': user['email'],
             'name_first': user['first'],
             'name_last': user['last'],
             'handle_str': user['handle']
-        }
-        name_list.append(user['handle'])
-        all_member_list.append(user1)
+        })
     #sort name list
     name_list.sort()
     #use , to separate
@@ -72,7 +71,7 @@ def dm_create_v1(token, u_ids):
     store['dms'].append(new_dm)
     # Save data
     data_store.set(store)
-    
+
     return {'dm_id': dm_id}
 
 def dm_list_v1(token):
@@ -92,7 +91,10 @@ def dm_list_v1(token):
     store = data_store.get()
     for dm in store['dms']:
         check_user_is_member(auth_id, dm, 'members')
-        new_dict = {"dm_id": dm['dm_id'], "name": dm['name']}
+        new_dict = {
+            "dm_id": dm['dm_id'], 
+            "name": dm['name']
+        }
         dm_list.append(new_dict)
 
     return {"dms": dm_list}
@@ -114,45 +116,49 @@ def dm_remove_v1(token, dm_id):
     token_valid_check(token)
     # Call helper function to check for valid dm
     dm = check_valid_dm_id(dm_id)
+
     # Call helper function to check valid token
     auth_id = token_get_user_id(token)
-    if(dm['creator'] == {}):
+
+    if check_user_is_member(auth_id, dm, 'members') is None:
         raise AccessError('The authorised user is no longer in dm')
-    elif(dm['creator']['u_id'] != auth_id):
+    
+    if dm['creator']['u_id'] != auth_id:
         raise AccessError('The auth user is not original dm creator')
     else:
         store['dms'].remove(dm)
+    
     data_store.set(store)
 
 def dm_details_v1(token, dm_id):
     token_valid_check(token)
     auth_id = token_get_user_id(token)
     dm = check_valid_dm_id(dm_id)
-    dm_auth_user = False
-    if check_user_is_member(auth_id, dm, 'members'):
-        dm_auth_user = True
-        return {
-            'name': dm['name'],
-            'members': dm['members']
-        }
-    if not dm_auth_user:
-        raise AccessError('The authorised user is no longer in dm')
 
-def dm_leave_v1(token, dm_id):
-    token_valid_check(token)
-    auth_id = token_get_user_id(token)
+    if check_user_is_member(auth_id, dm, 'members') is None:
+        raise AccessError('The authorised user is no longer in dm')
+    
+    return {
+        'name': dm['name'],
+        'members': dm['members']
+    }
+
+
+def dm_leave_v1(auth_user_id, dm_id):
     dm = check_valid_dm_id(dm_id)
     store = data_store.get()
-    dm_auth_user = False
-    if(dm['creator']['u_id'] == auth_id):
-        dm['creator'] = {}
-    for member in dm['members']:
-        if(auth_id == member['u_id']):
-            dm_auth_user = True
-            dm['members'].remove(member)
-    if not dm_auth_user:
+
+    if check_user_is_member(auth_user_id, dm, 'members') is None:
         raise AccessError('The authorised user is no longer in dm')
-    data_store.set(store)
+
+    if(dm['creator']['u_id'] == auth_user_id):
+        dm['creator'] = {}
+
+    for member in dm['members']:
+        if(auth_user_id == member['u_id']):
+            dm['members'].remove(member)
+            data_store.set(store)
+
 
 def check_valid_dm_id(dm_id):
     """
@@ -188,3 +194,32 @@ def check_creator_notin_u_ids_duplicate(u_id, id, u_ids):
     elif(u_ids.count(id) > 1):
         raise InputError('There are duplicate u_ids')
 
+def dm_messages_v1(token, dm_id, start):
+    """
+    check if given user id and dm id are valid,
+    check start not overflow in dm,
+    return messages to a dm authorised user,
+    if too much messages do pagination operate.
+
+    Arguments:
+        auth_user_id (int)    - an integer that specifies user id
+        dm_id (int) - an integer that specifies dm id
+        start (int) - an integer that specifies index for message
+
+    Exceptions:
+        AccessError - Occurs if the user id does not exist in dm
+
+    Return Value:
+        Returns a dictionary containing message_id, u_id, message, time_sent,
+        start and end if given user id and dm id are valid
+    """
+    token_valid_check(token)
+    auth_user_id = token_get_user_id(token)
+
+    # see if given auth_user_id and dm_id are valid
+    check_valid_auth_id(auth_user_id)
+    dm_data = check_valid_dm_id(dm_id)
+
+    messages = get_messages(auth_user_id, dm_data, start, "dm")
+
+    return(messages)

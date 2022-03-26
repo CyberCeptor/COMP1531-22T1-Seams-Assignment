@@ -104,6 +104,18 @@ def test_register_invalid_email(clear_and_register):
                                'name_first': 'first', 'name_last': 'last'})
     assert resp7.status_code == 400
 
+    # email is bool
+    resp7 = requests.post(config.url + 'auth/register/v2', 
+                         json={'email': True, 'password': 'password',
+                               'name_first': 'first', 'name_last': 'last'})
+    assert resp7.status_code == 400
+
+    # email is int
+    resp7 = requests.post(config.url + 'auth/register/v2', 
+                         json={'email': 666, 'password': 'password',
+                               'name_first': 'first', 'name_last': 'last'})
+    assert resp7.status_code == 400
+
 # based on code Haydon wrote in project starter video
 def test_register_duplicate_email(clear_and_register):
     """ registers a user with the same email as an already registered user and

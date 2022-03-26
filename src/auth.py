@@ -19,7 +19,7 @@ from src.error import InputError
 from src.data_store import data_store
 from src.token import token_generate, token_valid_check, token_remove
 
-VALID_EMAIL_REGEX = r'^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}$'
+from src.global_vars import valid_email_regex
 
 def auth_login_v2(email, password):
     """
@@ -91,7 +91,7 @@ def auth_register_v2(email, password, name_first, name_last):
     # generate user id
     u_id = len(store['users']) + 1
 
-    check_invalid_email(store, VALID_EMAIL_REGEX, email)
+    check_invalid_email(store, valid_email_regex, email)
 
     # check for invalid password
     if len(password) < 6:
@@ -144,7 +144,7 @@ def check_invalid_email(store, valid_email_regex, email):
     """
 
     # check for valid email address
-    if not re.fullmatch(valid_email_regex, email):
+    if not re.fullmatch(valid_email_regex, str(email)):
         raise InputError(description='Invalid email address')
 
     # check for duplicate email
