@@ -198,15 +198,19 @@ def test_channel_invite_invitee_already_joined(clear_and_register_and_create):
     """
     id1 = clear_and_register_and_create[0]
     chan_id1 = clear_and_register_and_create[1]
-    resp1 = requests.post(config.url + 'auth/register/v2', 
+    # create user 2
+    create_user2 = requests.post(config.url + 'auth/register/v2', 
                         json={'email': 'xue2@gmail.com', 'password': 'xzq19112',
                                 'name_first': 'Xue', 'name_last':'zhiqian'})
-    data = resp1.json()
+    user2 = create_user2.json()
+
+    # user 2 joins channel 1
     requests.post(config.url + 'channel/join/v2',
-                json={'token': data['token'], 'channel_id': chan_id1})   
+                json={'token': user2['token'], 'channel_id': chan_id1})  
+    # user 1 invites user 2
     add = requests.post(config.url + 'channel/invite/v2', 
                         json={'token': id1, 'channel_id': chan_id1,
-                                'u_id': data['auth_user_id']})
+                                'u_id': user2['auth_user_id']})
     assert add.status_code == 400
 
 def test_channel_invite_inviter_not_in_channel(clear_and_register_and_create):
@@ -239,3 +243,30 @@ def test_channel_invite_inviter_not_in_channel(clear_and_register_and_create):
     assert add.status_code == 403
 
 requests.delete(config.url + 'clear/v1')
+
+def test_channel_invite_success(clear_and_register_and_create):
+    """
+    clears any data stored in data_store and registers a invitee, a inviter,
+    a truowner withi given info, testing a invitee is alredy in channel to raise
+    input error
+
+    Arguments: clear_and_register_and_create (fixture)
+
+    Exceptions:
+        InputError - Raised for a invitee(already in channel)
+
+    Return Value: N/A
+    """
+    id1 = clear_and_register_and_create[0]
+    chan_id1 = clear_and_register_and_create[1]
+    # create user 2
+    create_user2 = requests.post(config.url + 'auth/register/v2', 
+                        json={'email': 'xue2@gmail.com', 'password': 'xzq19112',
+                                'name_first': 'Xue', 'name_last':'zhiqian'})
+    user2 = create_user2.json()
+
+    # user 1 invites user 2
+    add = requests.post(config.url + 'channel/invite/v2', 
+                        json={'token': id1, 'channel_id': chan_id1,
+                                'u_id': user2['auth_user_id']})
+    assert add.status_code == 200

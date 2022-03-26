@@ -35,6 +35,21 @@ def fixture_clear_and_register_create():
 def test_channel_leave_works(clear_and_register_create):
     token = clear_and_register_create[0]
     channel_id = clear_and_register_create[1]
+
+    create_user2 = requests.post(config.url + 'auth/register/v2', 
+                        json={'email': 'xue2@gmail.com', 'password': 'xzq19112',
+                                'name_first': 'Xue', 'name_last':'zhiqian'})
+    user2 = create_user2.json()
+    token2 = user2['token']
+
+    join_2 = requests.post(config.url + 'channel/join/v2',
+                        json={'token': token2, 'channel_id': channel_id})
+    assert join_2.status_code == 200
+    
+    channel_leave = requests.post(config.url + 'channel/leave/v1', 
+                            json={'token': token2, 'channel_id': channel_id})
+    assert channel_leave.status_code == 200
+
     channel_leave = requests.post(config.url + 'channel/leave/v1', 
                             json={'token': token, 'channel_id': channel_id})
     assert channel_leave.status_code == 200
