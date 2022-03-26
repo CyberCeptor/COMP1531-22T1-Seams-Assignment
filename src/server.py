@@ -320,9 +320,10 @@ def dm_remove_server():
 @APP.route('/dm/leave/v1', methods=['POST'])
 def dm_leave():
     store = request.get_json()
-    token = store['token']
     dm_id = store['dm_id']
-    dm_leave_v1(token, dm_id)
+    token_valid_check(store['token'])
+    auth_id = token_get_user_id(store['token'])
+    dm_leave_v1(auth_id, dm_id)
     return dumps({})
 
 @APP.route('/dm/messages/v1', methods=['GET'])

@@ -119,7 +119,9 @@ def channel_messages_v2(token, channel_id, start):
     check_valid_auth_id(auth_user_id)
     channel_data = check_valid_channel_id(channel_id)
 
-    get_messages(auth_user_id, channel_data, start, "channel")
+    messages = get_messages(auth_user_id, channel_data, start, "channel")
+
+    return messages
 
 def channel_join_v2(token, channel_id):
     """

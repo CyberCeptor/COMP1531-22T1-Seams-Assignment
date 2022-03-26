@@ -115,45 +115,48 @@ def dm_remove_v1(token, dm_id):
     token_valid_check(token)
     # Call helper function to check for valid dm
     dm = check_valid_dm_id(dm_id)
+
     # Call helper function to check valid token
     auth_id = token_get_user_id(token)
-    if(dm['creator'] == {}):
+
+    if check_user_is_member(auth_id, dm, 'members') is None:
         raise AccessError('The authorised user is no longer in dm')
-    elif(dm['creator']['u_id'] != auth_id):
+    
+    if dm['creator']['u_id'] != auth_id:
         raise AccessError('The auth user is not original dm creator')
     else:
         store['dms'].remove(dm)
+    
     data_store.set(store)
 
 def dm_details_v1(token, dm_id):
     token_valid_check(token)
     auth_id = token_get_user_id(token)
     dm = check_valid_dm_id(dm_id)
-    dm_auth_user = False
-    if check_user_is_member(auth_id, dm, 'members'):
-        dm_auth_user = True
-        return {
-            'name': dm['name'],
-            'members': dm['members']
-        }
-    if not dm_auth_user:
-        raise AccessError('The authorised user is no longer in dm')
 
-def dm_leave_v1(token, dm_id):
-    token_valid_check(token)
-    auth_id = token_get_user_id(token)
+    if check_user_is_member(auth_id, dm, 'members') is None:
+        raise AccessError('The authorised user is no longer in dm')
+    
+    return {
+        'name': dm['name'],
+        'members': dm['members']
+    }
+
+
+def dm_leave_v1(auth_user_id, dm_id):
     dm = check_valid_dm_id(dm_id)
     store = data_store.get()
-    dm_auth_user = False
-    if(dm['creator']['u_id'] == auth_id):
-        dm['creator'] = {}
-    for member in dm['members']:
-        if(auth_id == member['u_id']):
-            dm_auth_user = True
-            dm['members'].remove(member)
-    if not dm_auth_user:
+
+    if check_user_is_member(auth_user_id, dm, 'members') is None:
         raise AccessError('The authorised user is no longer in dm')
-    data_store.set(store)
+
+    if(dm['creator']['u_id'] == auth_user_id):
+        dm['creator'] = {}
+
+    for member in dm['members']:
+        if(auth_user_id == member['u_id']):
+            dm['members'].remove(member)
+            data_store.set(store)
 
 def check_valid_dm_id(dm_id):
     """
@@ -215,4 +218,6 @@ def dm_messages_v1(token, dm_id, start):
     check_valid_auth_id(auth_user_id)
     dm_data = check_valid_dm_id(dm_id)
 
-    get_messages(auth_user_id, dm_data, start, "dm")
+    messages = get_messages(auth_user_id, dm_data, start, "dm")
+
+    return messages

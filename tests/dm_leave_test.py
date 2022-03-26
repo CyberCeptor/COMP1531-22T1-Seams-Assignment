@@ -1,5 +1,5 @@
 """
-Filename: dm_leave_test.py
+Filename: dm_leave_http_test.py
 
 Author: Zefan Cao(z5237177)
 Created: 14/03/2022 - 24/03/2022
@@ -7,41 +7,55 @@ Created: 14/03/2022 - 24/03/2022
 Description: http pytest for dm_leave
 """
 import pytest
-from src.dm import dm_create_v1, dm_leave_v1, dm_details_v1
-from src.auth import auth_register_v2
-from src.error import InputError, AccessError
-from src.other import clear_v1
-def test_dm_leave_valid():
+import requests
+from src import config
+
+@pytest.fixture(name='clear_and_register')
+def fixture_clear_and_register():
     """
     clears any data stored in data_store and registers a user with the
-    given information, run dm details successful
+    given information
 
     Arguments: N/A
 
     Exceptions: N/A
 
+    Return Value: data['token']
+                  data['auth_user_id']
+    """
+    requests.delete(config.url + 'clear/v1')
+    resp = requests.post(config.url + 'auth/register/v2', 
+                        json={'email': 'wky@gmail.com', 'password': '547832',
+                                'name_first': 'wang', 'name_last': 'kaiyan'})
+    data = resp.json()
+    return [data['token'], data['auth_user_id']]
+
+def test_dm_leave_valid(clear_and_register):
+    """
+    clears any data stored in data_store and registers a user with the
+    given information, run dm details successful
+
+    Arguments: clear_and_register(fixture)
+
+    Exceptions: N/A
+
     Return Value: N/A
     """
-    clear_v1()
-    user1 = auth_register_v2('wky@gmail.com', '547832', 'wang', 'kaiyan')
-    user2 = auth_register_v2('lmz@gmail.com', '893621', 'li', 'mingzhe')
-    token1 = user1['token']
-    token2 = user2['token']
-    id2 = user2['auth_user_id']
-    id1 = user1['auth_user_id']
-    dm_dict = dm_create_v1(token1, [id2])
-    dm_id = dm_dict['dm_id']
-    dm_leave_v1(token2, dm_id)
-    detail = dm_details_v1(token1, dm_id)
-    assert detail['members'] == [{
-        'u_id':id1,
-        'email':'wky@gmail.com',
-        'name_first':'wang',
-        'name_last':'kaiyan',
-        'handle_str':'wangkaiyan'
-    }]
+    token1 = clear_and_register[0]
+    resp1 = requests.post(config.url + 'auth/register/v2', 
+                        json={'email': 'lmz@gmail.com', 'password': '893621',
+                                'name_first': 'li', 'name_last': 'mingzhe'})
+    data1 = resp1.json()
+    id1 = data1['auth_user_id']
+    create = requests.post(config.url + 'dm/create/v1', 
+                        json={'token': token1, 'u_ids': [id1]})
+    data2 = create.json()
+    dm_id = data2['dm_id']
+    leave = requests.post(config.url + 'dm/leave/v1', 
+                        json={'token': token1, 'dm_id': dm_id})
+    assert leave.status_code == 200
 
-def test_dm_leave_invalid_dm():
+def test_dm_leave_invalid_dm_id(clear_and_register):
     """
     clears any data stored in data_store and registers a user with the
     given information, raised a inputerror by invalid dm id
@@ -52,29 +66,37 @@ def test_dm_leave_invalid_dm():
 
     Return Value: N/A
     """
-    clear_v1()
-    user1 = auth_register_v2('wky@gmail.com', '547832', 'wang', 'kaiyan')
-    user2 = auth_register_v2('lmz@gmail.com', '893621', 'li', 'mingzhe')
+    token1 = clear_and_register[0]
+    id1 = clear_and_register[1]
+    resp1 = requests.post(config.url + 'auth/register/v2', 
+                        json={'email': 'lmz@gmail.com', 'password': '893621',
+                                'name_first': 'li', 'name_last': 'mingzhe'})
+    data1 = resp1.json()
+    id2 = data1['auth_user_id']
+    requests.post(config.url + 'dm/create/v1', 
+                        json={'token': token1, 'u_ids': [id1,id2]})
+  
+    leave = requests.post(config.url + 'dm/leave/v1', 
+                        json={'token': token1, 'dm_id': ''})
+    assert leave.status_code == 400
 
-    token1 = user1['token']
-    id2 = user2['auth_user_id']
-    dm_create_v1(token1, [id2])
-    with pytest.raises(InputError):
-        dm_leave_v1(token1, 900)
+    leave = requests.post(config.url + 'dm/leave/v1', 
+                        json={'token': token1, 'dm_id': 900})
+    assert leave.status_code == 400
 
-    with pytest.raises(InputError):
-        dm_leave_v1(token1, -900)
-    
-    with pytest.raises(InputError):
-        dm_leave_v1(token1, '')
+    leave = requests.post(config.url + 'dm/leave/v1', 
+                        json={'token': token1, 'dm_id': -900})
+    assert leave.status_code == 400
 
-    with pytest.raises(InputError):
-        dm_leave_v1(token1, True)
-    
-    with pytest.raises(InputError):
-        dm_leave_v1(token1, 'sh')
+    leave = requests.post(config.url + 'dm/leave/v1', 
+                        json={'token': token1, 'dm_id': 'kli'})
+    assert leave.status_code == 400
 
-def test_dm_leave_auth_notin_dm():
+    leave = requests.post(config.url + 'dm/leave/v1', 
+                        json={'token': token1, 'dm_id': True})
+    assert leave.status_code == 400
+
+def test_dm_leave_notin_dm(clear_and_register):
     """
     clears any data stored in data_store and registers a user with the
     given information, raise a access error by the auth not in dm
@@ -85,15 +107,23 @@ def test_dm_leave_auth_notin_dm():
 
     Return Value: N/A
     """
-    clear_v1()
-    user1 = auth_register_v2('wky@gmail.com', '547832', 'wang', 'kaiyan')
-    user2 = auth_register_v2('lmz@gmail.com', '893621', 'li', 'mingzhe')
-    user3 = auth_register_v2('hyf@gmail.com', 'hyf1234', 'huang', 'yifei')
-    token1 = user1['token']
-    token3 = user3['token']
-    id2 = user2['auth_user_id']
-    dm_dict = dm_create_v1(token1, [id2])
-    dm_id = dm_dict["dm_id"]
-    with pytest.raises(AccessError):
-        dm_leave_v1(token3, dm_id)
-clear_v1()
+    token1 = clear_and_register[0]
+    resp1 = requests.post(config.url + 'auth/register/v2', 
+                        json={'email': 'lmz@gmail.com', 'password': '893621',
+                                'name_first': 'li', 'name_last': 'mingzhe'})
+    data1 = resp1.json()
+    id2 = data1['auth_user_id']
+    resp2 = requests.post(config.url + 'auth/register/v2', 
+                        json={'email': 'hyf@gmail.com', 'password': 'hyf1234',
+                                'name_first': 'huang', 'name_last': 'yifei'})
+    data2 = resp2.json()
+    create = requests.post(config.url + 'dm/create/v1', 
+                        json={'token': token1, 'u_ids': [id2]})
+    token3 = data2['token']
+    data3 = create.json()
+    dm_id = data3['dm_id']
+    leave = requests.post(config.url + 'dm/leave/v1', 
+                        json={'token': token3, 'dm_id': dm_id})
+    assert leave.status_code == 403
+
+requests.delete(config.url + 'clear/v1')
