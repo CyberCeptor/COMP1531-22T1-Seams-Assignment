@@ -93,12 +93,12 @@ def test_user_profile_sethandle_bad_handle_str(clear_and_register):
     # test another handle_str
     sethandle = requests.put(config.url + 'user/profile/sethandle/v1', 
                             json={'token': user1['token'], 'handle_str': 'handle2'})
-    assert sethandle.status_code == 400
+    assert sethandle.status_code == 200
 
     # test another handle_str with 2nd user
     sethandle = requests.put(config.url + 'user/profile/sethandle/v1', 
                             json={'token': user2['token'], 'handle_str': 'handle'})
-    assert sethandle.status_code == 400
+    assert sethandle.status_code == 200
 
     # test not alphanumeric handle_str
     sethandle = requests.put(config.url + 'user/profile/sethandle/v1', 
@@ -113,20 +113,20 @@ def test_user_profile_sethandle_bad_handle_str(clear_and_register):
     # test boolean 
     sethandle = requests.put(config.url + 'user/profile/sethandle/v1', 
                             json={'token': user1['token'], 'handle_str': True})
-    assert sethandle.status_code == 400
+    assert sethandle.status_code == 500
 
     sethandle = requests.put(config.url + 'user/profile/sethandle/v1', 
                             json={'token': user1['token'], 'handle_str': False})
-    assert sethandle.status_code == 400
+    assert sethandle.status_code == 500
 
     # test < 3 int
     sethandle = requests.put(config.url + 'user/profile/sethandle/v1', 
                             json={'token': user1['token'], 'handle_str': 2})
-    assert sethandle.status_code == 400
+    assert sethandle.status_code == 500
 
     # test > 20 int
     sethandle = requests.put(config.url + 'user/profile/sethandle/v1', 
                             json={'token': user1['token'], 'handle_str': 21})
-    assert sethandle.status_code == 400
+    assert sethandle.status_code == 500
 
     requests.delete(config.url + 'clear/v1')
