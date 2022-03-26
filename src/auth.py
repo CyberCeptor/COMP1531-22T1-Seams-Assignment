@@ -99,14 +99,8 @@ def auth_register_v2(email, password, name_first, name_last):
 
     encrypted_pw = hashlib.sha256(password.encode()).hexdigest()
 
-    # check for invalid name
-    full_name = name_first + name_last
-    if type(name_first) is not str or type(name_first) is bool:
-        raise InputError(description='Invalid first name')
-    if type(name_last) is not str or type(name_last) is bool:
-        raise InputError(description='Invalid last name')
-
-    check_invalid_name(name_first, name_last, full_name)
+    # check for invalid name and return the full name
+    full_name = check_invalid_name(name_first, name_last)
 
     handle = create_handle(store, full_name)
 
@@ -157,7 +151,7 @@ def check_invalid_email(store, valid_email_regex, email):
         if user['email'] == email and user['removed'] is False:
             raise InputError(description='Email has already been taken')
 
-def check_invalid_name(name_first, name_last, full_name):
+def check_invalid_name(name_first, name_last):
     """
     tests if the given name is valid using the VALID_NAME_REGEX above and
     checks if the names will create an invalid handle
@@ -174,6 +168,12 @@ def check_invalid_name(name_first, name_last, full_name):
     Return Value: N/A
     """
 
+    if type(name_first) is not str or type(name_first) is bool:
+        raise InputError(description='Invalid first name')
+
+    if type(name_last) is not str or type(name_last) is bool:
+        raise InputError(description='Invalid last name')
+
     # check for invalid first name
     if name_first == '' or len(name_first) > 50:
         raise InputError(description='Invalid first name')
@@ -182,6 +182,8 @@ def check_invalid_name(name_first, name_last, full_name):
     if name_last == '' or len(name_last) > 50:
         raise InputError(description='Invalid last name')
 
+    full_name = name_first + name_last
+
     # check for invalid full name
     count_alpha = 0
     for char in full_name:
@@ -189,6 +191,8 @@ def check_invalid_name(name_first, name_last, full_name):
             count_alpha += 1
     if count_alpha == 0:
         raise InputError(description='Invalid name')
+    
+    return full_name
 
 def create_handle(store, full_name):
     """
