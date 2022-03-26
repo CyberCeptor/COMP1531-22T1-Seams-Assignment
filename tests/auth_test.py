@@ -15,19 +15,7 @@ from src import config
 NAME_22_CHARS = 'abcdefghijklmnopqrstuv'
 NAME_52_CHARS = 'abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz'
 
-@pytest.fixture(name='clear_and_register')
-def fixture_clear_and_register():
-    """ clears any data stored in data_store and registers a user with the
-    given information """
-
-    # clear_v1()
-    # auth_register_v1('abc@def.com', 'password', 'first', 'last')
-    requests.delete(config.url + 'clear/v1')
-
-    requests.post(config.url + 'auth/register/v2', 
-                  json={'email': 'abc@def.com', 'password': 'password',
-                        'name_first': 'first', 'name_last': 'last'})
-
+@pytest.mark.usefixtures('clear_and_register')
 def test_register_invalid_email(clear_and_register):
     """ registers a user with an invalid email and raises an InputError for each
     case
@@ -117,6 +105,7 @@ def test_register_invalid_email(clear_and_register):
     assert resp7.status_code == 400
 
 # based on code Haydon wrote in project starter video
+@pytest.mark.usefixtures('clear_and_register')
 def test_register_duplicate_email(clear_and_register):
     """ registers a user with the same email as an already registered user and
     raises an InputError
@@ -137,6 +126,7 @@ def test_register_duplicate_email(clear_and_register):
                                'name_first': 'first', 'name_last': 'last'})
     assert resp.status_code == 400
 
+@pytest.mark.usefixtures('clear_and_register')
 def test_register_invalid_password(clear_and_register):
     """ registers a user with an invalid password i.e one that is too short and
     raises an InputError
@@ -157,6 +147,7 @@ def test_register_invalid_password(clear_and_register):
                                'name_first': 'first', 'name_last': 'last'})
     assert resp.status_code == 400
 
+@pytest.mark.usefixtures('clear_and_register')
 def test_register_invalid_name(clear_and_register):
     """ registers a user with an invalid name and raises an InputError for each
     case
@@ -258,6 +249,7 @@ def test_register_works():
     assert register_id == login_id
     assert register_token != login_token
 
+@pytest.mark.usefixtures('clear_and_register')
 def test_login_invalid(clear_and_register):
     """ logs a user in and raises an InputError for each invalid case
 
