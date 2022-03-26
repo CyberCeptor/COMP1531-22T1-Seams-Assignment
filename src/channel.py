@@ -20,8 +20,6 @@ from src.other import check_user_is_member, check_valid_channel_id, check_user_i
 from src.data_store import data_store
 from src.token import token_valid_check, token_get_user_id
 
-from src.token import token_valid_check, token_get_user_id
-
 def channel_invite_v2(token, channel_id, u_id):
     """
     check if given user id and channel id are valid,
@@ -123,7 +121,7 @@ def channel_messages_v2(token, channel_id, start):
 
     messages = get_messages(auth_user_id, channel_data, start, "channel")
 
-    return(messages)
+    return messages
 
 def channel_join_v2(token, channel_id):
     """

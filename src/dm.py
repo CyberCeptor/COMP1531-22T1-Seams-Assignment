@@ -1,7 +1,7 @@
 """
 Filename: dm.py
 
-Author: Zefan Cao(z5237177)
+Author: Zefan Cao(z5237177), Xingjian Dong (z5221888)
 Created: 14/03/2022 - 24/03/2022
 
 Description: dm functions
@@ -11,6 +11,7 @@ from src.token import token_valid_check, token_get_user_id
 from src.other import check_valid_auth_id, cast_to_int_get_requests, check_user_is_member, get_messages
 from src.error import InputError, AccessError
 from src.global_vars import new_dm_id
+from src.data_store import data_store
 
 def dm_create_v1(token, u_ids):
     """
@@ -159,7 +160,6 @@ def dm_leave_v1(auth_user_id, dm_id):
             dm['members'].remove(member)
             data_store.set(store)
 
-
 def check_valid_dm_id(dm_id):
     """
     clears any data stored in data_store and registers users with the
@@ -222,4 +222,4 @@ def dm_messages_v1(token, dm_id, start):
 
     messages = get_messages(auth_user_id, dm_data, start, "dm")
 
-    return(messages)
+    return messages
