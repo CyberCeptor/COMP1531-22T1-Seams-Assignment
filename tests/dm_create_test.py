@@ -10,26 +10,7 @@ import pytest
 import requests
 from src import config
 
-@pytest.fixture(name='clear_and_register')
-def fixture_clear_and_register():
-    """
-    clears any data stored in data_store and registers a user with the
-    given information
-
-    Arguments: N/A
-
-    Exceptions: N/A
-
-    Return Value: data['token']
-                  data['auth_user_id']
-    """
-    requests.delete(config.url + 'clear/v1')
-    resp = requests.post(config.url + 'auth/register/v2', 
-                        json={'email': 'wky@gmail.com', 'password': '547832',
-                                'name_first': 'wang', 'name_last': 'kaiyan'})
-    data = resp.json()
-    return [data['token'], data['auth_user_id']]
-
+@pytest.mark.usefixtures('clear_and_register')
 def test_dm_create_valid(clear_and_register):
     """
     clears any data stored in data_store and registers users with the
@@ -42,7 +23,7 @@ def test_dm_create_valid(clear_and_register):
     Return Value: N/A
     """
 
-    token1 = clear_and_register[0]
+    token1 = clear_and_register['token']
     resp1 = requests.post(config.url + 'auth/register/v2', 
                         json={'email': 'lmz@gmail.com', 'password': '893621',
                                 'name_first': 'li', 'name_last': 'mingzhe'})
@@ -62,6 +43,7 @@ def test_dm_create_valid(clear_and_register):
                         json={'token': token1, 'u_ids': [id2,id3]})
     assert create.status_code == 200
 
+@pytest.mark.usefixtures('clear_and_register')
 def test_dm_create_invalid_uid(clear_and_register):
     """
     clears any data stored in data_store and registers users with the
@@ -73,7 +55,7 @@ def test_dm_create_invalid_uid(clear_and_register):
 
     Return Value: N/A
     """
-    token1 = clear_and_register[0]
+    token1 = clear_and_register['token']
     resp1 = requests.post(config.url + 'auth/register/v2', 
                         json={'email': 'lmz@gmail.com', 'password': '893621',
                                 'name_first': 'li', 'name_last': 'mingzhe'})
@@ -103,6 +85,7 @@ def test_dm_create_invalid_uid(clear_and_register):
                         json={'token': token1, 'u_ids': ['j',id1]})
     assert create.status_code == 400
 
+@pytest.mark.usefixtures('clear_and_register')
 def test_dm_create_duplicate_uid(clear_and_register):
     """
     clears any data stored in data_store and registers users with the
@@ -114,7 +97,7 @@ def test_dm_create_duplicate_uid(clear_and_register):
 
     Return Value: N/A
     """
-    token1 = clear_and_register[0]
+    token1 = clear_and_register['token']
     resp1 = requests.post(config.url + 'auth/register/v2', 
                         json={'email': 'lmz@gmail.com', 'password': '893621',
                                 'name_first': 'li', 'name_last': 'mingzhe'})

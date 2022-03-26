@@ -14,40 +14,13 @@ import requests
 
 from src import config
 
-@pytest.fixture(name='clear_and_register_and_create')
-def fixture_clear_and_register_and_create():
-    """
-    clears any data stored in data_store and registers a user with the
-    given information, create a channel using user id
 
-    Arguments: N/A
-
-    Exceptions: N/A
-
-    Return Value: N/A
-    """
-
-    requests.delete(config.url + 'clear/v1')
-    register = requests.post(config.url + 'auth/register/v2', 
-                         json={'email': 'abc@def.com', 'password': 'password',
-                               'name_first': 'first', 'name_last': 'last'})
-    user_data = register.json()
-    token = user_data['token']
-
-    create_channel = requests.post(config.url + 'channels/create/v2',
-                            json={'token': token, 'name': 'channel_name',
-                                    'is_public': True})
-    channel_data = create_channel.json()
-    channel_id = channel_data['channel_id']                             
-
-    return [token, channel_id]
-
-
-def test_message_send_invalid_token(clear_and_register_and_create):
+@pytest.mark.usefixtures('clear_and_register_and_create_channel')
+def test_message_send_invalid_token(clear_and_register_and_create_channel):
     """
     test for invalid input of token
 
-    Arguments: clear_and_register_and_create
+    Arguments: clear_and_register_and_create_channel
 
     Exceptions: N/A
 
@@ -56,7 +29,7 @@ def test_message_send_invalid_token(clear_and_register_and_create):
     # pylint: disable=unused-argument
 
     # token is int
-    chan_id = clear_and_register_and_create[1]
+    chan_id = clear_and_register_and_create_channel[1]
     resp0 = requests.post(config.url + 'message/send/v1', 
                           json = {'token': 0, 'channel_id': chan_id, 'message': 'hewwo'})
     assert resp0.status_code == 400
@@ -89,18 +62,19 @@ def test_message_send_invalid_token(clear_and_register_and_create):
     
     requests.delete(config.url + 'clear/v1')
 
-def test_message_send_invalid_channel_id(clear_and_register_and_create):
+@pytest.mark.usefixtures('clear_and_register_and_create_channel')
+def test_message_send_invalid_channel_id(clear_and_register_and_create_channel):
     """
     test for invalid input of channel id
 
-    Arguments: clear_and_register_and_create
+    Arguments: clear_and_register_and_create_channel
 
     Exceptions: N/A
 
     Return Value: N/A
     """
 
-    token = clear_and_register_and_create[0]
+    token = clear_and_register_and_create_channel[0]['token']
     # no channel id input
     resp0 = requests.post(config.url + 'message/send/v1', 
                           json = {'token': token, 'channel_id': '', 'message': 'hewwo'})
@@ -120,19 +94,20 @@ def test_message_send_invalid_channel_id(clear_and_register_and_create):
 
     requests.delete(config.url + 'clear/v1')
 
-def test_message_send_invalid_message(clear_and_register_and_create):
+@pytest.mark.usefixtures('clear_and_register_and_create_channel')
+def test_message_send_invalid_message(clear_and_register_and_create_channel):
     """
     test for invalid input of message
 
-    Arguments: clear_and_register_and_create
+    Arguments: clear_and_register_and_create_channel
 
     Exceptions: N/A
 
     Return Value: N/A
     """
 
-    token = clear_and_register_and_create[0]
-    chan_id = clear_and_register_and_create[1]
+    token = clear_and_register_and_create_channel[0]['token']
+    chan_id = clear_and_register_and_create_channel[1]
     # message is int
     resp0 = requests.post(config.url + 'message/send/v1', 
                           json = {'token': token, 'channel_id': chan_id, 'message': 0})
@@ -145,11 +120,12 @@ def test_message_send_invalid_message(clear_and_register_and_create):
 
     requests.delete(config.url + 'clear/v1')
 
-def test_message_send_invalid_length(clear_and_register_and_create):
+@pytest.mark.usefixtures('clear_and_register_and_create_channel')
+def test_message_send_invalid_length(clear_and_register_and_create_channel):
     """
     test if input message length is valid(less than 1, over 1000 char)
 
-    Arguments:  clear_and_register_and_create
+    Arguments:  clear_and_register_and_create_channel
 
     Exceptions:
         InputError  -   Raised for all tests below
@@ -157,8 +133,8 @@ def test_message_send_invalid_length(clear_and_register_and_create):
     Return Value:   N/A
     """
 
-    token = clear_and_register_and_create[0]
-    chan_id = clear_and_register_and_create[1]
+    token = clear_and_register_and_create_channel[0]['token']
+    chan_id = clear_and_register_and_create_channel[1]
     # long_message is more than 1000 char
     long_message = 'MoreThanAthousandCharactersMoreThanAthousandCharactersMoreThanAt\
     housandCharactersMoreThanAthousandCharactersMoreThanAthousandCharactersMo\
@@ -188,11 +164,12 @@ def test_message_send_invalid_length(clear_and_register_and_create):
 
     requests.delete(config.url + 'clear/v1')
 
-def test_user_not_belong(clear_and_register_and_create):
+@pytest.mark.usefixtures('clear_and_register_and_create_channel')
+def test_user_not_belong(clear_and_register_and_create_channel):
     """
     testing if user belongs to the channel
 
-    Arguments: clear_and_register_and_create (fixture)
+    Arguments: clear_and_register_and_create_channel (fixture)
 
     Exceptions: 
         Access Error - Raised for all test cases below
@@ -200,7 +177,7 @@ def test_user_not_belong(clear_and_register_and_create):
     Return Value: N/A
     """
     
-    chan_id = clear_and_register_and_create[1]
+    chan_id = clear_and_register_and_create_channel[1]
 
     # create user 2
     user2 = requests.post(config.url + 'auth/register/v2', 
@@ -215,19 +192,20 @@ def test_user_not_belong(clear_and_register_and_create):
 
     requests.delete(config.url + 'clear/v1')
 
-def test_successful_message_send(clear_and_register_and_create):
+@pytest.mark.usefixtures('clear_and_register_and_create_channel')
+def test_successful_message_send(clear_and_register_and_create_channel):
     """
     testing gor successful run of message send v1 and return
 
-    Arguments: clear_and_register_and_create (fixture)
+    Arguments: clear_and_register_and_create_channel (fixture)
 
     Exceptions: N/A
 
     Return Value: N/A
     """
     
-    token = clear_and_register_and_create[0]
-    chan_id = clear_and_register_and_create[1]
+    token = clear_and_register_and_create_channel[0]['token']
+    chan_id = clear_and_register_and_create_channel[1]
 
     send_message = requests.post(config.url + 'message/send/v1', 
                           json={'token': token, 'channel_id': chan_id, 
