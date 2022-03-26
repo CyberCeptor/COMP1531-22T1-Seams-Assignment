@@ -21,6 +21,7 @@ from src.token import token_get_user_id, token_valid_check
 from src.global_vars import new_message_id
 from src.error import AccessError, InputError
 import datetime
+from datetime import timezone
 
 from datetime import timezone
 
@@ -80,7 +81,7 @@ def message_send_v1(token, channel_id, message):
         'message': message, 
         'time_sent': utc_timestamp
     }
-    
+
     channel_data['messages'].insert(0, message_data)
 
     data_store.set(store)
