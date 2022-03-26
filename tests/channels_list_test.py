@@ -11,17 +11,6 @@ import requests
 
 from src import config
 
-@pytest.fixture(name='clear_and_register')
-def fixture_clear_and_register():
-    requests.delete(config.url + 'clear/v1')
-    response = requests.post(config.url + 'auth/register/v2', 
-                            json={'email': 'abc@def.com', 'password': 'password',
-                               'name_first': 'first', 'name_last': 'last'})
-
-    data = response.json()
-    token = data['token']
-    return token
-
 
 def test_channels_list():
     """
