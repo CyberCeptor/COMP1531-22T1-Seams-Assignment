@@ -1,3 +1,4 @@
+from xmlrpc.client import boolean
 from src.data_store import data_store
 from src.token import token_valid_check, token_locate_in_data_store, token_get_user_id
 from src.other import check_valid_auth_id, cast_to_int_get_requests
@@ -90,7 +91,13 @@ def user_profile_setname_v1(token, name_first, name_last):
     token_locate_in_data_store(token)
     user_id = token_get_user_id(token)
 
-    full_name = name_first + name_last
+    if type(name_first) is not str or type(name_first) is bool:
+        raise InputError(description='Invalid first name')
+
+    if type(name_last) is not str or type(name_last) is bool:
+        raise InputError(description='Invalid last name')
+
+    full_name = name_first + name_last    
     check_invalid_name(name_first, name_last, full_name)
 
     # set the user name to the new name
@@ -122,6 +129,10 @@ def user_profile_setname_v1(token, name_first, name_last):
     return {}
 
 def check_invalid_handle(store, handle_str):
+
+    if type(handle_str) is not str or type(handle_str) is bool:
+        raise InputError(description='Invalid handle_str')
+
     # check for invalid handle_str
     if len(handle_str) < 3 or len(handle_str) > 20:
         raise InputError(description='Invalid handle_str')
@@ -172,3 +183,4 @@ def user_profile_sethandle_v1(token, handle_str):
 
     data_store.set(store)
     return {}
+

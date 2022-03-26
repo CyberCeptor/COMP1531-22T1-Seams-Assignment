@@ -66,7 +66,7 @@ def test_user_setemail_working(clear_and_register):
                             json={'token': user2['token'], 'email': 'abc@def.com'})
     assert setemail.status_code == 200
 
-    # Assert that the all_members and owner_membets channel email has also been updated
+    # Assert that the all_members and owner_members channel email has also been updated
     # check the data in the channel is correct
     channels_details = requests.get(config.url + 'channel/details/v2', 
                             params={'token': user1['token'], 'channel_id': channel1['channel_id']})
