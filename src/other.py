@@ -11,7 +11,7 @@ Description: implementation for
         - checking if a channel_id is valid
         - checking if a user is a member of a channel
 """
-from src.error import InputError
+from src.error import InputError, AccessError
 from src.token import reset_session_id
 from src.data_store import data_store
 from src.global_vars import reset_message_id
@@ -193,3 +193,61 @@ def cast_to_int_get_requests(variable, var_name):
         raise InputError(description=f'Invalid {var_name}') from InputError
 
     return variable
+
+def get_messages(auth_user_id, data, start, data_str):
+    if data_str == "channel":
+        key = "all_members"
+    elif data_str == "dm":
+        key = "members"
+
+    # is_member is a bool to check whether given user is in the given channel
+    if check_user_is_member(auth_user_id, data, key) is None:
+        raise AccessError(f'User does not exist in {data_str}')
+
+    total_messages = len(data['messages'])
+
+    start = cast_to_int_get_requests(start, 'start')
+
+    if start < 0:
+        raise InputError('Invalid start')
+    elif start > total_messages:
+        raise InputError('Invalid start, not enough messages')
+
+    if total_messages == 0:
+        return {
+            'messages': [],
+            'start': start,
+            'end': -1,
+        }
+
+    # message starts
+    start_message = data['messages'][start]
+
+    # get end
+    end = start + 50
+
+    # make sure end is suitable index place
+    if end >= total_messages:
+        end = -1
+
+    # the messages list
+    messages_to_return = []
+
+    # if mesages not overflow
+    if end == -1:
+        if start == total_messages - 1: # if there is only 1 message
+            messages_to_return.append(start_message)
+        else:
+            for idx, message in data['messages']:
+                if idx >= start:
+                    messages_to_return.append(message)
+    else:
+        for idx, message in data['messages']:
+            if start <= idx < end:
+                messages_to_return.append(message)
+
+    return {
+        'messages': messages_to_return,
+        'start': start,
+        'end': end,
+    }

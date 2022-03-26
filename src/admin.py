@@ -102,7 +102,7 @@ def admin_user_remove(token, u_id):
     # remove user from all dms, replace their messages with 'Removed user'
     for dm in store['dms']:
         if check_user_is_member(u_id, dm, 'members'):
-            dm_leave_v1(token, dm['dm_id'])
+            dm_leave_v1(u_id, dm['dm_id'])
             replace_messages(u_id, dm)
 
     # change the user's first name to 'Removed' and last name to 'user'

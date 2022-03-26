@@ -8,14 +8,14 @@ from flask_cors import CORS
 
 
 from src.auth import auth_register_v2, auth_login_v2, auth_logout_v1
-from src.user import user_profile_v1, user_profile_setemail_v1
+from src.user import user_profile_v1, user_profile_setemail_v1, user_profile_setname_v1, user_profile_sethandle_v1
 
 from src.users import users_all_v1
 from src.messages import message_send_v1, message_remove_v1, message_edit_v1, message_senddm_v1
 from src.admin import admin_userpermission_change, admin_user_remove
 from src.other import clear_v1
 from src.token import token_valid_check, token_get_user_id
-from src.dm import dm_create_v1, dm_list_v1, dm_details_v1, dm_remove_v1, dm_leave_v1
+from src.dm import dm_create_v1, dm_list_v1, dm_details_v1, dm_remove_v1, dm_leave_v1, dm_messages_v1
 from src.channel import channel_details_v2, channel_invite_v2
 from src.channel import channel_addowner_v1, channel_removeowner_v1
 from src.channel import channel_join_v2, channel_messages_v2, channel_leave_v1
@@ -127,6 +127,26 @@ def user_setemail():
     user_profile_setemail_v1(token, email)
     save_data()
     return dumps({})
+
+@APP.route('/user/profile/setname/v1', methods=['PUT'])
+def user_setname():
+    name_data = request.get_json()
+    token = name_data['token']
+    name_first = name_data['name_first']
+    name_last = name_data['name_last']
+    user_profile_setname_v1(token, name_first, name_last)
+    save_data()
+    return dumps({})
+
+@APP.route('/user/profile/sethandle/v1', methods=['PUT'])
+def user_sethandle():
+    handle_data = request.get_json()
+    token = handle_data['token']
+    handle_str = handle_data['handle_str']
+    user_profile_sethandle_v1(token, handle_str)
+    save_data()
+    return dumps({})
+
 
 ################################################################################
 ##                              ADMIN ROUTES                                  ##
@@ -301,10 +321,22 @@ def dm_remove_server():
 @APP.route('/dm/leave/v1', methods=['POST'])
 def dm_leave():
     store = request.get_json()
-    token = store['token']
     dm_id = store['dm_id']
-    dm_leave_v1(token, dm_id)
+    token_valid_check(store['token'])
+    auth_id = token_get_user_id(store['token'])
+    dm_leave_v1(auth_id, dm_id)
     return dumps({})
+
+@APP.route('/dm/messages/v1', methods=['GET'])
+def dm_messages():
+    token = request.args.get('token')
+    dm_id = request.args.get('dm_id')
+    start = request.args.get('start')
+    dm_messages = dm_messages_v1(token, dm_id, start)
+    save_data()
+    return dumps(dm_messages)
+
+
 ################################################################################
 ##                               CLEAR ROUTE                                  ##
 ################################################################################

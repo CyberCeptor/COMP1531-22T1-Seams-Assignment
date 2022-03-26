@@ -22,6 +22,8 @@ from src.global_vars import new_message_id
 from src.error import AccessError, InputError
 import datetime
 
+from datetime import timezone
+
 def message_send_v1(token, channel_id, message):
     """
     If token given is authorised user, sends the message
@@ -68,14 +70,17 @@ def message_send_v1(token, channel_id, message):
     # increament message id for the store message
     message_id = new_message_id()
 
+    time = datetime.datetime.now(timezone.utc)
+    utc_time = time.replace(tzinfo=timezone.utc)
+    utc_timestamp = utc_time.timestamp()
+
     message_data = {
         'message_id': message_id, 
         'u_id': auth_user_id, 
         'message': message, 
-        'time_sent': datetime.datetime.now()
+        'time_sent': utc_timestamp
     }
-
-
+    
     channel_data['messages'].insert(0, message_data)
 
     data_store.set(store)
@@ -238,11 +243,15 @@ def message_senddm_v1(token, dm_id, message):
     # increament message id for the store message
     message_id = new_message_id()
 
+    time = datetime.datetime.now(timezone.utc)
+    utc_time = time.replace(tzinfo=timezone.utc)
+    utc_timestamp = utc_time.timestamp()
+
     message_data = {
         'message_id': message_id, 
         'u_id': auth_user_id, 
         'message': message, 
-        'time_sent': datetime.datetime.now()
+        'time_sent': utc_timestamp
     }
 
 
