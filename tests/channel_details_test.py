@@ -105,7 +105,7 @@ def test_channel_details_invalid_channel(clear_and_register_and_create_channel):
     # with pytest.raises(InputError):
     #     channel_details_v1(id1, True)
   
-    token = clear_and_register_and_create_channel[0]
+    token = clear_and_register_and_create_channel[0]['token']
     # no channel id input
     resp0 = requests.get(config.url + 'channel/details/v2', 
                           params = {'token': token, 'channel_id': ''})
@@ -167,9 +167,9 @@ def test_channel_details_return(clear_and_register_and_create_channel):
     
 
     # pylint: disable=unused-argument
-    token = clear_and_register_and_create_channel[0]
+    token = clear_and_register_and_create_channel[0]['token']
     chan_id = clear_and_register_and_create_channel[1]
-    u_id = clear_and_register_and_create_channel[2]
+    u_id = clear_and_register_and_create_channel[0]['auth_user_id']
 
     # success run
     resp = requests.get(config.url + 'channel/details/v2', 

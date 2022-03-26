@@ -6,7 +6,7 @@ from src import config
 
 @pytest.mark.usefixtures('clear_and_register_and_create_channel')
 def test_channel_leave_works(clear_and_register_and_create_channel):
-    token = clear_and_register_and_create_channel[0]
+    token = clear_and_register_and_create_channel[0]['token']
     channel_id = clear_and_register_and_create_channel[1]
 
     create_user2 = requests.post(config.url + 'auth/register/v2', 
@@ -45,7 +45,7 @@ def test_channel_leave_unknown_user(clear_and_register_and_create_channel):
 @pytest.mark.usefixtures('clear_and_register_and_create_channel')
 def test_channel_leave_invalid_channel_id(clear_and_register_and_create_channel):
     # creating 2 users and the channel.
-    token = clear_and_register_and_create_channel[0]
+    token = clear_and_register_and_create_channel[0]['token']
     # Incorrect channel id
     channel_leave = requests.post(config.url + 'channel/leave/v1', 
                             json={'token': token, 'channel_id': 444})

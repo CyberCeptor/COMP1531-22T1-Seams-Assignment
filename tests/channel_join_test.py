@@ -79,7 +79,7 @@ def test_channel_join_invalid_channel(clear_and_register_and_create_channel):
 
     Return Value: N/A
     """
-    id1 = clear_and_register_and_create_channel[0]
+    id1 = clear_and_register_and_create_channel[0]['token']
     add = requests.post(config.url + 'channel/join/v2',
                         json={'token': id1, 'channel_id': 5})
     assert add.status_code == 400
@@ -114,7 +114,7 @@ def test_channel_join_user_already_in_channel(clear_and_register_and_create_chan
 
     Return Value: N/A
     """
-    id1 = clear_and_register_and_create_channel[0]
+    id1 = clear_and_register_and_create_channel[0]['token']
     chan_id1 = clear_and_register_and_create_channel[1]
     add = requests.post(config.url + 'channel/join/v2',
                         json={'token': id1, 'channel_id': chan_id1})

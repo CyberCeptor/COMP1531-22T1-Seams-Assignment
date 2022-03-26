@@ -23,7 +23,7 @@ def test_channel_messages_invalid_channel(clear_and_register_and_create_channel)
     Return Value: N/A
     """
 
-    token = clear_and_register_and_create_channel[0]
+    token = clear_and_register_and_create_channel[0]['token']
    
     # no channel id input
     resp0 = requests.get(config.url + 'channel/messages/v2', 
@@ -143,7 +143,7 @@ def test_channel_messages_invalid_start(clear_and_register_and_create_channel):
     
     
     '''
-    token = clear_and_register_and_create_channel[0]
+    token = clear_and_register_and_create_channel[0]['token']
     chan_id = clear_and_register_and_create_channel[1]
     # start is bool
     resp0 = requests.get(config.url + 'channel/messages/v2', 
@@ -212,7 +212,7 @@ def test_channel_messages_return(clear_and_register_and_create_channel):
     '''
         # pylint: disable=unused-argument
 
-    token = clear_and_register_and_create_channel[0]
+    token = clear_and_register_and_create_channel[0]['token']
     chan_id = clear_and_register_and_create_channel[1]
 
     # test success run

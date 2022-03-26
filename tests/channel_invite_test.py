@@ -27,11 +27,13 @@ def test_channel_invite_invalid_channel(clear_and_register_and_create_channel):
 
     Return Value: N/A
     """
+
+    token = clear_and_register_and_create_channel[0]['token']
     resp1 = requests.post(config.url + 'auth/register/v2', 
                         json={'email': 'xue2@gmail.com', 'password': 'xzq19112',
                                 'name_first': 'Xue', 'name_last':'zhiqian'})
     data = resp1.json()
-    token = clear_and_register_and_create_channel[0]
+    
     id2 = data['auth_user_id']
     add = requests.post(config.url + 'channel/invite/v2', 
                         json={'token': token, 'channel_id': 44,
@@ -72,9 +74,9 @@ def test_channel_invite_self(clear_and_register_and_create_channel):
 
     Return Value: N/A
     """
-    token = clear_and_register_and_create_channel[0]
+    token = clear_and_register_and_create_channel[0]['token']
     chan_id1 = clear_and_register_and_create_channel[1]
-    id = clear_and_register_and_create_channel[2]
+    id = clear_and_register_and_create_channel[0]['token']
     add = requests.post(config.url + 'channel/invite/v2', 
                         json={'token': token, 'channel_id': chan_id1,
                                 'u_id': id})
@@ -94,7 +96,7 @@ def test_channel_invite_invalid_inviter(clear_and_register_and_create_channel):
 
     Return Value: N/A
     """
-    id1 = clear_and_register_and_create_channel[2]
+    id1 = clear_and_register_and_create_channel[0]['auth_user_id']
     chan_id1 = clear_and_register_and_create_channel[1]
     add = requests.post(config.url + 'channel/invite/v2', 
                         json={'token': -2, 'channel_id': chan_id1,
@@ -135,7 +137,7 @@ def test_channel_invite_invalid_invitee(clear_and_register_and_create_channel):
 
     Return Value: N/A
     """
-    id1 = clear_and_register_and_create_channel[0]
+    id1 = clear_and_register_and_create_channel[0]['token']
     chan_id1 = clear_and_register_and_create_channel[1]
     add = requests.post(config.url + 'channel/invite/v2', 
                         json={'token': id1, 'channel_id': chan_id1,
@@ -181,7 +183,7 @@ def test_channel_invite_invitee_already_joined(clear_and_register_and_create_cha
 
     Return Value: N/A
     """
-    id1 = clear_and_register_and_create_channel[0]
+    id1 = clear_and_register_and_create_channel[0]['token']
     chan_id1 = clear_and_register_and_create_channel[1]
     # create user 2
     create_user2 = requests.post(config.url + 'auth/register/v2', 
@@ -246,7 +248,7 @@ def test_channel_invite_success(clear_and_register_and_create_channel):
 
     Return Value: N/A
     """
-    id1 = clear_and_register_and_create_channel[0]
+    id1 = clear_and_register_and_create_channel[0]['token']
     chan_id1 = clear_and_register_and_create_channel[1]
     # create user 2
     create_user2 = requests.post(config.url + 'auth/register/v2', 
