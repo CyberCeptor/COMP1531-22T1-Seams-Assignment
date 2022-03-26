@@ -14,46 +14,12 @@ import requests
 
 from src import config
 
-@pytest.fixture(name='create_message')
-def fixture_create_message():
-    """
-    clears any data stored in data_store and registers a user with the
-    given information, create a channel using user id, send a message to channel
-
-    Arguments: N/A
-
-    Exceptions: N/A
-
-    Return Value: N/A
-    """
-
-    requests.delete(config.url + 'clear/v1')
-    register = requests.post(config.url + 'auth/register/v2', 
-                         json={'email': 'abc@def.com', 'password': 'password',
-                               'name_first': 'first', 'name_last': 'last'})
-    user_data = register.json()
-    token = user_data['token']
-
-    create_channel = requests.post(config.url + 'channels/create/v2',
-                            json={'token': token, 'name': 'channel_name',
-                                    'is_public': True})
-    channel_data = create_channel.json()
-    channel_id = channel_data['channel_id'] 
-
-    send_message = requests.post(config.url + 'message/send/v1', 
-                          json={'token': token, 'channel_id': channel_id, 
-                          'message': 'hewwo'})
-    message = send_message.json()
-    message_id = message['message_id']
- 
-    return [token, channel_id, message_id]
-
-
-def test_message_remove_invalid_token(create_message):
+@pytest.mark.usefixtures('clear_register_createchannel_sendmsg')
+def test_message_remove_invalid_token(clear_register_createchannel_sendmsg):
     """
     test for invalid input of token
 
-    Arguments: create_message
+    Arguments: clear_register_createchannel_sendmsg
     Exceptions: N/A
 
     Return Value: N/A
@@ -61,7 +27,7 @@ def test_message_remove_invalid_token(create_message):
     # pylint: disable=unused-argument
 
     # token is int
-    message_id = create_message[2]
+    message_id = clear_register_createchannel_sendmsg[2]
     resp0 = requests.delete(config.url + 'message/remove/v1', 
                           json = {'token': 0, 'message_id': message_id})
     assert resp0.status_code == 400
@@ -94,18 +60,19 @@ def test_message_remove_invalid_token(create_message):
     
     requests.delete(config.url + 'clear/v1')
 
-def test_message_remove_invalid_message_id(create_message):
+@pytest.mark.usefixtures('clear_register_createchannel_sendmsg')
+def test_message_remove_invalid_message_id(clear_register_createchannel_sendmsg):
     """
     test for invalid input of channel id
 
-    Arguments: create_message
+    Arguments: clear_register_createchannel_sendmsg
 
     Exceptions: N/A
 
     Return Value: N/A
     """
 
-    token = create_message[0]
+    token = clear_register_createchannel_sendmsg[0]
     # no message id input
     resp0 = requests.delete(config.url + 'message/remove/v1', 
                           json = {'token': token, 'message_id': ''})
@@ -129,7 +96,8 @@ def test_message_remove_invalid_message_id(create_message):
     requests.delete(config.url + 'clear/v1')
 
 
-def test_message_remove_global_user(create_message):
+@pytest.mark.usefixtures('clear_register_createchannel_sendmsg')
+def test_message_remove_global_user(clear_register_createchannel_sendmsg):
     """
     testing if global owner cannot remove message if not in that channel
 
@@ -141,7 +109,7 @@ def test_message_remove_global_user(create_message):
     Return Value: N/A
     """
     
-    token = create_message[0] # user 1 is global owner
+    token = clear_register_createchannel_sendmsg[0] # user 1 is global owner
     # create user2
     user2 = requests.post(config.url + 'auth/register/v2', 
                             json={'email': 'def@abc.com', 'password': 'password',
@@ -173,7 +141,9 @@ def test_message_remove_global_user(create_message):
                           json = {'token': token, 'message_id': message_id_2})
     assert resp.status_code == 200
 
-def test_message_remove_global_user_fail(create_message):
+
+@pytest.mark.usefixtures('clear_register_createchannel_sendmsg')
+def test_message_remove_global_user_fail(clear_register_createchannel_sendmsg):
     """
     testing if global owner cannot remove message if not in that channel
 
@@ -185,7 +155,7 @@ def test_message_remove_global_user_fail(create_message):
     Return Value: N/A
     """
     
-    token = create_message[0] # user 1 is global owner
+    token = clear_register_createchannel_sendmsg[0] # user 1 is global owner
     # create user2
     user2 = requests.post(config.url + 'auth/register/v2', 
                             json={'email': 'def@abc.com', 'password': 'password',
@@ -215,19 +185,20 @@ def test_message_remove_global_user_fail(create_message):
     requests.delete(config.url + 'clear/v1')
 
 
-def test_message_sent_not_belong_to_user(create_message):
+@pytest.mark.usefixtures('clear_register_createchannel_sendmsg')
+def test_message_sent_not_belong_to_user(clear_register_createchannel_sendmsg):
     """
     testing if message cannot be removed by different user
 
-    Arguments: create_message(fixture)
+    Arguments: clear_register_createchannel_sendmsg(fixture)
 
     Exceptions: 
         Access Error - Raised for all test cases below
 
     Return Value: N/A
     """
-    channel_id = create_message[1]
-    message_id = create_message[2]
+    channel_id = clear_register_createchannel_sendmsg[1]
+    message_id = clear_register_createchannel_sendmsg[2]
     # create user2
     user2 = requests.post(config.url + 'auth/register/v2', 
                             json={'email': 'def@abc.com', 'password': 'password',
@@ -247,11 +218,12 @@ def test_message_sent_not_belong_to_user(create_message):
 
     requests.delete(config.url + 'clear/v1')
 
-def test_successful_message_remove_by_owner(create_message):
+@pytest.mark.usefixtures('clear_register_createchannel_sendmsg')
+def test_successful_message_remove_by_owner(clear_register_createchannel_sendmsg):
     """
     testing if message removing is successful by channel owner
 
-    Arguments: create_message(fixture)
+    Arguments: clear_register_createchannel_sendmsg(fixture)
 
     Exceptions: 
         Access Error - Raised for all test cases below
@@ -260,8 +232,8 @@ def test_successful_message_remove_by_owner(create_message):
     """
     
 
-    token = create_message[0]
-    channel_id = create_message[1]
+    token = clear_register_createchannel_sendmsg[0]
+    channel_id = clear_register_createchannel_sendmsg[1]
     # create user2
     user2 = requests.post(config.url + 'auth/register/v2', 
                             json={'email': 'def@abc.com', 'password': 'password',
@@ -288,11 +260,12 @@ def test_successful_message_remove_by_owner(create_message):
 
     requests.delete(config.url + 'clear/v1')
 
-def test_successful_message_remove_by_user(create_message):
+@pytest.mark.usefixtures('clear_register_createchannel_sendmsg')
+def test_successful_message_remove_by_user(clear_register_createchannel_sendmsg):
     """
     testing if message removing is successful by user who sent the message
 
-    Arguments: create_message(fixture)
+    Arguments: clear_register_createchannel_sendmsg(fixture)
 
     Exceptions: 
         Access Error - Raised for all test cases below
@@ -300,7 +273,7 @@ def test_successful_message_remove_by_user(create_message):
     Return Value: N/A
     """
     
-    channel_id = create_message[1]
+    channel_id = clear_register_createchannel_sendmsg[1]
     # create user2
     user2 = requests.post(config.url + 'auth/register/v2', 
                             json={'email': 'def@abc.com', 'password': 'password',

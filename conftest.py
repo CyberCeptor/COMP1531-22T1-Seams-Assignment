@@ -3,3 +3,5 @@ import pytest
 from fixtures.clear_register import clear_register
 from fixtures.clear_register_two import clear_register_two
 from fixtures.clear_register_createchannel import clear_register_createchannel
+from fixtures.clear_register_create_channel_send_message import clear_register_createchannel_sendmsg
+from fixtures.clear_register_create_dm import clear_register_create_dm

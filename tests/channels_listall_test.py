@@ -12,44 +12,11 @@ import requests
 
 from src import config
 
-
-@pytest.fixture(name='clear_and_register_and_create')
-def fixture_clear_and_register_and_create():
-    """
-    Clears any data stored in data_store and registers a user with the
-    given information, create a channel using user id
-
-    Arguments: N/A
-
-    Exceptions: N/A
-
-    Return Value: N/A
-    """
-
-    # clear_v1()
-    # user1 = auth_register_v1('abc@def.com', 'password', 'first', 'last')
-    # chan_id1 = channels_create_v1(1, 'channel_name', True)
-    # return [user1['auth_user_id'], chan_id1['channel_id']]
-    requests.delete(config.url + 'clear/v1')
-    resp = requests.post(config.url + 'auth/register/v2', 
-                         json={'email': 'abc@def.com', 'password': 'password',
-                               'name_first': 'first', 'name_last': 'last'})
-    user_data = resp.json()
-    token = user_data['token']
-    u_id = user_data['auth_user_id']
-    resp_1 = requests.post(config.url + 'channels/create/v2',
-                            json={'token': token, 'name': 'channel_name',
-                                    'is_public': True})
-    channel_data = resp_1.json()
-    channel_id = channel_data['channel_id']
-    
-    return [token, channel_id, u_id]
-
-def test_channels_listall_invalid_token(clear_and_register_and_create):
+def test_channels_listall_invalid_token():
     """
     Testing invalid user id to raise input error
 
-    Arguments: clear_and_register_and_create (fixture)
+    Arguments: clear_and_register_and_create_channel (fixture)
 
     Exceptions:
         InputError - non existing user id
@@ -96,11 +63,10 @@ def test_channels_listall_invalid_token(clear_and_register_and_create):
     resp5 = requests.get(config.url + 'channels/listall/v2', params = {'token': unsaved_token})
     assert resp5.status_code == 403
 
-
 def test_channels_listall_v1_return():
     """ testing if listall returns right type of value
 
-    Arguments: clear_and_register_and_create (fixture)
+    Arguments: clear_and_register_and_create_channel (fixture)
 
     Exceptions: N/A
 
@@ -190,8 +156,8 @@ def test_channels_listall_v1_return():
     assert channels_listall_2_json['channels'][3]['name'] == 'pub_channel_user2'
     assert channels_listall_2_json['channels'][4]['name'] == 'pri_channel_user2'
 
-    # id1 = clear_and_register_and_create[0]
-    # chan_id1 = clear_and_register_and_create[1]
+    # id1 = clear_and_register_and_create_channel[0]
+    # chan_id1 = clear_and_register_and_create_channel[1]
     # result = channels_listall_v1(id1)
     # # result is a list of dictionary
     # # check if first dictionary gives the right values
