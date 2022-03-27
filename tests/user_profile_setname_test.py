@@ -153,7 +153,7 @@ def test_user_profile_setname_bad_name_first(clear_and_register):
     assert setname.status_code == 400
 
     # test > 50 int
-    name51 = 'hsfdfhwgnhbwihbnfgdosihgdsiohgnisdghjnliksdhjgilksdnhfgkl;dsnglsikdfjksdhjfkolhsdiklghniksdhngikhnsdighnisdglik;sj'
+    name51 = 'abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz'
     setname = requests.put(config.url + 'user/profile/setname/v1', 
                             json={'token': user1['token'], 'name_first': name51, 'name_last': 'last'})
     assert setname.status_code == 400
@@ -195,7 +195,7 @@ def test_user_profile_setname_bad_name_last(clear_and_register):
     assert setname.status_code == 400
 
     # test > 50 int
-    name51 = 'hsfdfhwgnhbwihbnfgdosihgdsiohgnisdghjnliksdhjgilksdnhfgkl;dsnglsikdfjksdhjfkolhsdiklghniksdhngikhnsdighnisdglik;sj'
+    name51 = 'abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz'
     setname = requests.put(config.url + 'user/profile/setname/v1', 
                             json={'token': user1['token'], 'name_first': 'first', 'name_last': name51})
     assert setname.status_code == 400
