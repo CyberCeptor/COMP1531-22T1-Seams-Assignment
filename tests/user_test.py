@@ -2,6 +2,7 @@ import pytest
 import requests
 
 from src import config
+from src.global_vars import expired_token, unsaved_token
 
 @pytest.mark.usefixtures('clear_register')
 def test_user_profile_working(clear_register):
@@ -68,21 +69,12 @@ def test_profile_bad_token_input(clear_register):
                     params={'token': '', 'u_id': user_json['auth_user_id']})
     assert user_profile.status_code == 400
 
-
-    '''token expired and unsaved'''
-    expired_token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6\
-        MSwic2Vzc2lvbl9pZCI6MSwiaGFuZGxlIjoiZmlyc3RsYXN0IiwiZXhwIjo\
-            xNTQ3OTc3ODgwfQ.366QLXfCURopcjJbAheQYLVNlGLX_INKVwr8_TVXYEQ'
     user_profile = requests.get(config.url + 'user/profile/v1', 
                     params={'token': expired_token, 'u_id': user_json['auth_user_id']})
     assert user_profile.status_code == 403
 
-    '''not expired, unsaved'''
-    not_expired_token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.\
-        eyJpZCI6MSwic2Vzc2lvbl9pZCI6MSwiaGFuZGxlIjoiZmlyc3RsYXN\
-            0IiwiZXhwIjoyNTQ3OTc3ODgwfQ.ckPPWiR-m6x0IRqpQtKmJgNLiD8eAEiTv2i8ToK3mkY'
     user_profile = requests.get(config.url + 'user/profile/v1', 
-                    params={'token': not_expired_token, 'u_id': user_json['auth_user_id']})
+                    params={'token': unsaved_token, 'u_id': user_json['auth_user_id']})
     assert user_profile.status_code == 403
 
 

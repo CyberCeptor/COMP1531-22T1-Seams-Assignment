@@ -39,6 +39,7 @@ def user_profile_v1(token, u_id):
     store = data_store.get()
     # iterates through the users in data_store and collects
     # the information of that user.
+
     for users in store['users']:
         if users['id'] == u_id:
             user = {

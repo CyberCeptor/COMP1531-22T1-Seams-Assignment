@@ -2,18 +2,13 @@ import pytest
 import requests
 
 from src import config
+from src.global_vars import expired_token, unsaved_token
 
 @pytest.fixture(name='clear_and_register_and_create')
 def fixture_clear_and_register_and_create():
     """
-   Clears.
-   Creates 2 users, and a channel with both members as owners
-
-    Arguments: N/A
-
-    Exceptions: N/A
-
-    Return Value: N/A
+    Clears.
+    Creates 2 users, and a channel with both members as owners
     """
     requests.delete(config.url + 'clear/v1')
 
@@ -52,6 +47,12 @@ def fixture_clear_and_register_and_create():
 
 
 def test_channel_removeowner_working(clear_and_register_and_create):
+    """
+    2 users both owner_members of a channel,
+    user2 removes themselves as owner,
+    user1 adds them back as an owner,
+    assert the channel information is correct.
+    """
     user1_id = clear_and_register_and_create[0]
     user1_token = clear_and_register_and_create[1]
     user2_id = clear_and_register_and_create[2]
@@ -64,8 +65,6 @@ def test_channel_removeowner_working(clear_and_register_and_create):
                         json={'token': user2_token, 'channel_id': channel_id, 'u_id': user2_id})
     assert remove.status_code == 200
 
-    # user2 being removed with the token of user1
-    # Need to add them back as owner_member first
     # add user2 to be an owner, with user1's token as they are owner_member
     addowner = requests.post(config.url + 'channel/addowner/v1',
                         json={'token': user1_token, 'channel_id': channel_id, 'u_id': user2_id})
@@ -91,6 +90,17 @@ def test_channel_removeowner_working(clear_and_register_and_create):
     }]
 
 def test_channel_removeowner_permission_id(clear_and_register_and_create):
+    """
+    2 users both owner_members of a channel,
+    user2 removes themselves as owner,
+    user3 is created and joins the channel and made owner_member,
+    (needed as the last owner_member cant remove themselves as owner_member)
+    user2 tries to remove user1 as owner,
+    user2 becomes a global owner of the channel,
+    (a global owner can add/remove owners as long as they are also a member,
+    they dont have to be owner, just all_member)
+    user2 then removes user1 as owner
+    """
     user1_id = clear_and_register_and_create[0]
     user1_token = clear_and_register_and_create[1]
     user2_id = clear_and_register_and_create[2]
@@ -138,14 +148,16 @@ def test_channel_removeowner_permission_id(clear_and_register_and_create):
 
 
 def test_channel_removeowner_not_an_owner(clear_and_register_and_create):
+    """
+    2 owner_members of channel,
+    user2 removed as owner,
+    assert user 2 is still an all_member of the channel,
+    user1 tries to remove user2 as an owner again,
+    InputError
+    """
     user1_token = clear_and_register_and_create[1]
     user2_id = clear_and_register_and_create[2]
     channel_id = clear_and_register_and_create[4]
-
-    # user1 is an owner
-    # user2 is also an owner
-    # remove user2, and then try and remove them again.
-    # InputError
 
     # user2 being removed as an owner
     remove = requests.post(config.url + 'channel/removeowner/v1', 
@@ -168,6 +180,13 @@ def test_channel_removeowner_not_an_owner(clear_and_register_and_create):
 
 
 def test_channel_removeowner_only_owner_member(clear_and_register_and_create):
+    """
+    2 owner_members of a channel,
+    user1 removes user2,
+    user1 tries to remove themselves,
+    InputError, as the last owner_member cannot remove
+    themselves as an owner.
+    """
     user1_id = clear_and_register_and_create[0]
     user1_token = clear_and_register_and_create[1]
     user2_id = clear_and_register_and_create[2]
@@ -187,6 +206,12 @@ def test_channel_removeowner_only_owner_member(clear_and_register_and_create):
 
 # Channel ID is valid, Token is not authorised with owner permissions.
 def test_channel_removeowner_not_authorised(clear_and_register_and_create):
+    """
+    2 owner_members of a channel,
+    user3 joins the channel, 
+    tries to remove user2,
+    AccessError
+    """
     user2_id = clear_and_register_and_create[2]
     channel_id = clear_and_register_and_create[4]
 
@@ -212,6 +237,13 @@ def test_channel_removeowner_not_authorised(clear_and_register_and_create):
 
 
 def test_channel_removeowner_bad_channel_id(clear_and_register_and_create):
+    """
+    Tests removeowner with all possible invalid inputs for channel_id:
+        - empty string
+        - string
+        - int/negative int
+        - boolean
+    """
     user2_id = clear_and_register_and_create[2]
     user2_token = clear_and_register_and_create[3]
 
@@ -238,6 +270,15 @@ def test_channel_removeowner_bad_channel_id(clear_and_register_and_create):
 
 
 def test_channel_removeowner_bad_user_id(clear_and_register_and_create):
+    """
+    Tests removeowner with all possible invalid inputs for user_id:
+        - empty string
+        - string
+        - int/negative int
+        - boolean
+    Creates a 3rd user to test their id againest a channel where they
+    are not a member.
+    """
     user1_token = clear_and_register_and_create[1]
     channel_id = clear_and_register_and_create[4]
 
@@ -275,6 +316,15 @@ def test_channel_removeowner_bad_user_id(clear_and_register_and_create):
     assert remove.status_code == 400
 
 def test_channel_removeowner_bad_token(clear_and_register_and_create):
+    """
+    Tests removeowner with all possible invalid inputs for token:
+        - empty string
+        - string
+        - int/negative int
+        - boolean
+        - an expired token
+        - an unsave token
+    """
     user2_id = clear_and_register_and_create[2]
     channel_id = clear_and_register_and_create[4]
 
@@ -299,18 +349,10 @@ def test_channel_removeowner_bad_token(clear_and_register_and_create):
                         json={'token': True, 'channel_id': channel_id, 'u_id': user2_id})
     assert remove.status_code == 400
 
-    # Expired Token
-    expired_token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6\
-        MSwic2Vzc2lvbl9pZCI6MSwiaGFuZGxlIjoiZmlyc3RsYXN0IiwiZXhwIjo\
-            xNTQ3OTc3ODgwfQ.366QLXfCURopcjJbAheQYLVNlGLX_INKVwr8_TVXYEQ'
     remove = requests.post(config.url + 'channel/removeowner/v1', 
                         json={'token': expired_token, 'channel_id': channel_id, 'u_id': user2_id})
     assert remove.status_code == 403
 
-    # unsaved token
-    unsaved_token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.\
-        eyJpZCI6MSwic2Vzc2lvbl9pZCI6MSwiaGFuZGxlIjoiZmlyc3RsYXN\
-            0IiwiZXhwIjoyNTQ3OTc3ODgwfQ.ckPPWiR-m6x0IRqpQtKmJgNLiD8eAEiTv2i8ToK3mkY'
     remove = requests.post(config.url + 'channel/removeowner/v1', 
                         json={'token': unsaved_token, 'channel_id': channel_id, 'u_id': user2_id})
     assert remove.status_code == 403
