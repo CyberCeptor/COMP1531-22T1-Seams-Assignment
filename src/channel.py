@@ -193,6 +193,7 @@ def channel_leave_v1(auth_user_id, channel_id):
     Given a channel with ID channel_id that the authorised user is a member of, remove them as a member 
     of the channel. Their messages should remain in the channel. If the only channel owner leaves, 
     the channel will remain.
+    If a user is a owner_members of a channel, they have to be an all_members user aswell.
 
     Arguments:
         -   token (string)
@@ -212,12 +213,12 @@ def channel_leave_v1(auth_user_id, channel_id):
     owner_data = check_user_is_member(auth_user_id, channel_data, 
                                       'owner_members')
 
-
+    # if the user is an owner_member, then they have to also be an
+    # all_members user aswell.
     if owner_data:
         channel_data['owner_members'].remove(owner_data)
-
-    # remove from the data_store
-    if member_data:
+        channel_data['all_members'].remove(member_data)
+    elif member_data:
         channel_data['all_members'].remove(member_data)
     else:
         raise AccessError('User is not a member of that channel')

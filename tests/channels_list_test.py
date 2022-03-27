@@ -19,18 +19,10 @@ def test_channels_list_working(clear_register_two):
     user1 creates 3 channels,
     user2 creates 2 channels, 
     user2 joins user1's first channel,
-    assert that all information of returned by channels_list
+    assert that all information returned by channels_list
     matches the above information.
     The channel_list will be in the order of lowest channel_id to 
     greatest.
-
-    Arguments:  N/A
-
-    Exceptions:
-        AccessError  - raised for non-user_id
-        InputError  - for non int input
-
-    Return Value: N/A
     """
 
     user1_token = clear_register_two[0]['token']
@@ -105,22 +97,33 @@ def test_channels_list_working(clear_register_two):
     assert channels_list2_json['channels'][1]['name'] == 'test_pub_channel'
     assert channels_list2_json['channels'][2]['name'] == 'test_pri_channel'
 
+@pytest.mark.usefixtures('clear_register_two')
+def test_channel_list_not_in_channel(clear_register_two):
+    """
+    Create two users, user1 creates a channel
+    user2 tries to call channel_list
+    """
+    user1_token = clear_register_two[0]['token']
+    user2_token = clear_register_two[1]['token']
+
+    # create channel1 (Public).
+    # This just ensures there is at least 1 channel in the data_store.
+    channel1 = requests.post(config.url + 'channels/create/v2', 
+                            json={'token': user1_token, 'name': 'channel_name1', 'is_public': True})
+    assert channel1.status_code == 200
+
+    # Channel_list for user 2, which they are not in any channels.
+    channels_list = requests.get(config.url + 'channels/list/v2', params = {'token': user2_token})
+    channels_list_json = channels_list.json()
+    # As user2 is not in any channels, the return is empty, thus has a length of 0.
+    assert len(channels_list_json['channels']) == 0
+
+
 @pytest.mark.usefixtures('clear_register_createchannel')
 def test_channels_list_invalid_token(clear_register_createchannel):
     """
     Create a user and a channel with clear_register_createchannel.
     Tries to create a channel_list with all possible invalid token's
-
-    Arguments: N/A
-
-    Exceptions:
-        AccessError -   when channels_list is passed a string 
-                    -   when passed an expired/unsaved token
-
-        InputError  -   for all other cases (ints, -ints, and booleans)
-                    -   an empty string
-
-    Return Value: N/A
     """
 
     # passing incorrect string as token.
