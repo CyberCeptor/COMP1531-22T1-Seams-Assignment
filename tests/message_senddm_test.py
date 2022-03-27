@@ -30,33 +30,39 @@ def test_message_send_invalid_token(clear_register_createdm):
     # token is int
     dm_id =  clear_register_createdm[1]
     resp0 = requests.post(config.url + 'message/senddm/v1', 
-                          json = {'token': 0, 'dm_id': dm_id, 'message': 'hewwo'})
+                          json = {'token': 0, 'dm_id': dm_id, 
+                          'message': 'hewwo'})
     assert resp0.status_code == 400
     # token is boo
     resp1 = requests.post(config.url + 'message/senddm/v1', 
-                          json = {'token': True, 'dm_id': dm_id, 'message': 'hewwo'})
+                          json = {'token': True, 'dm_id': dm_id, 
+                          'message': 'hewwo'})
     assert resp1.status_code == 400
     # token input empty
     resp2 = requests.post(config.url + 'message/senddm/v1', 
-                          json = {'token': '', 'dm_id': dm_id, 'message': 'hewwo'})
+                          json = {'token': '', 'dm_id': dm_id, 
+                          'message': 'hewwo'})
     assert resp2.status_code == 400
     # wrong token input
     resp3 = requests.post(config.url + 'message/senddm/v1', 
-                          json = {'token': 'not right string', 'dm_id': dm_id, 'message': 'hewwo'})
+                          json = {'token': 'not right string', 
+                          'dm_id': dm_id, 'message': 'hewwo'})
     assert resp3.status_code == 403
     # expired token
     expired_token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MSwic2Vzc\
         2lvbl9pZCI6MSwiaGFuZGxlIjoiZmlyc3RsYXN0IiwiZXhwIjoxNTQ3\
             OTc3ODgwfQ.366QLXfCURopcjJbAheQYLVNlGLX_INKVwr8_TVXYEQ'
     resp4 = requests.post(config.url + 'message/senddm/v1', 
-                          json = {'token': expired_token, 'dm_id': dm_id, 'message': 'hewwo'})
+                          json = {'token': expired_token, 
+                          'dm_id': dm_id, 'message': 'hewwo'})
     assert resp4.status_code == 403
     # unsaved token
-    unsaved_token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MSwic2Vzc2lvbl9pZCI6MSw\
-            iaGFuZGxlIjoiZmlyc3RsYXN0IiwiZXhwIjoyNTQ3OTc3ODgwfQ.ckPPWiR-m6x0IRq\
-            pQtKmJgNLiD8eAEiTv2i8ToK3mkY'
+    unsaved_token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MSwi\
+        c2Vzc2lvbl9pZCI6MSwiaGFuZGxlIjoiZmlyc3RsYXN0IiwiZXhwIjoyNTQ3OTc\
+        3ODgwfQ.ckPPWiR-m6x0IRqpQtKmJgNLiD8eAEiTv2i8ToK3mkY'
     resp5 = requests.post(config.url + 'message/senddm/v1', 
-                          json = {'token': unsaved_token, 'dm_id': dm_id, 'message': 'hewwo'})
+                          json = {'token': unsaved_token, 
+                          'dm_id': dm_id, 'message': 'hewwo'})
     assert resp5.status_code == 403
     
     requests.delete(config.url + 'clear/v1')
@@ -76,19 +82,23 @@ def test_message_send_invalid_channel_id(clear_register_createdm):
     token =  clear_register_createdm[0]
     # no dm id input
     resp0 = requests.post(config.url + 'message/senddm/v1', 
-                          json = {'token': token, 'dm_id': '', 'message': 'hewwo'})
+                          json = {'token': token, 'dm_id': '', 
+                          'message': 'hewwo'})
     assert resp0.status_code == 400
     # dm id is boo
     resp1 = requests.post(config.url + 'message/senddm/v1', 
-                          json = {'token': token, 'dm_id': True, 'message': 'hewwo'})
+                          json = {'token': token, 'dm_id': True, 
+                          'message': 'hewwo'})
     assert resp1.status_code == 400
     # dm id is string
     resp2 = requests.post(config.url + 'message/senddm/v1', 
-                          json = {'token': token, 'dm_id': 'str', 'message': 'hewwo'})
+                          json = {'token': token, 'dm_id': 'str', 
+                          'message': 'hewwo'})
     assert resp2.status_code == 400
     # invalid dm input
     resp3 = requests.post(config.url + 'message/senddm/v1', 
-                          json = {'token': token, 'dm_id': 2, 'message': 'hewwo'})
+                          json = {'token': token, 'dm_id': 2, 
+                          'message': 'hewwo'})
     assert resp3.status_code == 400
 
     requests.delete(config.url + 'clear/v1')
@@ -109,12 +119,14 @@ def test_message_send_invalid_message(clear_register_createdm):
     dm_id =  clear_register_createdm[1]
     # message is int
     resp0 = requests.post(config.url + 'message/senddm/v1', 
-                          json = {'token': token, 'dm_id': dm_id, 'message': 0})
+                          json = {'token': token, 'dm_id': dm_id, 
+                          'message': 0})
     assert resp0.status_code == 400
 
     # message is boo
     resp1 = requests.post(config.url + 'message/senddm/v1', 
-                          json = {'token': token, 'dm_id': dm_id, 'message': True})
+                          json = {'token': token, 'dm_id': dm_id, 
+                          'message': True})
     assert resp1.status_code == 400
 
     requests.delete(config.url + 'clear/v1')
@@ -136,20 +148,22 @@ def test_message_send_invalid_length(clear_register_createdm):
     token =  clear_register_createdm[0]
     dm_id =  clear_register_createdm[1]
     # long_message is more than 1000 char
-    long_message = 'MoreThanAthousandCharactersMoreThanAthousandCharactersMoreThanAt\
-    housandCharactersMoreThanAthousandCharactersMoreThanAthousandCharactersMo\
-    reThanAthousandCharactersMoreThanAthousandCharactersMoreThanAthousandChara\
-    ctersMoreThanAthousandCharactersMoreThanAthousandCharactersMoreThanAthousan\
-    dCharactersMoreThanAthousandCharactersMoreThanAthousandCharactersMoreThanA\
-    thousandCharactersMoreThanAthousandCharactersMoreThanAthousandCharactersMo\
-    reThanAthousandCharactersMoreThanAthousandCharactersMoreThanAthousandCharac\
-    tersMoreThanAthousandCharactersMoreThanAthousandCharactersMoreThanAthousand\
-    CharactersMoreThanAthousandCharactersMoreThanAthousandCharactersMoreThanAtho\
-    usandCharactersMoreThanAthousandCharactersMoreThanAthousandCharactersMoreThanA\
-    thousandCharactersMoreThanAthousandCharactersMoreThanAthousandCharactersMoreT\
-    hanAthousandCharactersMoreThanAthousandCharactersMoreThanAthousandCharactersMo\
-    reThanAthousandCharactersMoreThanAthousandCharactersMoreThanAthousandCharacters\
-    MoreThanAthousandCharactersMoreThanAthousandCharacters'
+    long_message = 'MoreThanAthousandCharactersMoreThanAthousandCharactersMor\
+        eThanAt housandCharactersMoreThanAthousandCharactersMoreThanAthousand\
+        CharactersMoreThanAthousandCharactersMoreThanAthousandCharactersMoreT\
+        hanAthousandCharactersMoreThanAthousandCharactersMoreThanAthousandCha\
+        ractersMoreThanAthousandCharactersMoreThanAthousandCharactersMoreThan\
+        AthousandCharactersMoreThanAthousandCharactersMoreThanAthousandCharac\
+        tersMoreThanAthousandCharactersMo reThanAthousandCharactersMoreThanAt\
+        housandCharactersMoreThanAthousandCharactersMoreThanAthousandCharacte\
+        rsMoreThanAthousandCharactersMoreThanAthousandCharactersMoreThanAthou\
+        sandCharactersMoreThanAthousandCharactersMoreThanAthousandCharactersM\
+        oreThanAthousandCharactersMoreThanAthousandCharactersMoreThanA thousa\
+        ndCharactersMoreThanAthousandCharactersMoreThanAthousandCharactersMor\
+        eT hanAthousandCharactersMoreThanAthousandCharactersMoreThanAthousand\
+        CharactersMo reThanAthousandCharactersMoreThanAthousandCharactersMore\
+        ThanAthousandCharacters MoreThanAthousandCharactersMoreThanAthousandC\
+        haracters'
 
     # less than 1 character
     resp0 = requests.post(config.url + 'message/senddm/v1', 
@@ -182,14 +196,16 @@ def test_user_not_belong(clear_register_createdm):
 
     # create user 3
     user3 = requests.post(config.url + 'auth/register/v2', 
-                            json={'email': 'hij@abc.com', 'password': 'password',
-                               'name_first': 'first3', 'name_last': 'last3'}) 
+                            json={'email': 'hij@abc.com', 
+                            'password': 'password',
+                            'name_first': 'first3', 'name_last': 'last3'}) 
     user3_data = user3.json()
     token_3 = user3_data['token']
 
     # user 3 tries to send message in dm1
     resp0 = requests.post(config.url + 'message/senddm/v1', 
-                          json = {'token': token_3, 'dm_id': dm_id, 'message': 'hewwofrom3'})
+                          json = {'token': token_3, 'dm_id': dm_id, 
+                          'message': 'hewwofrom3'})
     assert resp0.status_code == 403 #raise access error
 
     requests.delete(config.url + 'clear/v1')
