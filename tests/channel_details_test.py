@@ -12,41 +12,8 @@ import requests
 
 from src import config
 
-@pytest.fixture(name='clear_and_register_and_create')
-def fixture_clear_and_register_and_create():
-    """
-    clears any data stored in data_store and registers a user with the
-    given information, create a channel using user id
-
-    Arguments: N/A
-
-    Exceptions: N/A
-
-    Return Value: N/A
-    """
-
-    # clear_v1()
-    # user1 = auth_register_v1('abc@def.com', 'password', 'first', 'last')
-    # chan1 = channels_create_v1(1, 'channel_name', True)
-    # return [user1['auth_user_id'], chan1['channel_id']]
-    requests.delete(config.url + 'clear/v1')
-    resp = requests.post(config.url + 'auth/register/v2', 
-                         json={'email': 'abc@def.com', 'password': 'password',
-                               'name_first': 'first', 'name_last': 'last'})
-    user_data = resp.json()
-    token = user_data['token']
-    u_id = user_data['auth_user_id']
-    resp0 = requests.post(config.url + 'channels/create/v2',
-                            json={'token': token, 'name': 'channel_name',
-                                    'is_public': True})
-    channel_data = resp0.json()
-    channel_id = channel_data['channel_id']
-    return [token, channel_id, u_id]
-
-
-
-
-def test_channel_details_invalid_token(clear_and_register_and_create):
+@pytest.mark.usefixtures('clear_register_createchannel')
+def test_channel_details_invalid_token(clear_register_createchannel):
     """
     testing invalid user type to raise input error
 
@@ -61,7 +28,7 @@ def test_channel_details_invalid_token(clear_and_register_and_create):
 
 
     # token is int
-    chan_id = clear_and_register_and_create[1]
+    chan_id = clear_register_createchannel[1]
     resp0 = requests.get(config.url + 'channel/details/v2', 
                           params = {'token': 0, 'channel_id': chan_id})
     assert resp0.status_code == 400
@@ -108,7 +75,9 @@ def test_channel_details_invalid_token(clear_and_register_and_create):
     # with pytest.raises(InputError):
     #     channel_details_v1(-1, chan_id1)
 
-def test_channel_details_invalid_channel(clear_and_register_and_create):
+
+@pytest.mark.usefixtures('clear_register_createchannel')
+def test_channel_details_invalid_channel(clear_register_createchannel):
     """
     testing invalid channel id to raise input error
 
@@ -136,7 +105,7 @@ def test_channel_details_invalid_channel(clear_and_register_and_create):
     # with pytest.raises(InputError):
     #     channel_details_v1(id1, True)
   
-    token = clear_and_register_and_create[0]
+    token = clear_register_createchannel[0]['token']
     # no channel id input
     resp0 = requests.get(config.url + 'channel/details/v2', 
                           params = {'token': token, 'channel_id': ''})
@@ -155,8 +124,37 @@ def test_channel_details_invalid_channel(clear_and_register_and_create):
     assert resp3.status_code == 400
     
 
+@pytest.mark.usefixtures('clear_register_createchannel')
+def test_user_not_belong(clear_register_createchannel):
+    """
+    testing if user belongs to the channel
 
-def test_channel_details_return(clear_and_register_and_create):
+    Arguments: clear_and_register_and_create (fixture)
+
+    Exceptions: 
+        Access Error - Raised for all test cases below
+
+    Return Value: N/A
+    """
+    
+    chan_id = clear_register_createchannel[1]
+
+    # create user 2
+    user2 = requests.post(config.url + 'auth/register/v2', 
+                            json={'email': 'def@abc.com', 'password': 'password',
+                               'name_first': 'first2', 'name_last': 'last2'}) 
+    user2_data = user2.json()
+    token_2 = user2_data['token']
+
+    resp0 = requests.get(config.url + 'channel/details/v2', 
+                          params = {'token': token_2, 'channel_id': chan_id})
+    assert resp0.status_code == 403
+    
+    requests.delete(config.url + 'clear/v1')
+
+
+@pytest.mark.usefixtures('clear_register_createchannel')
+def test_channel_details_return(clear_register_createchannel):
     """
     testing if channel_details_v1 returns right values
 
@@ -169,9 +167,9 @@ def test_channel_details_return(clear_and_register_and_create):
     
 
     # pylint: disable=unused-argument
-    token = clear_and_register_and_create[0]
-    chan_id = clear_and_register_and_create[1]
-    u_id = clear_and_register_and_create[2]
+    token = clear_register_createchannel[0]['token']
+    chan_id = clear_register_createchannel[1]
+    u_id = clear_register_createchannel[0]['auth_user_id']
 
     # success run
     resp = requests.get(config.url + 'channel/details/v2', 
@@ -212,3 +210,5 @@ def test_channel_details_return(clear_and_register_and_create):
     #         'handle_str': 'firstlast'
     #     }]
     # }
+requests.delete(config.url + 'clear/v1')
+

@@ -4,44 +4,32 @@ import requests
 from src import config
 
 
-@pytest.fixture(name='clear_and_register_create')
-def fixture_clear_and_register_create():
-    """ clears any data stored in data_store and registers a user with the
-    given information
+@pytest.mark.usefixtures('clear_register_createchannel')
+def test_channel_leave_works(clear_register_createchannel):
+    token = clear_register_createchannel[0]['token']
+    channel_id = clear_register_createchannel[1]
 
-    Arguments: N/A
+    create_user2 = requests.post(config.url + 'auth/register/v2', 
+                        json={'email': 'xue2@gmail.com', 'password': 'xzq19112',
+                                'name_first': 'Xue', 'name_last':'zhiqian'})
+    user2 = create_user2.json()
+    token2 = user2['token']
 
-    Exceptions: N/A
+    join_2 = requests.post(config.url + 'channel/join/v2',
+                        json={'token': token2, 'channel_id': channel_id})
+    assert join_2.status_code == 200
+    
+    channel_leave = requests.post(config.url + 'channel/leave/v1', 
+                            json={'token': token2, 'channel_id': channel_id})
+    assert channel_leave.status_code == 200
 
-    Return Value: N/A """
-
-    requests.delete(config.url + 'clear/v1')
-
-    user = requests.post(config.url + 'auth/register/v2', 
-                  json={'email': 'abc@def.com', 'password': 'password',
-                        'name_first': 'first', 'name_last': 'last'})
-    user_json = user.json()
-
-    channel = requests.post(config.url + 'channels/create/v2', 
-                          json={'token': user_json['token'], 'name': 'test_channel_public',
-                                'is_public': True})
-    assert channel.status_code == 200
-    channel_json = channel.json()
-
-    return [user_json['token'], channel_json['channel_id']]
-
-
-# Working test case
-def test_channel_leave_works(clear_and_register_create):
-    token = clear_and_register_create[0]
-    channel_id = clear_and_register_create[1]
     channel_leave = requests.post(config.url + 'channel/leave/v1', 
                             json={'token': token, 'channel_id': channel_id})
     assert channel_leave.status_code == 200
 
-
-def test_channel_leave_unknown_user(clear_and_register_create):
-    channel_id = clear_and_register_create[1]
+@pytest.mark.usefixtures('clear_register_createchannel')
+def test_channel_leave_unknown_user(clear_register_createchannel):
+    channel_id = clear_register_createchannel[1]
 
     user2 = requests.post(config.url + 'auth/register/v2', 
                   json={'email': 'abc2@def.com', 'password': 'password',
@@ -54,10 +42,10 @@ def test_channel_leave_unknown_user(clear_and_register_create):
     assert channel_leave.status_code == 403
 
 
-
-def test_channel_leave_invalid_channel_id(clear_and_register_create):
+@pytest.mark.usefixtures('clear_register_createchannel')
+def test_channel_leave_invalid_channel_id(clear_register_createchannel):
     # creating 2 users and the channel.
-    token = clear_and_register_create[0]
+    token = clear_register_createchannel[0]['token']
     # Incorrect channel id
     channel_leave = requests.post(config.url + 'channel/leave/v1', 
                             json={'token': token, 'channel_id': 444})
@@ -80,8 +68,9 @@ def test_channel_leave_invalid_channel_id(clear_and_register_create):
 
     
     # bad token tests.
-def test_channel_leave_invalid_token(clear_and_register_create):
-    channel_id = clear_and_register_create[1]
+@pytest.mark.usefixtures('clear_register_createchannel')
+def test_channel_leave_invalid_token(clear_register_createchannel):
+    channel_id = clear_register_createchannel[1]
     # expired token
     expired_token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6\
         MSwic2Vzc2lvbl9pZCI6MSwiaGFuZGxlIjoiZmlyc3RsYXN0IiwiZXhwIjo\
@@ -118,6 +107,4 @@ def test_channel_leave_invalid_token(clear_and_register_create):
                             json={'token': 'bad_token', 'channel_id': channel_id})
     assert channel_leave.status_code == 403
 
-
-
-
+requests.delete(config.url + 'clear/v1')

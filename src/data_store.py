@@ -54,12 +54,12 @@ data = {
             'handle_str': 'firstlast',
         }],
         'is_public': is_public,
-        'messages' = [
-            'message_id': '1',
+        'messages' = [{
+            'message_id': 1,
             'u_id': 1,
             'message': 'hewwo',
-            'time_sent': '1582426789'
-        ],
+            'time_sent': datetime.datetime.now()
+        }],
     }],
     'tokens' = [{
         'user_id': user_data['id'],

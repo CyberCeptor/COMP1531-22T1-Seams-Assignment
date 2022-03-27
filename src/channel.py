@@ -15,11 +15,9 @@ Description: implementation for
 """
 
 from src.error import InputError, AccessError
-from src.other import check_valid_auth_id, cast_to_int_get_requests
+from src.other import check_valid_auth_id, get_messages
 from src.other import check_user_is_member, check_valid_channel_id, check_user_is_global_owner
 from src.data_store import data_store
-from src.token import token_valid_check, token_get_user_id, token_locate_in_data_store
-
 from src.token import token_valid_check, token_get_user_id
 
 def channel_invite_v2(token, channel_id, u_id):
@@ -120,59 +118,10 @@ def channel_messages_v2(token, channel_id, start):
     # see if given auth_user_id and channel_id are valid
     check_valid_auth_id(auth_user_id)
     channel_data = check_valid_channel_id(channel_id)
-    channel_id = channel_data['channel_id']
 
-    # is_member is a bool to check whether given user is in the given channel
-    if check_user_is_member(auth_user_id, channel_data, 'all_members') is None:
-        raise AccessError('User does not exist in channel')
+    messages = get_messages(auth_user_id, channel_data, start, "channel")
 
-    total_messages = len(channel_data['messages'])
-
-    start = cast_to_int_get_requests(start, 'start')
-
-    if start < 0:
-        raise InputError('Invalid start')
-    elif start > total_messages:
-        raise InputError('Invalid start, not enough messages')
-
-    if total_messages == 0:
-        return {
-            'messages': [],
-            'start': start,
-            'end': -1,
-        }
-
-    # message starts
-    start_message = channel_data['messages'][start]
-
-    # get end
-    end = start + 50
-
-    # make sure end is suitable index place
-    if end >= total_messages:
-        end = -1
-
-    # the messages list
-    messages_to_return = []
-
-    # if mesages not overflow
-    if end == -1:
-        if start == total_messages - 1: # if there is only 1 message
-            messages_to_return.append(start_message)
-        else:
-            for idx, message in channel_data['messages']:
-                if idx >= start:
-                    messages_to_return.append(message)
-    else:
-        for idx, message in channel_data['messages']:
-            if start <= idx < end:
-                messages_to_return.append(message)
-
-    return {
-        'messages': messages_to_return,
-        'start': start,
-        'end': end,
-    }
+    return messages
 
 def channel_join_v2(token, channel_id):
     """
@@ -263,14 +212,15 @@ def channel_leave_v1(auth_user_id, channel_id):
     owner_data = check_user_is_member(auth_user_id, channel_data, 
                                       'owner_members')
 
+
+    if owner_data:
+        channel_data['owner_members'].remove(owner_data)
+
     # remove from the data_store
     if member_data:
         channel_data['all_members'].remove(member_data)
     else:
         raise AccessError('User is not a member of that channel')
-
-    if owner_data:
-        channel_data['owner_members'].remove(owner_data)
 
     data_store.set(store)
 
@@ -298,34 +248,10 @@ Return Value:
         N/A - Returns an empty dict.
 """
 
+# If the user is a member of the channel, and a global owner of SEAMS,
+# they can add remove whoever they like, including themselves.
 def channel_addowner_v1(token, channel_id, u_id):
-    store = data_store.get()
-
-    token_valid_check(token)
-    token_locate_in_data_store(token)
-
-    check_valid_auth_id(u_id)
-    channel_data = check_valid_channel_id(channel_id)
-
-    member_data = check_user_is_member(u_id, channel_data, 'all_members')
-    if member_data is None:
-        raise InputError('User is not a valid member.')
-
-    # check the inviter, i.e. token, is logged in , i.e. token is in data_store
-
-    inviter_user_id = token_get_user_id(token)
-
-    # check that the inviter is an owner_member.
-    if check_user_is_member(inviter_user_id, channel_data, 'owner_members') is None:
-        raise AccessError('The inviter is not an owner_member')
-
-    # check that the user_id isn't already a owner_member
-    if check_user_is_member(u_id, channel_data, 'owner_members'):
-        raise InputError('The user is already an owner_member')
-
-    #add the member_data to the owner_members_dict
-    channel_data['owner_members'].append(member_data)
-    data_store.set(store)
+    channel_addremove_owner_valid_check(token, channel_id, u_id, 'add')
     return {}
 
 """
@@ -350,31 +276,44 @@ Return Value:
 """
 
 def channel_removeowner_v1(token, channel_id, u_id):
+    channel_addremove_owner_valid_check(token, channel_id, u_id, 'remove')
+    return {}
+
+def channel_addremove_owner_valid_check(token, channel_id, u_id, option):
     store = data_store.get()
     token_valid_check(token)
-    channel_data = check_valid_channel_id(channel_id)
     check_valid_auth_id(u_id)
-
-    # check the inviter, i.e. token, is logged in , i.e. token is in data_store
+    channel_data = check_valid_channel_id(channel_id)
     inviter_user_id = token_get_user_id(token)
+
+    # if check_user_is_member returns None, they are not a member of the channel, raise error
+    # if they are, check if there perm_id == 1, if it is, they have permission to add user.
+    setter_channel_data = check_user_is_member(inviter_user_id, channel_data, 'all_members')
+    if setter_channel_data == None:
+        raise AccessError("Not a member of the channel")
 
     member_data = check_user_is_member(u_id, channel_data, 'all_members')
     if member_data is None:
         raise InputError('User is not a valid member.')
 
-    # check the inviter is an owner member
-    if check_user_is_member(inviter_user_id, channel_data, 'owner_members') is None:
+    if check_user_is_global_owner(inviter_user_id):
+        pass
+    elif check_user_is_member(inviter_user_id, channel_data, 'owner_members') is None:
         raise AccessError('The inviter is not an owner_member')
 
-    # check the invitee is an owner member
-    if check_user_is_member(u_id, channel_data, 'owner_members') is None:
-        raise InputError('The invitee is not an owner_member') 
+    if option == 'add':
+        # check that the user_id isn't already a owner_member
+        if check_user_is_member(u_id, channel_data, 'owner_members'):
+            raise InputError('The user is already an owner_member')
+        #add the member_data to the owner_members_dict
+        channel_data['owner_members'].append(member_data)
+    if option == 'remove':
+        if check_user_is_member(u_id, channel_data, 'owner_members') is None:
+            raise InputError('The user is already an owner_member')
+        # Need to check the number of members in owner_members,
+        # if the member being removed is the only member, raise InputError.
+        if len(channel_data['owner_members']) == 1:
+            raise InputError('This is the only owner_member left in the channel')
+        channel_data['owner_members'].remove(member_data)
 
-    # Need to check the number of members in owner_members,
-    # if the member being removed is the only member, raise InputError.
-    if len(channel_data['owner_members']) == 1:
-        raise InputError('This is the only owner_member left in the channel')
-
-    channel_data['owner_members'].remove(member_data)
     data_store.set(store)
-    return {}

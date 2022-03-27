@@ -51,9 +51,6 @@ def fixture_clear_and_register_and_create():
     return [user1_id, user1_token, user2_id, user2_token, channel_id]
 
 
-
-
-
 def test_channel_removeowner_working(clear_and_register_and_create):
     user1_id = clear_and_register_and_create[0]
     user1_token = clear_and_register_and_create[1]
@@ -92,6 +89,53 @@ def test_channel_removeowner_working(clear_and_register_and_create):
         'name_last': 'last',
         'handle_str': 'firstlast'
     }]
+
+def test_channel_removeowner_permission_id(clear_and_register_and_create):
+    user1_id = clear_and_register_and_create[0]
+    user1_token = clear_and_register_and_create[1]
+    user2_id = clear_and_register_and_create[2]
+    user2_token = clear_and_register_and_create[3]
+    channel_id = clear_and_register_and_create[4]
+
+    # remove user2 as owner_member
+    addowner = requests.post(config.url + 'channel/removeowner/v1',
+                        json={'token': user2_token, 'channel_id': channel_id, 'u_id': user2_id})
+    assert addowner.status_code == 200
+
+    # create user3 and set them as an owner_member of the channel
+    user3 = requests.post(config.url + 'auth/register/v2', 
+                         json={'email': 'abc3@def.com', 'password': 'password3',
+                               'name_first': 'first3', 'name_last': 'last3'})
+    user3_data = user3.json()
+    user3_token = user3_data['token']
+    user3_id = user3_data['auth_user_id']
+
+    # add user3 to the channel
+    channel_join = requests.post(config.url + 'channel/join/v2',
+                        json={'token': user3_token,
+                        'channel_id': channel_id})
+    assert channel_join.status_code == 200
+
+    # add user3 to be an owner, with user1's token as they are owner_member
+    addowner = requests.post(config.url + 'channel/addowner/v1',
+                        json={'token': user1_token, 'channel_id': channel_id, 'u_id': user3_id})
+    assert addowner.status_code == 200
+
+    # user2 cant remove user1 as they are not a global member or an owner_member
+    removeowner = requests.post(config.url + 'channel/removeowner/v1',
+                        json={'token': user2_token, 'channel_id': channel_id, 'u_id': user1_id})
+    assert removeowner.status_code == 403
+
+    # setting user2 to global owner
+    global_perm = requests.post(config.url + 'admin/userpermission/change/v1', 
+                        json={'token': user1_token, 'u_id': user2_id, 'permission_id': 1})
+    assert global_perm.status_code == 200
+
+    # user2 can now remove user3 as they are not a owner_member, but are a global owner
+    addowner = requests.post(config.url + 'channel/removeowner/v1',
+                        json={'token': user2_token, 'channel_id': channel_id, 'u_id': user1_id})
+    assert addowner.status_code == 200
+
 
 def test_channel_removeowner_not_an_owner(clear_and_register_and_create):
     user1_token = clear_and_register_and_create[1]
@@ -139,6 +183,7 @@ def test_channel_removeowner_only_owner_member(clear_and_register_and_create):
     remove = requests.post(config.url + 'channel/removeowner/v1', 
                         json={'token': user1_token, 'channel_id': channel_id, 'u_id': user1_id})
     assert remove.status_code == 400
+
 
 # Channel ID is valid, Token is not authorised with owner permissions.
 def test_channel_removeowner_not_authorised(clear_and_register_and_create):
@@ -269,3 +314,5 @@ def test_channel_removeowner_bad_token(clear_and_register_and_create):
     remove = requests.post(config.url + 'channel/removeowner/v1', 
                         json={'token': unsaved_token, 'channel_id': channel_id, 'u_id': user2_id})
     assert remove.status_code == 403
+
+requests.delete(config.url + 'clear/v1')

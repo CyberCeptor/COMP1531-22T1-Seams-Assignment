@@ -11,49 +11,29 @@ import pytest
 import requests
 from src import config
 
-@pytest.fixture(name='clear_and_register_and_create')
-def fixture_clear_and_register_and_create():
-    """
-    clears any data stored in data_store and registers a user with the
-    given information, create a channel using user id
 
-    Arguments: N/A
 
-    Exceptions: N/A
-
-    Return Value: N/A
-    """
-
-    requests.delete(config.url + 'clear/v1')
-    resp = requests.post(config.url + 'auth/register/v2', 
-                        json={'email': 'abc@def.com', 'password': 'password',
-                                'name_first': 'first', 'name_last': 'last'})
-    data = resp.json()
-    chan = requests.post(config.url + 'channels/create/v2',
-                        json={'token': data['token'], 'name': 'channel_name',
-                            'is_public': True})
-
-    data1 = chan.json()
-    return [data['token'], data1['channel_id'], data['auth_user_id']]
-
-def test_channel_invite_invalid_channel(clear_and_register_and_create):
+@pytest.mark.usefixtures('clear_register_createchannel')
+def test_channel_invite_invalid_channel(clear_register_createchannel):
     """
     clears any data stored in data_store and registers a invitee,
     a inviter with given information, testing invalid channel to raise input
     error
 
-    Arguments: clear_and_register_and_create (fixture)
+    Arguments: clear_register_createchannel (fixture)
 
     Exceptions:
         InputError - Raised for an invlaid channel
 
     Return Value: N/A
     """
+
+    token = clear_register_createchannel[0]['token']
     resp1 = requests.post(config.url + 'auth/register/v2', 
                         json={'email': 'xue2@gmail.com', 'password': 'xzq19112',
                                 'name_first': 'Xue', 'name_last':'zhiqian'})
     data = resp1.json()
-    token = clear_and_register_and_create[0]
+    
     id2 = data['auth_user_id']
     add = requests.post(config.url + 'channel/invite/v2', 
                         json={'token': token, 'channel_id': 44,
@@ -80,40 +60,44 @@ def test_channel_invite_invalid_channel(clear_and_register_and_create):
                                 'u_id': id2})
     assert add.status_code == 400
 
-def test_channel_invite_self(clear_and_register_and_create):
+
+@pytest.mark.usefixtures('clear_register_createchannel')
+def test_channel_invite_self(clear_register_createchannel):
     """
     clears any data stored in data_store and registers a inviter
     with given information, testing inviter invite himself
 
-    Arguments: clear_and_register_and_create (fixture)
+    Arguments: clear_register_createchannel (fixture)
 
     Exceptions:
         InputError - Raised for inviter invite himself
 
     Return Value: N/A
     """
-    token = clear_and_register_and_create[0]
-    chan_id1 = clear_and_register_and_create[1]
-    id = clear_and_register_and_create[2]
+    token = clear_register_createchannel[0]['token']
+    chan_id1 = clear_register_createchannel[1]
+    id = clear_register_createchannel[0]['token']
     add = requests.post(config.url + 'channel/invite/v2', 
                         json={'token': token, 'channel_id': chan_id1,
                                 'u_id': id})
     assert add.status_code == 400
 
-def test_channel_invite_invalid_inviter(clear_and_register_and_create):
+
+@pytest.mark.usefixtures('clear_register_createchannel')
+def test_channel_invite_invalid_inviter(clear_register_createchannel):
     """
     clears any data stored in data_store and registers a invitee
     with given information, testing invalid token to raise input error
 
-    Arguments: clear_and_register_and_create (fixture)
+    Arguments: clear_register_createchannel (fixture)
 
     Exceptions:
         InputError - Raised for an invlaid token
 
     Return Value: N/A
     """
-    id1 = clear_and_register_and_create[2]
-    chan_id1 = clear_and_register_and_create[1]
+    id1 = clear_register_createchannel[0]['auth_user_id']
+    chan_id1 = clear_register_createchannel[1]
     add = requests.post(config.url + 'channel/invite/v2', 
                         json={'token': -2, 'channel_id': chan_id1,
                                 'u_id': id1})
@@ -139,20 +123,22 @@ def test_channel_invite_invalid_inviter(clear_and_register_and_create):
                                 'u_id': id1})
     assert add.status_code == 400
 
-def test_channel_invite_invalid_invitee(clear_and_register_and_create):
+
+@pytest.mark.usefixtures('clear_register_createchannel')
+def test_channel_invite_invalid_invitee(clear_register_createchannel):
     """
     clears any data stored in data_store and registers a inviter
     with given information, testing invalid invitee to raise input error
 
-    Arguments: clear_and_register_and_create (fixture)
+    Arguments: clear_register_createchannel (fixture)
 
     Exceptions:
         InputError - Raised for an invlaid inviter
 
     Return Value: N/A
     """
-    id1 = clear_and_register_and_create[0]
-    chan_id1 = clear_and_register_and_create[1]
+    id1 = clear_register_createchannel[0]['token']
+    chan_id1 = clear_register_createchannel[1]
     add = requests.post(config.url + 'channel/invite/v2', 
                         json={'token': id1, 'channel_id': chan_id1,
                                 'u_id': -2})
@@ -183,47 +169,54 @@ def test_channel_invite_invalid_invitee(clear_and_register_and_create):
         channel_invite_v2(id1, chan_id1, '3')
     '''
 
-def test_channel_invite_invitee_already_joined(clear_and_register_and_create):
+@pytest.mark.usefixtures('clear_register_createchannel')
+def test_channel_invite_invitee_already_joined(clear_register_createchannel):
     """
     clears any data stored in data_store and registers a invitee, a inviter,
     a truowner withi given info, testing a invitee is alredy in channel to raise
     input error
 
-    Arguments: clear_and_register_and_create (fixture)
+    Arguments: clear_register_createchannel (fixture)
 
     Exceptions:
         InputError - Raised for a invitee(already in channel)
 
     Return Value: N/A
     """
-    id1 = clear_and_register_and_create[0]
-    chan_id1 = clear_and_register_and_create[1]
-    resp1 = requests.post(config.url + 'auth/register/v2', 
+    id1 = clear_register_createchannel[0]['token']
+    chan_id1 = clear_register_createchannel[1]
+    # create user 2
+    create_user2 = requests.post(config.url + 'auth/register/v2', 
                         json={'email': 'xue2@gmail.com', 'password': 'xzq19112',
                                 'name_first': 'Xue', 'name_last':'zhiqian'})
-    data = resp1.json()
+    user2 = create_user2.json()
+
+    # user 2 joins channel 1
     requests.post(config.url + 'channel/join/v2',
-                json={'token': data['token'], 'channel_id': chan_id1})   
+                json={'token': user2['token'], 'channel_id': chan_id1})  
+    # user 1 invites user 2
     add = requests.post(config.url + 'channel/invite/v2', 
                         json={'token': id1, 'channel_id': chan_id1,
-                                'u_id': data['auth_user_id']})
+                                'u_id': user2['auth_user_id']})
     assert add.status_code == 400
 
-def test_channel_invite_inviter_not_in_channel(clear_and_register_and_create):
+
+@pytest.mark.usefixtures('clear_register_createchannel')
+def test_channel_invite_inviter_not_in_channel(clear_register_createchannel):
     """
     clears any data stored in data_store and registers a inviter, a invitee,
     the owner of channel with the given information,
     create a channel with user id, and then use the inviter(is not in channel)
     to add the invitee to raise a access error
 
-    Arguments: clear_and_register_and_create(fixture)
+    Arguments: clear_register_createchannel(fixture)
 
     Exceptions:
         AccessError: Raised for a invter(not in channel) add the invitee
 
     Return Value: N/A
     """
-    chan1_id = clear_and_register_and_create[1]
+    chan1_id = clear_register_createchannel[1]
     resp1 = requests.post(config.url + 'auth/register/v2', 
                         json={'email': 'xue2@gmail.com', 'password': 'xzq19112',
                                 'name_first': 'Xue', 'name_last':'zhiqian'})
@@ -239,3 +232,32 @@ def test_channel_invite_inviter_not_in_channel(clear_and_register_and_create):
     assert add.status_code == 403
 
 requests.delete(config.url + 'clear/v1')
+
+
+@pytest.mark.usefixtures('clear_register_createchannel')
+def test_channel_invite_success(clear_register_createchannel):
+    """
+    clears any data stored in data_store and registers a invitee, a inviter,
+    a truowner withi given info, testing a invitee is alredy in channel to raise
+    input error
+
+    Arguments: clear_register_createchannel (fixture)
+
+    Exceptions:
+        InputError - Raised for a invitee(already in channel)
+
+    Return Value: N/A
+    """
+    id1 = clear_register_createchannel[0]['token']
+    chan_id1 = clear_register_createchannel[1]
+    # create user 2
+    create_user2 = requests.post(config.url + 'auth/register/v2', 
+                        json={'email': 'xue2@gmail.com', 'password': 'xzq19112',
+                                'name_first': 'Xue', 'name_last':'zhiqian'})
+    user2 = create_user2.json()
+
+    # user 1 invites user 2
+    add = requests.post(config.url + 'channel/invite/v2', 
+                        json={'token': id1, 'channel_id': chan_id1,
+                                'u_id': user2['auth_user_id']})
+    assert add.status_code == 200
