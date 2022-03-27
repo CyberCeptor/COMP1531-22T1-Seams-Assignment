@@ -10,8 +10,8 @@ import pytest
 import requests
 from src import config
 
-@pytest.mark.usefixtures('clear_register_two')
-def test_dm_remove_invalid_token(clear_register_two):
+@pytest.mark.usefixtures('clear_register_createdm')
+def test_dm_remove_invalid_token(clear_register_createdm):
     """
     clears any data stored in data_store and registers a user with the
     given information, run dm remove successfully
@@ -22,17 +22,7 @@ def test_dm_remove_invalid_token(clear_register_two):
 
     Return Value: N/A
     """
-    id1 = clear_register_two[0]['auth_user_id']
-    resp1 = requests.post(config.url + 'auth/register/v2', 
-                        json={'email': 'lmz@gmail.com', 'password': '893621',
-                                'name_first': 'li', 'name_last': 'mingzhe'})
-    data1 = resp1.json()
-    token2 = clear_register_two[1]['token']
-    
-    create = requests.post(config.url + 'dm/create/v1', 
-                json={'token': token2, 'u_ids': [id1]})
-    data2 = create.json()
-    dm_id = data2['dm_id']
+    dm_id = clear_register_createdm[0]
     remove = requests.delete(config.url + 'dm/remove/v1', 
                         json={'token': 500, 'dm_id': dm_id})
     assert remove.status_code == 400
@@ -53,8 +43,8 @@ def test_dm_remove_invalid_token(clear_register_two):
                         json={'token': False, 'dm_id': dm_id})
     assert remove.status_code == 400
 
-@pytest.mark.usefixtures('clear_register_two')
-def test_dm_remove_valid(clear_register_two):
+@pytest.mark.usefixtures('clear_register_createdm')
+def test_dm_remove_valid(clear_register_createdm):
     """
     clears any data stored in data_store and registers a user with the
     given information, run dm remove successfully
@@ -65,10 +55,10 @@ def test_dm_remove_valid(clear_register_two):
 
     Return Value: N/A
     """
-    token1 = clear_register_two[0]['token']
-    id1 = clear_register_two[0]['auth_user_id']
-    id2 = clear_register_two[1]['auth_user_id']
-    token2 = clear_register_two[1]['token']
+    token1 = clear_register_createdm[2]['token']
+    id1 = clear_register_createdm[2]['auth_user_id']
+    id2 = clear_register_createdm[3]['auth_user_id']
+    token2 = clear_register_createdm[3]['token']
     
     create = requests.post(config.url + 'dm/create/v1', 
                 json={'token': token2, 'u_ids': [id1]})
@@ -90,8 +80,8 @@ def test_dm_remove_valid(clear_register_two):
                 json={'token': token1, 'u_ids': [id2, id1]})
     assert create.status_code == 400
 
-@pytest.mark.usefixtures('clear_register_two')
-def test_dm_remove_invalid_u_id(clear_register_two):
+@pytest.mark.usefixtures('clear_register_createdm')
+def test_dm_remove_invalid_u_id(clear_register_createdm):
     """
     clears any data stored in data_store and registers a user with the
     given information, raise inputerror by invalid u_id
@@ -102,12 +92,8 @@ def test_dm_remove_invalid_u_id(clear_register_two):
 
     Return Value: N/A
     """
-    id1 = clear_register_two[0]['auth_user_id']
-    token2 = clear_register_two[1]['token']
+    token2 = clear_register_createdm[0]
 
-    requests.post(config.url + 'dm/create/v1', 
-                json={'token': token2, 'u_ids': [id1]})
-    
     remove = requests.delete(config.url + 'dm/remove/v1', 
                         json={'token': token2, 'dm_id': ''})
     assert remove.status_code == 400
@@ -128,8 +114,8 @@ def test_dm_remove_invalid_u_id(clear_register_two):
                         json={'token': token2, 'dm_id': -900})
     assert remove.status_code == 400
 
-@pytest.mark.usefixtures('clear_register_two')
-def test_dm_remove_not_creator(clear_register_two):
+@pytest.mark.usefixtures('clear_register_createdm')
+def test_dm_remove_not_creator(clear_register_createdm):
     """
     clears any data stored in data_store and registers a user with the
     given information, raise accesserror by not a creator
@@ -140,19 +126,15 @@ def test_dm_remove_not_creator(clear_register_two):
 
     Return Value: N/A
     """
-    token1 = clear_register_two[0]['token']
-    id1 = clear_register_two[0]['auth_user_id']
-    token2 = clear_register_two[1]['token']
-    create = requests.post(config.url + 'dm/create/v1', 
-                json={'token': token2, 'u_ids': [id1]})
-    data2 = create.json()
-    dm_id = data2['dm_id']
+    token1 = clear_register_createdm[0]
+    dm_id = clear_register_createdm[1]
+    token1 = clear_register_createdm[3]['token']
     remove = requests.delete(config.url + 'dm/remove/v1', 
                         json={'token': token1, 'dm_id': dm_id})
     assert remove.status_code == 403
 
-@pytest.mark.usefixtures('clear_register_two')
-def test_dm_remove_not_in_dm(clear_register_two):
+@pytest.mark.usefixtures('clear_register_createdm')
+def test_dm_remove_not_in_dm(clear_register_createdm):
     """
     clears any data stored in data_store and registers a user with the
     given information, raise accesserror by not in dm
@@ -163,12 +145,8 @@ def test_dm_remove_not_in_dm(clear_register_two):
 
     Return Value: N/A
     """
-    token1 = clear_register_two[0]['token']
-    id2 = clear_register_two[1]['auth_user_id']
-    create = requests.post(config.url + 'dm/create/v1', 
-                        json={'token': token1, 'u_ids': [id2]})
-    data2 = create.json()
-    dm_id = data2['dm_id']
+    token1 = clear_register_createdm[0]
+    dm_id = clear_register_createdm[1]
     requests.post(config.url + 'dm/leave/v1', 
                 json={'token': token1, 'dm_id': dm_id})
     remove = requests.delete(config.url + 'dm/remove/v1', 

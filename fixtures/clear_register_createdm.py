@@ -47,4 +47,4 @@ def clear_register_createdm(clear_register_two):
     dm = create_dm.json()
     dm_id = dm['dm_id']
 
-    return [token_1, dm_id]
+    return [token_1, dm_id, user_1_data, user_2_data]

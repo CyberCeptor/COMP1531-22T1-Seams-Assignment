@@ -18,3 +18,12 @@ user.py
 - in setname, the user's name must follow the same restrictions as when the user
     is first registered, including that their full name must have at least one char
     that is alphanumeric
+
+dm.py
+- in dm_leave, if the creator leave the dm, the creator  the creator data can 
+    no longer be accessed this dm(the creator leave will make the 'creator'
+    empty)
+
+- in dm_create, the dm will have the unique dm id
+
+- in dm_list, the user which matches the token is already in a dm

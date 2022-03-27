@@ -10,8 +10,8 @@ import pytest
 import requests
 from src import config
 
-@pytest.mark.usefixtures('clear_register_two')
-def test_dm_details_valid(clear_register_two):
+@pytest.mark.usefixtures('clear_register_createdm')
+def test_dm_details_valid(clear_register_createdm):
     """
     clears any data stored in data_store and registers a user with the
     given information, run dm details successful
@@ -22,18 +22,14 @@ def test_dm_details_valid(clear_register_two):
 
     Return Value: N/A
     """
-    token1 = clear_register_two[0]['token']
-    id1 = clear_register_two[1]['auth_user_id']
-    create = requests.post(config.url + 'dm/create/v1', 
-                        json={'token': token1, 'u_ids': [id1]})
-    data2 = create.json()
-    dm_id = data2['dm_id']
+    token1 = clear_register_createdm[0]
+    dm_id = clear_register_createdm[1]
     detail = requests.get(config.url + 'dm/details/v1', 
                         params={'token': token1, 'dm_id': dm_id})
     assert detail.status_code == 200
 
-@pytest.mark.usefixtures('clear_register_two')
-def test_dm_details_invalid_token(clear_register_two):
+@pytest.mark.usefixtures('clear_register_createdm')
+def test_dm_details_invalid_token(clear_register_createdm):
     """
     clears any data stored in data_store and registers a user with the
     given information, run dm details successful
@@ -44,12 +40,7 @@ def test_dm_details_invalid_token(clear_register_two):
 
     Return Value: N/A
     """
-    token1 = clear_register_two[0]['token']
-    id1 = clear_register_two[1]['auth_user_id']
-    create = requests.post(config.url + 'dm/create/v1', 
-                        json={'token': token1, 'u_ids': [id1]})
-    data2 = create.json()
-    dm_id = data2['dm_id']
+    dm_id = clear_register_createdm[1]
     detail = requests.get(config.url + 'dm/details/v1', 
                         params={'token': 500, 'dm_id': dm_id})
     assert detail.status_code == 400
@@ -108,8 +99,8 @@ def test_dm_details_invalid_dm_id(clear_register_two):
                         params={'token': token1, 'dm_id': True})
     assert detail.status_code == 400
 
-@pytest.mark.usefixtures('clear_register_two')
-def test_dm_details_auth_notin_dm(clear_register_two):
+@pytest.mark.usefixtures('clear_register_createdm')
+def test_dm_details_auth_notin_dm(clear_register_createdm):
     """
     clears any data stored in data_store and registers a user with the
     given information, raise a access error by the auth not in dm
@@ -120,17 +111,12 @@ def test_dm_details_auth_notin_dm(clear_register_two):
 
     Return Value: N/A
     """
-    token1 = clear_register_two[0]['token']
-    id2 = clear_register_two[1]['auth_user_id']
-    resp2 = requests.post(config.url + 'auth/register/v2', 
-                        json={'email': 'hyf@gmail.com', 'password': 'hyf1234',
-                                'name_first': 'huang', 'name_last': 'yifei'})
-    data2 = resp2.json()
-    create = requests.post(config.url + 'dm/create/v1', 
-                        json={'token': token1, 'u_ids': [id2]})
+    resp1 = requests.post(config.url + 'auth/register/v2', 
+                        json={'email': 'lmz@gmail.com', 'password': '893621',
+                                'name_first': 'li', 'name_last': 'mingzhe'})
+    data2 = resp1.json()
     token3 = data2['token']
-    data3 = create.json()
-    dm_id = data3['dm_id']
+    dm_id = clear_register_createdm[1]
     detail = requests.get(config.url + 'dm/details/v1', 
                         params={'token': token3, 'dm_id': dm_id})
     assert detail.status_code == 403
