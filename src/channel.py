@@ -190,7 +190,7 @@ def add_invitee(u_id, channel):
 
 def channel_leave_v1(auth_user_id, channel_id):
     """
-    Given a channel with ID channel_id that the authorised user is a member of, remove them as a member 
+    Given a channel_id that the authorised user is a member of, remove them as a member 
     of the channel. Their messages should remain in the channel. If the only channel owner leaves, 
     the channel will remain.
     If a user is a owner_members of a channel, they have to be an all_members user aswell.
@@ -201,11 +201,11 @@ def channel_leave_v1(auth_user_id, channel_id):
 
     Exceptions:
         AccessError - Occurs when the user_id returned from the token is not a member of
-            that channel.
+                        that channel, i.e. not in all_members.
 
-    Return Value: N/A
+    Return Value: 
+                N/A
     """
-
     store = data_store.get()
     channel_data = check_valid_channel_id(channel_id)
     member_data = check_user_is_member(auth_user_id, channel_data, 
@@ -222,9 +222,8 @@ def channel_leave_v1(auth_user_id, channel_id):
         channel_data['all_members'].remove(member_data)
     else:
         raise AccessError('User is not a member of that channel')
-
+    
     data_store.set(store)
-
     return {}
 
 
