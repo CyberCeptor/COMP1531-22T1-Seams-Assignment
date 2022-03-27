@@ -8,7 +8,9 @@ Description: pytest for dm_remove
 """
 
 import pytest
+
 import requests
+
 from src import config
 
 @pytest.mark.usefixtures('clear_register_two_createdm')

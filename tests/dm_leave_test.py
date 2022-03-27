@@ -1,27 +1,23 @@
 """
-Filename: dm_leave_http_test.py
+Filename: dm_leave_test.py
 
 Author: Zefan Cao(z5237177)
 Created: 14/03/2022 - 24/03/2022
 
 Description: http pytest for dm_leave
 """
+
 import pytest
+
 import requests
+
 from src import config
 
 @pytest.mark.usefixtures('clear_register_two_createdm')
 def test_dm_leave_invalid_token(clear_register_two_createdm):
-    """
-    clears any data stored in data_store and registers a user with the
-    given information, raised a inputerror by invalid dm id
+    """ clears any data stored in data_store and registers a user with the
+    given information, raised a inputerror by invalid dm id """
 
-    Arguments: clear_register(fixture)
-
-    Exceptions: InputErroe - raised by invalid token
-
-    Return Value: N/A
-    """
     dm_id = clear_register_two_createdm[2]
     leave = requests.post(config.url + 'dm/leave/v1', 
                         json={'token': 500, 'dm_id': dm_id})
@@ -45,16 +41,9 @@ def test_dm_leave_invalid_token(clear_register_two_createdm):
 
 @pytest.mark.usefixtures('clear_register_two_createdm')
 def test_dm_leave_valid(clear_register_two_createdm):
-    """
-    clears any data stored in data_store and registers a user with the
-    given information, run dm details successful
+    """ clears any data stored in data_store and registers a user with the
+    given information, run dm details successful"""
 
-    Arguments: clear_register(fixture)
-
-    Exceptions: N/A
-
-    Return Value: N/A
-    """
     token1 = clear_register_two_createdm[0]['token']
     dm_id = clear_register_two_createdm[2]
     leave = requests.post(config.url + 'dm/leave/v1', 
@@ -63,16 +52,9 @@ def test_dm_leave_valid(clear_register_two_createdm):
 
 @pytest.mark.usefixtures('clear_register_two_createdm')
 def test_dm_leave_invalid_dm_id(clear_register_two_createdm):
-    """
-    clears any data stored in data_store and registers a user with the
-    given information, raised a inputerror by invalid dm id
+    """ clears any data stored in data_store and registers a user with the
+    given information, raised a inputerror by invalid dm id """
 
-    Arguments: clear_register(fixture)
-
-    Exceptions: InputErroe - raised by invalid dm_id
-
-    Return Value: N/A
-    """
     token1 = clear_register_two_createdm[0]['token']
   
     leave = requests.post(config.url + 'dm/leave/v1', 
@@ -97,16 +79,9 @@ def test_dm_leave_invalid_dm_id(clear_register_two_createdm):
 
 @pytest.mark.usefixtures('clear_register_two_createdm')
 def test_dm_leave_not_in_dm(clear_register_two_createdm):
-    """
-    clears any data stored in data_store and registers a user with the
-    given information, raise a access error by the auth not in dm
-
-    Arguments: clear_register(fixture)
-
-    Exceptions: AccessError - raised by auth not in dm
-
-    Return Value: N/A
-    """
+    """ clears any data stored in data_store and registers a user with the
+    given information, raise a access error by the auth not in dm """
+    
     resp1 = requests.post(config.url + 'auth/register/v2', 
                         json={'email': 'lmz@gmail.com', 'password': '893621',
                                 'name_first': 'li', 'name_last': 'mingzhe'})

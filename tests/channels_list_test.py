@@ -80,20 +80,20 @@ def test_channels_list_working(clear_register_two_createchannel):
     assert len(channels_list['channels']) == 3
     assert channel_id1 in [k['channel_id'] for k in channels_list['channels']]
     assert channel2_json['channel_id'] in [k['channel_id'] for k in 
-                                            channel2_json['channels']]
+                                            channels_list['channels']]
     assert channel3_json['channel_id'] in [k['channel_id'] for k in 
-                                            channel3_json['channels']]
+                                            channels_list['channels']]
 
     assert 'channel_name' in [k['name'] for k in channels_list['channels']]
     assert 'channel_name2' in [k['name'] for k in channels_list['channels']]
     assert 'private_channel1' in [k['name'] for k in channels_list['channels']]
 
     #  Check that the channel_list2 info matches that was created.
-    #  The channels_list will return in the order of channel_id, so the lowest channel_id, 
-    #  will be the first in the list
+    #  The channels_list will return in the order of channel_id, so the lowest 
+    # channel_id, will be the first in the list
     assert len(channels_list2['channels']) == 3
     assert channel_id1 in [k['channel_id'] for k in channels_list2['channels']]
-    assert channel5_json['channel_id'] in [k['channel_id'] for k in 
+    assert channel4_json['channel_id'] in [k['channel_id'] for k in 
                                             channels_list2['channels']]
     assert channel5_json['channel_id'] in [k['channel_id'] for k in 
                                             channels_list2['channels']]
@@ -102,21 +102,12 @@ def test_channels_list_working(clear_register_two_createchannel):
     assert 'test_pub_channel' in [k['name'] for k in channels_list2['channels']]
     assert 'test_pri_channel' in [k['name'] for k in channels_list2['channels']]
 
-@pytest.mark.usefixtures('clear_register_two')
-def test_channel_list_not_in_channel(clear_register_two):
-    """
-    Create two users, user1 creates a channel
-    user2 tries to call channel_list
-    """
-    user1_token = clear_register_two[0]['token']
-    user2_token = clear_register_two[1]['token']
+@pytest.mark.usefixtures('clear_register_two_createchannel')
+def test_channel_list_not_in_channel(clear_register_two_createchannel):
+    """ Create two users, user1 creates a channel
+    user2 tries to call channel_list """
 
-    # create channel1 (Public).
-    # This just ensures there is at least 1 channel in the data_store.
-    channel1 = requests.post(config.url + 'channels/create/v2', 
-                            json={'token': user1_token, 'name': 'channel_name1', 
-                                  'is_public': True})
-    assert channel1.status_code == 200
+    user2_token = clear_register_two_createchannel[1]['token']
 
     # Channel_list for user 2, which they are not in any channels.
     channels_list = requests.get(config.url + 'channels/list/v2', 
@@ -128,37 +119,43 @@ def test_channel_list_not_in_channel(clear_register_two):
 
 @pytest.mark.usefixtures('clear_register_createchannel')
 def test_channels_list_invalid_token(clear_register_createchannel):
-    """
-    Create a user and a channel with clear_register_createchannel.
-    Tries to create a channel_list with all possible invalid token's
-    """
+    """ Create a user and a channel with clear_register_createchannel.
+    Tries to create a channel_list with all possible invalid token's """
 
     # passing incorrect string as token.
-    channels_list_json = requests.get(config.url + 'channels/list/v2', params = {'token': 'SomeWordsHere'})
+    channels_list_json = requests.get(config.url + 'channels/list/v2', 
+                                        params = {'token': 'SomeWordsHere'})
     assert channels_list_json.status_code == 403 # AccessError
 
     # passing incorrect string as token.
-    channels_list_json = requests.get(config.url + 'channels/list/v2', params = {'token': ''})
+    channels_list_json = requests.get(config.url + 'channels/list/v2', 
+                                        params = {'token': ''})
     assert channels_list_json.status_code == 400 
 
     # passing int as a token.
-    channels_list_json = requests.get(config.url + 'channels/list/v2', params = {'token': 4444})
+    channels_list_json = requests.get(config.url + 'channels/list/v2', 
+                                        params = {'token': 4444})
     assert channels_list_json.status_code == 400
 
-    channels_list_json = requests.get(config.url + 'channels/list/v2', params = {'token': -1})
+    channels_list_json = requests.get(config.url + 'channels/list/v2', 
+                                        params = {'token': -1})
     assert channels_list_json.status_code == 400
     # passing a True bool as a token
-    channels_list_json = requests.get(config.url + 'channels/list/v2', params = {'token': True})
+    channels_list_json = requests.get(config.url + 'channels/list/v2', 
+                                        params = {'token': True})
     assert channels_list_json.status_code == 400
 
     # passing a False bool as a token
-    channels_list_json = requests.get(config.url + 'channels/list/v2', params = {'token': False})
+    channels_list_json = requests.get(config.url + 'channels/list/v2', 
+                                        params = {'token': False})
     assert channels_list_json.status_code == 400
 
-    channels_list_json = requests.get(config.url + 'channels/list/v2', params = {'token': expired_token})
+    channels_list_json = requests.get(config.url + 'channels/list/v2', 
+                                        params = {'token': expired_token})
     assert channels_list_json.status_code == 403
 
-    channels_list_json = requests.get(config.url + 'channels/list/v2', params = {'token': unsaved_token})
+    channels_list_json = requests.get(config.url + 'channels/list/v2', 
+                                        params = {'token': unsaved_token})
     assert channels_list_json.status_code == 403
 
 requests.delete(config.url + 'clear/v1')

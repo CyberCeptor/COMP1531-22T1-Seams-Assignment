@@ -1,27 +1,22 @@
 """
-Filename: dm_create_http_test.py
+Filename: dm_create_test.py
 
 Author: Zefan Cao(z5237177)
 Created: 14/03/2022 - 24/03/2022
 
 Description: pytest for dm_create
 """
+
 import pytest
+
 import requests
+
 from src import config
 
 @pytest.mark.usefixtures('clear_register_two_createdm')
 def test_dm_create_valid(clear_register_two_createdm):
-    """
-    clears any data stored in data_store and registers users with the
-    given information, create the dm with token and u_ids
-
-    Arguments: N/A
-
-    Exceptions: N/A
-
-    Return Value: N/A
-    """
+    """ clears any data stored in data_store and registers users with the
+    given information, create the dm with token and u_ids """
 
     token1 = clear_register_two_createdm[0]['token']
     resp2 = requests.post(config.url + 'auth/register/v2', 
@@ -37,16 +32,9 @@ def test_dm_create_valid(clear_register_two_createdm):
 
 @pytest.mark.usefixtures('clear_register')
 def test_dm_create_token_invalid(clear_register):
-    """
-    clears any data stored in data_store and registers users with the
-    given information, create the dm with token and u_ids
+    """ clears any data stored in data_store and registers users with the
+    given information, create the dm with token and u_ids """
 
-    Arguments: N/A
-
-    Exceptions: InmutError - valid token
-
-    Return Value: N/A
-    """
     id1 = clear_register['auth_user_id']
     create = requests.post(config.url + 'dm/create/v1', 
                         json={'token': 500, 'u_ids': [id1]})
@@ -70,16 +58,9 @@ def test_dm_create_token_invalid(clear_register):
 
 @pytest.mark.usefixtures('clear_register_two')
 def test_dm_create_invalid_uid(clear_register_two):
-    """
-    clears any data stored in data_store and registers users with the
-    given information, create the dm with token and u_ids
+    """ clears any data stored in data_store and registers users with the
+    given information, create the dm with token and u_ids """
 
-    Arguments: N/A
-
-    Exceptions: InputError - raised by invalid ids
-
-    Return Value: N/A
-    """
     token1 = clear_register_two[0]['token']
     id1 = clear_register_two[1]['auth_user_id']
     create = requests.post(config.url + 'dm/create/v1', 
@@ -108,16 +89,9 @@ def test_dm_create_invalid_uid(clear_register_two):
 
 @pytest.mark.usefixtures('clear_register_two')
 def test_dm_create_duplicate_uid(clear_register_two):
-    """
-    clears any data stored in data_store and registers users with the
-    given information, create the dm with token and u_ids
+    """ clears any data stored in data_store and registers users with the
+    given information, create the dm with token and u_ids """
 
-    Arguments: N/A
-
-    Exceptions: InputError - raised by duplicate ids
-
-    Return Value: N/A
-    """
     token1 = clear_register_two[0]['token']
     resp2 = requests.post(config.url + 'auth/register/v2', 
                         json={'email': 'hyf@gmail.com', 'password': 'hyf1234',
@@ -134,16 +108,8 @@ def test_dm_create_duplicate_uid(clear_register_two):
     assert create.status_code == 400
 
 def test_dm_create_creator_in_uids(clear_register):
-    """
-    clears any data stored in data_store and registers users with the
-    given information, create the dm with token and u_ids
-
-    Arguments: N/A
-
-    Exceptions: N/A
-
-    Return Value: N/A
-    """
+    """ clears any data stored in data_store and registers users with the
+    given information, create the dm with token and u_ids  """
 
     token1 = clear_register['token']
     id1 = clear_register['auth_user_id']

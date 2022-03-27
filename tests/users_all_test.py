@@ -38,19 +38,18 @@ def test_users_all_return(clear_register):
 
     # check the response is same as expected
     assert len(get1['users']) == 2
-    assert get1['users'] == [{
-        'u_id': id1,
-        'email': 'abc@def.com',
-        'name_first': 'first',
-        'name_last': 'last',
-        'handle_str': 'firstlast'
-        }, {
-        'u_id': id2,
-        'email': 'def@ghi.com',
-        'name_first': 'first',
-        'name_last': 'last',
-        'handle_str': 'firstlast0'
-    }]
+    
+    assert id1 in [k['u_id'] for k in get1['users']]
+    assert 'abc@def.com' in [k['email'] for k in get1['users']]
+    assert 'first' in [k['name_first'] for k in get1['users']]
+    assert 'last' in [k['name_last'] for k in get1['users']]
+    assert 'firstlast' in [k['handle_str'] for k in get1['users']]
+
+    assert id2 in [k['u_id'] for k in get1['users']]
+    assert 'def@ghi.com' in [k['email'] for k in get1['users']]
+    assert 'first' in [k['name_first'] for k in get1['users']]
+    assert 'last' in [k['name_last'] for k in get1['users']]
+    assert 'firstlast0' in [k['handle_str'] for k in get1['users']]
 
     # use user1's token to get the info of all users, reponse will be the same
     resp2 = requests.get(config.url + 'users/all/v1', params={'token': token2})

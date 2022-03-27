@@ -1,27 +1,23 @@
 """
-Filename: dm_list_http_test.py
+Filename: dm_list_test.py
 
 Author: Zefan Cao(z5237177)
 Created: 14/03/2022 - 24/03/2022
 
 Description:http pytest for dm_list
 """
+
 import pytest
+
 import requests
+
 from src import config
 
 @pytest.mark.usefixtures('clear_register_two_createdm')
 def test_dm_list_valid(clear_register_two_createdm):
-    """
-    clears any data stored in data_store and registers a user with the
-    given information, create the dm with token and u_ids, list with token
+    """ clears any data stored in data_store and registers a user with the
+    given information, create the dm with token and u_ids, list with token """
 
-    Arguments: clear_register(fixture)
-
-    Exceptions: N/A
-
-    Return Value: N/A
-    """
     token1 = clear_register_two_createdm[0]['token']
     resp1 = requests.post(config.url + 'auth/register/v2', 
                         json={'email': 'lmz@gmail.com', 'password': '893621',
@@ -39,16 +35,8 @@ def test_dm_list_valid(clear_register_two_createdm):
 
 @pytest.mark.usefixtures('clear_register_two_createdm')
 def test_dm_list_invalid_token(clear_register_two_createdm):
-    """
-    clears any data stored in data_store and registers a user with the
-    given information, create the dm with token and u_ids, list with token
-
-    Arguments: clear_register(fixture)
-
-    Exceptions: N/A
-
-    Return Value: N/A
-    """
+    """ clears any data stored in data_store and registers a user with the
+    given information, create the dm with token and u_ids, list with token """
     
     list1 = requests.get(config.url + 'dm/list/v1',
                 params={'token': 500})
