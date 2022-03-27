@@ -47,50 +47,9 @@ def message_send_v1(token, channel_id, message):
         Message_id - int to specifies each message
     """
 
-    store = data_store.get()
+    message_id = send_message(token, channel_id, message, 'channel')
 
-    token_valid_check(token)
-    auth_user_id = token_get_user_id(token)
-
-    # see if given auth_user_id and channel_id are valid
-    check_valid_auth_id(auth_user_id)
-    channel_data = check_valid_channel_id(channel_id)
-    channel_id = channel_data['channel_id']
-
-    if check_user_is_member(auth_user_id, channel_data, 'all_members') is None:
-        raise AccessError('User does not exist in channel')
-
-    if not isinstance(message, str):
-        raise InputError('Message is a string')
-
-    if message == '':
-        raise InputError('Empty message input')
-
-    if len(message) > 1000:
-        raise InputError('Message must not exceed 1000 characters')
-
-    # increament message id for the store message
-    message_id = new_message_id()
-
-    time = datetime.datetime.now(timezone.utc)
-    utc_time = time.replace(tzinfo=timezone.utc)
-    utc_timestamp = utc_time.timestamp()
-
-    message_data = {
-        'message_id': message_id, 
-        'u_id': auth_user_id, 
-        'message': message, 
-        'time_sent': utc_timestamp
-    }
-
-    channel_data['messages'].insert(0, message_data)
-
-    data_store.set(store)
-
-    return {
-        'message_id': message_id
-    }
-
+    return message_id
 
 def message_edit_v1(token, message_id, message):
     """
@@ -149,7 +108,6 @@ def message_edit_v1(token, message_id, message):
     data_store.set(store)
 
     return {}
-
 
 def message_remove_v1(token, message_id):
     """
@@ -220,49 +178,9 @@ def message_senddm_v1(token, dm_id, message):
         Message_id - int to specifies each message
     """
 
-    store = data_store.get()
+    message_id = send_message(token, dm_id, message, 'dm')
 
-    token_valid_check(token)
-    auth_user_id = token_get_user_id(token)
-
-    # see if given auth_user_id and dm_id are valid
-    check_valid_auth_id(auth_user_id)
-    dm_info = check_valid_dm_id(dm_id)
-    dm_id = dm_info['dm_id']
-
-    if check_user_is_member(auth_user_id, dm_info, 'members') is None:
-        raise AccessError('User does not exist in dm')
-
-    if not isinstance(message, str):
-        raise InputError('Message is a string')
-
-    if message == '':
-        raise InputError('Empty message input')
-
-    if len(message) > 1000:
-        raise InputError('Message must not exceed 1000 characters')
-
-    # increament message id for the store message
-    message_id = new_message_id()
-
-    time = datetime.datetime.now(timezone.utc)
-    utc_time = time.replace(tzinfo=timezone.utc)
-    utc_timestamp = utc_time.timestamp()
-
-    message_data = {
-        'message_id': message_id, 
-        'u_id': auth_user_id, 
-        'message': message, 
-        'time_sent': utc_timestamp
-    }
-
-    dm_info['messages'].insert(0, message_data)
-
-    data_store.set(store)
-
-    return {
-        'message_id': message_id
-    }
+    return message_id
 
 def get_channel_id_with_message_id(message_id):
     """
@@ -314,3 +232,74 @@ def check_message_id_valid(message_id):
 
     # if message_id is not found, raise an InputError
     raise InputError('Message does not exist in channels database')
+
+def send_message(token, data_id, message, data_str):
+    """
+    Helper function for message/send and message/senddm: If token given is an
+    authorised user, sends the message to a specified channel/dm with input
+    data_id
+
+    Arguments:
+        token (str)    - unique str representation of user
+        dm_id (int)    - integer specifies a dm or channel
+        message (str)  - message that the user wishes to send
+        data_str (str) - a string used to print out any error messages if
+                         InputError is raised and to check if message is being
+                         sent to a channel or dm
+
+    Exceptions:
+        AccessError - 
+        InputError  - 
+
+    Return Value:
+        Message_id - int to specifies each message
+    """
+
+    store = data_store.get()
+
+    token_valid_check(token)
+    auth_user_id = token_get_user_id(token)
+
+    # check if dm_id/channel_id are valid
+    if data_str == 'channel':
+        data_info = check_valid_channel_id(data_id)
+        data_id = data_info['channel_id']
+        key = 'all_members'
+    elif data_str == 'dm':
+        data_info = check_valid_dm_id(data_id)
+        data_id = data_info['dm_id']
+        key = 'members'
+
+    if check_user_is_member(auth_user_id, data_info, key) is None:
+        raise AccessError(f'User does not exist in {data_str}')
+
+    if not isinstance(message, str):
+        raise InputError('Message is a string')
+
+    if message == '':
+        raise InputError('Empty message input')
+
+    if len(message) > 1000:
+        raise InputError('Message must not exceed 1000 characters')
+
+    # increament message id for the store message
+    message_id = new_message_id()
+
+    time = datetime.datetime.now(timezone.utc)
+    utc_time = time.replace(tzinfo=timezone.utc)
+    utc_timestamp = utc_time.timestamp()
+
+    message_data = {
+        'message_id': message_id, 
+        'u_id': auth_user_id, 
+        'message': message, 
+        'time_sent': utc_timestamp
+    }
+
+    data_info['messages'].insert(0, message_data)
+
+    data_store.set(store)
+
+    return {
+        'message_id': message_id
+    }

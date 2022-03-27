@@ -187,7 +187,8 @@ def get_messages(auth_user_id, data, start, data_str):
         start (int)        - an int specifying the start index for the return of
                              messages data
         data_str (str)     - a string used to print out any error messages if
-                             InputError is raised
+                             InputError is raised and to check if messages are
+                             being obtained from a channel or dm
 
     Exceptions:
         AccessError - Raised if the auth_user_id is not a member of the given
