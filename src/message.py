@@ -1,8 +1,8 @@
 """
-Filename: messages.py
+Filename: message.py
 
 Author: Yangjun Yue(z5317840)
-Created: 23/03/2022
+Created: 23/03/2022 - 27/03/2022
 
 Description: implementation for
     - sending message to a specified channel by an authorised user
@@ -12,8 +12,8 @@ Description: implementation for
 
 from src.data_store import data_store
 
-from src.other import check_message_id_valid, check_valid_auth_id, check_valid_channel_id, \
-    check_user_is_member, check_message_id_valid, get_channel_id_with_message_id
+from src.other import check_message_id_valid, check_valid_auth_id,\
+                      check_valid_channel_id, check_user_is_member
 from src.admin import check_user_is_global_owner
 
 from src.dm import check_valid_dm_id
@@ -21,8 +21,6 @@ from src.token import token_get_user_id, token_valid_check
 from src.global_vars import new_message_id
 from src.error import AccessError, InputError
 import datetime
-from datetime import timezone
-
 from datetime import timezone
 
 def message_send_v1(token, channel_id, message):
@@ -262,3 +260,54 @@ def message_senddm_v1(token, dm_id, message):
     return {
         'message_id': message_id
     }
+
+def get_channel_id_with_message_id(message_id):
+    """
+    finds and returns the channel data that the message_id is found in
+    
+    Arguments:
+        message_id (int) - an integer that specifies a message
+
+    Exceptions: N/A
+
+    Return Value:
+        Returns the channel data if the message_id is found
+    """
+
+    store = data_store.get()
+    for channel in store['channels']:
+        for message_data in channel['messages']:
+            if message_data['message_id'] == message_id:
+                return channel
+
+def check_message_id_valid(message_id):
+    """
+    checks if the given message_id is valid by checking if it exists in stored
+    data
+
+    Arguments:
+        message_id (int) - an int that specifies a message
+
+    Exceptions:
+        InputError - Raised if the message_id is of an invalid type, is less
+                     than 1, or cannot be found in the stored data
+
+    Return Value:
+        Returns the channel's message data that the message_id is found in 
+    """
+
+    if isinstance(message_id, int) is False or type(message_id) == bool:
+        raise InputError('Message id is not of a valid type')
+
+    if message_id < 1:
+        raise InputError('The message id is not valid (out of bounds)')
+
+    # return message data if message id exists
+    store = data_store.get()
+    for channel in store['channels']:
+        for message_data in channel['messages']:
+            if message_data['message_id'] == message_id:
+                return message_data
+
+    # if message_id is not found, raise an InputError
+    raise InputError('Message does not exist in channels database')
