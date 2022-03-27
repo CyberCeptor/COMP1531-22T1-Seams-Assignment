@@ -99,3 +99,38 @@ def test_user_profile_setname_bad_name_last(clear_and_register):
     assert setname.status_code == 400
 
     requests.delete(config.url + 'clear/v1')
+
+def test_user_setname_bad_token(clear_and_register):
+    setname = requests.put(config.url + 'user/profile/setname/v1', 
+                            json={'token': '', 'name_first': 'first', 'name_last': 'last'})
+    assert setname.status_code == 400
+
+    setname = requests.put(config.url + 'user/profile/setname/v1', 
+                            json={'token': 'string', 'name_first': 'first', 'name_last': 'last'})
+    assert setname.status_code == 403
+
+    setname = requests.put(config.url + 'user/profile/setname/v1', 
+                            json={'token': 444, 'name_first': 'first', 'name_last': 'last'})
+    assert setname.status_code == 400
+
+    setname = requests.put(config.url + 'user/profile/setname/v1', 
+                            json={'token': -1, 'name_first': 'first', 'name_last': 'last'})
+    assert setname.status_code == 400
+
+    setname = requests.put(config.url + 'user/profile/setname/v1', 
+                            json={'token': True, 'name_first': 'first', 'name_last': 'last'})
+    assert setname.status_code == 400
+
+    expired_token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6\
+        MSwic2Vzc2lvbl9pZCI6MSwiaGFuZGxlIjoiZmlyc3RsYXN0IiwiZXhwIjo\
+            xNTQ3OTc3ODgwfQ.366QLXfCURopcjJbAheQYLVNlGLX_INKVwr8_TVXYEQ'
+    setname = requests.put(config.url + 'user/profile/setname/v1', 
+                            json={'token': expired_token, 'name_first': 'first', 'name_last': 'last'})
+    assert setname.status_code == 403
+
+    unsaved_token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.\
+        eyJpZCI6MSwic2Vzc2lvbl9pZCI6MSwiaGFuZGxlIjoiZmlyc3RsYXN\
+            0IiwiZXhwIjoyNTQ3OTc3ODgwfQ.ckPPWiR-m6x0IRqpQtKmJgNLiD8eAEiTv2i8ToK3mkY'
+    setname = requests.put(config.url + 'user/profile/setname/v1', 
+                            json={'token': unsaved_token, 'name_first': 'first', 'name_last': 'last'})
+    assert setname.status_code == 403

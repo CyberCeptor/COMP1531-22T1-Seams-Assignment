@@ -130,3 +130,38 @@ def test_user_profile_sethandle_bad_handle_str(clear_and_register):
     assert sethandle.status_code == 400
 
     requests.delete(config.url + 'clear/v1')
+
+def test_user_sethandle_bad_token(clear_and_register):
+    sethandle = requests.put(config.url + 'user/profile/sethandle/v1', 
+                            json={'token': '', 'handle_str': 'handle'})
+    assert sethandle.status_code == 400
+
+    sethandle = requests.put(config.url + 'user/profile/sethandle/v1', 
+                            json={'token': 'string', 'handle_str': 'handle'})
+    assert sethandle.status_code == 403
+
+    sethandle = requests.put(config.url + 'user/profile/sethandle/v1', 
+                            json={'token': 444, 'handle_str': 'handle'})
+    assert sethandle.status_code == 400
+
+    sethandle = requests.put(config.url + 'user/profile/sethandle/v1', 
+                            json={'token': -1, 'handle_str': 'handle'})
+    assert sethandle.status_code == 400
+
+    sethandle = requests.put(config.url + 'user/profile/sethandle/v1', 
+                            json={'token': True, 'handle_str': 'handle'})
+    assert sethandle.status_code == 400
+
+    expired_token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6\
+        MSwic2Vzc2lvbl9pZCI6MSwiaGFuZGxlIjoiZmlyc3RsYXN0IiwiZXhwIjo\
+            xNTQ3OTc3ODgwfQ.366QLXfCURopcjJbAheQYLVNlGLX_INKVwr8_TVXYEQ'
+    sethandle = requests.put(config.url + 'user/profile/sethandle/v1', 
+                            json={'token': expired_token, 'handle_str': 'handle'})
+    assert sethandle.status_code == 403
+
+    unsaved_token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.\
+        eyJpZCI6MSwic2Vzc2lvbl9pZCI6MSwiaGFuZGxlIjoiZmlyc3RsYXN\
+            0IiwiZXhwIjoyNTQ3OTc3ODgwfQ.ckPPWiR-m6x0IRqpQtKmJgNLiD8eAEiTv2i8ToK3mkY'
+    sethandle = requests.put(config.url + 'user/profile/sethandle/v1', 
+                            json={'token': unsaved_token, 'handle_str': 'handle'})
+    assert sethandle.status_code == 403
