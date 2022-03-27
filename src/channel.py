@@ -1,7 +1,7 @@
 """
 Filename: channel.py
 
-Author: Yangjun Yue(z5317840), Zefan Cao(z5237177), Xingjian Dong (z5221888)
+Author: Jenson Morgan(z5360181), Yangjun Yue(z5317840), Zefan Cao(z5237177), Xingjian Dong (z5221888)
 Created: 28/02/2022 - 06/03/2022
 
 Description: implementation for
@@ -331,6 +331,7 @@ Return Value:
 def channel_removeowner_v1(token, channel_id, u_id):
     channel_addremove_owner_valid_check(token, channel_id, u_id, 'remove')
     return {}
+
 
 def channel_addremove_owner_valid_check(token, channel_id, u_id, option):
     store = data_store.get()

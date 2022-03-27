@@ -31,6 +31,37 @@ def user_profile_v1(token, u_id):
     return user
 
 """
+Update the authorised user's first and last name
+PUT
+Arguments:
+    -   token
+    -   name_first
+    -   name_last
+Exceptions:
+    InputError:
+        -   length of name_first is not between 1 and 50 characters inclusive
+        -   length of name_last is not between 1 and 50 characters inclusive
+Return Value:
+    N/A
+
+"""
+
+def user_profile_setname_v1(token, name_first, name_last):
+
+    
+    return {}
+
+
+
+
+
+
+
+
+
+
+
+"""
 Update the authorised user's email address
 
 PUT
