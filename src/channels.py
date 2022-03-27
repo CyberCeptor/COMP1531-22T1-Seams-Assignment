@@ -3,8 +3,7 @@ Filename: channels.py
 
 Author: Jenson Morgan(z5360181), Yangjun Yue(z5317840)
 Created: 24/02/2022 - 04/03/2022
-from src.other import check_valid_auth_id
-from src.other import check_user_is_member_or_owner
+
 Description: implementation for
     - creating either a public or a private channel with given name
     - listing all channels the user is part of and gives the channel id and name
@@ -17,11 +16,16 @@ from src.token import token_valid_check, token_get_user_id
 
 def channels_list_v2(token):
     """
-    Provides a channel list of all the public channels
-    the user is a member of.
+    Validates the user token, gets the user_id from the decoded
+    token, validates the user id, searches all channels and 
+    appends the channel name and id when the user is a member.
+
+    Channels_list will be ordered by the channel_id, so regardless
+    of when the user joins the channel, the return value will be ordered
+    by the lowest value channel_id first to the next greatest value.
 
     Arguments:
-        auth_user_id(int)    - must be a valid user id.
+        token   - token must be valid.
 
     Exceptions:
         null
