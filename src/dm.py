@@ -8,7 +8,7 @@ Description: dm functions
 """
 from src.data_store import data_store
 from src.token import token_valid_check, token_get_user_id
-from src.other import check_valid_auth_id, cast_to_int_get_requests, check_user_is_member, get_messages
+from src.other import check_valid_auth_id, check_user_is_member, get_messages, check_valid_dm_id
 from src.error import InputError, AccessError
 from src.global_vars import new_id
 from src.data_store import data_store
@@ -159,34 +159,6 @@ def dm_leave_v1(auth_user_id, dm_id):
         if(auth_user_id == member['u_id']):
             dm['members'].remove(member)
             data_store.set(store)
-
-def check_valid_dm_id(dm_id):
-    """
-    clears any data stored in data_store and registers users with the
-    given information, create the dm with token and u_ids
-
-    Arguments: token
-               u_ids
-
-    Exceptions: InputError - raised by duplicate ids
-                InputError - raised by invalid ids
-
-    Return Value: dm_id
-    """
-    if type(dm_id) is bool:
-        raise InputError('dm id is not of a valid type')
-
-    dm_id = cast_to_int_get_requests(dm_id, 'dm id')
-
-    if dm_id < 1:
-        raise InputError('The dm id is not valid (out of bounds)')
-
-    store = data_store.get()
-    for dm in store['dms']:
-       if dm['dm_id'] == dm_id:
-            return dm
-    # if the dm_id is not found, raise an AccessError
-    raise InputError('dm does not exist in dms')
 
 def check_creator_notin_u_ids_duplicate(u_id, id, u_ids):
     if u_id == id:
