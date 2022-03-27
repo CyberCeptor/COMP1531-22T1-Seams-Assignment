@@ -29,12 +29,10 @@ def test_user_setname_working(clear_register_two):
                         json={'token': user2['token'], 'channel_id': channel_id})
     assert join.status_code == 200
 
-
     # add them as an owner of the channel
     addowner = requests.post(config.url + 'channel/addowner/v1',
                         json={'token': user1['token'], 'channel_id': channel_id, 'u_id': user2['auth_user_id']})
     assert addowner.status_code == 200
-
 
     # changing the name address of both users.
     setname = requests.put(config.url + 'user/profile/setname/v1', 
@@ -50,7 +48,7 @@ def test_user_setname_working(clear_register_two):
                             json={'token': user2['token'], 'name_first': 'first', 'name_last': 'last'})
     assert setname.status_code == 200
 
-    # Assert that the all_members and owner_membets channel name has also been updated
+    # Assert that the all_members and owner_members channel name has also been updated
     # check the data in the channel is correct
     detail_details = requests.get(config.url + 'channel/details/v2', 
                             params={'token': user1['token'], 'channel_id': channel1['channel_id']})
@@ -69,7 +67,7 @@ def test_user_setname_working_dm(clear_register_two):
     user1 = clear_register_two[0]
     user2 = clear_register_two[1]
 
-    # create a dm, add the other user as an owner aswell, 
+    # create a dm, add the other user aswell, 
     # to Test that all information is updated
     create = requests.post(config.url + 'dm/create/v1', 
                         json={'token': user1['token'], 'u_ids': [user2['auth_user_id']]})
@@ -82,8 +80,8 @@ def test_user_setname_working_dm(clear_register_two):
                             json={'token': user1['token'], 'name_first': 'firsta', 'name_last': 'lasta'})
     assert setname.status_code == 200
 
-    # Assert that the all_members and owner_membets channel name has also been updated
-    # check the data in the channel is correct
+    # Assert that the all_members and owner_members dm name has also been updated
+    # check the data in the dm is correct
     detail = requests.get(config.url + 'dm/details/v1', 
                         params={'token': user1['token'], 'dm_id': dm_id})
     assert detail.status_code == 200
@@ -123,12 +121,12 @@ def test_user_profile_setname_bad_name_first(clear_register_two):
                             json={'token': user1['token'], 'name_first': False, 'name_last': 'last'})
     assert setname.status_code == 400
 
-    # test < 1 int
+    # test < 1 character
     setname = requests.put(config.url + 'user/profile/setname/v1', 
                             json={'token': user1['token'], 'name_first': 0, 'name_last': 'last'})
     assert setname.status_code == 400
 
-    # test > 50 int
+    # test > 50 characters
     name51 = 'abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz'
     setname = requests.put(config.url + 'user/profile/setname/v1', 
                             json={'token': user1['token'], 'name_first': name51, 'name_last': 'last'})
@@ -165,12 +163,12 @@ def test_user_profile_setname_bad_name_last(clear_register_two):
                             json={'token': user1['token'], 'name_first': 'first', 'name_last': False})
     assert setname.status_code == 400
 
-    # test < 1 int
+    # test < 1 character
     setname = requests.put(config.url + 'user/profile/setname/v1', 
                             json={'token': user1['token'], 'name_first': 'first', 'name_last': 0})
     assert setname.status_code == 400
 
-    # test > 50 int
+    # test > 50 characters
     name51 = 'abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz'
     setname = requests.put(config.url + 'user/profile/setname/v1', 
                             json={'token': user1['token'], 'name_first': 'first', 'name_last': name51})
@@ -180,26 +178,32 @@ def test_user_profile_setname_bad_name_last(clear_register_two):
 
 @pytest.mark.usefixtures('clear_register_two')
 def test_user_setname_bad_token(clear_register_two):
+    # test empty token
     setname = requests.put(config.url + 'user/profile/setname/v1', 
                             json={'token': '', 'name_first': 'first', 'name_last': 'last'})
     assert setname.status_code == 400
 
+    # test accesserror token string
     setname = requests.put(config.url + 'user/profile/setname/v1', 
                             json={'token': 'string', 'name_first': 'first', 'name_last': 'last'})
     assert setname.status_code == 403
 
+    # test positive number token
     setname = requests.put(config.url + 'user/profile/setname/v1', 
                             json={'token': 444, 'name_first': 'first', 'name_last': 'last'})
     assert setname.status_code == 400
 
+    # test negative number token
     setname = requests.put(config.url + 'user/profile/setname/v1', 
                             json={'token': -1, 'name_first': 'first', 'name_last': 'last'})
     assert setname.status_code == 400
 
+    # test bool token
     setname = requests.put(config.url + 'user/profile/setname/v1', 
                             json={'token': True, 'name_first': 'first', 'name_last': 'last'})
     assert setname.status_code == 400
 
+    # test expired token
     expired_token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6\
         MSwic2Vzc2lvbl9pZCI6MSwiaGFuZGxlIjoiZmlyc3RsYXN0IiwiZXhwIjo\
             xNTQ3OTc3ODgwfQ.366QLXfCURopcjJbAheQYLVNlGLX_INKVwr8_TVXYEQ'
@@ -207,6 +211,7 @@ def test_user_setname_bad_token(clear_register_two):
                             json={'token': expired_token, 'name_first': 'first', 'name_last': 'last'})
     assert setname.status_code == 403
 
+    # test unsaved token
     unsaved_token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.\
         eyJpZCI6MSwic2Vzc2lvbl9pZCI6MSwiaGFuZGxlIjoiZmlyc3RsYXN\
             0IiwiZXhwIjoyNTQ3OTc3ODgwfQ.ckPPWiR-m6x0IRqpQtKmJgNLiD8eAEiTv2i8ToK3mkY'

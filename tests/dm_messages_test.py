@@ -174,7 +174,6 @@ def test_dm_messages_invalid_start(clear_register_and_create):
 
     Return Value: N/A
     
-    
     '''
     token = clear_register_and_create[0]
     dm_id = clear_register_and_create[1]
@@ -238,7 +237,6 @@ def test_dm_messages_return(clear_register_and_create):
     Exceptions: N/A
 
     Return Value: N/A
-    
     
     '''
         # pylint: disable=unused-argument

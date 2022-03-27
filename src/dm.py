@@ -202,7 +202,7 @@ def dm_messages_v1(token, dm_id, start):
     if too much messages do pagination operate.
 
     Arguments:
-        auth_user_id (int)    - an integer that specifies user id
+        auth_user_id (int) - an integer that specifies user id
         dm_id (int) - an integer that specifies dm id
         start (int) - an integer that specifies index for message
 
