@@ -10,26 +10,7 @@ import pytest
 import requests
 from src import config
 
-@pytest.fixture(name='clear_register')
-def fixture_clear_register():
-    """
-    clears any data stored in data_store and registers a user with the
-    given information
-
-    Arguments: N/A
-
-    Exceptions: N/A
-
-    Return Value: data['token']
-                  data['auth_user_id']
-    """
-    requests.delete(config.url + 'clear/v1')
-    resp = requests.post(config.url + 'auth/register/v2', 
-                        json={'email': 'wky@gmail.com', 'password': '547832',
-                                'name_first': 'wang', 'name_last': 'kaiyan'})
-    data = resp.json()
-    return [data['token'], data['auth_user_id']]
-
+@pytest.mark.usefixtures('clear_register')
 def test_dm_details_valid(clear_register):
     """
     clears any data stored in data_store and registers a user with the
@@ -41,7 +22,7 @@ def test_dm_details_valid(clear_register):
 
     Return Value: N/A
     """
-    token1 = clear_register[0]
+    token1 = clear_register['token']
     resp1 = requests.post(config.url + 'auth/register/v2', 
                         json={'email': 'lmz@gmail.com', 'password': '893621',
                                 'name_first': 'li', 'name_last': 'mingzhe'})
@@ -66,7 +47,7 @@ def test_dm_details_invalid_token(clear_register):
 
     Return Value: N/A
     """
-    token1 = clear_register[0]
+    token1 = clear_register['token']
     resp1 = requests.post(config.url + 'auth/register/v2', 
                         json={'email': 'lmz@gmail.com', 'password': '893621',
                                 'name_first': 'li', 'name_last': 'mingzhe'})
@@ -107,8 +88,8 @@ def test_dm_details_invalid_dm_id(clear_register):
 
     Return Value: N/A
     """
-    token1 = clear_register[0]
-    id1 = clear_register[1]
+    token1 = clear_register['token']
+    id1 = clear_register['auth_user_id']
     resp1 = requests.post(config.url + 'auth/register/v2', 
                         json={'email': 'lmz@gmail.com', 'password': '893621',
                                 'name_first': 'li', 'name_last': 'mingzhe'})
@@ -137,7 +118,7 @@ def test_dm_details_invalid_dm_id(clear_register):
                         params={'token': token1, 'dm_id': True})
     assert detail.status_code == 400
 
-def tetest_dm_details_auth_notin_dm(clear_register):
+def test_dm_details_auth_notin_dm(clear_register):
     """
     clears any data stored in data_store and registers a user with the
     given information, raise a access error by the auth not in dm
@@ -148,7 +129,7 @@ def tetest_dm_details_auth_notin_dm(clear_register):
 
     Return Value: N/A
     """
-    token1 = clear_register[0]
+    token1 = clear_register['token']
     resp1 = requests.post(config.url + 'auth/register/v2', 
                         json={'email': 'lmz@gmail.com', 'password': '893621',
                                 'name_first': 'li', 'name_last': 'mingzhe'})

@@ -42,6 +42,7 @@ def dm_create_v1(token, u_ids):
         'name_last': user_info['last'],
         'handle_str': user_info['handle']
     }
+    
     # Assume the dm id start at 1 and increase by adding 1
     # for any newdm created
     dm_id = new_id('dm')
@@ -49,6 +50,7 @@ def dm_create_v1(token, u_ids):
     all_member_list = []
     all_member_list.append(owner)
     name_list.append(user_info['handle'])
+    
     for u_id in u_ids:
         check_creator_notin_u_ids_duplicate(auth_id, u_id, u_ids)
         user = check_valid_auth_id(u_id)
@@ -60,6 +62,7 @@ def dm_create_v1(token, u_ids):
             'name_last': user['last'],
             'handle_str': user['handle']
         })
+    
     #sort name list
     name_list.sort()
     #use , to separate
@@ -93,6 +96,7 @@ def dm_list_v1(token):
     auth_id = token_get_user_id(token)
     dm_list = []
     store = data_store.get()
+    
     for dm in store['dms']:
         check_user_is_member(auth_id, dm, 'members')
         new_dict = {
@@ -210,6 +214,7 @@ def check_valid_dm_id(dm_id):
         raise InputError('The dm id is not valid (out of bounds)')
 
     store = data_store.get()
+    
     for dm in store['dms']:
        if dm['dm_id'] == dm_id:
             return dm
@@ -217,6 +222,17 @@ def check_valid_dm_id(dm_id):
     raise InputError('dm does not exist in dms')
 
 def check_creator_notin_u_ids_duplicate(u_id, id, u_ids):
+    """
+    check the whether there is duplicate ids and whether the creator is in uids
+
+    Arguments: u_id (int)          - unique str representation of user
+               u_ids (str)          - the list of u_id
+
+    Exceptions: InputError - raised by creator in u_ids
+                InputError - raised by duplicate ids
+
+    Return Value: N/A
+    """
     if u_id == id:
         raise InputError('Creator can not dm himself')
     elif(u_ids.count(id) > 1):
