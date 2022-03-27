@@ -126,20 +126,20 @@ def channels_create_v2(token, name, is_public):
     check_valid_auth_id(auth_user_id)
 
     if len(name) > 20:
-        raise InputError('The channel name must be less than 20 characters')
+        raise InputError(description='The channel name must be less than 20 characters')
 
     if name == '':
-        raise InputError('No channel name was entered')
+        raise InputError(description='No channel name was entered')
 
     if not isinstance(is_public, bool):
-        raise InputError('The public/private value given is not of type bool')
+        raise InputError(description='The public/private value given is not of type bool')
 
     # Loops through data_store['channels'] to check channel names if they
     # already exist. Having two channles with the same name is fine,
     # as long as they have different is_public values.
     for channel in store['channels']:
         if channel['name'] == name and channel['is_public'] == is_public:
-            raise InputError('This channel name already exists')
+            raise InputError(description='This channel name already exists')
 
     # get the number of channels created so far, incremented for the new channel
     # id.

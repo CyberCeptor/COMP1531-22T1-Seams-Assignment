@@ -37,6 +37,8 @@ def user_profile_v1(token, u_id):
     check_valid_auth_id(u_id)
 
     store = data_store.get()
+    # iterates through the users in data_store and collects
+    # the information of that user.
     for users in store['users']:
         if users['id'] == u_id:
             user = {
@@ -177,24 +179,14 @@ def check_invalid_handle(store, handle_str):
 
 def user_profile_sethandle_v1(token, handle_str):
     store = data_store.get()
-
-    # check the name is valid (i.e. usable name_first, name_last)
-    # both done by check_invalid_name.
-    # need to check that the name is the correct format.
-
-    # check the token is current and acceptable
     token_valid_check(token)
     user_id = token_get_user_id(token)
 
     check_invalid_handle(store, handle_str)
 
-    # set the user name to the new name
     for user in store['users']:
         if user['id'] == user_id:
             user['handle'] = handle_str
-
-    # iterate through all channels that the member is in and set 
-    # the name there aswell.
 
     for channel in store['channels']:
         for user in channel['all_members']:
