@@ -134,3 +134,5 @@ def test_user_setname_bad_token(clear_and_register):
     setname = requests.put(config.url + 'user/profile/setname/v1', 
                             json={'token': unsaved_token, 'name_first': 'first', 'name_last': 'last'})
     assert setname.status_code == 403
+
+    requests.delete(config.url + 'clear/v1')

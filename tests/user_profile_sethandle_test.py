@@ -165,3 +165,5 @@ def test_user_sethandle_bad_token(clear_and_register):
     sethandle = requests.put(config.url + 'user/profile/sethandle/v1', 
                             json={'token': unsaved_token, 'handle_str': 'handle'})
     assert sethandle.status_code == 403
+
+    requests.delete(config.url + 'clear/v1')
