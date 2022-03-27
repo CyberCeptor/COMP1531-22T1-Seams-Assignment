@@ -1,12 +1,13 @@
 """
 Filename: auth.py
 
-Author: Aleesha, z5371516, Jenson, z5360181
-Created: 24/02/2022 - 04/03/2022
+Author: Aleesha Bunrith(z5371516), Jenson Morgan(z5360181)
+Created: 24/02/2022 - 27/03/2022
 
 Description: implementation for
     - registering a user using an email, password, first name, and last name
     - using an email and password to login to a user's account
+    - logging out a user with their current valid token
     - helper functions for the above
 """
 
@@ -19,7 +20,7 @@ from src.error import InputError
 from src.data_store import data_store
 from src.token import token_generate, token_valid_check, token_remove
 
-VALID_EMAIL_REGEX = r'^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}$'
+from src.global_vars import valid_email_regex
 
 def auth_login_v2(email, password):
     """
@@ -86,22 +87,21 @@ def auth_register_v2(email, password, name_first, name_last):
         Returns a dict containing the generated auth_user_id
     """
 
-
     store = data_store.get()
     # generate user id
     u_id = len(store['users']) + 1
 
-    check_invalid_email(store, VALID_EMAIL_REGEX, email)
+    check_invalid_email(store, valid_email_regex, email)
 
     # check for invalid password
     if len(password) < 6:
         raise InputError(description='Password is too short')
 
+    # encrypt the given password for storage
     encrypted_pw = hashlib.sha256(password.encode()).hexdigest()
 
-    # check for invalid name
-    full_name = name_first + name_last
-    check_invalid_name(name_first, name_last, full_name)
+    # check for invalid name and return the full name
+    full_name = check_invalid_name(name_first, name_last)
 
     handle = create_handle(store, full_name)
 
@@ -144,7 +144,7 @@ def check_invalid_email(store, valid_email_regex, email):
     """
 
     # check for valid email address
-    if not re.fullmatch(valid_email_regex, email):
+    if not re.fullmatch(valid_email_regex, str(email)):
         raise InputError(description='Invalid email address')
 
     # check for duplicate email
@@ -152,7 +152,7 @@ def check_invalid_email(store, valid_email_regex, email):
         if user['email'] == email and user['removed'] is False:
             raise InputError(description='Email has already been taken')
 
-def check_invalid_name(name_first, name_last, full_name):
+def check_invalid_name(name_first, name_last):
     """
     tests if the given name is valid using the VALID_NAME_REGEX above and
     checks if the names will create an invalid handle
@@ -163,11 +163,20 @@ def check_invalid_name(name_first, name_last, full_name):
         full_name (str)  - a string that contains the user's first and last name
 
     Exceptions:
-        InputError - Occurs if the first and/or last name doesn't match the
-        VALID_NAME_REGEX, and if the fullname would create an invalid handle
+        InputError - Occurs if the first and/or last name is of an invalid type
+                     and/or length
+                   - Occurs if the user's names (concatenated) has less than one
+                     alphnumeric character
 
     Return Value: N/A
     """
+
+    # check for inputs of invalid type
+    if type(name_first) is not str or type(name_first) is bool:
+        raise InputError(description='Invalid first name')
+
+    if type(name_last) is not str or type(name_last) is bool:
+        raise InputError(description='Invalid last name')
 
     # check for invalid first name
     if name_first == '' or len(name_first) > 50:
@@ -177,6 +186,8 @@ def check_invalid_name(name_first, name_last, full_name):
     if name_last == '' or len(name_last) > 50:
         raise InputError(description='Invalid last name')
 
+    full_name = name_first + name_last
+
     # check for invalid full name
     count_alpha = 0
     for char in full_name:
@@ -184,6 +195,8 @@ def check_invalid_name(name_first, name_last, full_name):
             count_alpha += 1
     if count_alpha == 0:
         raise InputError(description='Invalid name')
+    
+    return full_name
 
 def create_handle(store, full_name):
     """
@@ -226,5 +239,17 @@ def create_handle(store, full_name):
     return handle
 
 def auth_logout_v1(token):
+    """
+    logs out a user using their current valid token, checks if it is valid then
+    removes the token info from the data
+
+    Arguments:
+        token (jwt token str) - a user's valid jwt token
+
+    Exceptions: N/A
+
+    Return Value: N/A
+    """
+
     token_valid_check(token)
     token_remove(token)

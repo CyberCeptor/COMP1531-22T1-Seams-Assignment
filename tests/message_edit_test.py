@@ -14,46 +14,12 @@ import requests
 
 from src import config
 
-@pytest.fixture(name='create_message')
-def fixture_create_message():
-    """
-    clears any data stored in data_store and registers a user with the
-    given information, create a channel using user id, send a message to channel
-
-    Arguments: N/A
-
-    Exceptions: N/A
-
-    Return Value: N/A
-    """
-
-    requests.delete(config.url + 'clear/v1')
-    register = requests.post(config.url + 'auth/register/v2', 
-                         json={'email': 'abc@def.com', 'password': 'password',
-                               'name_first': 'first', 'name_last': 'last'})
-    user_data = register.json()
-    token = user_data['token']
-
-    create_channel = requests.post(config.url + 'channels/create/v2',
-                            json={'token': token, 'name': 'channel_name',
-                                    'is_public': True})
-    channel_data = create_channel.json()
-    channel_id = channel_data['channel_id'] 
-
-    send_message = requests.post(config.url + 'message/send/v1', 
-                          json={'token': token, 'channel_id': channel_id, 
-                          'message': 'hewwo'})
-    message = send_message.json()
-    message_id = message['message_id']
- 
-    return [token, channel_id, message_id]
-
-
-def test_message_edit_invalid_token(create_message):
+@pytest.mark.usefixtures('clear_register_createchannel_sendmsg')
+def test_message_edit_invalid_token(clear_register_createchannel_sendmsg):
     """
     test for invalid input of token
 
-    Arguments: create_message
+    Arguments: clear_register_createchannel_sendmsg
     Exceptions: N/A
 
     Return Value: N/A
@@ -61,7 +27,7 @@ def test_message_edit_invalid_token(create_message):
     # pylint: disable=unused-argument
 
     # token is int
-    message_id = create_message[2]
+    message_id = clear_register_createchannel_sendmsg[2]
     resp0 = requests.put(config.url + 'message/edit/v1', 
                           json = {'token': 0, 'message_id': message_id, 'message': 'hewwo'})
     assert resp0.status_code == 400
@@ -94,18 +60,20 @@ def test_message_edit_invalid_token(create_message):
     
     requests.delete(config.url + 'clear/v1')
 
-def test_message_edit_invalid_message_id(create_message):
+
+@pytest.mark.usefixtures('clear_register_createchannel_sendmsg')
+def test_message_edit_invalid_message_id(clear_register_createchannel_sendmsg):
     """
     test for invalid input of channel id
 
-    Arguments: create_message
+    Arguments: clear_register_createchannel_sendmsg
 
     Exceptions: N/A
 
     Return Value: N/A
     """
 
-    token = create_message[0]
+    token = clear_register_createchannel_sendmsg[0]
     # no message id input
     resp0 = requests.put(config.url + 'message/edit/v1', 
                           json = {'token': token, 'message_id': '', 'message': 'hewwo'})
@@ -129,19 +97,20 @@ def test_message_edit_invalid_message_id(create_message):
     requests.delete(config.url + 'clear/v1')
 
 
-def test_message_edit_invalid_message(create_message):
+@pytest.mark.usefixtures('clear_register_createchannel_sendmsg')
+def test_message_edit_invalid_message(clear_register_createchannel_sendmsg):
     """
     test for invalid input of message
 
-    Arguments: create_message
+    Arguments: clear_register_createchannel_sendmsg
 
     Exceptions: N/A
 
     Return Value: N/A
     """
 
-    token = create_message[0]
-    message_id = create_message[2]
+    token = clear_register_createchannel_sendmsg[0]
+    message_id = clear_register_createchannel_sendmsg[2]
     # message is int
     resp0 = requests.put(config.url + 'message/edit/v1', 
                           json = {'token': token, 'message_id': message_id, 'message': 0})
@@ -154,11 +123,13 @@ def test_message_edit_invalid_message(create_message):
 
     requests.delete(config.url + 'clear/v1')
 
-def test_message_send_invalid_length(create_message):
+
+@pytest.mark.usefixtures('clear_register_createchannel_sendmsg')
+def test_message_send_invalid_length(clear_register_createchannel_sendmsg):
     """
     test if input message length is valid(less than 1, over 1000 char)
 
-    Arguments:  create_message
+    Arguments:  clear_register_createchannel_sendmsg
 
     Exceptions:
         InputError  -   Raised for all tests below
@@ -166,8 +137,8 @@ def test_message_send_invalid_length(create_message):
     Return Value:   N/A
     """
 
-    token = create_message[0]
-    message_id = create_message[2]
+    token = clear_register_createchannel_sendmsg[0]
+    message_id = clear_register_createchannel_sendmsg[2]
 
     # long_message is more than 1000 char
     long_message = 'MoreThanAthousandCharactersMoreThanAthousandCharactersMoreThanAt\
@@ -193,7 +164,9 @@ def test_message_send_invalid_length(create_message):
 
     requests.delete(config.url + 'clear/v1')
 
-def test_message_edit_different_message(create_message):
+
+@pytest.mark.usefixtures('clear_register_createchannel_sendmsg')
+def test_message_edit_different_message(clear_register_createchannel_sendmsg):
     """
     testing if message belongs to the channel
 
@@ -205,7 +178,7 @@ def test_message_edit_different_message(create_message):
     Return Value: N/A
     """
     
-    token = create_message[0]
+    token = clear_register_createchannel_sendmsg[0]
     # create user2
     user2 = requests.post(config.url + 'auth/register/v2', 
                             json={'email': 'def@abc.com', 'password': 'password',
@@ -236,19 +209,20 @@ def test_message_edit_different_message(create_message):
     requests.delete(config.url + 'clear/v1')
 
 
-def test_message_sent_not_belong_to_user(create_message):
+@pytest.mark.usefixtures('clear_register_createchannel_sendmsg')
+def test_message_sent_not_belong_to_user(clear_register_createchannel_sendmsg):
     """
     testing if message is sent by the user who makes the editing request
 
-    Arguments: create_message(fixture)
+    Arguments: clear_register_createchannel_sendmsg(fixture)
 
     Exceptions: 
         Access Error - Raised for all test cases below
 
     Return Value: N/A
     """
-    channel_id = create_message[1]
-    message_id = create_message[2]
+    channel_id = clear_register_createchannel_sendmsg[1]
+    message_id = clear_register_createchannel_sendmsg[2]
     # create user2
     user2 = requests.post(config.url + 'auth/register/v2', 
                             json={'email': 'def@abc.com', 'password': 'password',
@@ -268,11 +242,13 @@ def test_message_sent_not_belong_to_user(create_message):
 
     requests.delete(config.url + 'clear/v1')
 
-def test_successful_message_edit_owner(create_message):
+
+@pytest.mark.usefixtures('clear_register_createchannel_sendmsg')
+def test_successful_message_edit_owner(clear_register_createchannel_sendmsg):
     """
     testing if message editing is successful
 
-    Arguments: create_message(fixture)
+    Arguments: clear_register_createchannel_sendmsg(fixture)
 
     Exceptions: 
         Access Error - Raised for all test cases below
@@ -282,8 +258,8 @@ def test_successful_message_edit_owner(create_message):
     
 #         the authorised user has owner permissions in the channel/DM
 
-    token = create_message[0]
-    channel_id = create_message[1]
+    token = clear_register_createchannel_sendmsg[0]
+    channel_id = clear_register_createchannel_sendmsg[1]
     # create user2
     user2 = requests.post(config.url + 'auth/register/v2', 
                             json={'email': 'def@abc.com', 'password': 'password',
@@ -314,11 +290,13 @@ def test_successful_message_edit_owner(create_message):
     assert resp1.status_code == 200
     requests.delete(config.url + 'clear/v1')
 
-def test_successful_message_edit_global_owner(create_message):
+
+@pytest.mark.usefixtures('clear_register_createchannel_sendmsg')
+def test_successful_message_edit_global_owner(clear_register_createchannel_sendmsg):
     """
     testing if message editing is successful
 
-    Arguments: create_message(fixture)
+    Arguments: clear_register_createchannel_sendmsg(fixture)
 
     Exceptions: 
         Access Error - Raised for all test cases below
@@ -328,7 +306,7 @@ def test_successful_message_edit_global_owner(create_message):
     
 #         the authorised user has owner permissions in the channel/DM
 
-    token = create_message[0]
+    token = clear_register_createchannel_sendmsg[0]
     # create user2
     user2 = requests.post(config.url + 'auth/register/v2', 
                             json={'email': 'def@abc.com', 'password': 'password',
@@ -362,19 +340,21 @@ def test_successful_message_edit_global_owner(create_message):
 
     requests.delete(config.url + 'clear/v1')
 
-def test_message_edit_empty(create_message):
+
+@pytest.mark.usefixtures('clear_register_createchannel_sendmsg')
+def test_message_edit_empty(clear_register_createchannel_sendmsg):
     """
     testing if entered message is empty, the message is deleted
 
-    Arguments: create_message(fixture)
+    Arguments: clear_register_createchannel_sendmsg(fixture)
 
     Exceptions: N/A
 
     Return Value: N/A
     """
 
-    token = create_message[0]
-    message_id = create_message[2]
+    token = clear_register_createchannel_sendmsg[0]
+    message_id = clear_register_createchannel_sendmsg[2]
     
     resp = requests.put(config.url + 'message/edit/v1', 
                           json = {'token': token, 'message_id': message_id, 'message': ''})

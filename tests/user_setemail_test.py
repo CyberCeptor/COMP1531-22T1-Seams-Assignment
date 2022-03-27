@@ -66,7 +66,7 @@ def test_user_setemail_working(clear_and_register):
                             json={'token': user2['token'], 'email': 'abc@def.com'})
     assert setemail.status_code == 200
 
-    # Assert that the all_members and owner_membets channel email has also been updated
+    # Assert that the all_members and owner_members channel email has also been updated
     # check the data in the channel is correct
     channels_details = requests.get(config.url + 'channel/details/v2', 
                             params={'token': user1['token'], 'channel_id': channel1['channel_id']})
@@ -131,7 +131,7 @@ def test_user_setemail_bad_token(clear_and_register):
 
     setemail = requests.put(config.url + 'user/profile/setemail/v1', 
                             json={'token': 'string', 'email': 'abc2@def.com'})
-    assert setemail.status_code == 400
+    assert setemail.status_code == 403
 
     setemail = requests.put(config.url + 'user/profile/setemail/v1', 
                             json={'token': 444, 'email': 'abc2@def.com'})
@@ -150,11 +150,11 @@ def test_user_setemail_bad_token(clear_and_register):
             xNTQ3OTc3ODgwfQ.366QLXfCURopcjJbAheQYLVNlGLX_INKVwr8_TVXYEQ'
     setemail = requests.put(config.url + 'user/profile/setemail/v1', 
                             json={'token': expired_token, 'email': 'abc2@def.com'})
-    assert setemail.status_code == 400
+    assert setemail.status_code == 403
 
     unsaved_token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.\
         eyJpZCI6MSwic2Vzc2lvbl9pZCI6MSwiaGFuZGxlIjoiZmlyc3RsYXN\
             0IiwiZXhwIjoyNTQ3OTc3ODgwfQ.ckPPWiR-m6x0IRqpQtKmJgNLiD8eAEiTv2i8ToK3mkY'
     setemail = requests.put(config.url + 'user/profile/setemail/v1', 
                             json={'token': unsaved_token, 'email': 'abc2@def.com'})
-    assert setemail.status_code == 400
+    assert setemail.status_code == 403
