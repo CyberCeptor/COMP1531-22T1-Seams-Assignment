@@ -11,7 +11,7 @@ from src.auth import auth_register_v2, auth_login_v2, auth_logout_v1
 from src.user import user_profile_v1, user_profile_setemail_v1, user_profile_setname_v1, user_profile_sethandle_v1
 
 from src.users import users_all_v1
-from src.messages import message_send_v1, message_remove_v1, message_edit_v1, message_senddm_v1
+from src.message import message_send_v1, message_remove_v1, message_edit_v1, message_senddm_v1
 from src.admin import admin_userpermission_change, admin_user_remove
 from src.other import clear_v1
 from src.token import token_valid_check, token_get_user_id

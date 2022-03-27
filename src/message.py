@@ -10,18 +10,21 @@ Description: implementation for
     - removing specified message from channel
 """
 
-from src.data_store import data_store
+import datetime
 
-from src.other import check_message_id_valid, check_valid_auth_id,\
-                      check_valid_channel_id, check_user_is_member
-from src.admin import check_user_is_global_owner
+from datetime import timezone
 
 from src.dm import check_valid_dm_id
-from src.token import token_get_user_id, token_valid_check
-from src.global_vars import new_message_id
+
+from src.admin import check_user_is_global_owner
 from src.error import AccessError, InputError
-import datetime
-from datetime import timezone
+from src.other import check_valid_auth_id, check_valid_channel_id,\
+                      check_user_is_member
+from src.token import token_get_user_id, token_valid_check
+
+from src.data_store import data_store
+
+from src.global_vars import new_message_id
 
 def message_send_v1(token, channel_id, message):
     """
