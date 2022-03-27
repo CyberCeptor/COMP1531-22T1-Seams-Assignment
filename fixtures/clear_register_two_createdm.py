@@ -1,10 +1,10 @@
 """
 Filename: clear_register_two_createdm.py
 
-Author: Yangjun Yue(z5371516)
+Author: Yangjun Yue(z5317840)
 Created: 27/03/2022
 
-Description: pytest fixture for registering one user then creating a channel
+Description: pytest fixture for registering two users then creating a dm
 """
 
 import pytest
@@ -24,6 +24,7 @@ def clear_register_two_createdm(clear_register_two):
     create_dm = requests.post(config.url + 'dm/create/v1', 
                               json={'token': user1['token'],
                                     'u_ids': [user2['auth_user_id']]})
+    assert create_dm.status_code == 200
     dm = create_dm.json()
     dm_id = dm['dm_id']
 

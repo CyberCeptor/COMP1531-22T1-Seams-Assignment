@@ -16,7 +16,7 @@ from src import config
 from src.global_vars import expired_token, unsaved_token
 
 @pytest.mark.usefixtures('clear_register')
-def test_channels_create_valid_token(clear_register):
+def test_channels_create_invalid_token(clear_register):
     """ Registers a valid user, and them attempts to create multiple channels
     with invalid token values, both public and private channels. """
     

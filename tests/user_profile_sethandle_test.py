@@ -154,7 +154,7 @@ def test_user_profile_sethandle_duplicate_handle_str(clear_register_two):
 
     # test another handle_str in channel
     sethandle = requests.put(config.url + 'user/profile/sethandle/v1', 
-                            json={'token': user1['token'], 'handle_str': 'first2last2'})
+                            json={'token': user1['token'], 'handle_str': 'firstlast0'})
     assert sethandle.status_code == 400
 
     requests.delete(config.url + 'clear/v1')

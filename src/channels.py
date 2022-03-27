@@ -12,8 +12,9 @@ Description: implementation for
 
 from src.error import InputError
 from src.other import check_valid_auth_id, check_user_is_member
-from src.data_store import data_store
 from src.token import token_valid_check, token_get_user_id
+
+from src.data_store import data_store
 
 def channels_list_v2(token):
     """
@@ -28,13 +29,13 @@ def channels_list_v2(token):
     Arguments:
         token   - token must be valid.
 
-    Exceptions:
-        null
+    Exceptions: N/A
 
     Return Value:
         Returns a dict containing the channel_id and name of the channels
         the user is a member of
     """
+
     token_valid_check(token)
     auth_user_id = token_get_user_id(token)
 
@@ -50,6 +51,7 @@ def channels_list_v2(token):
                 'name': channel['name'],
             }
             channels_list.append(channel_data)
+
     return {
         'channels': channels_list
     }
@@ -62,8 +64,7 @@ def channels_listall_v2(token):
     Arguments:
         auth_user_id (int)      - an integer that specifies user id
 
-    Exceptions:
-        N/A
+    Exceptions: N/A
 
     Return Value:
         Returns list of dictionaries containing channel id as int
@@ -127,13 +128,15 @@ def channels_create_v2(token, name, is_public):
     check_valid_auth_id(auth_user_id)
 
     if len(name) > 20:
-        raise InputError(description='The channel name must be less than 20 characters')
+        raise InputError(description='The channel name must be less than 20 \
+                                      characters')
 
     if name == '':
         raise InputError(description='No channel name was entered')
 
     if not isinstance(is_public, bool):
-        raise InputError(description='The public/private value given is not of type bool')
+        raise InputError(description='The public/private value given is not of\
+                                      type bool')
 
     # Loops through data_store['channels'] to check channel names if they
     # already exist. Having two channles with the same name is fine,

@@ -8,12 +8,14 @@ Description: implementation for
     - sending message to a specified channel by an authorised user
     - given a specified message id and editing that message
     - removing specified message from channel
+    - helpers for the above
 """
 
 from src.admin import check_user_is_global_owner
 from src.error import AccessError, InputError
-from src.other import check_valid_auth_id, check_user_is_member, send_message
 from src.token import token_get_user_id, token_valid_check
+from src.other import check_valid_auth_id, check_user_is_member, send_message
+
 from src.data_store import data_store
 
 def message_send_v1(token, channel_id, message):
@@ -62,6 +64,7 @@ def message_edit_v1(token, message_id, message):
 
     Return Value: N/A
     """
+
     store = data_store.get()
 
     # check message input is valid, otherwise raise input errors
@@ -84,10 +87,9 @@ def message_edit_v1(token, message_id, message):
     channel = get_channel_id_with_message_id(message_id)
     
     # check is user is in the channel
-    if check_user_is_member(auth_user_id, channel, 'all_members') is not None:
-        if check_user_is_member(auth_user_id, channel, 'owner_members') \
-            is not None or global_owner is True or \
-            message_data['u_id'] == auth_user_id:
+    if check_user_is_member(auth_user_id, channel, 'all_members'):
+        if (check_user_is_member(auth_user_id, channel, 'owner_members') or 
+            global_owner is True or message_data['u_id'] == auth_user_id):
             # if user is either owner or global owner or it's 
             # the user who sent the message
             message_data['message'] = message
@@ -95,9 +97,11 @@ def message_edit_v1(token, message_id, message):
             if message == '':
                 message_remove_v1(token, message_id)
         else:
-            raise AccessError(description='User has no access to this specified message')
+            raise AccessError(description='User has no access to this specified\
+                                           message')
     else:
-        raise AccessError(description='User has no access to this specified message')
+        raise AccessError(description='User has no access to this specified \
+                                       message')
 
     data_store.set(store)
 
@@ -138,10 +142,9 @@ def message_remove_v1(token, message_id):
     # is user is a global member and is member in the channel
 
     # check is user is in the channel
-    if check_user_is_member(auth_user_id, channel, 'all_members') is not None:
-        if check_user_is_member(auth_user_id, channel, 'owner_members') \
-            is not None or global_owner is True or \
-            message_data['u_id'] == auth_user_id:
+    if check_user_is_member(auth_user_id, channel, 'all_members'):
+        if (check_user_is_member(auth_user_id, channel, 'owner_members') or 
+            global_owner is True or message_data['u_id'] == auth_user_id):
             # if user is either owner or global owner or it's the user 
             # who sent the message
             channel['messages'].remove(message_data)
@@ -149,7 +152,8 @@ def message_remove_v1(token, message_id):
             raise AccessError(description='User has no access to \
             this specified message')
     else:
-        raise AccessError('User has no access to this specified message')
+        raise AccessError(description='User has no access to this specified \
+                                       message')
 
     data_store.set(store)
 

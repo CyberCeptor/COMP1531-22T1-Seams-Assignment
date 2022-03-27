@@ -13,6 +13,9 @@ Description: implementation for
         - checking if a user is a global owner
         - casting a variable into an int to check for invalid inputs for
           GET requests
+        - getting messages from a channel or dm
+        - sending a message to a channel or dm
+        - checking if a dm id is valid
 """
 
 import datetime
@@ -315,6 +318,7 @@ def send_message(token, data_id, message, data_str):
     # increament message id for the store message
     message_id = new_id('message')
 
+    # generate timestamp
     time = datetime.datetime.now(timezone.utc)
     utc_time = time.replace(tzinfo=timezone.utc)
     utc_timestamp = utc_time.timestamp()
@@ -347,9 +351,11 @@ def check_valid_dm_id(dm_id):
 
     Return Value: dm_id
     """
+
     if type(dm_id) is bool:
         raise InputError('dm id is not of a valid type')
 
+    # cast dm_id to an int since it is a GET request
     dm_id = cast_to_int_get_requests(dm_id, 'dm id')
 
     if dm_id < 1:
@@ -359,5 +365,6 @@ def check_valid_dm_id(dm_id):
     for dm in store['dms']:
        if dm['dm_id'] == dm_id:
             return dm
+
     # if the dm_id is not found, raise an AccessError
     raise InputError('dm does not exist in dms')

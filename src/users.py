@@ -1,3 +1,12 @@
+"""
+Filename: users.py
+
+Author: Aleesha Bunrith(z5371516)
+Created: 21/03/2022 - 28/03/2022
+
+Description: Implementation for getting the info of all current users
+"""
+
 from src.token import token_valid_check
 
 from src.data_store import data_store

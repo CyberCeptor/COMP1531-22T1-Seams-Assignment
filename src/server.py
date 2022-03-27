@@ -10,7 +10,8 @@ from src.dm import dm_create_v1, dm_list_v1, dm_details_v1, dm_remove_v1,\
                    dm_leave_v1, dm_messages_v1
 
 from src.auth import auth_register_v2, auth_login_v2, auth_logout_v1
-from src.user import user_profile_v1, user_profile_setemail_v1, user_profile_setname_v1, user_profile_sethandle_v1
+from src.user import user_profile_v1, user_profile_setemail_v1, \
+                     user_profile_setname_v1, user_profile_sethandle_v1
 
 from src.admin import admin_userpermission_change, admin_user_remove
 from src.other import clear_v1

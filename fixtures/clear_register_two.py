@@ -22,7 +22,7 @@ def clear_register_two(clear_register):
 
     resp = requests.post(config.url + 'auth/register/v2', 
                           json={'email': 'def@ghi.com', 'password': 'password',
-                                'name_first': 'first2', 'name_last': 'last2'})
+                                'name_first': 'first', 'name_last': 'last'})
     assert resp.status_code == 200
     user2 = resp.json()
 
