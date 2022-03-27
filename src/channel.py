@@ -23,11 +23,11 @@ from src.token import token_valid_check, token_get_user_id
 def channel_invite_v2(token, channel_id, u_id):
     """
     check if given user id and channel id are valid,
-    and then add the user into the channel with u_id, channel_id
+    and then add the user into the channel with u_id, channel_id, token
     return nothing
 
     Arguments:
-        auth_user_id (int)    - an integer that specifies user(inviter) id
+        token (str)    - unique str representation of user
         channel_id (int) - an integer that specifies channel id
         u_id (int) - an integer that specifies user(invitee) id
 
@@ -130,7 +130,7 @@ def channel_join_v2(token, channel_id):
     return nothing
 
     Arguments:
-        auth_user_id (int)    - an integer that specifies user(inviter) id
+        token (string)    - unique str representation of user
         channel_id (int) - an integer that specifies channel id
 
     Exceptions:
