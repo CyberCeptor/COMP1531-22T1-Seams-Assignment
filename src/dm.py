@@ -192,6 +192,7 @@ def dm_leave_v1(auth_user_id, dm_id):
             dm['members'].remove(member)
             data_store.set(store)
 
+
 def check_valid_dm_id(dm_id):
     """
     clears any data stored in data_store and registers users with the
