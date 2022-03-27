@@ -181,14 +181,15 @@ def dm_leave_v1(auth_user_id, dm_id):
     dm = check_valid_dm_id(dm_id)
     store = data_store.get()
 
-    for member in dm['members']:
-        if(dm['creator']['u_id'] == auth_user_id):
-            dm['creator'] = {}
-        if(auth_user_id != member['u_id']):
-            raise AccessError('The authorised user is no longer in dm')
-        else:
-            dm['members'].remove(member)
-            data_store.set(store)
+    if(dm['creator']['u_id'] == auth_user_id):
+        dm['creator'] = {}
+
+    member = check_user_is_member(auth_user_id, dm, 'members')
+    if member is None:
+        raise AccessError('The authorised user is no longer in dm')
+    else:
+        dm['members'].remove(member)
+        data_store.set(store)
 
 
 def check_valid_dm_id(dm_id):
