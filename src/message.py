@@ -24,7 +24,7 @@ from src.token import token_get_user_id, token_valid_check
 
 from src.data_store import data_store
 
-from src.global_vars import new_message_id
+from src.global_vars import new_id
 
 def message_send_v1(token, channel_id, message):
     """
@@ -283,7 +283,7 @@ def send_message(token, data_id, message, data_str):
         raise InputError('Message must not exceed 1000 characters')
 
     # increament message id for the store message
-    message_id = new_message_id()
+    message_id = new_id('message')
 
     time = datetime.datetime.now(timezone.utc)
     utc_time = time.replace(tzinfo=timezone.utc)

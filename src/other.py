@@ -16,11 +16,10 @@ Description: implementation for
 """
 
 from src.error import InputError, AccessError
-from src.token import reset_session_id
 
 from src.data_store import data_store
 
-from src.global_vars import reset_message_id, reset_dm_id
+from src.global_vars import reset_id
 
 def clear_v1():
     """
@@ -38,9 +37,9 @@ def clear_v1():
     store['tokens'].clear()
     store['dms'].clear()
     data_store.set(store)
-    reset_session_id()
-    reset_message_id()
-    reset_dm_id()
+    reset_id('session')
+    reset_id('message')
+    reset_id('id')
     
 def check_valid_auth_id(auth_user_id):
     """

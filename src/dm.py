@@ -10,7 +10,7 @@ from src.data_store import data_store
 from src.token import token_valid_check, token_get_user_id
 from src.other import check_valid_auth_id, cast_to_int_get_requests, check_user_is_member, get_messages
 from src.error import InputError, AccessError
-from src.global_vars import new_dm_id
+from src.global_vars import new_id
 from src.data_store import data_store
 
 def dm_create_v1(token, u_ids):
@@ -40,7 +40,7 @@ def dm_create_v1(token, u_ids):
     }
     # Assume the dm id start at 1 and increase by adding 1
     # for any newdm created
-    dm_id = new_dm_id()
+    dm_id = new_id('dm')
     name_list = []
     all_member_list = []
     all_member_list.append(owner)
