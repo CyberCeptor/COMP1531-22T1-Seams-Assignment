@@ -76,9 +76,8 @@ def test_user_setemail_working(clear_register_two):
 
     # Assert that the all_members and owner_members channel email has also been updated
     # check the data in the channel is correct
-    dm_details = requests.get(config.url + 'dm/details/v1', 
-                              params={'token': user1['token'], 'dm_id': dm_id})
-    dm_json = dm_details.json()
+    requests.get(config.url + 'dm/details/v1', 
+                    params={'token': user1['token'], 'dm_id': dm_id})
 
 @pytest.mark.usefixtures('clear_register_two')
 def test_user_setemail_bad_email(clear_register_two):
@@ -92,7 +91,7 @@ def test_user_setemail_bad_email(clear_register_two):
     """
     user1 = clear_register_two[0]
     user2 = clear_register_two[1]
-    
+
     # test another users email
     setemail = requests.put(config.url + 'user/profile/setemail/v1', 
                             json={'token': user1['token'], 'email': 'def@ghi.com'})
