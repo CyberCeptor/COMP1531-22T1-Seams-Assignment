@@ -10,6 +10,7 @@ Description: pytests for user_profile_sethandle_v1
 import pytest
 import requests
 from src import config
+from src.data_store import data_store
 
 @pytest.fixture(name='clear_and_register')
 def fixture_clear_and_register():
@@ -25,12 +26,12 @@ def fixture_clear_and_register():
     requests.delete(config.url + 'clear/v1')
     user1 = requests.post(config.url + 'auth/register/v2', 
                   json={'email': 'abc@def.com', 'password': 'password',
-                        'name_first': 'first', 'name_last': 'last', 'handle_str': 'handle'})
+                        'name_first': 'first', 'name_last': 'last'})
     user1_json = user1.json()
 
     user2 = requests.post(config.url + 'auth/register/v2', 
                   json={'email': 'abc2@def.com', 'password': 'password2',
-                        'name_first': 'first2', 'name_last': 'last2', 'handle_str': 'handle2'})
+                        'name_first': 'first2', 'name_last': 'last2'})
     user2_json = user2.json()
     
     return [user1_json, user2_json]
@@ -102,8 +103,9 @@ def test_user_profile_sethandle_bad_handle_str(clear_and_register):
 
     # test not alphanumeric handle_str
     sethandle = requests.put(config.url + 'user/profile/sethandle/v1', 
-                            json={'token': user1['token'], 'handle_str': ' '})
+                            json={'token': user1['token'], 'handle_str': '@#$%^&'})
     assert sethandle.status_code == 400
+
 
     # test empty string
     sethandle = requests.put(config.url + 'user/profile/sethandle/v1', 
@@ -167,4 +169,28 @@ def test_user_sethandle_bad_token(clear_and_register):
                             json={'token': unsaved_token, 'handle_str': 'handle'})
     assert sethandle.status_code == 403
 
+def test_user_profile_sethandle_duplicate_handle_str(clear_and_register):
+    user1 = clear_and_register[0]
+    user2 = clear_and_register[1]
+
+
+    # test another handle_str
+    sethandle = requests.put(config.url + 'user/profile/sethandle/v1', 
+                            json={'token': user1['token'], 'handle_str': 'first2last2'})
+    assert sethandle.status_code == 400
+
+
     requests.delete(config.url + 'clear/v1')
+
+
+def test_user_sethandle_working(clear_and_register):
+    user1 = clear_and_register[0]
+    user2 = clear_and_register[1]
+
+    create = requests.post(config.url + 'dm/create/v1', 
+                        json={'token': user1['token'], 'u_ids': [user2['auth_user_id']]})
+    assert create.status_code == 200
+
+    sethandle = requests.put(config.url + 'user/profile/sethandle/v1', 
+                            json={'token': user2['token'], 'handle_str': 'first2last22222'})
+    assert sethandle.status_code == 200
