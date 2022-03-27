@@ -1,3 +1,15 @@
+"""
+Filename: channel_addowner_test.py
+
+Author: Jenson Morgan(z5360181)
+Created: 28/02/2022 - 27/03/2022
+
+Testing channel_addowner works.
+tests its working, bad inputs, 
+unauthorised, global owners, non-members,
+and non-owner_members.
+"""
+
 import pytest
 import requests
 
