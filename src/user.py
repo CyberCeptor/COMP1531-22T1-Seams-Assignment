@@ -9,8 +9,8 @@ Description:
     -   user_profile_v1: return the user information from a token and u_id.
     -   user_setemail_v1: set a new email for the user, in users, and the
         channels the user is in
-    -   user_setname_v1: set the user's first name and last name, in the user and
-        channels data_store
+    -   user_setname_v1: set the user's first name and last name, in the user
+        and channels data_store
     - user_set_handle_v1: set the user's handle with the new information
         Helper Function: 
             - check_valid_handle: checks the handle is authentic
@@ -26,9 +26,19 @@ def user_profile_v1(token, u_id):
     """
     For a valid user, returns information about their user_id, firstname,
     last name, and handle
+
+    Arguments:
+        token (str) - a valid jwt token string
+        u_id (int)  - an int specifying a user
+
+    Exceptions: N/A
+
+    Return: Returns a user's user_id, email, name_first, name_last, handle_str
     """
 
     token_valid_check(token)
+
+    # cast u_id into an int since it is a GET request
     u_id = cast_to_int_get_requests(u_id, 'user id')
 
     check_valid_auth_id(u_id)
@@ -49,17 +59,21 @@ def user_profile_v1(token, u_id):
 
     return user
 
-
-"""
-Update the authorised user's email address
-
-PUT
-
-    InputError:
-        - email entered is not a valid email
-        - email address is already used by another user
-"""
 def user_profile_setemail_v1(token, email):
+    """
+    Update the authorised user's email
+    
+    Arguments:
+        -   token
+        -   email
+    
+    Exceptions:
+        InputError: given email does not match the given valid email regex
+    
+    Return Value:
+        N/A
+    """
+
     store = data_store.get()
 
     # check the email is valid (i.e. usable email address, format)
@@ -95,22 +109,23 @@ def user_profile_setemail_v1(token, email):
     data_store.set(store)
     return {}
 
-
 def user_profile_setname_v1(token, name_first, name_last):
     """
-Update the authorised user's first and last name
-PUT
-Arguments:
-    -   token
-    -   name_first
-    -   name_last
-Exceptions:
-    InputError:
-        -   length of name_first is not between 1 and 50 characters inclusive
-        -   length of name_last is not between 1 and 50 characters inclusive
-Return Value:
-    N/A
-"""
+    Update the authorised user's first and last name
+    
+    Arguments:
+        -   token
+        -   name_first
+        -   name_last
+    
+    Exceptions:
+        InputError:
+            -   length of name_first is not between 1 and 50 characters inclusive
+            -   length of name_last is not between 1 and 50 characters inclusive
+    
+    Return Value:
+        N/A
+    """
     store = data_store.get()
 
     # check the name is valid (i.e. usable name_first, name_last)

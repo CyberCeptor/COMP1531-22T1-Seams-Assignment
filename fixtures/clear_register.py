@@ -1,5 +1,5 @@
 """
-Filename: clear_and_register_two.py
+Filename: clear_and_register.py
 
 Author: Aleesha Bunrith(z5371516)
 Created: 26/03/2022

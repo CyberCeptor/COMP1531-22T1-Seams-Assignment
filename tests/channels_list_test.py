@@ -154,36 +154,4 @@ def test_channels_list_invalid_token(clear_register_createchannel):
     channels_list_json = requests.get(config.url + 'channels/list/v2', params = {'token': unsaved_token})
     assert channels_list_json.status_code == 403
 
-<<<<<<< HEAD
-    # channels_list_json = channels_list.json()
-    # assert channels_list_json.status_code == 400
-    # clear_v1()
-    # user1 = auth_register_v1('abc@def.com', 'password', 'first', 'last')
-    # id1 = user1['auth_user_id']
-    # channels_create_v1(id1, 'test_channel_public', True)
-    # channels_create_v1(id1, 'test_channel_private', False)
-    # auth_id 1 has created two channels, there is no user 4444 to create the
-    # channels list.
-    # with pytest.raises(AccessError):
-    #     channels_list_v1(44444) # give incorrect auth_id.
-
-
-# def test_channels_logout():
-#     requests.delete(config.url + 'clear/v1')
-
-#     user = requests.post(config.url + 'auth/register/v2', 
-#                   json={'email': 'abc@def.com', 'password': 'password',
-#                         'name_first': 'first', 'name_last': 'last'})
-#     assert user.status_code == 200
-#     user1 = user.json()
-
-#     logout = requests.post(config.url + 'auth/logout/v1', json={'token': user1['token']})
-#     assert logout.status_code == 200
-
-#     channel = requests.post(config.url + 'channels/create/v2', 
-#                             json={'token': user1['token'], 'name': 'public_channel', 'is_public': True})
-    
-#     assert channel.status_code == 403
-=======
->>>>>>> master
 requests.delete(config.url + 'clear/v1')

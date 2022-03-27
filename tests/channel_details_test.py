@@ -8,6 +8,7 @@ Description: pytests for channel_details_v1
 """
 
 import pytest
+
 import requests
 
 from src import config
@@ -42,7 +43,8 @@ def test_channel_details_invalid_token(clear_register_createchannel):
     assert resp2.status_code == 400
     # wrong token input
     resp3 = requests.get(config.url + 'channel/details/v2', 
-                          params={'token': 'not right string', 'channel_id': chan_id})
+                          params={'token': 'not right string',
+                                  'channel_id': chan_id})
     assert resp3.status_code == 403
     # expired token
     expired_token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MSwic2Vzc\

@@ -42,6 +42,7 @@ def clear_v1():
     store['tokens'].clear()
     store['dms'].clear()
     data_store.set(store)
+    
     reset_id('session')
     reset_id('message')
     reset_id('dm')

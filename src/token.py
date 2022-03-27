@@ -152,9 +152,9 @@ def token_valid_check(token):
     try:
         jwt.decode(token, key, algorithms=[algorithm])
     except jwt.ExpiredSignatureError:
-        raise AccessError(description='Token has expired')
+        raise AccessError(description='Token has expired') from AccessError
     except jwt.DecodeError:
-        raise AccessError(description='Invalid token')
+        raise AccessError(description='Invalid token') from InputError
 
     # check if the valid token is stored in the data
     token_locate_in_data_store(token)

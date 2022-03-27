@@ -1,3 +1,11 @@
+"""
+Filename: clear_register_two_createdm.py
+
+Author: Yangjun Yue(z5371516)
+Created: 27/03/2022
+
+Description: pytest fixture for registering one user then creating a channel
+"""
 
 import pytest
 
