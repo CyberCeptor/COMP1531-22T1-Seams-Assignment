@@ -10,90 +10,74 @@ import pytest
 import requests
 
 from src import config
+from src.global_vars import expired_token, unsaved_token
 
-
-def test_channels_list():
+@pytest.mark.usefixtures('clear_register_two')
+def test_channels_list_working(clear_register_two):
     """
-    Creates a 2 channels:
-        -   tests if given a non-existant
-        user_id it raises an accesserror
-        -   tests for non-int input (bool, string)
-    Arguments:  N/A
-
-    Exceptions:
-        AccessError  - raised for non-user_id
-        InputError  - for non int input
-
-    Return Value: N/A
+    Create 2 users from clear_register_two,
+    user1 creates 3 channels,
+    user2 creates 2 channels, 
+    user2 joins user1's first channel,
+    assert that all information returned by channels_list
+    matches the above information.
+    The channel_list will be in the order of lowest channel_id to 
+    greatest.
     """
 
-    # create 2 users, create two channels, create a channels list with the first user
-    # assert:
-    # the status code
-    # the channels_id matches the output of the channels created
-    # the number of channels created in the list "len()"
-    """
-    create a user, create 3 channels
-    create a channel_list for user1
-    create a second user, create 2 channels
-    create a channel_list for user2
-    check that the channel_list for user1 matches what has been created
-    and the length of 4.
+    user1_token = clear_register_two[0]['token']
+    user2_token = clear_register_two[1]['token']
 
-    """
-
-    requests.delete(config.url + 'clear/v1')
-
-
-    # create user1.
-    user1 = requests.post(config.url + 'auth/register/v2', 
-                            json={'email': 'abc@def.com', 'password': 'password',
-                               'name_first': 'first', 'name_last': 'last'})
-    user1_json = user1.json()
-
-    # create the 3 channels for user1.
+    # create channel1 (Public)
     channel1 = requests.post(config.url + 'channels/create/v2', 
-                            json={'token': user1_json['token'], 'name': 'channel_name1', 'is_public': True})
-
+                            json={'token': user1_token, 'name': 'channel_name1', 'is_public': True})
     assert channel1.status_code == 200
     channel1_json = channel1.json()
-
-
+    
+    # create channel2 (Public)
     channel2 = requests.post(config.url + 'channels/create/v2', 
-                            json={'token': user1_json['token'], 'name': 'channel_name2', 'is_public': True})
+                            json={'token': user1_token, 'name': 'channel_name2', 'is_public': True})
+    assert channel2.status_code == 200
     channel2_json = channel2.json()
 
-    # create a private channel aswell to test list. 
+    # create channel3 (Private)
     channel3 = requests.post(config.url + 'channels/create/v2', 
-                            json={'token': user1_json['token'], 'name': 'private_channel1', 'is_public': False})
+                            json={'token': user1_token, 'name': 'private_channel1', 'is_public': False})
+    assert channel3.status_code == 200
     channel3_json = channel3.json()
 
-    # create user2.
-    user2 = requests.post(config.url + 'auth/register/v2', 
-                            json={'email': 'def@abc.com', 'password': 'password',
-                               'name_first': 'first2', 'name_last': 'last2'}) 
-    user2_json = user2.json()
-    # Public channel for other user.
-    requests.post(config.url + 'channels/create/v2', 
-                            json={'token': user2_json['token'], 'name': 'test_pub_channel', 'is_public': True})
-    # Private channel for other user.
-    requests.post(config.url + 'channels/create/v2', 
-                            json={'token': user2_json['token'], 'name': 'test_pri_channel', 'is_public': False})
+    # Create channel4 for user2 (Public)
+    channel4 = requests.post(config.url + 'channels/create/v2', 
+                            json={'token': user2_token, 'name': 'test_pub_channel', 'is_public': True})
+    assert channel4.status_code == 200
+    channel4_json = channel4.json()
+
+    # Create channel5 for user2 (Private)
+    channel5 = requests.post(config.url + 'channels/create/v2', 
+                            json={'token': user2_token, 'name': 'test_pri_channel', 'is_public': False})
+    assert channel5.status_code == 200
+    channel5_json = channel5.json()
 
 
+    # User2 joins user1's first channels
+    join = requests.post(config.url + 'channel/join/v2',
+                        json={'token': user2_token,
+                        'channel_id': channel1_json['channel_id']})
+    assert join.status_code == 200   
 
-    # channel_list for user 1.
-    channels_list = requests.get(config.url + 'channels/list/v2', params = {'token': user1_json['token']})
+
+    # Channel_list for user 1.
+    channels_list = requests.get(config.url + 'channels/list/v2', params = {'token': user1_token})
+    assert channels_list.status_code == 200
     channels_list_json = channels_list.json()
 
-    # creating the channel list for the second user.
-    requests.get(config.url + 'channels/list/v2', params = {'token': user2_json['token']})
+    # Channel_list2 for user2. Test if it interefere's with user1's list.
+    channels_list2 = requests.get(config.url + 'channels/list/v2', params = {'token': user2_token})
+    assert channels_list2.status_code == 200
+    channels_list2_json = channels_list2.json()
 
-    # check the channels_list function has worked.
-    assert channels_list.status_code == 200
-    # check the number of channels in list for user1.
+    # Check that the channel_list info matches what was created.
     assert len(channels_list_json['channels']) == 3
-    # check that the channel_list info matches what was created.
     assert channels_list_json['channels'][0]['channel_id'] == channel1_json['channel_id']
     assert channels_list_json['channels'][1]['channel_id'] == channel2_json['channel_id']
     assert channels_list_json['channels'][2]['channel_id'] == channel3_json['channel_id']
@@ -101,59 +85,61 @@ def test_channels_list():
     assert channels_list_json['channels'][1]['name'] == 'channel_name2'
     assert channels_list_json['channels'][2]['name'] == 'private_channel1'
 
+    #  Check that the channel_list2 info matches that was created.
+    #  The channels_list will return in the order of channel_id, so the lowest channel_id, 
+    #  will be the first in the list
+    assert len(channels_list2_json['channels']) == 3
+    assert channels_list2_json['channels'][0]['channel_id'] == channel1_json['channel_id']
+    assert channels_list2_json['channels'][1]['channel_id'] == channel4_json['channel_id']   
+    assert channels_list2_json['channels'][2]['channel_id'] == channel5_json['channel_id'] 
+    
+    assert channels_list2_json['channels'][0]['name'] == 'channel_name1'
+    assert channels_list2_json['channels'][1]['name'] == 'test_pub_channel'
+    assert channels_list2_json['channels'][2]['name'] == 'test_pri_channel'
 
-    # clear_v1()
-    # user1 = auth_register_v1('abc@def.com', 'password', 'first', 'last')
-    # id1 = user1['auth_user_id']
-    # channels_create_v1(id1, 'test_channel', True)
-    # channels_create_v1(id1, 'test_channel', False)
-    # with pytest.raises(AccessError):
-    #     channels_list_v1(2)
-    # with pytest.raises(InputError):
-    #     channels_list_v1(-2)
-    # with pytest.raises(InputError):
-    #     channels_list_v1(True)
-    # with pytest.raises(InputError):
-    #     channels_list_v1('String')
-    # with pytest.raises(InputError):
-    #     channels_list_v1('')
-
-def test_channels_list_invalid_token():
+@pytest.mark.usefixtures('clear_register_two')
+def test_channel_list_not_in_channel(clear_register_two):
     """
-    Create channel, and test a non-valid id.
-
-    Arguments: N/A
-
-    Exceptions:
-        AccessError -   for the non valid id case below
-
-    Return Value: N/A
+    Create two users, user1 creates a channel
+    user2 tries to call channel_list
     """
+    user1_token = clear_register_two[0]['token']
+    user2_token = clear_register_two[1]['token']
 
+    # create channel1 (Public).
+    # This just ensures there is at least 1 channel in the data_store.
+    channel1 = requests.post(config.url + 'channels/create/v2', 
+                            json={'token': user1_token, 'name': 'channel_name1', 'is_public': True})
+    assert channel1.status_code == 200
+
+    # Channel_list for user 2, which they are not in any channels.
+    channels_list = requests.get(config.url + 'channels/list/v2', params = {'token': user2_token})
+    channels_list_json = channels_list.json()
+    # As user2 is not in any channels, the return is empty, thus has a length of 0.
+    assert len(channels_list_json['channels']) == 0
+
+
+@pytest.mark.usefixtures('clear_register_createchannel')
+def test_channels_list_invalid_token(clear_register_createchannel):
     """
-    Create a user, create two channels, give an incorrect token value to channels_list
+    Create a user and a channel with clear_register_createchannel.
+    Tries to create a channel_list with all possible invalid token's
     """
-    requests.delete(config.url + 'clear/v1')
-
-    user1 = requests.post(config.url + 'auth/register/v2', 
-                            json={'email': 'abc@def.com', 'password': 'password',
-                               'name_first': 'first', 'name_last': 'last'})
-    user1_json = user1.json()
-
-    requests.post(config.url + 'channels/create/v2', 
-                            json={'token': user1_json['token'], 'name': 'public_channel', 'is_public': True})
-
-    requests.post(config.url + 'channels/create/v2', 
-                            json={'token': user1_json['token'], 'name': 'priv_channel', 'is_public': False})
 
     # passing incorrect string as token.
     channels_list_json = requests.get(config.url + 'channels/list/v2', params = {'token': 'SomeWordsHere'})
     assert channels_list_json.status_code == 403 # AccessError
 
+    # passing incorrect string as token.
+    channels_list_json = requests.get(config.url + 'channels/list/v2', params = {'token': ''})
+    assert channels_list_json.status_code == 400 
+
     # passing int as a token.
     channels_list_json = requests.get(config.url + 'channels/list/v2', params = {'token': 4444})
     assert channels_list_json.status_code == 400
 
+    channels_list_json = requests.get(config.url + 'channels/list/v2', params = {'token': -1})
+    assert channels_list_json.status_code == 400
     # passing a True bool as a token
     channels_list_json = requests.get(config.url + 'channels/list/v2', params = {'token': True})
     assert channels_list_json.status_code == 400
@@ -162,14 +148,13 @@ def test_channels_list_invalid_token():
     channels_list_json = requests.get(config.url + 'channels/list/v2', params = {'token': False})
     assert channels_list_json.status_code == 400
 
-    # an expired token passed to channels list.
-    expired_token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MSwic2Vzc2lvbl9pZCI6MSwiaGFuZGxlIjoiZmly\
-        c3RsYXN0IiwiZXhwIjoxNTQ3OTc3ODgwfQ.366QLXfCURopcjJbAheQYLVNlGLX_INKVwr8_TVXYEQ'
-
     channels_list_json = requests.get(config.url + 'channels/list/v2', params = {'token': expired_token})
     assert channels_list_json.status_code == 403
 
+    channels_list_json = requests.get(config.url + 'channels/list/v2', params = {'token': unsaved_token})
+    assert channels_list_json.status_code == 403
 
+<<<<<<< HEAD
     # channels_list_json = channels_list.json()
     # assert channels_list_json.status_code == 400
     # clear_v1()
@@ -199,4 +184,6 @@ def test_channels_list_invalid_token():
 #                             json={'token': user1['token'], 'name': 'public_channel', 'is_public': True})
     
 #     assert channel.status_code == 403
+=======
+>>>>>>> master
 requests.delete(config.url + 'clear/v1')
