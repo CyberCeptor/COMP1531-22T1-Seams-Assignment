@@ -186,7 +186,7 @@ def test_admin_userpermission_change_one_global_owner(clear_register_two):
     assert resp.status_code == 400
 
 @pytest.mark.usefixtures('clear_register_two')
-def admin_userpermission_change_unchanged_perms(clear_register_two):
+def test_admin_userpermission_change_unchanged_perms(clear_register_two):
     """ a global owner is trying to change the permission ids of themselves and
     another user to permission they already have """
 

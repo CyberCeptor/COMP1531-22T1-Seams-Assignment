@@ -139,7 +139,7 @@ def test_admin_user_remove_works(clear_register_two):
     assert profile['email'] == 'def@ghi.com'
     assert profile['name_first'] == 'Removed'
     assert profile['name_last'] == 'user'
-    assert profile['handle_str'] == 'first2last2'
+    assert profile['handle_str'] == 'firstlast0'
 
     # user2's new profile should have the same email and handle since it is now
     # reusable
@@ -161,6 +161,76 @@ def test_admin_user_remove_works(clear_register_two):
     assert new_profile['name_first'] == 'first'
     assert new_profile['name_last'] == 'last'
     assert new_profile['handle_str'] == 'firstlast0'
+
+@pytest.mark.usefixtures('clear_register_createchannel')
+def test_admin_user_remove_not_in_channel_or_dm(clear_register_createchannel):
+    """ user1 removes user3, check that they are not in any channels or dms """
+
+    token1 = clear_register_createchannel[0]['token']
+
+    chan_id = clear_register_createchannel[1]
+
+    # register a second user
+    resp0 = requests.post(config.url + 'auth/register/v2',
+                          json={'email': 'def@ghi.com', 'password': 'password',
+                                'name_first': 'first', 'name_last': 'last'})
+    assert resp0.status_code == 200
+    user2 = resp0.json()
+    id2 = user2['auth_user_id']
+
+    # register a third user
+    resp1 = requests.post(config.url + 'auth/register/v2',
+                         json={'email': 'ghi@jkl.com', 'password': 'password',
+                               'name_first': 'first', 'name_last': 'last'})
+    assert resp1.status_code == 200
+    user3 = resp1.json()
+    id3 = user3['auth_user_id']
+
+    # there will be one owner member and two members in total
+    resp2 = requests.get(config.url + 'channel/details/v2',
+                         params={'token': token1, 'channel_id': chan_id})
+    assert resp2.status_code == 200
+    chan_data = resp2.json()
+    assert len(chan_data['owner_members']) == 1
+    assert len(chan_data['all_members']) == 1
+
+    # assert that user3 is not in the channel
+    assert id3 not in [k['u_id'] for k in chan_data['all_members']]
+    assert id3 not in [k['u_id'] for k in chan_data['owner_members']]
+
+    # user1 creates a dm consisting of themselves and user1
+    resp3 = requests.post(config.url + 'dm/create/v1', 
+                          json={'token': token1, 'u_ids': [id2]})
+    assert resp3.status_code == 200
+    dm_data = resp3.json()
+    dm_id = dm_data['dm_id']
+
+    # there will only be two dm members in total
+    resp4 = requests.get(config.url + 'dm/details/v1',
+                         params={'token': token1, 'dm_id': dm_id})
+    assert resp4.status_code == 200
+    dm_data = resp4.json()
+    assert len(dm_data['members']) == 2
+
+    # check that user3 has not sent any messages in a channel
+    resp6 = requests.get(config.url + 'channel/messages/v2',
+                         params={'token': token1, 'channel_id': chan_id,
+                                 'start': 0})
+    assert resp6.status_code == 200
+    chan_msgs_data = resp6.json()
+    assert id3 not in [k['u_id'] for k in chan_msgs_data['messages']]
+
+    # check that user3 has not sent any messages in a dm
+    resp7 = requests.get(config.url + 'dm/messages/v1',
+                         params={'token': token1, 'dm_id': dm_id, 'start': 0})
+    assert resp7.status_code == 200
+    dm_msgs_data = resp7.json()
+    assert id3 not in [k['u_id'] for k in dm_msgs_data['messages']]
+
+    # user1 removes user3
+    resp8 = requests.delete(config.url + 'admin/user/remove/v1', 
+                          json={'token': token1, 'u_id': id3})
+    assert resp8.status_code == 200
 
 @pytest.mark.usefixtures('clear_register_two')
 def test_admin_user_remove_only_one_global_owner(clear_register_two):

@@ -2,7 +2,7 @@
 Filename: clear_register_createchannel.py
 
 Author: Aleesha Bunrith(z5371516)
-Created: 27/03/2022
+Created: 28/03/2022
 
 Description: pytest fixture for registering one user then creating a channel
 """
@@ -23,6 +23,7 @@ def clear_register_createchannel(clear_register):
     chan = requests.post(config.url + 'channels/create/v2',
                         json={'token': user1['token'], 'name': 'channel_name',
                             'is_public': True})
-
+    assert chan.status_code == 200
     chan_data = chan.json()
+    
     return [user1, chan_data['channel_id']]

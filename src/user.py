@@ -9,8 +9,8 @@ Description:
     -   user_profile_v1: return the user information from a token and u_id.
     -   user_setemail_v1: set a new email for the user, in users, and the
         channels the user is in
-    -   user_setname_v1: set the user's first name and last name, in the user and
-        channels data_store
+    -   user_setname_v1: set the user's first name and last name, in the user
+        and channels data_store
     - user_set_handle_v1: set the user's handle with the new information
         Helper Function: 
             - check_valid_handle: checks the handle is authentic
@@ -22,16 +22,23 @@ from src.other import check_valid_auth_id, cast_to_int_get_requests
 from src.auth import check_invalid_email, check_invalid_name
 from src.error import InputError
 
-VALID_EMAIL_REGEX = r'^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}$'
-
-
 def user_profile_v1(token, u_id):
     """
     For a valid user, returns information about their user_id, firstname,
     last name, and handle
+
+    Arguments:
+        token (str) - a valid jwt token string
+        u_id (int)  - an int specifying a user
+
+    Exceptions: N/A
+
+    Return: Returns a user's user_id, email, name_first, name_last, handle_str
     """
 
     token_valid_check(token)
+
+    # cast u_id into an int since it is a GET request
     u_id = cast_to_int_get_requests(u_id, 'user id')
 
     check_valid_auth_id(u_id)
@@ -52,17 +59,20 @@ def user_profile_v1(token, u_id):
 
     return user
 
-
-"""
-Update the authorised user's email address
-
-PUT
-
-    InputError:
-        - email entered is not a valid email
-        - email address is already used by another user
-"""
 def user_profile_setemail_v1(token, email):
+    """
+    Update the authorised user's email
+    
+    Arguments:
+        -   token
+        -   email
+    
+    Exceptions:
+        InputError: given email does not match the given valid email regex
+    
+    Return Value: N/A
+    """
+
     store = data_store.get()
 
     # check the email is valid (i.e. usable email address, format)
@@ -72,7 +82,7 @@ def user_profile_setemail_v1(token, email):
     token_valid_check(token)
     user_id = token_get_user_id(token)
 
-    check_invalid_email(store, VALID_EMAIL_REGEX, str(email))
+    check_invalid_email(store, str(email))
 
     # set the user email to the new email
     for user in store['users']:
@@ -98,22 +108,23 @@ def user_profile_setemail_v1(token, email):
     data_store.set(store)
     return {}
 
-
 def user_profile_setname_v1(token, name_first, name_last):
     """
-Update the authorised user's first and last name
-PUT
-Arguments:
-    -   token
-    -   name_first
-    -   name_last
-Exceptions:
-    InputError:
-        -   length of name_first is not between 1 and 50 characters inclusive
-        -   length of name_last is not between 1 and 50 characters inclusive
-Return Value:
-    N/A
-"""
+    Update the authorised user's first and last name
+    
+    Arguments:
+        -   token
+        -   name_first
+        -   name_last
+    
+    Exceptions:
+        InputError:
+            -  length of name_first is not between 1 and 50 characters inclusive
+            -  length of name_last is not between 1 and 50 characters inclusive
+    
+    Return Value: N/A
+    """
+
     store = data_store.get()
 
     # check the name is valid (i.e. usable name_first, name_last)
@@ -161,6 +172,20 @@ Return Value:
     return {}
 
 def check_invalid_handle(store, handle_str):
+    """
+    checks if a given handle_str is invalid
+
+    Arguments:
+        store (data)     - the stored data
+        handle_str (str) - a str that the user wants to change their handle to
+
+    Exceptions: 
+        InputError - Raised if handle_str input is of invalid type, length, is 
+                     not alphanumeric, and if a user already has the same handle
+
+    Return Value: N/A
+    """
+
     # check handle is string or bool
     if type(handle_str) is not str or type(handle_str) is bool:
         raise InputError(description='Invalid handle_str')
@@ -178,18 +203,32 @@ def check_invalid_handle(store, handle_str):
         if user['handle'] == handle_str and user['removed'] is False:
             raise InputError(description='Handle has already been taken')
 
-
 def user_profile_sethandle_v1(token, handle_str):
+    """
+    updates a user's handle to the given handle_str if valid
+
+    Arguments:
+        token (str)      - a valid jwt token string
+        handle_str (str) - a str that the user wants to change their handle to
+
+    Exceptions: 
+        InputError - Raised if handle_str input is invalid
+
+    Return Value: N/A
+    """
+
     store = data_store.get()
     token_valid_check(token)
     user_id = token_get_user_id(token)
 
     check_invalid_handle(store, handle_str)
 
+    # set user's handle to new handle in stored data
     for user in store['users']:
         if user['id'] == user_id:
             user['handle'] = handle_str
 
+    # set user's handle to new handle in channel data
     for channel in store['channels']:
         for user in channel['all_members']:
             if user['u_id'] == user_id:
@@ -198,6 +237,7 @@ def user_profile_sethandle_v1(token, handle_str):
             if user['u_id'] == user_id:
                 user['handle_str'] = handle_str
 
+    # set user's handle to new handle in dm data
     for dm in store['dms']:
         for user in dm['members']:
             if user['u_id'] == user_id:
@@ -205,4 +245,3 @@ def user_profile_sethandle_v1(token, handle_str):
 
     data_store.set(store)
     return {}
-

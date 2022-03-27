@@ -13,13 +13,21 @@ Description: implementation for
         - checking if a user is a global owner
         - casting a variable into an int to check for invalid inputs for
           GET requests
+        - getting messages from a channel or dm
+        - sending a message to a channel or dm
+        - checking if a dm id is valid
 """
 
+import datetime
+
+from datetime import timezone
+
 from src.error import InputError, AccessError
+from src.token import token_valid_check, token_get_user_id
 
 from src.data_store import data_store
 
-from src.global_vars import reset_id
+from src.global_vars import new_id, reset_id
 
 def clear_v1():
     """
@@ -37,9 +45,10 @@ def clear_v1():
     store['tokens'].clear()
     store['dms'].clear()
     data_store.set(store)
+    
     reset_id('session')
     reset_id('message')
-    reset_id('id')
+    reset_id('dm')
     
 def check_valid_auth_id(auth_user_id):
     """
@@ -59,10 +68,10 @@ def check_valid_auth_id(auth_user_id):
     """
     
     if isinstance(auth_user_id, int) is False or type(auth_user_id) is bool:
-        raise InputError('User id is not of a valid type')
+        raise InputError(description='User id is not of a valid type')
 
     if auth_user_id < 1:
-        raise InputError('The user id is not valid (out of bounds)')
+        raise InputError(description='The user id is not valid')
 
     # if the auth_user_id is found, return the user data
     store = data_store.get()
@@ -71,7 +80,7 @@ def check_valid_auth_id(auth_user_id):
             return user
 
     # if the auth_user_id is not found, raise an InputError
-    raise InputError('User does not exist in users database')
+    raise InputError(description='User does not exist in users database')
 
 def check_valid_channel_id(channel_id):
     """
@@ -91,13 +100,13 @@ def check_valid_channel_id(channel_id):
     
     # bools are read as int's 0 & 1, so need to check prior
     if type(channel_id) is bool:
-        raise InputError('Invalid channel_id type')
+        raise InputError(description='Invalid channel_id type')
 
     # for GET requests since params are taken in as strings
     channel_id = cast_to_int_get_requests(channel_id, 'channel id')
 
     if channel_id < 1:
-        raise InputError('The channel id is not valid (out of bounds)')
+        raise InputError(description='The channel id is not valid')
 
     # if the channel_id is found, return the user data
     store = data_store.get()
@@ -106,7 +115,7 @@ def check_valid_channel_id(channel_id):
             return channel
 
     # if the channel_id is not found, raise an InputError
-    raise InputError('Channel does not exist in channels database')
+    raise InputError(description='Channel does not exist in channels database')
 
 def check_user_is_member(auth_user_id, data, key):
     """
@@ -207,7 +216,7 @@ def get_messages(auth_user_id, data, start, data_str):
 
     # check whether given user is in the given channel
     if check_user_is_member(auth_user_id, data, key) is None:
-        raise AccessError(f'User does not exist in {data_str}')
+        raise AccessError(description=f'User does not exist in {data_str}')
 
     total_messages = len(data['messages'])
 
@@ -215,9 +224,9 @@ def get_messages(auth_user_id, data, start, data_str):
     start = cast_to_int_get_requests(start, 'start')
 
     if start < 0:
-        raise InputError('Invalid start')
+        raise InputError(description='Invalid start')
     elif start > total_messages:
-        raise InputError('Invalid start, not enough messages')
+        raise InputError(description='Invalid start, not enough messages')
 
     # return an empty messages list if there are no messages to get
     if total_messages == 0:
@@ -256,4 +265,106 @@ def get_messages(auth_user_id, data, start, data_str):
         'start': start,
         'end': end,
     }
-    
+
+def send_message(token, data_id, message, data_str):
+    """
+    Helper function for message/send and message/senddm: If token given is an
+    authorised user, sends the message to a specified channel/dm with input
+    data_id
+
+    Arguments:
+        token (str)    - unique str representation of user
+        dm_id (int)    - integer specifies a dm or channel
+        message (str)  - message that the user wishes to send
+        data_str (str) - a string used to print out any error messages if
+                         InputError is raised and to check if message is being
+                         sent to a channel or dm
+
+    Exceptions:
+        AccessError - 
+        InputError  - 
+
+    Return Value:
+        Message_id - int to specifies each message
+    """
+
+    store = data_store.get()
+
+    token_valid_check(token)
+    auth_user_id = token_get_user_id(token)
+
+    # check if dm_id/channel_id are valid
+    if data_str == 'channel':
+        data_info = check_valid_channel_id(data_id)
+        data_id = data_info['channel_id']
+        key = 'all_members'
+    elif data_str == 'dm':
+        data_info = check_valid_dm_id(data_id)
+        data_id = data_info['dm_id']
+        key = 'members'
+
+    if check_user_is_member(auth_user_id, data_info, key) is None:
+        raise AccessError(description=f'User does not exist in {data_str}')
+
+    if not isinstance(message, str):
+        raise InputError(description='Message is a string')
+
+    if message == '':
+        raise InputError(description='Empty message input')
+
+    if len(message) > 1000:
+        raise InputError(description='Message must not exceed 1000 characters')
+
+    # increament message id for the store message
+    message_id = new_id('message')
+
+    # generate timestamp
+    time = datetime.datetime.now(timezone.utc)
+    utc_time = time.replace(tzinfo=timezone.utc)
+    utc_timestamp = utc_time.timestamp()
+
+    message_data = {
+        'message_id': message_id, 
+        'u_id': auth_user_id, 
+        'message': message, 
+        'time_sent': utc_timestamp
+    }
+
+    data_info['messages'].insert(0, message_data)
+
+    data_store.set(store)
+
+    return {
+        'message_id': message_id
+    }
+
+def check_valid_dm_id(dm_id):
+    """
+    clears any data stored in data_store and registers users with the
+    given information, create the dm with token and u_ids
+
+    Arguments: token
+               u_ids
+
+    Exceptions: InputError - raised by duplicate ids
+                InputError - raised by invalid ids
+
+    Return Value: dm_id
+    """
+
+    if type(dm_id) is bool:
+        raise InputError('dm id is not of a valid type')
+
+    # cast dm_id to an int since it is a GET request
+    dm_id = cast_to_int_get_requests(dm_id, 'dm id')
+
+    if dm_id < 1:
+        raise InputError('The dm id is not valid (out of bounds)')
+
+    store = data_store.get()
+    for dm in store['dms']:
+       if dm['dm_id'] == dm_id:
+            return dm
+
+    # if the dm_id is not found, raise an AccessError
+    raise InputError('dm does not exist in dms')
