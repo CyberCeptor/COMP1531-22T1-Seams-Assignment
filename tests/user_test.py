@@ -3,40 +3,16 @@ import requests
 
 from src import config
 
-
-@pytest.fixture(name='clear_and_register')
-def fixture_clear_and_register():
-    """ clears any data stored in data_store and registers a user with the
-    given information
-
-    Arguments: N/A
-
-    Exceptions: N/A
-
-    Return Value: user_data in json form.
-    """
-    requests.delete(config.url + 'clear/v1')
-    user = requests.post(config.url + 'auth/register/v2', 
-                  json={'email': 'abc@def.com', 'password': 'password',
-                        'name_first': 'first', 'name_last': 'last'})
-    user_json = user.json()
-    return user_json
-
-def test_user_profile(clear_and_register):
+@pytest.mark.usefixtures('clear_register')
+def test_user_profile_working(clear_register):
     """
     Create two users,
     then calls user_profile_v1 with the token of the first user,
     and the id of the second user.
     Returns the info of the ID given. (i.e., the second user)
-
-    Arguments: clear_and_register
-
-    Exceptions: N/A
-
-    Return Value: N/A
     """
 
-    user0_json = clear_and_register
+    user0_json = clear_register
 
     user1 = requests.post(config.url + 'auth/register/v2', 
                   json={'email': 'def@abc.com', 'password': 'password',
@@ -57,8 +33,8 @@ def test_user_profile(clear_and_register):
         'handle_str': 'firstlast',
     }
 
-
-def test_profile_bad_token_input(clear_and_register):
+@pytest.mark.usefixtures('clear_register')
+def test_profile_bad_token_input(clear_register):
     """
     Calls user_profile with a bad token:
         -   a string
@@ -67,19 +43,10 @@ def test_profile_bad_token_input(clear_and_register):
         -   an empty string
         -   an expired token
         -   an unsaved token
-
-    Arguments: 
-        clear_and_register
-
-    Exceptions: 
-        InputError - Raised for int, bool, empty string
-        AccessError - Raised for invalid token (string)
-
-    Return Value: N/A
     """
 
     '''Testing with a bad token'''
-    user_json = clear_and_register
+    user_json = clear_register
     user_profile = requests.get(config.url + 'user/profile/v1', 
                     params={'token': 'bad_token', 'u_id': user_json['auth_user_id']})
     assert user_profile.status_code == 403
@@ -119,8 +86,8 @@ def test_profile_bad_token_input(clear_and_register):
     assert user_profile.status_code == 403
 
 
-
-def test_profile_bad_u_id_input(clear_and_register):
+@pytest.mark.usefixtures('clear_register')
+def test_profile_bad_u_id_input(clear_register):
     """
     Calls user_profile with a bad user_id:
         -   an invalid user_id, not in the data_store
@@ -128,18 +95,9 @@ def test_profile_bad_u_id_input(clear_and_register):
         -   a boolean
         -   an empty string
         -   a string
-
-    Arguments: 
-        clear_and_register
-
-    Exceptions: 
-        InputError - Raised for neg-int, bool, strings
-        AccessError - Raised for invalid user_id (not in data)
-
-    Return Value: N/A
     """
 
-    user_json = clear_and_register
+    user_json = clear_register
     '''tesing with a bad id as an int'''
     user_profile = requests.get(config.url + 'user/profile/v1', 
                     params={'token': user_json['token'], 'u_id': 100})
