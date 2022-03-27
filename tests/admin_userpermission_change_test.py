@@ -20,12 +20,22 @@ def test_admin_userpermission_change_works(clear_register_two):
     """ user1, a global owner, changes the permissions of user2, a normal
     member, so that they also become a global owner """
 
-    token = clear_register_two[0]['token']
+    token1 = clear_register_two[0]['token']
+    id1 = clear_register_two[0]['auth_user_id']
+
+    token2 = clear_register_two[1]['token']
     id2 = clear_register_two[1]['auth_user_id']
 
+    # change user2 to a global owner
     resp0 = requests.post(config.url + 'admin/userpermission/change/v1',
-                          json={'token': token, 'u_id': id2,
+                          json={'token': token1, 'u_id': id2,
                                 'permission_id': 1})
+    assert resp0.status_code == 200
+
+    # user2 can now demote user1 to a normal user
+    resp0 = requests.post(config.url + 'admin/userpermission/change/v1',
+                          json={'token': token2, 'u_id': id1,
+                                'permission_id': 2})
     assert resp0.status_code == 200
 
 @pytest.mark.usefixtures('clear_register_two')
@@ -170,10 +180,10 @@ def test_admin_userpermission_change_one_global_owner(clear_register_two):
     id = clear_register_two[0]['auth_user_id']
 
     # demoting own permissions but there is only one global owner
-    resp0 = requests.post(config.url + 'admin/userpermission/change/v1',
+    resp = requests.post(config.url + 'admin/userpermission/change/v1',
                           json={'token': token, 'u_id': id,
                                 'permission_id': 2})
-    assert resp0.status_code == 400
+    assert resp.status_code == 400
 
 @pytest.mark.usefixtures('clear_register_two')
 def admin_userpermission_change_unchanged_perms(clear_register_two):
