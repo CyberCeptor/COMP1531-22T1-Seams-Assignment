@@ -47,15 +47,33 @@ def test_user_setname_working(clear_and_register):
     channel1 = channel1.json()
     channel_id = channel1['channel_id']
 
+    '''# create a dm, add the other user as an owner aswell, 
+    # to Test that all information is updated
+    dm1 = requests.post(config.url + 'dm/create/v1', 
+                            json={'token': user1['token'], 'u_ids': user2['auth_user_id']})
+    assert dm1.status_code == 200
+    dm1 = dm1.json()
+    dm_id = dm1['dm_id']'''
+
     # Add the 2nd user to the channel
     join = requests.post(config.url + 'channel/join/v2',
                         json={'token': user2['token'], 'channel_id': channel_id})
     assert join.status_code == 200
 
+    '''# Add the 2nd user to the dm
+    join = requests.post(config.url + 'dm/join/v1',
+                        json={'token': user2['token'], 'dm_id': dm_id})
+    assert join.status_code == 200'''
+
     # add them as an owner of the channel
     addowner = requests.post(config.url + 'channel/addowner/v1',
                         json={'token': user1['token'], 'channel_id': channel_id, 'u_id': user2['auth_user_id']})
     assert addowner.status_code == 200
+
+    '''# add them as an owner of the dm
+    addowner = requests.post(config.url + 'dm/addowner/v1',
+                        json={'token': user1['token'], 'dm_id': dm_id, 'u_id': user2['auth_user_id']})
+    assert addowner.status_code == 200'''
 
     # changing the name of both users.
     setname = requests.put(config.url + 'user/profile/setname/v1', 
@@ -77,18 +95,29 @@ def test_user_setname_working(clear_and_register):
                             params={'token': user1['token'], 'channel_id': channel1['channel_id']})
     channels_json = channels_details.json()
 
+    '''# Assert that the all_members and owner_members dm name has also been updated
+    # check the data in the dm is correct
+    dms_details = requests.get(config.url + 'dm/details/v1', 
+                            params={'token': user1['token'], 'dm_id': dm1['dm_id']})
+    dms_json = dms_details.json()'''
+
     assert len(channels_json['owner_members']) == 2
     assert len(channels_json['all_members']) == 2
+    '''assert len(dms_json['members']) == 2'''
 
     assert channels_json['owner_members'][0]['name_first'] == 'first3'
     assert channels_json['owner_members'][0]['name_last'] == 'last3'
     assert channels_json['all_members'][0]['name_first'] == 'first3'
     assert channels_json['all_members'][0]['name_last'] == 'last3'
+    '''assert dms_json['members'][0]['name_first'] == 'first3'
+    assert dms_json['members'][0]['name_last'] == 'last3''''
 
     assert channels_json['owner_members'][1]['name_first'] == 'first'
     assert channels_json['owner_members'][1]['name_last'] == 'last'
     assert channels_json['all_members'][1]['name_first'] == 'first'
     assert channels_json['all_members'][1]['name_last'] == 'last'
+    '''assert dms_json['members'][1]['name_first'] == 'first'
+    assert dms_json['members'][1]['name_last'] == 'last''''
 
 def test_user_profile_setname_bad_name_first(clear_and_register):
     user1 = clear_and_register[0]
@@ -124,8 +153,9 @@ def test_user_profile_setname_bad_name_first(clear_and_register):
     assert setname.status_code == 400
 
     # test > 50 int
+    name51 = 'hsfdfhwgnhbwihbnfgdosihgdsiohgnisdghjnliksdhjgilksdnhfgkl;dsnglsikdfjksdhjfkolhsdiklghniksdhngikhnsdighnisdglik;sj'
     setname = requests.put(config.url + 'user/profile/setname/v1', 
-                            json={'token': user1['token'], 'name_first': 51, 'name_last': 'last'})
+                            json={'token': user1['token'], 'name_first': name51, 'name_last': 'last'})
     assert setname.status_code == 400
 
     requests.delete(config.url + 'clear/v1')
@@ -165,8 +195,9 @@ def test_user_profile_setname_bad_name_last(clear_and_register):
     assert setname.status_code == 400
 
     # test > 50 int
+    name51 = 'hsfdfhwgnhbwihbnfgdosihgdsiohgnisdghjnliksdhjgilksdnhfgkl;dsnglsikdfjksdhjfkolhsdiklghniksdhngikhnsdighnisdglik;sj'
     setname = requests.put(config.url + 'user/profile/setname/v1', 
-                            json={'token': user1['token'], 'name_first': 'first', 'name_last': 51})
+                            json={'token': user1['token'], 'name_first': 'first', 'name_last': name51})
     assert setname.status_code == 400
 
     requests.delete(config.url + 'clear/v1')
