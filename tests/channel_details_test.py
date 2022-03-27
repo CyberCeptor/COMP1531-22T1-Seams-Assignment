@@ -30,50 +30,34 @@ def test_channel_details_invalid_token(clear_register_createchannel):
     # token is int
     chan_id = clear_register_createchannel[1]
     resp0 = requests.get(config.url + 'channel/details/v2', 
-                          params = {'token': 0, 'channel_id': chan_id})
+                          params={'token': 0, 'channel_id': chan_id})
     assert resp0.status_code == 400
     # token is boo
     resp1 = requests.get(config.url + 'channel/details/v2', 
-                          params = {'token': True, 'channel_id': chan_id})
+                          params={'token': True, 'channel_id': chan_id})
     assert resp1.status_code == 400
     # token input empty
     resp2 = requests.get(config.url + 'channel/details/v2', 
-                          params = {'token': '', 'channel_id': chan_id})
+                          params={'token': '', 'channel_id': chan_id})
     assert resp2.status_code == 400
     # wrong token input
     resp3 = requests.get(config.url + 'channel/details/v2', 
-                          params = {'token': 'not right string', 'channel_id': chan_id})
+                          params={'token': 'not right string', 'channel_id': chan_id})
     assert resp3.status_code == 403
     # expired token
     expired_token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MSwic2Vzc\
         2lvbl9pZCI6MSwiaGFuZGxlIjoiZmlyc3RsYXN0IiwiZXhwIjoxNTQ3\
             OTc3ODgwfQ.366QLXfCURopcjJbAheQYLVNlGLX_INKVwr8_TVXYEQ'
     resp4 = requests.get(config.url + 'channel/details/v2', 
-                          params = {'token': expired_token, 'channel_id': chan_id})
+                          params={'token': expired_token, 'channel_id': chan_id})
     assert resp4.status_code == 403
     # unsaved token
     unsaved_token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MSwic2Vzc2lvbl9pZCI6MSw\
             iaGFuZGxlIjoiZmlyc3RsYXN0IiwiZXhwIjoyNTQ3OTc3ODgwfQ.ckPPWiR-m6x0IRq\
             pQtKmJgNLiD8eAEiTv2i8ToK3mkY'
     resp5 = requests.get(config.url + 'channel/details/v2', 
-                          params = {'token': unsaved_token, 'channel_id': chan_id})
+                          params={'token': unsaved_token, 'channel_id': chan_id})
     assert resp5.status_code == 403
-
-    # # no user input
-    # with pytest.raises(InputError):
-    #     channel_details_v1('', chan_id1)
-    # # wrong type user input
-    # with pytest.raises(InputError):
-    #     channel_details_v1('not int', chan_id1)
-    # # wrong type user input
-    # with pytest.raises(InputError):
-    #     channel_details_v1(True, chan_id1)
-    # # user is not in the channel
-    # with pytest.raises(AccessError):
-    #     channel_details_v1(2, chan_id1)
-    # # non exist user input
-    # with pytest.raises(InputError):
-    #     channel_details_v1(-1, chan_id1)
 
 
 @pytest.mark.usefixtures('clear_register_createchannel')
@@ -89,38 +73,22 @@ def test_channel_details_invalid_channel(clear_register_createchannel):
     Return Value: N/A
     """
   
-    # # no channel id input
-    # with pytest.raises(InputError):
-    #     channel_details_v1(id1, '')
-    # # wrong channel id input
-    # with pytest.raises(InputError):
-    #     channel_details_v1(id1, -1)
-    # # wrong type channel id input
-    # with pytest.raises(InputError):
-    #     channel_details_v1(id1, 'not int')
-    # # non-existant channel
-    # with pytest.raises(InputError):
-    #     channel_details_v1(id1, 6)
-    # # wrong type channel id input
-    # with pytest.raises(InputError):
-    #     channel_details_v1(id1, True)
-  
     token = clear_register_createchannel[0]['token']
     # no channel id input
     resp0 = requests.get(config.url + 'channel/details/v2', 
-                          params = {'token': token, 'channel_id': ''})
+                          params={'token': token, 'channel_id': ''})
     assert resp0.status_code == 400
     # channel id is boo
     resp1 = requests.get(config.url + 'channel/details/v2', 
-                          params = {'token': token, 'channel_id': True})
+                          params={'token': token, 'channel_id': True})
     assert resp1.status_code == 400
     # channel id is string
     resp2 = requests.get(config.url + 'channel/details/v2', 
-                          params = {'token': token, 'channel_id': 'str'})
+                          params={'token': token, 'channel_id': 'str'})
     assert resp2.status_code == 400
     # wrong channel input
     resp3 = requests.get(config.url + 'channel/details/v2', 
-                          params = {'token': token, 'channel_id': 2})
+                          params={'token': token, 'channel_id': 2})
     assert resp3.status_code == 400
     
 
@@ -145,9 +113,9 @@ def test_user_not_belong(clear_register_createchannel):
                                'name_first': 'first2', 'name_last': 'last2'}) 
     user2_data = user2.json()
     token_2 = user2_data['token']
-
+    # raise access error when user is not in the channel
     resp0 = requests.get(config.url + 'channel/details/v2', 
-                          params = {'token': token_2, 'channel_id': chan_id})
+                          params={'token': token_2, 'channel_id': chan_id})
     assert resp0.status_code == 403
     
     requests.delete(config.url + 'clear/v1')
@@ -173,7 +141,7 @@ def test_channel_details_return(clear_register_createchannel):
 
     # success run
     resp = requests.get(config.url + 'channel/details/v2', 
-                          params = {'token': token, 'channel_id': chan_id})
+                          params={'token': token, 'channel_id': chan_id})
     assert resp.status_code == 200
 
     channel_details = resp.json()
@@ -189,26 +157,8 @@ def test_channel_details_return(clear_register_createchannel):
     assert channel_details['name'] == 'channel_name'
     assert channel_details['is_public'] == True
     assert channel_details['owner_members'] == owner_members
+    # user 1 is the only member in this channel for now
     assert channel_details['all_members']== owner_members
 
-    
-    # assert result == {
-    #     'name': 'channel_name',
-    #     'is_public': True,
-    #     'owner_members': [{
-    #         'u_id': id1,
-    #         'email': 'abc@def.com',
-    #         'name_first': 'first',
-    #         'name_last': 'last',
-    #         'handle_str': 'firstlast'
-    #     }],
-    #     'all_members': [{
-    #         'u_id': id1,
-    #         'email': 'abc@def.com',
-    #         'name_first': 'first',
-    #         'name_last': 'last',
-    #         'handle_str': 'firstlast'
-    #     }]
-    # }
 requests.delete(config.url + 'clear/v1')
 
