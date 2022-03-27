@@ -105,6 +105,15 @@
     <p id="t50" class="run"><span class="n"><a href="#t50">50</a></span><span class="t">        <span class="key">raise</span> <span class="nam">AccessError</span><span class="op">(</span><span class="nam">description</span><span class="op">=</span><span class="str">'Inviter is not in the channel'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p id="t51" class="pln"><span class="n"><a href="#t51">51</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p id="t52" class="run"><span class="n"><a href="#t52">52</a></span><span class="t">    <span class="key">if</span> <span class="nam">check_user_is_member</span><span class="op">(</span><span class="nam">u_id</span><span class="op">,</span> <span class="nam">channel_data</span><span class="op">,</span> <span class="str">'all_members'</span><span class="op">)</span> <span class="key">is</span> <span class="key">not</span> <span class="key">None</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> master
+    <p id="t53" class="run"><span class="n"><a href="#t53">53</a></span><span class="t">        <span class="key">raise</span> <span class="nam">InputError</span><span class="op">(</span><span class="str">'Invitee is already in the channel'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+=======
+>>>>>>> master
     <p id="t53" class="run"><span class="n"><a href="#t53">53</a></span><span class="t">        <span class="key">raise</span> <span class="nam">InputError</span><span class="op">(</span><span class="nam">description</span><span class="op">=</span><span class="str">'Invitee is already in the channel'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p id="t54" class="pln"><span class="n"><a href="#t54">54</a></span><span class="t">    <span class="key">else</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p id="t55" class="run"><span class="n"><a href="#t55">55</a></span><span class="t">        <span class="nam">add_invitee</span><span class="op">(</span><span class="nam">u_id</span><span class="op">,</span> <span class="nam">channel_data</span><span class="op">)</span> <span class="com">#add user</span>&nbsp;</span><span class="r"></span></p>
@@ -275,7 +284,19 @@
     <p id="t220" class="run"><span class="n"><a href="#t220">220</a></span><span class="t">    <span class="key">if</span> <span class="nam">member_data</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p id="t221" class="run"><span class="n"><a href="#t221">221</a></span><span class="t">        <span class="nam">channel_data</span><span class="op">[</span><span class="str">'all_members'</span><span class="op">]</span><span class="op">.</span><span class="nam">remove</span><span class="op">(</span><span class="nam">member_data</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p id="t222" class="pln"><span class="n"><a href="#t222">222</a></span><span class="t">    <span class="key">else</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+<<<<<<< HEAD
     <p id="t223" class="run"><span class="n"><a href="#t223">223</a></span><span class="t">        <span class="key">raise</span> <span class="nam">AccessError</span><span class="op">(</span><span class="nam">description</span><span class="op">=</span><span class="str">'User is not a member of that channel'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+=======
+<<<<<<< HEAD
+    <p id="t223" class="run"><span class="n"><a href="#t223">223</a></span><span class="t">        <span class="key">raise</span> <span class="nam">AccessError</span><span class="op">(</span><span class="str">'User is not a member of that channel'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+=======
+<<<<<<< HEAD
+    <p id="t223" class="run"><span class="n"><a href="#t223">223</a></span><span class="t">        <span class="key">raise</span> <span class="nam">AccessError</span><span class="op">(</span><span class="str">'User is not a member of that channel'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+=======
+    <p id="t223" class="run"><span class="n"><a href="#t223">223</a></span><span class="t">        <span class="key">raise</span> <span class="nam">AccessError</span><span class="op">(</span><span class="nam">description</span><span class="op">=</span><span class="str">'User is not a member of that channel'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+>>>>>>> master
+>>>>>>> master
+>>>>>>> master
     <p id="t224" class="pln"><span class="n"><a href="#t224">224</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p id="t225" class="run"><span class="n"><a href="#t225">225</a></span><span class="t">    <span class="nam">data_store</span><span class="op">.</span><span class="nam">set</span><span class="op">(</span><span class="nam">store</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p id="t226" class="pln"><span class="n"><a href="#t226">226</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
@@ -345,30 +366,94 @@
     <p id="t290" class="pln"><span class="n"><a href="#t290">290</a></span><span class="t">    <span class="com"># if they are, check if there perm_id == 1, if it is, they have permission to add user.</span>&nbsp;</span><span class="r"></span></p>
     <p id="t291" class="run"><span class="n"><a href="#t291">291</a></span><span class="t">    <span class="nam">setter_channel_data</span> <span class="op">=</span> <span class="nam">check_user_is_member</span><span class="op">(</span><span class="nam">inviter_user_id</span><span class="op">,</span> <span class="nam">channel_data</span><span class="op">,</span> <span class="str">'all_members'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p id="t292" class="run"><span class="n"><a href="#t292">292</a></span><span class="t">    <span class="key">if</span> <span class="nam">setter_channel_data</span> <span class="op">==</span> <span class="key">None</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> master
+    <p id="t293" class="run"><span class="n"><a href="#t293">293</a></span><span class="t">        <span class="key">raise</span> <span class="nam">AccessError</span><span class="op">(</span><span class="str">"Not a member of the channel"</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t294" class="pln"><span class="n"><a href="#t294">294</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
+    <p id="t295" class="run"><span class="n"><a href="#t295">295</a></span><span class="t">    <span class="nam">member_data</span> <span class="op">=</span> <span class="nam">check_user_is_member</span><span class="op">(</span><span class="nam">u_id</span><span class="op">,</span> <span class="nam">channel_data</span><span class="op">,</span> <span class="str">'all_members'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t296" class="run"><span class="n"><a href="#t296">296</a></span><span class="t">    <span class="key">if</span> <span class="nam">member_data</span> <span class="key">is</span> <span class="key">None</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t297" class="run"><span class="n"><a href="#t297">297</a></span><span class="t">        <span class="key">raise</span> <span class="nam">InputError</span><span class="op">(</span><span class="str">'User is not a valid member.'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+<<<<<<< HEAD
+=======
+=======
+>>>>>>> master
     <p id="t293" class="run"><span class="n"><a href="#t293">293</a></span><span class="t">        <span class="key">raise</span> <span class="nam">AccessError</span><span class="op">(</span><span class="nam">description</span><span class="op">=</span><span class="str">'Not a member of the channel'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p id="t294" class="pln"><span class="n"><a href="#t294">294</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p id="t295" class="run"><span class="n"><a href="#t295">295</a></span><span class="t">    <span class="nam">member_data</span> <span class="op">=</span> <span class="nam">check_user_is_member</span><span class="op">(</span><span class="nam">u_id</span><span class="op">,</span> <span class="nam">channel_data</span><span class="op">,</span> <span class="str">'all_members'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p id="t296" class="run"><span class="n"><a href="#t296">296</a></span><span class="t">    <span class="key">if</span> <span class="nam">member_data</span> <span class="key">is</span> <span class="key">None</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p id="t297" class="run"><span class="n"><a href="#t297">297</a></span><span class="t">        <span class="key">raise</span> <span class="nam">InputError</span><span class="op">(</span><span class="nam">description</span><span class="op">=</span><span class="str">'User is not a valid member.'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+<<<<<<< HEAD
+=======
+>>>>>>> master
+>>>>>>> master
+>>>>>>> master
     <p id="t298" class="pln"><span class="n"><a href="#t298">298</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p id="t299" class="run"><span class="n"><a href="#t299">299</a></span><span class="t">    <span class="key">if</span> <span class="nam">check_user_is_global_owner</span><span class="op">(</span><span class="nam">inviter_user_id</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p id="t300" class="run"><span class="n"><a href="#t300">300</a></span><span class="t">        <span class="key">pass</span>&nbsp;</span><span class="r"></span></p>
     <p id="t301" class="run"><span class="n"><a href="#t301">301</a></span><span class="t">    <span class="key">elif</span> <span class="nam">check_user_is_member</span><span class="op">(</span><span class="nam">inviter_user_id</span><span class="op">,</span> <span class="nam">channel_data</span><span class="op">,</span> <span class="str">'owner_members'</span><span class="op">)</span> <span class="key">is</span> <span class="key">None</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+<<<<<<< HEAD
     <p id="t302" class="run"><span class="n"><a href="#t302">302</a></span><span class="t">        <span class="key">raise</span> <span class="nam">AccessError</span><span class="op">(</span><span class="nam">description</span><span class="op">=</span><span class="str">'The inviter is not an owner_member'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+=======
+<<<<<<< HEAD
+    <p id="t302" class="run"><span class="n"><a href="#t302">302</a></span><span class="t">        <span class="key">raise</span> <span class="nam">AccessError</span><span class="op">(</span><span class="str">'The inviter is not an owner_member'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+=======
+<<<<<<< HEAD
+    <p id="t302" class="run"><span class="n"><a href="#t302">302</a></span><span class="t">        <span class="key">raise</span> <span class="nam">AccessError</span><span class="op">(</span><span class="str">'The inviter is not an owner_member'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+=======
+    <p id="t302" class="run"><span class="n"><a href="#t302">302</a></span><span class="t">        <span class="key">raise</span> <span class="nam">AccessError</span><span class="op">(</span><span class="nam">description</span><span class="op">=</span><span class="str">'The inviter is not an owner_member'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+>>>>>>> master
+>>>>>>> master
+>>>>>>> master
     <p id="t303" class="pln"><span class="n"><a href="#t303">303</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p id="t304" class="run"><span class="n"><a href="#t304">304</a></span><span class="t">    <span class="key">if</span> <span class="nam">option</span> <span class="op">==</span> <span class="str">'add'</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p id="t305" class="pln"><span class="n"><a href="#t305">305</a></span><span class="t">        <span class="com"># check that the user_id isn't already a owner_member</span>&nbsp;</span><span class="r"></span></p>
     <p id="t306" class="run"><span class="n"><a href="#t306">306</a></span><span class="t">        <span class="key">if</span> <span class="nam">check_user_is_member</span><span class="op">(</span><span class="nam">u_id</span><span class="op">,</span> <span class="nam">channel_data</span><span class="op">,</span> <span class="str">'owner_members'</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+<<<<<<< HEAD
     <p id="t307" class="run"><span class="n"><a href="#t307">307</a></span><span class="t">            <span class="key">raise</span> <span class="nam">InputError</span><span class="op">(</span><span class="nam">description</span><span class="op">=</span><span class="str">'The user is already an owner_member'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+=======
+<<<<<<< HEAD
+    <p id="t307" class="run"><span class="n"><a href="#t307">307</a></span><span class="t">            <span class="key">raise</span> <span class="nam">InputError</span><span class="op">(</span><span class="str">'The user is already an owner_member'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+=======
+<<<<<<< HEAD
+    <p id="t307" class="run"><span class="n"><a href="#t307">307</a></span><span class="t">            <span class="key">raise</span> <span class="nam">InputError</span><span class="op">(</span><span class="str">'The user is already an owner_member'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+=======
+    <p id="t307" class="run"><span class="n"><a href="#t307">307</a></span><span class="t">            <span class="key">raise</span> <span class="nam">InputError</span><span class="op">(</span><span class="nam">description</span><span class="op">=</span><span class="str">'The user is already an owner_member'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+>>>>>>> master
+>>>>>>> master
+>>>>>>> master
     <p id="t308" class="pln"><span class="n"><a href="#t308">308</a></span><span class="t">        <span class="com">#add the member_data to the owner_members_dict</span>&nbsp;</span><span class="r"></span></p>
     <p id="t309" class="run"><span class="n"><a href="#t309">309</a></span><span class="t">        <span class="nam">channel_data</span><span class="op">[</span><span class="str">'owner_members'</span><span class="op">]</span><span class="op">.</span><span class="nam">append</span><span class="op">(</span><span class="nam">member_data</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p id="t310" class="run"><span class="n"><a href="#t310">310</a></span><span class="t">    <span class="key">if</span> <span class="nam">option</span> <span class="op">==</span> <span class="str">'remove'</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p id="t311" class="run"><span class="n"><a href="#t311">311</a></span><span class="t">        <span class="key">if</span> <span class="nam">check_user_is_member</span><span class="op">(</span><span class="nam">u_id</span><span class="op">,</span> <span class="nam">channel_data</span><span class="op">,</span> <span class="str">'owner_members'</span><span class="op">)</span> <span class="key">is</span> <span class="key">None</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> master
+    <p id="t312" class="run"><span class="n"><a href="#t312">312</a></span><span class="t">            <span class="key">raise</span> <span class="nam">InputError</span><span class="op">(</span><span class="str">'The user is already an owner_member'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t313" class="pln"><span class="n"><a href="#t313">313</a></span><span class="t">        <span class="com"># Need to check the number of members in owner_members,</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t314" class="pln"><span class="n"><a href="#t314">314</a></span><span class="t">        <span class="com"># if the member being removed is the only member, raise InputError.</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t315" class="run"><span class="n"><a href="#t315">315</a></span><span class="t">        <span class="key">if</span> <span class="nam">len</span><span class="op">(</span><span class="nam">channel_data</span><span class="op">[</span><span class="str">'owner_members'</span><span class="op">]</span><span class="op">)</span> <span class="op">==</span> <span class="num">1</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t316" class="run"><span class="n"><a href="#t316">316</a></span><span class="t">            <span class="key">raise</span> <span class="nam">InputError</span><span class="op">(</span><span class="str">'This is the only owner_member left in the channel'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+<<<<<<< HEAD
+=======
+=======
+>>>>>>> master
     <p id="t312" class="run"><span class="n"><a href="#t312">312</a></span><span class="t">            <span class="key">raise</span> <span class="nam">InputError</span><span class="op">(</span><span class="nam">description</span><span class="op">=</span><span class="str">'The user is already an owner_member'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p id="t313" class="pln"><span class="n"><a href="#t313">313</a></span><span class="t">        <span class="com"># Need to check the number of members in owner_members,</span>&nbsp;</span><span class="r"></span></p>
     <p id="t314" class="pln"><span class="n"><a href="#t314">314</a></span><span class="t">        <span class="com"># if the member being removed is the only member, raise InputError.</span>&nbsp;</span><span class="r"></span></p>
     <p id="t315" class="run"><span class="n"><a href="#t315">315</a></span><span class="t">        <span class="key">if</span> <span class="nam">len</span><span class="op">(</span><span class="nam">channel_data</span><span class="op">[</span><span class="str">'owner_members'</span><span class="op">]</span><span class="op">)</span> <span class="op">==</span> <span class="num">1</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p id="t316" class="run"><span class="n"><a href="#t316">316</a></span><span class="t">            <span class="key">raise</span> <span class="nam">InputError</span><span class="op">(</span><span class="nam">description</span><span class="op">=</span><span class="str">'This is the only owner_member left in the channel'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+<<<<<<< HEAD
+=======
+>>>>>>> master
+>>>>>>> master
+>>>>>>> master
     <p id="t317" class="run"><span class="n"><a href="#t317">317</a></span><span class="t">        <span class="nam">channel_data</span><span class="op">[</span><span class="str">'owner_members'</span><span class="op">]</span><span class="op">.</span><span class="nam">remove</span><span class="op">(</span><span class="nam">member_data</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p id="t318" class="pln"><span class="n"><a href="#t318">318</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p id="t319" class="run"><span class="n"><a href="#t319">319</a></span><span class="t">    <span class="nam">data_store</span><span class="op">.</span><span class="nam">set</span><span class="op">(</span><span class="nam">store</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
@@ -377,7 +462,19 @@
     <div class="content">
         <p>
             <a class="nav" href="index.html">&#xab; index</a> &nbsp; &nbsp; <a class="nav" href="https://coverage.readthedocs.io">coverage.py v5.4</a>,
+<<<<<<< HEAD
             created at 2022-03-28 03:56 +1100
+=======
+<<<<<<< HEAD
+            created at 2022-03-28 01:12 +1100
+=======
+<<<<<<< HEAD
+            created at 2022-03-27 20:06 +1100
+=======
+            created at 2022-03-27 23:47 +1100
+>>>>>>> master
+>>>>>>> master
+>>>>>>> master
         </p>
     </div>
 </div>

@@ -173,6 +173,7 @@ def user_profile_setname_v1(token, name_first, name_last):
     return {}
 
 def check_invalid_handle(store, handle_str):
+    # check handle is string or bool
     if type(handle_str) is not str or type(handle_str) is bool:
         raise InputError(description='Invalid handle_str')
 
