@@ -4,7 +4,9 @@ Filename: channel_leave_test.py
 Author: Jenson Morgan(z5360181)
 Created: 28/02/2022 - 27/03/2022
 
-Description: pytests for channel_leave_v1
+Testing channel_leave works, 
+raises errors for incorrect input format for
+channel id and token, and if the user is not in the channel.
 """
 
 import pytest
@@ -67,6 +69,11 @@ def test_channel_leave_works(clear_register_createchannel):
 
 @pytest.mark.usefixtures('clear_register_createchannel')
 def test_channel_leave_unknown_user(clear_register_createchannel):
+    """
+    Creates 2 users and a channel for user1,
+    user2 tries to leave the channel, but they are not a member,
+    AccessError.
+    """
     channel_id = clear_register_createchannel[1]
 
     user2 = requests.post(config.url + 'auth/register/v2', 
@@ -74,7 +81,7 @@ def test_channel_leave_unknown_user(clear_register_createchannel):
                         'name_first': 'first2', 'name_last': 'last2'})
     user2_json = user2.json()
 
-    # User NOT in the channel
+    # User2 NOT in the channel
     channel_leave = requests.post(config.url + 'channel/leave/v1', 
                             json={'token': user2_json['token'], 'channel_id': channel_id})
     assert channel_leave.status_code == 403
@@ -84,6 +91,7 @@ def test_channel_leave_unknown_user(clear_register_createchannel):
 def test_channel_leave_invalid_channel_id(clear_register_createchannel):
     # creating 2 users and the channel.
     token = clear_register_createchannel[0]['token']
+
     # Incorrect channel id
     channel_leave = requests.post(config.url + 'channel/leave/v1', 
                             json={'token': token, 'channel_id': 444})
