@@ -161,11 +161,7 @@ Return Value:
     return {}
 
 def check_invalid_handle(store, handle_str):
-<<<<<<< HEAD
-
     # check handle is string or bool
-=======
->>>>>>> master
     if type(handle_str) is not str or type(handle_str) is bool:
         raise InputError(description='Invalid handle_str')
 

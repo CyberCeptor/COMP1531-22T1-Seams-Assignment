@@ -80,16 +80,6 @@ def test_user_setemail_working(clear_register_two):
                               params={'token': user1['token'], 'dm_id': dm_id})
     dm_json = dm_details.json()
 
-<<<<<<< HEAD
-    assert len(dm_json['members']) == 2
-
-    assert 'abc3@def.com' in [k['email'] for k in dm_json['members']]
-    assert 'abc@def.com' in [k['email'] for k in dm_json['members']]
-
-def test_user_setemail_bad_email(clear_and_register):
-    user1 = clear_and_register[0]
-    user2 = clear_and_register[1]
-=======
 @pytest.mark.usefixtures('clear_register_two')
 def test_user_setemail_bad_email(clear_register_two):
     """
@@ -102,8 +92,7 @@ def test_user_setemail_bad_email(clear_register_two):
     """
     user1 = clear_register_two[0]
     user2 = clear_register_two[1]
->>>>>>> master
-
+    
     # test another users email
     setemail = requests.put(config.url + 'user/profile/setemail/v1', 
                             json={'token': user1['token'], 'email': 'def@ghi.com'})
