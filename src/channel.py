@@ -216,70 +216,74 @@ def channel_leave_v1(auth_user_id, channel_id):
     # if the user is an owner_member, then they have to also be an
     # all_members user aswell.
     if owner_data:
-        channel_data['owner_members'].remove(owner_data)
         channel_data['all_members'].remove(member_data)
+        channel_data['owner_members'].remove(owner_data)
     elif member_data:
         channel_data['all_members'].remove(member_data)
     else:
         raise AccessError('User is not a member of that channel')
-    
+
     data_store.set(store)
     return {}
 
 
-"""
-Make user with user id u_id an owner of the channel.
-POST
-Arguments:
-        - token (of owner_member adding the other user)
-        - channel_id (the channel to add the owner too)
-        - u_id (the user_id of the member being added to owners)
 
-Exceptions:
-    InputError:
-        - channel_id does not refer to valid channel
-        - u_id does not refer to a valid user
-        - u_id refers to a user who is not a member of the channel
-        - u_id refers to a user who is already an owner of the channel
-
-    AccessError:
-        - channel_id is valid and the authorised user does not have permissions in the channel
-Return Value:
-        N/A - Returns an empty dict.
-"""
 
 # If the user is a member of the channel, and a global owner of SEAMS,
 # they can add remove whoever they like, including themselves.
 def channel_addowner_v1(token, channel_id, u_id):
+    """
+    Make user with user id u_id an owner of the channel.
+    POST
+    Arguments:
+            - token (of owner_member adding the other user)
+            - channel_id (the channel to add the owner too)
+            - u_id (the user_id of the member being added to owners)
+
+    Exceptions:
+        InputError:
+            - channel_id does not refer to valid channel
+            - u_id does not refer to a valid user
+            - u_id refers to a user who is not a member of the channel
+            - u_id refers to a user who is already an owner of the channel
+
+        AccessError:
+            - channel_id is valid and the authorised user does not have permissions in the channel
+    Return Value:
+            N/A - Returns an empty dict.
+    """
     channel_addremove_owner_valid_check(token, channel_id, u_id, 'add')
     return {}
 
-"""
-Remove user with user id u_id as an owner of the channel
-POST
-Arguments:
-        - token (the token of an authorised owner_members)
-        - channel_id (channel to remove the user_id from)
-        - u_id (id of member to remove from owner_members)
 
-Exceptions:
-    InputError:
-        - channel_id does not refer to valid channel
-        - u_id does not refer to a valid user
-        - u_id refers to a user who is not an owner of the channel
-        - u_id refers to a user who is currently the only owner of the channel
-    AccessError:
-        - channel_id is valid and the authorised user does not have owner permissions in the channel
 
-Return Value:
-    N/A
-"""
 
 def channel_removeowner_v1(token, channel_id, u_id):
+    """
+    Remove user with user id u_id as an owner of the channel
+    POST
+    Arguments:
+            - token (the token of an authorised owner_members)
+            - channel_id (channel to remove the user_id from)
+            - u_id (id of member to remove from owner_members)
+
+    Exceptions:
+        InputError:
+            - channel_id does not refer to valid channel
+            - u_id does not refer to a valid user
+            - u_id refers to a user who is not an owner of the channel
+            - u_id refers to a user who is currently the only owner of the channel
+        AccessError:
+            - channel_id is valid and the authorised user does not have owner permissions in the channel
+
+    Return Value:
+                N/A
+    """
     channel_addremove_owner_valid_check(token, channel_id, u_id, 'remove')
     return {}
 
-
+'''As both add/reove owner share the same code, apart from the last statement,
+this function performs both, but containts a 4th argument to differentiate between them.'''
 def channel_addremove_owner_valid_check(token, channel_id, u_id, option):
     store = data_store.get()
     token_valid_check(token)
@@ -308,7 +312,7 @@ def channel_addremove_owner_valid_check(token, channel_id, u_id, option):
             raise InputError('The user is already an owner_member')
         #add the member_data to the owner_members_dict
         channel_data['owner_members'].append(member_data)
-    if option == 'remove':
+    elif option == 'remove':
         if check_user_is_member(u_id, channel_data, 'owner_members') is None:
             raise InputError('The user is already an owner_member')
         # Need to check the number of members in owner_members,
