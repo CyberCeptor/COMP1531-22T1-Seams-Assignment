@@ -44,6 +44,39 @@ def test_dm_create_valid(clear_register):
     assert create.status_code == 200
 
 @pytest.mark.usefixtures('clear_register')
+def test_dm_create_token_invalid(clear_register):
+    """
+    clears any data stored in data_store and registers users with the
+    given information, create the dm with token and u_ids
+
+    Arguments: N/A
+
+    Exceptions: InmutError - valid token
+
+    Return Value: N/A
+    """
+    id1 = clear_register['auth_user_id']
+    create = requests.post(config.url + 'dm/create/v1', 
+                        json={'token': 500, 'u_ids': [id1]})
+    assert create.status_code == 400
+
+    create = requests.post(config.url + 'dm/create/v1', 
+                        json={'token': -500, 'u_ids': [id1]})
+    assert create.status_code == 400
+
+    create = requests.post(config.url + 'dm/create/v1', 
+                        json={'token': '', 'u_ids': [id1]})
+    assert create.status_code == 400
+
+    create = requests.post(config.url + 'dm/create/v1', 
+                        json={'token': True, 'u_ids': [id1]})
+    assert create.status_code == 400
+
+    create = requests.post(config.url + 'dm/create/v1', 
+                        json={'token': 'sbfg', 'u_ids': [id1]})
+    assert create.status_code == 403
+
+@pytest.mark.usefixtures('clear_register')
 def test_dm_create_invalid_uid(clear_register):
     """
     clears any data stored in data_store and registers users with the
@@ -114,6 +147,24 @@ def test_dm_create_duplicate_uid(clear_register):
 
     create = requests.post(config.url + 'dm/create/v1', 
                         json={'token': token1, 'u_ids': [id3,id3]})
+    assert create.status_code == 400
+
+def test_dm_create_creator_in_uids(clear_register):
+    """
+    clears any data stored in data_store and registers users with the
+    given information, create the dm with token and u_ids
+
+    Arguments: N/A
+
+    Exceptions: N/A
+
+    Return Value: N/A
+    """
+
+    token1 = clear_register['token']
+    id1 = clear_register['auth_user_id']
+    create = requests.post(config.url + 'dm/create/v1', 
+                        json={'token': token1, 'u_ids': [id1]})
     assert create.status_code == 400
 
 requests.delete(config.url + 'clear/v1')

@@ -30,6 +30,48 @@ def fixture_clear_register():
     data = resp.json()
     return [data['token'], data['auth_user_id']]
 
+def test_dm_leave_invalid_token(clear_register):
+    """
+    clears any data stored in data_store and registers a user with the
+    given information, raised a inputerror by invalid dm id
+
+    Arguments: clear_register(fixture)
+
+    Exceptions: InputErroe - raised by invalid token
+
+    Return Value: N/A
+    """
+    token1 = clear_register[0]
+    id1 = clear_register[1]
+    resp1 = requests.post(config.url + 'auth/register/v2', 
+                        json={'email': 'lmz@gmail.com', 'password': '893621',
+                                'name_first': 'li', 'name_last': 'mingzhe'})
+    data1 = resp1.json()
+    id2 = data1['auth_user_id']
+    create = requests.post(config.url + 'dm/create/v1', 
+                        json={'token': token1, 'u_ids': [id2]})
+    data2 = create.json()
+    dm_id = data2['dm_id']
+    leave = requests.post(config.url + 'dm/leave/v1', 
+                        json={'token': 500, 'dm_id': dm_id})
+    assert leave.status_code == 400
+
+    leave = requests.post(config.url + 'dm/leave/v1', 
+                        json={'token': -500, 'dm_id': dm_id})
+    assert leave.status_code == 400
+
+    leave = requests.post(config.url + 'dm/leave/v1', 
+                        json={'token': '', 'dm_id': dm_id})
+    assert leave.status_code == 400
+
+    leave = requests.post(config.url + 'dm/leave/v1', 
+                        json={'token': 'd', 'dm_id': dm_id})
+    assert leave.status_code == 403
+
+    leave = requests.post(config.url + 'dm/leave/v1', 
+                        json={'token': False, 'dm_id': dm_id})
+    assert leave.status_code == 400
+
 def test_dm_leave_valid(clear_register):
     """
     clears any data stored in data_store and registers a user with the

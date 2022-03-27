@@ -30,6 +30,48 @@ def fixture_clear_and_register():
     data = resp.json()
     return [data['token'], data['auth_user_id']]
 
+def test_dm_remove_invalid_token(clear_and_register):
+    """
+    clears any data stored in data_store and registers a user with the
+    given information, run dm remove successfully
+
+    Arguments: clear_and_register(fixture)
+
+    Exceptions: N/A
+
+    Return Value: N/A
+    """
+    id1 = clear_and_register[1]
+    resp1 = requests.post(config.url + 'auth/register/v2', 
+                        json={'email': 'lmz@gmail.com', 'password': '893621',
+                                'name_first': 'li', 'name_last': 'mingzhe'})
+    data1 = resp1.json()
+    token2 = data1['token']
+    
+    create = requests.post(config.url + 'dm/create/v1', 
+                json={'token': token2, 'u_ids': [id1]})
+    data2 = create.json()
+    dm_id = data2['dm_id']
+    remove = requests.delete(config.url + 'dm/remove/v1', 
+                        json={'token': 500, 'dm_id': dm_id})
+    assert remove.status_code == 400
+
+    remove = requests.delete(config.url + 'dm/remove/v1', 
+                        json={'token': -500, 'dm_id': dm_id})
+    assert remove.status_code == 400
+
+    remove = requests.delete(config.url + 'dm/remove/v1', 
+                        json={'token': '', 'dm_id': dm_id})
+    assert remove.status_code == 400
+
+    remove = requests.delete(config.url + 'dm/remove/v1', 
+                        json={'token': 's', 'dm_id': dm_id})
+    assert remove.status_code == 403
+
+    remove = requests.delete(config.url + 'dm/remove/v1', 
+                        json={'token': False, 'dm_id': dm_id})
+    assert remove.status_code == 400
+
 def test_dm_remove_valid(clear_and_register):
     """
     clears any data stored in data_store and registers a user with the
