@@ -102,7 +102,7 @@ def test_user_profile_sethandle_bad_handle_str(clear_and_register):
 
     # test not alphanumeric handle_str
     sethandle = requests.put(config.url + 'user/profile/sethandle/v1', 
-                            json={'token': user1['token'], 'handle_str': '$%*$^&$'})
+                            json={'token': user1['token'], 'handle_str': '!@#$%^&*()_+'})
     assert sethandle.status_code == 400
 
     # test empty string
