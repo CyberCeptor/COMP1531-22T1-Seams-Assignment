@@ -36,6 +36,14 @@ def test_user_setemail_working(clear_register_two):
                         json={'token': user1['token'], 'channel_id': channel_id, 'u_id': user2['auth_user_id']})
     assert addowner.status_code == 200
 
+    # create a dm, add the other user as a member, 
+    # to Test that all information is updated
+    dm1 = requests.post(config.url + 'dm/create/v1', 
+                             json={'token': user1['token'],
+                                   'u_ids': [user2['auth_user_id']]})
+    assert dm1.status_code == 200
+    dm1_json = dm1.json()
+    dm_id = dm1_json['dm_id']
 
     # changing the email address of both users.
     setemail = requests.put(config.url + 'user/profile/setemail/v1', 
@@ -53,19 +61,23 @@ def test_user_setemail_working(clear_register_two):
 
     # Assert that the all_members and owner_members channel email has also been updated
     # check the data in the channel is correct
-    channels_details = requests.get(config.url + 'channel/details/v2', 
+    channel_details = requests.get(config.url + 'channel/details/v2', 
                             params={'token': user1['token'], 'channel_id': channel1['channel_id']})
-    channels_json = channels_details.json()
+    channel_json = channel_details.json()
 
-    assert len(channels_json['owner_members']) == 2
-    assert len(channels_json['all_members']) == 2
+    assert len(channel_json['owner_members']) == 2
+    assert len(channel_json['all_members']) == 2
 
-    assert channels_json['owner_members'][0]['email'] == 'abc3@def.com'
-    assert channels_json['all_members'][0]['email'] == 'abc3@def.com'
+    assert 'abc3@def.com' in [k['email'] for k in channel_json['owner_members']]
+    assert 'abc3@def.com' in [k['email'] for k in channel_json['all_members']]
 
-    assert channels_json['owner_members'][1]['email'] == 'abc@def.com'
-    assert channels_json['all_members'][1]['email'] == 'abc@def.com'
+    assert 'abc@def.com' in [k['email'] for k in channel_json['owner_members']]
+    assert 'abc@def.com' in [k['email'] for k in channel_json['all_members']]
 
+    # Assert that the all_members and owner_members channel email has also been updated
+    # check the data in the channel is correct
+    requests.get(config.url + 'dm/details/v1', 
+                    params={'token': user1['token'], 'dm_id': dm_id})
 
 @pytest.mark.usefixtures('clear_register_two')
 def test_user_setemail_bad_email(clear_register_two):
