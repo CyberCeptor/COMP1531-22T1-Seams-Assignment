@@ -28,38 +28,41 @@ def test_message_edit_invalid_token(clear_register_createchannel_sendmsg):
     # token is int
     message_id = clear_register_createchannel_sendmsg[2]
     resp0 = requests.put(config.url + 'message/edit/v1', 
-                          json={'token': 0, 'message_id': message_id, 'message': 'hewwo'})
+                          json={'token': 0, 'message_id': message_id,
+                                'message': 'hewwo'})
     assert resp0.status_code == 400
     # token is boo
     resp1 = requests.put(config.url + 'message/edit/v1', 
-                          json={'token': True, 'message_id': message_id, 'message': 'hewwo'})
+                          json={'token': True, 'message_id': message_id,
+                                'message': 'hewwo'})
     assert resp1.status_code == 400
     # token input empty
     resp2 = requests.put(config.url + 'message/edit/v1', 
-                          json={'token': '', 'message_id': message_id, 'message': 'hewwo'})
+                          json={'token': '', 'message_id': message_id, 
+                                'message': 'hewwo'})
     assert resp2.status_code == 400
     # wrong token input
     resp3 = requests.put(config.url + 'message/edit/v1', 
-                          json={'token': 'str', 'message_id': message_id, 'message': 'hewwo'})
+                          json={'token': 'str', 'message_id': message_id, 
+                                'message': 'hewwo'})
     assert resp3.status_code == 403
     # expired token
     expired_token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MSwic2Vzc\
         2lvbl9pZCI6MSwiaGFuZGxlIjoiZmlyc3RsYXN0IiwiZXhwIjoxNTQ3\
             OTc3ODgwfQ.366QLXfCURopcjJbAheQYLVNlGLX_INKVwr8_TVXYEQ'
     resp4 = requests.put(config.url + 'message/edit/v1', 
-                          json={'token': expired_token, 'message_id': message_id, 'message': 'hewwo'})
+                         json={'token': expired_token, 'message_id': message_id,
+                               'message': 'hewwo'})
     assert resp4.status_code == 403
     # unsaved token
     unsaved_token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MSwic2Vzc2lvbl9pZCI6MSw\
             iaGFuZGxlIjoiZmlyc3RsYXN0IiwiZXhwIjoyNTQ3OTc3ODgwfQ.ckPPWiR-m6x0IRq\
             pQtKmJgNLiD8eAEiTv2i8ToK3mkY'
     resp5 = requests.put(config.url + 'message/edit/v1', 
-                          json={'token': unsaved_token, 'message_id': message_id, 'message': 'hewwo'})
+                         json={'token': unsaved_token, 'message_id': message_id,
+                               'message': 'hewwo'})
     assert resp5.status_code == 403
     
-    requests.delete(config.url + 'clear/v1')
-
-
 @pytest.mark.usefixtures('clear_register_createchannel_sendmsg')
 def test_message_edit_invalid_message_id(clear_register_createchannel_sendmsg):
     """
@@ -95,18 +98,9 @@ def test_message_edit_invalid_message_id(clear_register_createchannel_sendmsg):
 
     requests.delete(config.url + 'clear/v1')
 
-
 @pytest.mark.usefixtures('clear_register_createchannel_sendmsg')
 def test_message_edit_invalid_message(clear_register_createchannel_sendmsg):
-    """
-    test for invalid input of message
-
-    Arguments: clear_register_createchannel_sendmsg
-
-    Exceptions: N/A
-
-    Return Value: N/A
-    """
+    """ test for invalid input of message """
 
     token = clear_register_createchannel_sendmsg[0]
     message_id = clear_register_createchannel_sendmsg[2]

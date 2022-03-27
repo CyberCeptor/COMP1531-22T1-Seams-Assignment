@@ -10,8 +10,8 @@ Description: implementation for
     - allowing members of both private and public channels to invite a valid
         user and add them to the channel
     - allowing authorised user to join a channel with channel id
-    - helper functions for the above
     - return messages to channel authorised user
+    - helper functions for the above
 """
 
 from src.error import InputError, AccessError

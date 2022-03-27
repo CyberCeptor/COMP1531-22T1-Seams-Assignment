@@ -10,8 +10,8 @@ import pytest
 import requests
 from src import config
 
-@pytest.mark.usefixtures('clear_register_createdm')
-def test_dm_details_valid(clear_register_createdm):
+@pytest.mark.usefixtures('clear_register_two_createdm')
+def test_dm_details_valid(clear_register_two_createdm):
     """
     clears any data stored in data_store and registers a user with the
     given information, run dm details successful
@@ -22,14 +22,14 @@ def test_dm_details_valid(clear_register_createdm):
 
     Return Value: N/A
     """
-    token1 = clear_register_createdm[0]
-    dm_id = clear_register_createdm[1]
+    token1 = clear_register_two_createdm[0]['token']
+    dm_id = clear_register_two_createdm[2]
     detail = requests.get(config.url + 'dm/details/v1', 
                         params={'token': token1, 'dm_id': dm_id})
     assert detail.status_code == 200
 
-@pytest.mark.usefixtures('clear_register_createdm')
-def test_dm_details_invalid_token(clear_register_createdm):
+@pytest.mark.usefixtures('clear_register_two_createdm')
+def test_dm_details_invalid_token(clear_register_two_createdm):
     """
     clears any data stored in data_store and registers a user with the
     given information, run dm details successful
@@ -40,7 +40,7 @@ def test_dm_details_invalid_token(clear_register_createdm):
 
     Return Value: N/A
     """
-    dm_id = clear_register_createdm[1]
+    dm_id = clear_register_two_createdm[2]
     detail = requests.get(config.url + 'dm/details/v1', 
                         params={'token': 500, 'dm_id': dm_id})
     assert detail.status_code == 400
@@ -99,12 +99,8 @@ def test_dm_details_invalid_dm_id(clear_register_two):
                         params={'token': token1, 'dm_id': True})
     assert detail.status_code == 400
 
-<<<<<<< HEAD
-def test_dm_details_auth_notin_dm(clear_register):
-=======
-@pytest.mark.usefixtures('clear_register_createdm')
-def test_dm_details_auth_notin_dm(clear_register_createdm):
->>>>>>> master
+@pytest.mark.usefixtures('clear_register_two_createdm')
+def test_dm_details_auth_notin_dm(clear_register_two_createdm):
     """
     clears any data stored in data_store and registers a user with the
     given information, raise a access error by the auth not in dm
@@ -120,7 +116,7 @@ def test_dm_details_auth_notin_dm(clear_register_createdm):
                                 'name_first': 'li', 'name_last': 'mingzhe'})
     data2 = resp1.json()
     token3 = data2['token']
-    dm_id = clear_register_createdm[1]
+    dm_id = clear_register_two_createdm[2]
     detail = requests.get(config.url + 'dm/details/v1', 
                         params={'token': token3, 'dm_id': dm_id})
     assert detail.status_code == 403

@@ -10,8 +10,8 @@ import pytest
 import requests
 from src import config
 
-@pytest.mark.usefixtures('clear_register_two')
-def test_dm_create_valid(clear_register_two):
+@pytest.mark.usefixtures('clear_register_two_createdm')
+def test_dm_create_valid(clear_register_two_createdm):
     """
     clears any data stored in data_store and registers users with the
     given information, create the dm with token and u_ids
@@ -23,17 +23,13 @@ def test_dm_create_valid(clear_register_two):
     Return Value: N/A
     """
 
-    token1 = clear_register_two[0]['token']
+    token1 = clear_register_two_createdm[0]['token']
     resp2 = requests.post(config.url + 'auth/register/v2', 
                         json={'email': 'hyf@gmail.com', 'password': 'hyf1234',
                                 'name_first': 'huang', 'name_last': 'yifei'})
     data2 = resp2.json()
-    id2 = clear_register_two[1]['auth_user_id']
+    id2 = clear_register_two_createdm[1]['auth_user_id']
     id3 = data2['auth_user_id']
-
-    create = requests.post(config.url + 'dm/create/v1', 
-                        json={'token': token1, 'u_ids': [id2]})
-    assert create.status_code == 200
 
     create = requests.post(config.url + 'dm/create/v1', 
                         json={'token': token1, 'u_ids': [id2,id3]})

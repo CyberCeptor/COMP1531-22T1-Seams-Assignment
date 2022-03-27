@@ -17,7 +17,8 @@ expired_token = jwt.encode({'id': 44, 'session_id': 200, 'handle': 'firstlast',
                             'exp': 1448474355}, key, algorithm=algorithm)
 
 # an unexpired, unsaved token
-unsaved_token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6Miwic2Vzc2lvbl9pZCI6MiwiaGFuZGxlIjoiZmlyc3QwbGFzdDAiLCJleHAiOjI2NDg0NzQzNTV9.GgUFaPxo8sdpgyPESJOEu2LAZ-NBmWsiQymg8Hzb1ok'
+unsaved_token = jwt.encode({'id': 44, 'session_id': 200, 'handle': 'firstlast',
+                            'exp': 2548474355}, key, algorithm=algorithm)
 
 DM_ID_COUNTER = 0
 MESSAGE_ID_COUNTER = 0

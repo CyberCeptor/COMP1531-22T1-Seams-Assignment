@@ -148,6 +148,7 @@ def token_valid_check(token):
     except ValueError:
         pass
 
+    # if token can be successfully decoded with no errors, it is valid
     try:
         jwt.decode(token, key, algorithms=[algorithm])
     except jwt.ExpiredSignatureError:

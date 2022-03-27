@@ -163,7 +163,6 @@ def dm_details_v1(token, dm_id):
         'members': dm['members']
     }
 
-
 def dm_leave_v1(auth_user_id, dm_id):
     """
     clears any data stored in data_store and registers users with the
@@ -191,39 +190,6 @@ def dm_leave_v1(auth_user_id, dm_id):
         dm['members'].remove(member)
         data_store.set(store)
 
-
-<<<<<<< HEAD
-=======
-def check_valid_dm_id(dm_id):
-    """
-    clears any data stored in data_store and registers users with the
-    given information, create the dm with token and u_ids
-
-    Arguments: token (str)          - unique str representation of user
-               u_ids (str)          - the list of u_id
-
-    Exceptions: InputError - raised by duplicate ids
-                InputError - raised by invalid ids
-
-    Return Value: dm
-    """
-    if type(dm_id) is bool:
-        raise InputError('dm id is not of a valid type')
-
-    dm_id = cast_to_int_get_requests(dm_id, 'dm id')
-
-    if dm_id < 1:
-        raise InputError('The dm id is not valid (out of bounds)')
-
-    store = data_store.get()
-    
-    for dm in store['dms']:
-       if dm['dm_id'] == dm_id:
-            return dm
-    # if the dm_id is not found, raise an AccessError
-    raise InputError('dm does not exist in dms')
-
->>>>>>> master
 def check_creator_notin_u_ids_duplicate(u_id, id, u_ids):
     """
     check the whether there is duplicate ids and whether the creator is in uids

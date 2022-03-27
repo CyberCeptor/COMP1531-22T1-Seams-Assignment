@@ -6,7 +6,7 @@ import requests
 from src import config
 
 @pytest.fixture
-def clear_register_createdm(clear_register_two):
+def clear_register_two_createdm(clear_register_two):
     """ clears any data stored in data_store, registers two users, creates a dm
     channel using the first user's id and adds the second user into it """
 
@@ -19,8 +19,4 @@ def clear_register_createdm(clear_register_two):
     dm = create_dm.json()
     dm_id = dm['dm_id']
 
-<<<<<<< HEAD
-    return [user1['token'], dm_id]
-=======
-    return [token_1, dm_id, user_1_data, user_2_data]
->>>>>>> master
+    return [user1, user2, dm_id]
