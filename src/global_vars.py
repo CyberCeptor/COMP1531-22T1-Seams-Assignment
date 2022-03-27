@@ -15,27 +15,34 @@ unsaved_token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MSwic2Vzc2lvbl9pZ\
 
 valid_email_regex = r'^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}$'
 
-MESSAGE_ID_COUNTER = 0
-def new_message_id():
-    global MESSAGE_ID_COUNTER 
-    MESSAGE_ID_COUNTER  += 1
-    return MESSAGE_ID_COUNTER 
-
-def reset_message_id():
-    global MESSAGE_ID_COUNTER
-    MESSAGE_ID_COUNTER = 0
-    return MESSAGE_ID_COUNTER
-
-
 DM_ID_COUNTER = 0
+MESSAGE_ID_COUNTER = 0
+SESSION_ID_COUNTER = 0
 
-def new_dm_id():
-    global DM_ID_COUNTER
-    DM_ID_COUNTER += 1
-    return DM_ID_COUNTER
-
-def reset_dm_id():
-    global DM_ID_COUNTER
-    DM_ID_COUNTER = 0
-    return DM_ID_COUNTER
-
+def new_id(option):
+    if option == 'message':
+        global MESSAGE_ID_COUNTER
+        MESSAGE_ID_COUNTER += 1
+        return MESSAGE_ID_COUNTER 
+    elif option == 'dm':
+        global DM_ID_COUNTER 
+        DM_ID_COUNTER += 1
+        return DM_ID_COUNTER
+    elif option == 'session':
+        global SESSION_ID_COUNTER 
+        SESSION_ID_COUNTER += 1
+        return SESSION_ID_COUNTER
+    
+def reset_id(option):
+    if option == 'message':
+        global MESSAGE_ID_COUNTER
+        MESSAGE_ID_COUNTER = 0
+        return MESSAGE_ID_COUNTER 
+    elif option == 'dm':
+        global DM_ID_COUNTER 
+        DM_ID_COUNTER = 0
+        return DM_ID_COUNTER
+    elif option == 'session':
+        global SESSION_ID_COUNTER 
+        SESSION_ID_COUNTER = 0
+        return SESSION_ID_COUNTER

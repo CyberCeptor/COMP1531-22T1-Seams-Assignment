@@ -1,12 +1,13 @@
 """
 Filename: auth.py
 
-Author: Aleesha, z5371516, Jenson, z5360181
-Created: 24/02/2022 - 04/03/2022
+Author: Aleesha Bunrith(z5371516), Jenson Morgan(z5360181)
+Created: 24/02/2022 - 27/03/2022
 
 Description: implementation for
     - registering a user using an email, password, first name, and last name
     - using an email and password to login to a user's account
+    - logging out a user with their current valid token
     - helper functions for the above
 """
 
@@ -86,7 +87,6 @@ def auth_register_v2(email, password, name_first, name_last):
         Returns a dict containing the generated auth_user_id
     """
 
-
     store = data_store.get()
     # generate user id
     u_id = len(store['users']) + 1
@@ -97,6 +97,7 @@ def auth_register_v2(email, password, name_first, name_last):
     if len(password) < 6:
         raise InputError(description='Password is too short')
 
+    # encrypt the given password for storage
     encrypted_pw = hashlib.sha256(password.encode()).hexdigest()
 
     # check for invalid name and return the full name
@@ -162,12 +163,15 @@ def check_invalid_name(name_first, name_last):
         full_name (str)  - a string that contains the user's first and last name
 
     Exceptions:
-        InputError - Occurs if the first and/or last name doesn't match the
-        VALID_NAME_REGEX, and if the fullname would create an invalid handle
+        InputError - Occurs if the first and/or last name is of an invalid type
+                     and/or length
+                   - Occurs if the user's names (concatenated) has less than one
+                     alphnumeric character
 
     Return Value: N/A
     """
 
+    # check for inputs of invalid type
     if type(name_first) is not str or type(name_first) is bool:
         raise InputError(description='Invalid first name')
 
@@ -235,5 +239,17 @@ def create_handle(store, full_name):
     return handle
 
 def auth_logout_v1(token):
+    """
+    logs out a user using their current valid token, checks if it is valid then
+    removes the token info from the data
+
+    Arguments:
+        token (jwt token str) - a user's valid jwt token
+
+    Exceptions: N/A
+
+    Return Value: N/A
+    """
+
     token_valid_check(token)
     token_remove(token)
