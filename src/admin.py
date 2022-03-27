@@ -58,10 +58,10 @@ def admin_userpermission_change(token, u_id, permission_id):
 
     # check for invalid permission_id inputs
     if not isinstance(permission_id, int) or type(permission_id) is bool:
-        raise InputError('Permission id is not of valid type')
+        raise InputError(description='Permission id is not of valid type')
 
     if permission_id not in [1, 2]:
-        raise InputError('Invalid permission id')
+        raise InputError(description='Invalid permission id')
 
     # count the number of global users
     num_global_owners = len([user for user in store['users'] if 

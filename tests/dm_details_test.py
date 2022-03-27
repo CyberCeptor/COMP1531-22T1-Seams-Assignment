@@ -96,7 +96,7 @@ def test_dm_details_invalid_dm_id(clear_register):
                         params={'token': token1, 'dm_id': True})
     assert detail.status_code == 400
 
-def tetest_dm_details_auth_notin_dm(clear_register):
+def test_dm_details_auth_notin_dm(clear_register):
     """
     clears any data stored in data_store and registers a user with the
     given information, raise a access error by the auth not in dm

@@ -5,9 +5,6 @@ from src.other import check_valid_auth_id, cast_to_int_get_requests
 from src.auth import check_invalid_email, check_invalid_name
 from src.error import InputError
 
-VALID_EMAIL_REGEX = r'^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}$'
-
-
 def user_profile_v1(token, u_id):
     """
     For a valid user, returns information about their user_id, firstname,
@@ -53,7 +50,7 @@ def user_profile_setemail_v1(token, email):
     token_locate_in_data_store(token)
     user_id = token_get_user_id(token)
 
-    check_invalid_email(store, VALID_EMAIL_REGEX, str(email))
+    check_invalid_email(store, str(email))
 
     # set the user email to the new email
     for user in store['users']:

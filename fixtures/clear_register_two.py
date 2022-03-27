@@ -15,7 +15,7 @@ from src import config
 
 @pytest.fixture
 def clear_register_two(clear_register):
-    """ clears any data stored in data_store and registers two users with the
+    """ clears any data stored in data_store, registers a second user with the
     given information and returns the json return info for each """
 
     user1 = clear_register

@@ -16,7 +16,7 @@ from src import config
 @pytest.fixture
 def clear_register():
     """ clears any data stored in data_store and registers a user with the
-    given information """
+    given information and returns the json return info """
 
     requests.delete(config.url + 'clear/v1')
 

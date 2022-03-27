@@ -59,10 +59,10 @@ def check_valid_auth_id(auth_user_id):
     """
     
     if isinstance(auth_user_id, int) is False or type(auth_user_id) is bool:
-        raise InputError('User id is not of a valid type')
+        raise InputError(description='User id is not of a valid type')
 
     if auth_user_id < 1:
-        raise InputError('The user id is not valid (out of bounds)')
+        raise InputError(description='The user id is not valid')
 
     # if the auth_user_id is found, return the user data
     store = data_store.get()
@@ -71,7 +71,7 @@ def check_valid_auth_id(auth_user_id):
             return user
 
     # if the auth_user_id is not found, raise an InputError
-    raise InputError('User does not exist in users database')
+    raise InputError(description='User does not exist in users database')
 
 def check_valid_channel_id(channel_id):
     """
@@ -91,13 +91,13 @@ def check_valid_channel_id(channel_id):
     
     # bools are read as int's 0 & 1, so need to check prior
     if type(channel_id) is bool:
-        raise InputError('Invalid channel_id type')
+        raise InputError(description='Invalid channel_id type')
 
     # for GET requests since params are taken in as strings
     channel_id = cast_to_int_get_requests(channel_id, 'channel id')
 
     if channel_id < 1:
-        raise InputError('The channel id is not valid (out of bounds)')
+        raise InputError(description='The channel id is not valid')
 
     # if the channel_id is found, return the user data
     store = data_store.get()
@@ -106,7 +106,7 @@ def check_valid_channel_id(channel_id):
             return channel
 
     # if the channel_id is not found, raise an InputError
-    raise InputError('Channel does not exist in channels database')
+    raise InputError(description='Channel does not exist in channels database')
 
 def check_user_is_member(auth_user_id, data, key):
     """
@@ -207,7 +207,7 @@ def get_messages(auth_user_id, data, start, data_str):
 
     # check whether given user is in the given channel
     if check_user_is_member(auth_user_id, data, key) is None:
-        raise AccessError(f'User does not exist in {data_str}')
+        raise AccessError(description=f'User does not exist in {data_str}')
 
     total_messages = len(data['messages'])
 
@@ -215,9 +215,9 @@ def get_messages(auth_user_id, data, start, data_str):
     start = cast_to_int_get_requests(start, 'start')
 
     if start < 0:
-        raise InputError('Invalid start')
+        raise InputError(description='Invalid start')
     elif start > total_messages:
-        raise InputError('Invalid start, not enough messages')
+        raise InputError(description='Invalid start, not enough messages')
 
     # return an empty messages list if there are no messages to get
     if total_messages == 0:

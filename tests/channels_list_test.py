@@ -189,13 +189,14 @@ def test_channels_list_invalid_token():
 #     user = requests.post(config.url + 'auth/register/v2', 
 #                   json={'email': 'abc@def.com', 'password': 'password',
 #                         'name_first': 'first', 'name_last': 'last'})
-#     user_json = user.json()
-#     logout = requests.post(config.url + 'auth/logout/v1', user_json['token'])
+#     assert user.status_code == 200
+#     user1 = user.json()
 
+#     logout = requests.post(config.url + 'auth/logout/v1', json={'token': user1['token']})
 #     assert logout.status_code == 200
 
 #     channel = requests.post(config.url + 'channels/create/v2', 
-#                             json={'token': user_json['token'], 'name': 'public_channel', 'is_public': True})
+#                             json={'token': user1['token'], 'name': 'public_channel', 'is_public': True})
     
 #     assert channel.status_code == 403
 requests.delete(config.url + 'clear/v1')
