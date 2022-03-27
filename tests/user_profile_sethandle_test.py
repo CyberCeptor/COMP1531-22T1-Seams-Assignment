@@ -125,8 +125,9 @@ def test_user_profile_sethandle_bad_handle_str(clear_and_register):
     assert sethandle.status_code == 400
 
     # test > 20 int
+    string21 = 'fnsdfoinsnfwnpfnspindmfjmsdpfmjsdijf'
     sethandle = requests.put(config.url + 'user/profile/sethandle/v1', 
-                            json={'token': user1['token'], 'handle_str': 21})
+                            json={'token': user1['token'], 'handle_str': string21})
     assert sethandle.status_code == 400
 
     requests.delete(config.url + 'clear/v1')

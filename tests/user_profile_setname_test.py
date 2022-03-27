@@ -105,6 +105,7 @@ def fixture_clear_and_register():
 #     assert len(channels_json['all_members']) == 2
 #     '''assert len(dms_json['members']) == 2'''
 
+<<<<<<< HEAD
 #     assert channels_json['owner_members'][0]['name_first'] == 'first3'
 #     assert channels_json['owner_members'][0]['name_last'] == 'last3'
 #     assert channels_json['all_members'][0]['name_first'] == 'first3'
@@ -118,6 +119,21 @@ def fixture_clear_and_register():
 #     assert channels_json['all_members'][1]['name_last'] == 'last'
 #     '''assert dms_json['members'][1]['name_first'] == 'first'
 #     assert dms_json['members'][1]['name_last'] == 'last''''
+=======
+    assert channels_json['owner_members'][0]['name_first'] == 'first3'
+    assert channels_json['owner_members'][0]['name_last'] == 'last3'
+    assert channels_json['all_members'][0]['name_first'] == 'first3'
+    assert channels_json['all_members'][0]['name_last'] == 'last3'
+    '''assert dms_json['members'][0]['name_first'] == 'first3'
+    assert dms_json['members'][0]['name_last'] == 'last3'''
+
+    assert channels_json['owner_members'][1]['name_first'] == 'first'
+    assert channels_json['owner_members'][1]['name_last'] == 'last'
+    assert channels_json['all_members'][1]['name_first'] == 'first'
+    assert channels_json['all_members'][1]['name_last'] == 'last'
+    '''assert dms_json['members'][1]['name_first'] == 'first'
+    assert dms_json['members'][1]['name_last'] == 'last'''
+>>>>>>> 9346f0341a19872861bc336a418bd25db679af23
 
 def test_user_profile_setname_bad_name_first(clear_and_register):
     user1 = clear_and_register[0]
