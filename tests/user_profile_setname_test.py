@@ -11,33 +11,10 @@ import pytest
 import requests
 from src import config
 
-@pytest.fixture(name='clear_and_register')
-def fixture_clear_and_register():
-    """ clears any data stored in data_store and registers a user with the
-    given information
-
-    Arguments: N/A
-
-    Exceptions: N/A
-
-    Return Value: user_data in json form.
-    """
-    requests.delete(config.url + 'clear/v1')
-    user1 = requests.post(config.url + 'auth/register/v2', 
-                  json={'email': 'abc@def.com', 'password': 'password',
-                        'name_first': 'first', 'name_last': 'last'})
-    user1_json = user1.json()
-
-    user2 = requests.post(config.url + 'auth/register/v2', 
-                  json={'email': 'abc2@def.com', 'password': 'password2',
-                        'name_first': 'first2', 'name_last': 'last2'})
-    user2_json = user2.json()
-    
-    return [user1_json, user2_json]
-
-def test_user_setname_working(clear_and_register):
-    user1 = clear_and_register[0]
-    user2 = clear_and_register[1]
+@pytest.mark.usefixtures('clear_register_two')
+def test_user_setname_working(clear_register_two):
+    user1 = clear_register_two[0]
+    user2 = clear_register_two[1]
 
     # create a channel, add the other user as an owner aswell, 
     # to Test that all information is updated
@@ -87,10 +64,10 @@ def test_user_setname_working(clear_and_register):
     assert 'lasta' in [k['name_last'] for k in detail_json['owner_members']]
     assert 'lasta' in [k['name_last'] for k in detail_json['all_members']]
 
-
-def test_user_setname_working_dm(clear_and_register):
-    user1 = clear_and_register[0]
-    user2 = clear_and_register[1]
+@pytest.mark.usefixtures('clear_register_two')
+def test_user_setname_working_dm(clear_register_two):
+    user1 = clear_register_two[0]
+    user2 = clear_register_two[1]
 
     # create a dm, add the other user as an owner aswell, 
     # to Test that all information is updated
@@ -117,9 +94,10 @@ def test_user_setname_working_dm(clear_and_register):
     assert 'firsta' in [k['name_first'] for k in detail_json['members']]
     assert 'lasta' in [k['name_last'] for k in detail_json['members']]
 
-def test_user_profile_setname_bad_name_first(clear_and_register):
-    user1 = clear_and_register[0]
-    user2 = clear_and_register[1]
+@pytest.mark.usefixtures('clear_register_two')
+def test_user_profile_setname_bad_name_first(clear_register_two):
+    user1 = clear_register_two[0]
+    user2 = clear_register_two[1]
 
     # test users name_first
     setname = requests.put(config.url + 'user/profile/setname/v1', 
@@ -158,10 +136,10 @@ def test_user_profile_setname_bad_name_first(clear_and_register):
 
     requests.delete(config.url + 'clear/v1')
 
-
-def test_user_profile_setname_bad_name_last(clear_and_register):
-    user1 = clear_and_register[0]
-    user2 = clear_and_register[1]
+@pytest.mark.usefixtures('clear_register_two')
+def test_user_profile_setname_bad_name_last(clear_register_two):
+    user1 = clear_register_two[0]
+    user2 = clear_register_two[1]
 
     # test users name_last
     setname = requests.put(config.url + 'user/profile/setname/v1', 
@@ -200,7 +178,8 @@ def test_user_profile_setname_bad_name_last(clear_and_register):
 
     requests.delete(config.url + 'clear/v1')
 
-def test_user_setname_bad_token(clear_and_register):
+@pytest.mark.usefixtures('clear_register_two')
+def test_user_setname_bad_token(clear_register_two):
     setname = requests.put(config.url + 'user/profile/setname/v1', 
                             json={'token': '', 'name_first': 'first', 'name_last': 'last'})
     assert setname.status_code == 400
