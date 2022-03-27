@@ -151,7 +151,6 @@ def test_user_sethandle_bad_token(clear_register_two):
 @pytest.mark.usefixtures('clear_register_two')
 def test_user_profile_sethandle_duplicate_handle_str(clear_register_two):
     user1 = clear_register_two[0]
-    user2 = clear_register_two[1]
 
     # test another handle_str in channel
     sethandle = requests.put(config.url + 'user/profile/sethandle/v1', 
