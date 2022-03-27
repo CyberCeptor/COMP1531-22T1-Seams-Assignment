@@ -114,10 +114,17 @@
     <p id="t59" class="pln"><span class="n"><a href="#t59">59</a></span><span class="t"><span class="str">    """</span>&nbsp;</span><span class="r"></span></p>
     <p id="t60" class="pln"><span class="n"><a href="#t60">60</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p id="t61" class="run"><span class="n"><a href="#t61">61</a></span><span class="t">    <span class="key">if</span> <span class="nam">isinstance</span><span class="op">(</span><span class="nam">auth_user_id</span><span class="op">,</span> <span class="nam">int</span><span class="op">)</span> <span class="key">is</span> <span class="key">False</span> <span class="key">or</span> <span class="nam">type</span><span class="op">(</span><span class="nam">auth_user_id</span><span class="op">)</span> <span class="key">is</span> <span class="nam">bool</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+<<<<<<< HEAD
     <p id="t62" class="run"><span class="n"><a href="#t62">62</a></span><span class="t">        <span class="key">raise</span> <span class="nam">InputError</span><span class="op">(</span><span class="nam">description</span><span class="op">=</span><span class="str">'User id is not of a valid type'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p id="t63" class="pln"><span class="n"><a href="#t63">63</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p id="t64" class="run"><span class="n"><a href="#t64">64</a></span><span class="t">    <span class="key">if</span> <span class="nam">auth_user_id</span> <span class="op">&lt;</span> <span class="num">1</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p id="t65" class="run"><span class="n"><a href="#t65">65</a></span><span class="t">        <span class="key">raise</span> <span class="nam">InputError</span><span class="op">(</span><span class="nam">description</span><span class="op">=</span><span class="str">'The user id is not valid'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+=======
+    <p id="t62" class="run"><span class="n"><a href="#t62">62</a></span><span class="t">        <span class="key">raise</span> <span class="nam">InputError</span><span class="op">(</span><span class="str">'User id is not of a valid type'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t63" class="pln"><span class="n"><a href="#t63">63</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
+    <p id="t64" class="run"><span class="n"><a href="#t64">64</a></span><span class="t">    <span class="key">if</span> <span class="nam">auth_user_id</span> <span class="op">&lt;</span> <span class="num">1</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t65" class="run"><span class="n"><a href="#t65">65</a></span><span class="t">        <span class="key">raise</span> <span class="nam">InputError</span><span class="op">(</span><span class="str">'The user id is not valid (out of bounds)'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+>>>>>>> master
     <p id="t66" class="pln"><span class="n"><a href="#t66">66</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p id="t67" class="pln"><span class="n"><a href="#t67">67</a></span><span class="t">    <span class="com"># if the auth_user_id is found, return the user data</span>&nbsp;</span><span class="r"></span></p>
     <p id="t68" class="run"><span class="n"><a href="#t68">68</a></span><span class="t">    <span class="nam">store</span> <span class="op">=</span> <span class="nam">data_store</span><span class="op">.</span><span class="nam">get</span><span class="op">(</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
@@ -126,7 +133,11 @@
     <p id="t71" class="run"><span class="n"><a href="#t71">71</a></span><span class="t">            <span class="key">return</span> <span class="nam">user</span>&nbsp;</span><span class="r"></span></p>
     <p id="t72" class="pln"><span class="n"><a href="#t72">72</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p id="t73" class="pln"><span class="n"><a href="#t73">73</a></span><span class="t">    <span class="com"># if the auth_user_id is not found, raise an InputError</span>&nbsp;</span><span class="r"></span></p>
+<<<<<<< HEAD
     <p id="t74" class="run"><span class="n"><a href="#t74">74</a></span><span class="t">    <span class="key">raise</span> <span class="nam">InputError</span><span class="op">(</span><span class="nam">description</span><span class="op">=</span><span class="str">'User does not exist in users database'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+=======
+    <p id="t74" class="run"><span class="n"><a href="#t74">74</a></span><span class="t">    <span class="key">raise</span> <span class="nam">InputError</span><span class="op">(</span><span class="str">'User does not exist in users database'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+>>>>>>> master
     <p id="t75" class="pln"><span class="n"><a href="#t75">75</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p id="t76" class="run"><span class="n"><a href="#t76">76</a></span><span class="t"><span class="key">def</span> <span class="nam">check_valid_channel_id</span><span class="op">(</span><span class="nam">channel_id</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p id="t77" class="pln"><span class="n"><a href="#t77">77</a></span><span class="t">    <span class="str">"""</span>&nbsp;</span><span class="r"></span></p>
@@ -146,13 +157,21 @@
     <p id="t91" class="pln"><span class="n"><a href="#t91">91</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p id="t92" class="pln"><span class="n"><a href="#t92">92</a></span><span class="t">    <span class="com"># bools are read as int's 0 &amp; 1, so need to check prior</span>&nbsp;</span><span class="r"></span></p>
     <p id="t93" class="run"><span class="n"><a href="#t93">93</a></span><span class="t">    <span class="key">if</span> <span class="nam">type</span><span class="op">(</span><span class="nam">channel_id</span><span class="op">)</span> <span class="key">is</span> <span class="nam">bool</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+<<<<<<< HEAD
     <p id="t94" class="run"><span class="n"><a href="#t94">94</a></span><span class="t">        <span class="key">raise</span> <span class="nam">InputError</span><span class="op">(</span><span class="nam">description</span><span class="op">=</span><span class="str">'Invalid channel_id type'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+=======
+    <p id="t94" class="run"><span class="n"><a href="#t94">94</a></span><span class="t">        <span class="key">raise</span> <span class="nam">InputError</span><span class="op">(</span><span class="str">'Invalid channel_id type'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+>>>>>>> master
     <p id="t95" class="pln"><span class="n"><a href="#t95">95</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p id="t96" class="pln"><span class="n"><a href="#t96">96</a></span><span class="t">    <span class="com"># for GET requests since params are taken in as strings</span>&nbsp;</span><span class="r"></span></p>
     <p id="t97" class="run"><span class="n"><a href="#t97">97</a></span><span class="t">    <span class="nam">channel_id</span> <span class="op">=</span> <span class="nam">cast_to_int_get_requests</span><span class="op">(</span><span class="nam">channel_id</span><span class="op">,</span> <span class="str">'channel id'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p id="t98" class="pln"><span class="n"><a href="#t98">98</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p id="t99" class="run"><span class="n"><a href="#t99">99</a></span><span class="t">    <span class="key">if</span> <span class="nam">channel_id</span> <span class="op">&lt;</span> <span class="num">1</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+<<<<<<< HEAD
     <p id="t100" class="run"><span class="n"><a href="#t100">100</a></span><span class="t">        <span class="key">raise</span> <span class="nam">InputError</span><span class="op">(</span><span class="nam">description</span><span class="op">=</span><span class="str">'The channel id is not valid'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+=======
+    <p id="t100" class="run"><span class="n"><a href="#t100">100</a></span><span class="t">        <span class="key">raise</span> <span class="nam">InputError</span><span class="op">(</span><span class="str">'The channel id is not valid (out of bounds)'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+>>>>>>> master
     <p id="t101" class="pln"><span class="n"><a href="#t101">101</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p id="t102" class="pln"><span class="n"><a href="#t102">102</a></span><span class="t">    <span class="com"># if the channel_id is found, return the user data</span>&nbsp;</span><span class="r"></span></p>
     <p id="t103" class="run"><span class="n"><a href="#t103">103</a></span><span class="t">    <span class="nam">store</span> <span class="op">=</span> <span class="nam">data_store</span><span class="op">.</span><span class="nam">get</span><span class="op">(</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
@@ -161,7 +180,11 @@
     <p id="t106" class="run"><span class="n"><a href="#t106">106</a></span><span class="t">            <span class="key">return</span> <span class="nam">channel</span>&nbsp;</span><span class="r"></span></p>
     <p id="t107" class="pln"><span class="n"><a href="#t107">107</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p id="t108" class="pln"><span class="n"><a href="#t108">108</a></span><span class="t">    <span class="com"># if the channel_id is not found, raise an InputError</span>&nbsp;</span><span class="r"></span></p>
+<<<<<<< HEAD
     <p id="t109" class="run"><span class="n"><a href="#t109">109</a></span><span class="t">    <span class="key">raise</span> <span class="nam">InputError</span><span class="op">(</span><span class="nam">description</span><span class="op">=</span><span class="str">'Channel does not exist in channels database'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+=======
+    <p id="t109" class="run"><span class="n"><a href="#t109">109</a></span><span class="t">    <span class="key">raise</span> <span class="nam">InputError</span><span class="op">(</span><span class="str">'Channel does not exist in channels database'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+>>>>>>> master
     <p id="t110" class="pln"><span class="n"><a href="#t110">110</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p id="t111" class="run"><span class="n"><a href="#t111">111</a></span><span class="t"><span class="key">def</span> <span class="nam">check_user_is_member</span><span class="op">(</span><span class="nam">auth_user_id</span><span class="op">,</span> <span class="nam">data</span><span class="op">,</span> <span class="nam">key</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p id="t112" class="pln"><span class="n"><a href="#t112">112</a></span><span class="t">    <span class="str">"""</span>&nbsp;</span><span class="r"></span></p>
@@ -262,7 +285,11 @@
     <p id="t207" class="pln"><span class="n"><a href="#t207">207</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p id="t208" class="pln"><span class="n"><a href="#t208">208</a></span><span class="t">    <span class="com"># check whether given user is in the given channel</span>&nbsp;</span><span class="r"></span></p>
     <p id="t209" class="run"><span class="n"><a href="#t209">209</a></span><span class="t">    <span class="key">if</span> <span class="nam">check_user_is_member</span><span class="op">(</span><span class="nam">auth_user_id</span><span class="op">,</span> <span class="nam">data</span><span class="op">,</span> <span class="nam">key</span><span class="op">)</span> <span class="key">is</span> <span class="key">None</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+<<<<<<< HEAD
     <p id="t210" class="run"><span class="n"><a href="#t210">210</a></span><span class="t">        <span class="key">raise</span> <span class="nam">AccessError</span><span class="op">(</span><span class="nam">description</span><span class="op">=</span><span class="str">f'User does not exist in {data_str}'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+=======
+    <p id="t210" class="run"><span class="n"><a href="#t210">210</a></span><span class="t">        <span class="key">raise</span> <span class="nam">AccessError</span><span class="op">(</span><span class="str">f'User does not exist in {data_str}'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+>>>>>>> master
     <p id="t211" class="pln"><span class="n"><a href="#t211">211</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p id="t212" class="run"><span class="n"><a href="#t212">212</a></span><span class="t">    <span class="nam">total_messages</span> <span class="op">=</span> <span class="nam">len</span><span class="op">(</span><span class="nam">data</span><span class="op">[</span><span class="str">'messages'</span><span class="op">]</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p id="t213" class="pln"><span class="n"><a href="#t213">213</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
@@ -270,9 +297,15 @@
     <p id="t215" class="run"><span class="n"><a href="#t215">215</a></span><span class="t">    <span class="nam">start</span> <span class="op">=</span> <span class="nam">cast_to_int_get_requests</span><span class="op">(</span><span class="nam">start</span><span class="op">,</span> <span class="str">'start'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p id="t216" class="pln"><span class="n"><a href="#t216">216</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p id="t217" class="run"><span class="n"><a href="#t217">217</a></span><span class="t">    <span class="key">if</span> <span class="nam">start</span> <span class="op">&lt;</span> <span class="num">0</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+<<<<<<< HEAD
     <p id="t218" class="run"><span class="n"><a href="#t218">218</a></span><span class="t">        <span class="key">raise</span> <span class="nam">InputError</span><span class="op">(</span><span class="nam">description</span><span class="op">=</span><span class="str">'Invalid start'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p id="t219" class="run"><span class="n"><a href="#t219">219</a></span><span class="t">    <span class="key">elif</span> <span class="nam">start</span> <span class="op">></span> <span class="nam">total_messages</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p id="t220" class="run"><span class="n"><a href="#t220">220</a></span><span class="t">        <span class="key">raise</span> <span class="nam">InputError</span><span class="op">(</span><span class="nam">description</span><span class="op">=</span><span class="str">'Invalid start, not enough messages'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+=======
+    <p id="t218" class="run"><span class="n"><a href="#t218">218</a></span><span class="t">        <span class="key">raise</span> <span class="nam">InputError</span><span class="op">(</span><span class="str">'Invalid start'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t219" class="run"><span class="n"><a href="#t219">219</a></span><span class="t">    <span class="key">elif</span> <span class="nam">start</span> <span class="op">></span> <span class="nam">total_messages</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t220" class="run"><span class="n"><a href="#t220">220</a></span><span class="t">        <span class="key">raise</span> <span class="nam">InputError</span><span class="op">(</span><span class="str">'Invalid start, not enough messages'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+>>>>>>> master
     <p id="t221" class="pln"><span class="n"><a href="#t221">221</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p id="t222" class="pln"><span class="n"><a href="#t222">222</a></span><span class="t">    <span class="com"># return an empty messages list if there are no messages to get</span>&nbsp;</span><span class="r"></span></p>
     <p id="t223" class="run"><span class="n"><a href="#t223">223</a></span><span class="t">    <span class="key">if</span> <span class="nam">total_messages</span> <span class="op">==</span> <span class="num">0</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
@@ -317,7 +350,11 @@
     <div class="content">
         <p>
             <a class="nav" href="index.html">&#xab; index</a> &nbsp; &nbsp; <a class="nav" href="https://coverage.readthedocs.io">coverage.py v5.4</a>,
+<<<<<<< HEAD
             created at 2022-03-27 22:35 +1100
+=======
+            created at 2022-03-27 23:47 +1100
+>>>>>>> master
         </p>
     </div>
 </div>
