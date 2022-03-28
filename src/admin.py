@@ -71,14 +71,14 @@ def admin_userpermission_change(token, u_id, permission_id):
     if (check_user_is_global_owner(u_id) and num_global_owners == 1 and
         permission_id == 2):
         raise InputError(description='Cannot demote the only global owner')
-    elif check_user_is_global_owner(u_id) and permission_id == 1:
+    
+    if check_user_is_global_owner(u_id) and permission_id == 1:
         raise InputError(description='User is already a global owner')
-    elif not check_user_is_global_owner(u_id) and permission_id == 2:
+    
+    if not check_user_is_global_owner(u_id) and permission_id == 2:
         raise InputError(description='User is already a member')
 
     change_permission(u_id, permission_id)
-
-    return {}
 
 def admin_user_remove(token, u_id):
     """
@@ -140,8 +140,6 @@ def admin_user_remove(token, u_id):
     user_data['removed'] = True
     
     data_store.set(store)
-
-    return {}
 
 def change_permission(auth_user_id, permission_id):
     """

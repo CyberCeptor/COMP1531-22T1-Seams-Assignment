@@ -179,4 +179,109 @@ def test_channel_messages_return(clear_register_createchannel):
     assert channel_messages['start'] == 0
     assert channel_messages['end'] == -1
 
+@pytest.mark.usefixtures('clear_register_createchannel')
+def test_channel_messages_return_less_than_50(clear_register_createchannel):
+    """ testing channel_message returns all messages if there's less than 50
+    messages """
+
+    token = clear_register_createchannel[0]['token']
+    chan_id = clear_register_createchannel[1]
+
+    resp = requests.post(config.url + 'message/send/v1', 
+                          json={'token': token, 'channel_id': chan_id,
+                                'message': 'hewwo'})
+    assert resp.status_code == 200
+
+    resp = requests.post(config.url + 'message/send/v1', 
+                          json={'token': token, 'channel_id': chan_id,
+                                'message': 'hewwo'})
+    assert resp.status_code == 200
+
+    resp = requests.post(config.url + 'message/send/v1', 
+                          json={'token': token, 'channel_id': chan_id,
+                                'message': 'hewwo'})
+    assert resp.status_code == 200
+
+    resp = requests.post(config.url + 'message/send/v1', 
+                          json={'token': token, 'channel_id': chan_id,
+                                'message': 'hewwo'})
+    assert resp.status_code == 200
+
+    resp = requests.post(config.url + 'message/send/v1', 
+                          json={'token': token, 'channel_id': chan_id,
+                                'message': 'hewwo'})
+    assert resp.status_code == 200
+
+    # test success run
+    resp = requests.get(config.url + 'channel/messages/v2', 
+                          params = {'token': token, 'channel_id': chan_id, 
+                                    'start': 0})
+    assert resp.status_code == 200
+    channel_messages = resp.json()
+
+    assert len(channel_messages['messages']) == 5
+    assert channel_messages['start'] == 0
+    assert channel_messages['end'] == -1
+
+@pytest.mark.usefixtures('clear_register_createchannel_send50msgs')
+def test_channel_messages_return_50(clear_register_createchannel_send50msgs):
+    """ testing channel_message returns empty if no message """
+
+    token = clear_register_createchannel_send50msgs[0]
+    chan_id = clear_register_createchannel_send50msgs[1]
+
+    # test success run
+    resp = requests.get(config.url + 'channel/messages/v2', 
+                          params = {'token': token, 'channel_id': chan_id, 
+                                    'start': 0})
+    assert resp.status_code == 200
+    channel_messages = resp.json()
+
+    assert len(channel_messages['messages']) == 50
+    assert channel_messages['start'] == 0
+    assert channel_messages['end'] == -1
+
+@pytest.mark.usefixtures('clear_register_createchannel_send50msgs')
+def test_channel_messages_return_more_than_50(clear_register_createchannel_send50msgs):
+    """ testing channel_message returns empty if no message """
+
+    token = clear_register_createchannel_send50msgs[0]
+    chan_id = clear_register_createchannel_send50msgs[1]
+
+    resp = requests.post(config.url + 'message/send/v1', 
+                          json={'token': token, 'channel_id': chan_id,
+                                'message': 'hewwo'})
+    assert resp.status_code == 200
+
+    resp = requests.post(config.url + 'message/send/v1', 
+                          json={'token': token, 'channel_id': chan_id,
+                                'message': 'hewwo'})
+    assert resp.status_code == 200
+
+    resp = requests.post(config.url + 'message/send/v1', 
+                          json={'token': token, 'channel_id': chan_id,
+                                'message': 'hewwo'})
+    assert resp.status_code == 200
+
+    resp = requests.post(config.url + 'message/send/v1', 
+                          json={'token': token, 'channel_id': chan_id,
+                                'message': 'hewwo'})
+    assert resp.status_code == 200
+
+    resp = requests.post(config.url + 'message/send/v1', 
+                          json={'token': token, 'channel_id': chan_id,
+                                'message': 'hewwo'})
+    assert resp.status_code == 200
+
+    # test success run
+    resp = requests.get(config.url + 'channel/messages/v2', 
+                          params = {'token': token, 'channel_id': chan_id, 
+                                    'start': 0})
+    assert resp.status_code == 200
+    channel_messages = resp.json()
+
+    assert len(channel_messages['messages']) == 50
+    assert channel_messages['start'] == 0
+    assert channel_messages['end'] == 50
+
 requests.delete(config.url + 'clear/v1')

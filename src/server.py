@@ -122,7 +122,6 @@ def user_profile():
     token = request.args.get('token')
     u_id = request.args.get('u_id')
     profile = user_profile_v1(token, u_id)
-    print(profile)
     save_data()
     return dumps(profile)
 
