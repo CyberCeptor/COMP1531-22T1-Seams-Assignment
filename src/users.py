@@ -36,5 +36,5 @@ def users_all_v1(token):
             'name_first': user['first'],
             'name_last': user['last'],
             'handle_str': user['handle'],
-            } for user in store['users']]
+        } for user in store['users']]
     }

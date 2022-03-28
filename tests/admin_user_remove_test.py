@@ -141,11 +141,11 @@ def test_admin_user_remove_works(clear_register_two):
     assert resp13.status_code == 200
     profile = resp13.json()
    
-    assert profile['u_id'] == id2
-    assert profile['email'] == 'def@ghi.com'
-    assert profile['name_first'] == 'Removed'
-    assert profile['name_last'] == 'user'
-    assert profile['handle_str'] == 'firstlast0'
+    assert profile['user']['u_id'] == id2
+    assert profile['user']['email'] == 'def@ghi.com'
+    assert profile['user']['name_first'] == 'Removed'
+    assert profile['user']['name_last'] == 'user'
+    assert profile['user']['handle_str'] == 'firstlast0'
 
     # user2's new profile should have the same email and handle since it is now
     # reusable
@@ -162,11 +162,11 @@ def test_admin_user_remove_works(clear_register_two):
     assert resp15.status_code == 200
     new_profile = resp15.json()
     
-    assert new_profile['u_id'] == id2_new
-    assert new_profile['email'] == 'def@ghi.com'
-    assert new_profile['name_first'] == 'first'
-    assert new_profile['name_last'] == 'last'
-    assert new_profile['handle_str'] == 'firstlast0'
+    assert new_profile['user']['u_id'] == id2_new
+    assert new_profile['user']['email'] == 'def@ghi.com'
+    assert new_profile['user']['name_first'] == 'first'
+    assert new_profile['user']['name_last'] == 'last'
+    assert new_profile['user']['handle_str'] == 'firstlast0'
 
 @pytest.mark.usefixtures('clear_register_createchannel')
 def test_admin_user_remove_not_in_channel_or_dm(clear_register_createchannel):

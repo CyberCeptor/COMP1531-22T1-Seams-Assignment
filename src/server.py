@@ -3,7 +3,7 @@ import signal
 import pickle
 from src import config
 from json import dumps
-from flask import Flask, request
+from flask import Flask, request, jsonify
 from flask_cors import CORS
 
 from src.dm import dm_create_v1, dm_list_v1, dm_details_v1, dm_remove_v1,\
@@ -110,6 +110,7 @@ def logout():
 def get_all_users():
     token = request.args.get('token')
     users = users_all_v1(token)
+    print(users)
     save_data()
     return dumps(users)
 
@@ -122,8 +123,9 @@ def user_profile():
     token = request.args.get('token')
     u_id = request.args.get('u_id')
     profile = user_profile_v1(token, u_id)
+    print(profile)
     save_data()
-    return dumps(profile)
+    return jsonify(profile)
 
 @APP.route('/user/profile/setemail/v1', methods=['PUT'])
 def user_setemail():

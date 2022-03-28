@@ -45,11 +45,13 @@ def user_profile_v1(token, u_id):
     user = check_valid_auth_id(u_id)
 
     return {
-        'u_id': user['id'],
-        'email': user['email'],
-        'name_first': user['first'],
-        'name_last': user['last'],
-        'handle_str': user['handle'],
+        'user': {
+            'u_id': user['id'],
+            'email': user['email'],
+            'name_first': user['first'],
+            'name_last': user['last'],
+            'handle_str': user['handle'],
+        }
     }
 
 def user_profile_setemail_v1(token, email):

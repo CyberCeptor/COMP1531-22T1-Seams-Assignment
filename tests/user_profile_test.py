@@ -15,33 +15,54 @@ from src import config
 
 from src.global_vars import expired_token, unsaved_token
 
-@pytest.mark.usefixtures('clear_register')
-def test_user_profile_working(clear_register):
+@pytest.mark.usefixtures('clear_register_two')
+def test_user_profile_working(clear_register_two):
     """ Create two users,
     then calls user_profile_v1 with the token of the first user,
     and the id of the second user.
     Returns the info of the ID given. (i.e., the second user) """
 
-    user0_json = clear_register
+    user1 = clear_register_two[0]
+    user2 = clear_register_two[1]
 
-    user1 = requests.post(config.url + 'auth/register/v2', 
-                  json={'email': 'def@abc.com', 'password': 'password',
-                        'name_first': 'first0', 'name_last': 'last0'})
-                    
-    assert user1.status_code == 200
-    user1_json = user1.json()
-
+    # user2 is looking at user1's profile
     user_profile = requests.get(config.url + 'user/profile/v1', 
-                    params={'token': user1_json['token'], 
-                            'u_id': user0_json['auth_user_id']})
+                    params={'token': user2['token'], 
+                            'u_id': user1['auth_user_id']})
     assert user_profile.status_code == 200
     profile = user_profile.json()
 
-    assert profile['u_id'] == user0_json['auth_user_id']
-    assert profile['email'] == 'abc@def.com'
-    assert profile['name_first'] == 'first'
-    assert profile['name_last'] == 'last'
-    assert profile['handle_str'] == 'firstlast'
+    assert profile['user']['u_id'] == user1['auth_user_id']
+    assert profile['user']['email'] == 'abc@def.com'
+    assert profile['user']['name_first'] == 'first'
+    assert profile['user']['name_last'] == 'last'
+    assert profile['user']['handle_str'] == 'firstlast'
+
+    # user1 is looking at their own profile
+    user_profile = requests.get(config.url + 'user/profile/v1', 
+                    params={'token': user1['token'], 
+                            'u_id': user1['auth_user_id']})
+    assert user_profile.status_code == 200
+    profile = user_profile.json()
+
+    assert profile['user']['u_id'] == user1['auth_user_id']
+    assert profile['user']['email'] == 'abc@def.com'
+    assert profile['user']['name_first'] == 'first'
+    assert profile['user']['name_last'] == 'last'
+    assert profile['user']['handle_str'] == 'firstlast'
+
+    # user2 is looking at their own profile
+    user_profile = requests.get(config.url + 'user/profile/v1', 
+                    params={'token': user2['token'], 
+                            'u_id': user2['auth_user_id']})
+    assert user_profile.status_code == 200
+    profile = user_profile.json()
+
+    assert profile['user']['u_id'] == user2['auth_user_id']
+    assert profile['user']['email'] == 'def@ghi.com'
+    assert profile['user']['name_first'] == 'first'
+    assert profile['user']['name_last'] == 'last'
+    assert profile['user']['handle_str'] == 'firstlast0'
 
 @pytest.mark.usefixtures('clear_register')
 def test_profile_bad_token_input(clear_register):
