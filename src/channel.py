@@ -58,9 +58,7 @@ def channel_invite_v2(token, channel_id, u_id):
         raise InputError(description='Invitee is already in the channel')
     else:
         add_invitee(user_data, channel_data) #add user
-    return {
-    }
-
+    
 def channel_details_v2(token, channel_id):
     """
     check if given user id and channel id are valid,
@@ -230,7 +228,6 @@ def channel_leave_v1(auth_user_id, channel_id):
         raise AccessError(description='User is not a member of that channel')
 
     data_store.set(store)
-    return {}
 
 def channel_addowner_v1(token, channel_id, u_id):
     """
@@ -256,7 +253,6 @@ def channel_addowner_v1(token, channel_id, u_id):
     """
 
     channel_addremove_owner_valid_check(token, channel_id, u_id, 'add')
-    return {}
 
 def channel_removeowner_v1(token, channel_id, u_id):
     """
@@ -282,7 +278,6 @@ def channel_removeowner_v1(token, channel_id, u_id):
     """
 
     channel_addremove_owner_valid_check(token, channel_id, u_id, 'remove')
-    return {}
 
 def channel_addremove_owner_valid_check(token, channel_id, u_id, option):
     """

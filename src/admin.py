@@ -78,6 +78,8 @@ def admin_userpermission_change(token, u_id, permission_id):
 
     change_permission(u_id, permission_id)
 
+    return {}
+
 def admin_user_remove(token, u_id):
     """
     removes a user from Seams, they will be removed from all channels and dms,
@@ -138,6 +140,8 @@ def admin_user_remove(token, u_id):
     user_data['removed'] = True
     
     data_store.set(store)
+
+    return {}
 
 def change_permission(auth_user_id, permission_id):
     """

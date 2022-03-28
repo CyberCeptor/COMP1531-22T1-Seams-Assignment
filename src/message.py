@@ -105,8 +105,6 @@ def message_edit_v1(token, message_id, message):
 
     data_store.set(store)
 
-    return {}
-
 def message_remove_v1(token, message_id):
     """
     If token given is authorised user, remove the message
@@ -156,8 +154,6 @@ def message_remove_v1(token, message_id):
                                        message')
 
     data_store.set(store)
-
-    return {}
 
 def message_senddm_v1(token, dm_id, message):
     """
@@ -236,4 +232,3 @@ def check_message_id_valid(message_id):
 
     # if message_id is not found, raise an InputError
     raise InputError(description='Message does not exist in channels database')
-
