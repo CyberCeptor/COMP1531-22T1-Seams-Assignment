@@ -154,14 +154,7 @@ def test_message_sent_not_belong_to_user(clear_register_createchannel_sendmsg):
 
     channel_id = clear_register_createchannel_sendmsg[1]
     message_id = clear_register_createchannel_sendmsg[2]
-
-    # create user2
-    user2 = requests.post(config.url + 'auth/register/v2', 
-                            json={'email': 'def@abc.com', 
-                            'password': 'password',
-                            'name_first': 'first2', 'name_last': 'last2'}) 
-    user2_json = user2.json()
-    token_2 = user2_json['token']
+    token_2 = clear_register_createchannel_sendmsg[4]
 
     # user 2 joins channel 1 
     requests.post(config.url + 'channel/join/v2',
@@ -227,26 +220,26 @@ def test_successful_message_remove_by_user(clear_register_createchannel_sendmsg)
     assert resp.status_code == 200
 
 
-@pytest.mark.usefixtures('clear_register_createchannel_sendmsg')
-def test_dm_successful_message_remove_by_user(clear_register_createchannel_sendmsg):
+@pytest.mark.usefixtures('clear_register_createdm_sendmsg')
+def test_dm_successful_message_remove_by_user(clear_register_createdm_sendmsg):
     """ testing if message removing is successful by user who sent the message 
     """
     
-    message_id =  clear_register_createchannel_sendmsg[3]
-    token_2 = clear_register_createchannel_sendmsg[4]
+    message_id =  clear_register_createdm_sendmsg[2]
+    token_2 = clear_register_createdm_sendmsg[1]
 
     # successful removal when user 2 tries to remove own message in dm
     resp = requests.delete(config.url + 'message/remove/v1', 
                           json = {'token': token_2, 'message_id': message_id})
     assert resp.status_code == 200
 
-@pytest.mark.usefixtures('clear_register_createchannel_sendmsg')
-def test_dm_successful_message_remove_by_owner(clear_register_createchannel_sendmsg):
+@pytest.mark.usefixtures('clear_register_createdm_sendmsg')
+def test_dm_successful_message_remove_by_owner(clear_register_createdm_sendmsg):
     """ testing if message removing is successful by owner
     """
     
-    message_id =  clear_register_createchannel_sendmsg[3]
-    token_1 = clear_register_createchannel_sendmsg[0]
+    message_id =  clear_register_createdm_sendmsg[2]
+    token_1 = clear_register_createdm_sendmsg[0]
 
     # successful removal when user 1 who is owner of dm tries to remove message in dm
     resp = requests.delete(config.url + 'message/remove/v1', 
@@ -254,14 +247,22 @@ def test_dm_successful_message_remove_by_owner(clear_register_createchannel_send
     assert resp.status_code == 200
 
 
-@pytest.mark.usefixtures('clear_register_createchannel_sendmsg')
-def test_dm_fail_message_remove(clear_register_createchannel_sendmsg):
+@pytest.mark.usefixtures('clear_register_createdm_sendmsg')
+def test_dm_fail_message_remove(clear_register_createdm_sendmsg):
     """ testing if message removing fails if user does not have access
     """
     
-    token_1 = clear_register_createchannel_sendmsg[0]
-    dm_id = clear_register_createchannel_sendmsg[5]
-    token_2 = clear_register_createchannel_sendmsg[4]
+    token_1 = clear_register_createdm_sendmsg[0]
+    dm_id = clear_register_createdm_sendmsg[3]
+    token_2 = clear_register_createdm_sendmsg[1]
+
+    # create user 3
+
+    user3 = requests.post(config.url + 'auth/register/v2', 
+                  json={'email': 'iii@def.com', 'password': 'password',
+                        'name_first': 'first3', 'name_last': 'last3'})
+    assert user3.status_code == 200
+    user_3 = user3.json()
 
     # user 1 sends message in dm
     send_message = requests.post(config.url + 'message/senddm/v1', 
@@ -275,4 +276,8 @@ def test_dm_fail_message_remove(clear_register_createchannel_sendmsg):
     # raise access error when user 2 tries to remove user 1's message
     resp = requests.delete(config.url + 'message/remove/v1', 
                           json = {'token': token_2, 'message_id': message_id})
+    assert resp.status_code == 403
+    # access error when user3 tries to remove the message
+    resp = requests.delete(config.url + 'message/remove/v1', 
+                          json = {'token': user_3['token'], 'message_id': message_id})
     assert resp.status_code == 403

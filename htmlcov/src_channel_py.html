@@ -3,7 +3,7 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=emulateIE7" />
-    <title>Coverage for src/channel.py: 99%</title>
+    <title>Coverage for src/channel.py: 100%</title>
     <link rel="icon" sizes="32x32" href="favicon_32.png">
     <link rel="stylesheet" href="style.css" type="text/css">
     <script type="text/javascript" src="jquery.min.js"></script>
@@ -18,7 +18,7 @@
 <div id="header">
     <div class="content">
         <h1>Coverage for <b>src/channel.py</b> :
-            <span class="pc_cov">99%</span>
+            <span class="pc_cov">100%</span>
         </h1>
         <img id="keyboard_icon" src="keybd_closed.png" alt="Show keyboard shortcuts" />
         <h2 class="stats">
@@ -26,7 +26,7 @@
             <button type="button" class="run shortkey_r button_toggle_run" title="Toggle lines run">89 run</button>
             <button type="button" class="mis show_mis shortkey_m button_toggle_mis" title="Toggle lines missing">0 missing</button>
             <button type="button" class="exc show_exc shortkey_x button_toggle_exc" title="Toggle lines excluded">0 excluded</button>
-            <button type="button" class="par run show_par shortkey_p button_toggle_par" title="Toggle lines partially run">1 partial</button>
+            <button type="button" class="par run show_par shortkey_p button_toggle_par" title="Toggle lines partially run">0 partial</button>
         </h2>
     </div>
 </div>
@@ -387,7 +387,7 @@
     <p id="t332" class="pln"><span class="n"><a href="#t332">332</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p id="t333" class="pln"><span class="n"><a href="#t333">333</a></span><span class="t">        <span class="com">#add the member_data to the owner_members_dict</span>&nbsp;</span><span class="r"></span></p>
     <p id="t334" class="run"><span class="n"><a href="#t334">334</a></span><span class="t">        <span class="nam">channel</span><span class="op">[</span><span class="str">'owner_members'</span><span class="op">]</span><span class="op">.</span><span class="nam">append</span><span class="op">(</span><span class="nam">member_data</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t335" class="par run show_par"><span class="n"><a href="#t335">335</a></span><span class="t">    <span class="key">elif</span> <span class="nam">option</span> <span class="op">==</span> <span class="str">'remove'</span><span class="op">:</span>&nbsp;</span><span class="r"><span class="annotate short">335&#x202F;&#x219B;&#x202F;347</span><span class="annotate long">line 335 didn't jump to line 347, because the condition on line 335 was never false</span></span></p>
+    <p id="t335" class="run"><span class="n"><a href="#t335">335</a></span><span class="t">    <span class="key">if</span> <span class="nam">option</span> <span class="op">==</span> <span class="str">'remove'</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p id="t336" class="run"><span class="n"><a href="#t336">336</a></span><span class="t">        <span class="key">if</span> <span class="nam">check_user_is_member</span><span class="op">(</span><span class="nam">u_id</span><span class="op">,</span> <span class="nam">channel</span><span class="op">,</span> <span class="str">'owner_members'</span><span class="op">)</span> <span class="key">is</span> <span class="key">None</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p id="t337" class="run"><span class="n"><a href="#t337">337</a></span><span class="t">            <span class="key">raise</span> <span class="nam">InputError</span><span class="op">(</span><span class="nam">description</span><span class="op">=</span><span class="str">'The user is already an owner_member'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p id="t338" class="pln"><span class="n"><a href="#t338">338</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
@@ -405,7 +405,7 @@
     <div class="content">
         <p>
             <a class="nav" href="index.html">&#xab; index</a> &nbsp; &nbsp; <a class="nav" href="https://coverage.readthedocs.io">coverage.py v5.4</a>,
-            created at 2022-03-29 16:48 +1100
+            created at 2022-03-29 19:15 +1100
         </p>
     </div>
 </div>

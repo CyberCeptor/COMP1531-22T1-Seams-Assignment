@@ -4,8 +4,8 @@ Filename: clear_register_createdm_sendmsg.py
 Author: Yangjun Yue(z5317840)
 Created: 28/03/2022
 
-Description: pytest fixture for registering two users, creating a channel, and
-             adding the second user as an owner
+Description: pytest fixture for registering two users, creating a dm, and
+             send a message
 """
 
 import pytest
@@ -32,4 +32,4 @@ def clear_register_createdm_sendmsg(clear_register_two_createdm):
     assert send_message.status_code == 200
     dm_message = send_message.json()
 
-    return [user_1['token'], dm_message['message_id'], user2['token']]
+    return [user_1['token'], user2['token'], dm_message['message_id'], dm_id]

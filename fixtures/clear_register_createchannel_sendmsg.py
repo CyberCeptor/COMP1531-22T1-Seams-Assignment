@@ -49,4 +49,4 @@ def clear_register_createchannel_sendmsg(clear_register_createchannel):
     assert send_message.status_code == 200
     dm_message = send_message.json()
 
-    return [user_1['token'], channel_id, chan_message['message_id'], dm_message['message_id']]
+    return [user_1['token'], channel_id, chan_message['message_id'], dm_message['message_id'], user2['token']]
