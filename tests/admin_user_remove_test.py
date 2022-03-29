@@ -58,6 +58,7 @@ def test_admin_user_remove_works(clear_register_two):
                           json={'token': token2, 'channel_id': chan_id,
                                 'message': 'hewwo'})
     assert resp3.status_code == 200
+    msg_id = resp3.json()['message_id']
 
     # user2 also creates a dm consisting of themselves and user1,
     # and sends a message in it
@@ -71,6 +72,7 @@ def test_admin_user_remove_works(clear_register_two):
                           json={'token': token2, 'dm_id': dm_id,
                                 'message': 'hewwooooo'})
     assert resp5.status_code == 200
+    dm_msg_id = resp5.json()['message_id']
 
     # there will only be two dm members in total
     resp6 = requests.get(config.url + 'dm/details/v1',
@@ -85,10 +87,11 @@ def test_admin_user_remove_works(clear_register_two):
                           json={'token': token1, 'u_id': id2})
     assert resp7.status_code == 200
 
-    # there will only be 1 user left
+    # there will still be two users left but user2's name will be 'Removed user'
     resp8 = requests.get(config.url + 'users/all/v1', params={'token': token1})
     assert resp8.status_code == 200
     users = resp8.json()
+    assert id2 not in [k['u_id'] for k in users['users']]
     assert len(users['users']) == 1
 
     # there will only be one channel member left and no channel owners
@@ -108,6 +111,7 @@ def test_admin_user_remove_works(clear_register_two):
                                  'start': 0})
     assert resp10.status_code == 200
     chan_msgs_data = resp10.json()
+    assert msg_id in [k['message_id'] for k in chan_msgs_data['messages']]
     assert id2 in [k['u_id'] for k in chan_msgs_data['messages']]
     assert 'Removed user' in [k['message'] for k in chan_msgs_data['messages']]
 
@@ -125,6 +129,7 @@ def test_admin_user_remove_works(clear_register_two):
                          params={'token': token1, 'dm_id': dm_id, 'start': 0})
     assert resp12.status_code == 200
     dm_msgs_data = resp12.json()
+    assert dm_msg_id in [k['message_id'] for k in dm_msgs_data['messages']]
     assert id2 in [k['u_id'] for k in dm_msgs_data['messages']]
     assert 'Removed user' in [k['message'] for k in dm_msgs_data['messages']]
     
@@ -135,11 +140,11 @@ def test_admin_user_remove_works(clear_register_two):
     assert resp13.status_code == 200
     profile = resp13.json()
    
-    assert profile['u_id'] == id2
-    assert profile['email'] == 'def@ghi.com'
-    assert profile['name_first'] == 'Removed'
-    assert profile['name_last'] == 'user'
-    assert profile['handle_str'] == 'firstlast0'
+    assert profile['user']['u_id'] == id2
+    assert profile['user']['email'] == 'def@ghi.com'
+    assert profile['user']['name_first'] == 'Removed'
+    assert profile['user']['name_last'] == 'user'
+    assert profile['user']['handle_str'] == 'firstlast0'
 
     # user2's new profile should have the same email and handle since it is now
     # reusable
@@ -156,11 +161,11 @@ def test_admin_user_remove_works(clear_register_two):
     assert resp15.status_code == 200
     new_profile = resp15.json()
     
-    assert new_profile['u_id'] == id2_new
-    assert new_profile['email'] == 'def@ghi.com'
-    assert new_profile['name_first'] == 'first'
-    assert new_profile['name_last'] == 'last'
-    assert new_profile['handle_str'] == 'firstlast0'
+    assert new_profile['user']['u_id'] == id2_new
+    assert new_profile['user']['email'] == 'def@ghi.com'
+    assert new_profile['user']['name_first'] == 'first'
+    assert new_profile['user']['name_last'] == 'last'
+    assert new_profile['user']['handle_str'] == 'firstlast0'
 
 @pytest.mark.usefixtures('clear_register_createchannel')
 def test_admin_user_remove_not_in_channel_or_dm(clear_register_createchannel):

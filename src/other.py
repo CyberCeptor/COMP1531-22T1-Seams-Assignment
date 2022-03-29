@@ -236,14 +236,15 @@ def get_messages(auth_user_id, data, start, data_str):
             'end': -1,
         }
 
-    # message starts
-    start_message = data['messages'][start]
-
     # get end
     end = start + 50
 
+    print(total_messages)
+
     # make sure end is suitable index place
     if end > total_messages:
+        end = -1
+    elif end == total_messages:
         end = -1
 
     # the messages list
@@ -252,9 +253,10 @@ def get_messages(auth_user_id, data, start, data_str):
     if end == -1:
         if start == total_messages - 1:
             # if there is only 1 message
-            to_return.append(start_message)
+            to_return.append(data['messages'][start])
         else:
-            # if there are less than 50 messages from the index start
+            # if there are less than 50 messages from the index start or
+            # if there are only 50 messages
             to_return = [data['messages'][index] for index in
                          range(start, total_messages)]
     else:

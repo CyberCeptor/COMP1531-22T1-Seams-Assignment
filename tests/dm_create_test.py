@@ -87,6 +87,22 @@ def test_dm_create_invalid_uid(clear_register_two):
                         json={'token': token1, 'u_ids': ['j',id1]})
     assert create.status_code == 400
 
+    create = requests.post(config.url + 'dm/create/v1',
+                        json={'token': token1, 'u_ids': id1})
+    assert create.status_code == 400
+
+    create = requests.post(config.url + 'dm/create/v1',
+                        json={'token': token1, 'u_ids': True})
+    assert create.status_code == 400
+
+    create = requests.post(config.url + 'dm/create/v1',
+                        json={'token': token1, 'u_ids': ''})
+    assert create.status_code == 400
+
+    create = requests.post(config.url + 'dm/create/v1',
+                        json={'token': token1, 'u_ids': 'str'})
+    assert create.status_code == 400
+
 @pytest.mark.usefixtures('clear_register_two')
 def test_dm_create_duplicate_uid(clear_register_two):
     """ clears any data stored in data_store and registers users with the

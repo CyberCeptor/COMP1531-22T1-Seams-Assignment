@@ -41,23 +41,18 @@ def user_profile_v1(token, u_id):
     # cast u_id into an int since it is a GET request
     u_id = cast_to_int_get_requests(u_id, 'user id')
 
-    check_valid_auth_id(u_id)
+    # grab the user data after checking if the u_id is valid
+    user = check_valid_auth_id(u_id)
 
-    store = data_store.get()
-    # iterates through the users in data_store and collects
-    # the information of that user.
-
-    for users in store['users']:
-        if users['id'] == u_id:
-            user = {
-                'u_id': users['id'],
-                'email': users['email'],
-                'name_first': users['first'],
-                'name_last': users['last'],
-                'handle_str': users['handle'],
-            }
-
-    return user
+    return {
+        'user': {
+            'u_id': user['id'],
+            'email': user['email'],
+            'name_first': user['first'],
+            'name_last': user['last'],
+            'handle_str': user['handle'],
+        }
+    }
 
 def user_profile_setemail_v1(token, email):
     """
@@ -106,7 +101,6 @@ def user_profile_setemail_v1(token, email):
                 user['email'] = email
 
     data_store.set(store)
-    return {}
 
 def user_profile_setname_v1(token, name_first, name_last):
     """
@@ -169,7 +163,6 @@ def user_profile_setname_v1(token, name_first, name_last):
                 user['name_last'] = name_last
 
     data_store.set(store)
-    return {}
 
 def check_invalid_handle(store, handle_str):
     """
@@ -244,4 +237,3 @@ def user_profile_sethandle_v1(token, handle_str):
                 user['handle_str'] = handle_str
 
     data_store.set(store)
-    return {}
