@@ -1,4 +1,4 @@
-import sys
+import sys  
 import signal
 import pickle
 from src import config
@@ -28,6 +28,7 @@ from src.channels import channels_create_v2, channels_list_v2,\
                          channels_listall_v2
 
 from src.data_store_pickle import pickle_data
+
 
 def quit_gracefully(*args):
     '''For coverage'''

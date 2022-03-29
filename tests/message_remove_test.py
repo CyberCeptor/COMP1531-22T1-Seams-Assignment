@@ -78,6 +78,7 @@ def test_message_remove_invalid_message_id(\
     resp4 = requests.delete(config.url + 'message/remove/v1', 
                           json = {'token': token, 'message_id': 100})
     assert resp4.status_code == 400
+    requests.delete(config.url + 'clear/v1')
 
 
 @pytest.mark.usefixtures('clear_register_createchannel_sendmsg')
@@ -85,13 +86,9 @@ def test_message_remove_global_user(clear_register_createchannel_sendmsg):
     """ testing if global owner cannot remove message if not in that channel """
     
     token = clear_register_createchannel_sendmsg[0] # user 1 is global owner
+    token_2 = clear_register_createchannel_sendmsg[4]
     # create user2
-    user2 = requests.post(config.url + 'auth/register/v2', 
-                            json={'email': 'def@abc.com', 
-                            'password': 'password',
-                            'name_first': 'first2', 'name_last': 'last2'}) 
-    user2_json = user2.json()
-    token_2 = user2_json['token']
+    
 
     # user2 creates private channel 2 and becomes owner of that channel
     create_channel_2 = requests.post(config.url + 'channels/create/v2',
@@ -175,6 +172,7 @@ def test_message_sent_not_belong_to_user(clear_register_createchannel_sendmsg):
     resp = requests.delete(config.url + 'message/remove/v1', 
                           json = {'token': token_2, 'message_id': message_id})
     assert resp.status_code == 403 # raise access error
+    
 
 @pytest.mark.usefixtures('clear_register_createchannel_sendmsg')
 def test_successful_message_remove_by_owner(\
@@ -183,13 +181,7 @@ def test_successful_message_remove_by_owner(\
     
     token = clear_register_createchannel_sendmsg[0]
     channel_id = clear_register_createchannel_sendmsg[1]
-
-    # create user2
-    user2 = requests.post(config.url + 'auth/register/v2', 
-                          json={'email': 'def@abc.com', 'password': 'password',
-                               'name_first': 'first2', 'name_last': 'last2'}) 
-    user2_json = user2.json()
-    token_2 = user2_json['token']
+    token_2 = clear_register_createchannel_sendmsg[4]
 
     # user 2 joins the channel 1
     requests.post(config.url + 'channel/join/v2',
@@ -208,18 +200,14 @@ def test_successful_message_remove_by_owner(\
                           json = {'token': token, 'message_id': message_id_2})
     assert resp.status_code == 200
 
+
 @pytest.mark.usefixtures('clear_register_createchannel_sendmsg')
 def test_successful_message_remove_by_user(clear_register_createchannel_sendmsg):
     """ testing if message removing is successful by user who sent the message 
     """
     
     channel_id = clear_register_createchannel_sendmsg[1]
-    # create user2
-    user2 = requests.post(config.url + 'auth/register/v2', 
-                          json={'email': 'def@abc.com', 'password': 'password',
-                               'name_first': 'first2', 'name_last': 'last2'}) 
-    user2_json = user2.json()
-    token_2 = user2_json['token']
+    token_2 = clear_register_createchannel_sendmsg[4]
 
     # user 2 joins the channel 1
     requests.post(config.url + 'channel/join/v2',
@@ -238,4 +226,53 @@ def test_successful_message_remove_by_user(clear_register_createchannel_sendmsg)
                           json = {'token': token_2, 'message_id': message_id_2})
     assert resp.status_code == 200
 
-requests.delete(config.url + 'clear/v1')
+
+@pytest.mark.usefixtures('clear_register_createchannel_sendmsg')
+def test_dm_successful_message_remove_by_user(clear_register_createchannel_sendmsg):
+    """ testing if message removing is successful by user who sent the message 
+    """
+    
+    message_id =  clear_register_createchannel_sendmsg[3]
+    token_2 = clear_register_createchannel_sendmsg[4]
+
+    # successful removal when user 2 tries to remove own message in dm
+    resp = requests.delete(config.url + 'message/remove/v1', 
+                          json = {'token': token_2, 'message_id': message_id})
+    assert resp.status_code == 200
+
+@pytest.mark.usefixtures('clear_register_createchannel_sendmsg')
+def test_dm_successful_message_remove_by_owner(clear_register_createchannel_sendmsg):
+    """ testing if message removing is successful by owner
+    """
+    
+    message_id =  clear_register_createchannel_sendmsg[3]
+    token_1 = clear_register_createchannel_sendmsg[0]
+
+    # successful removal when user 1 who is owner of dm tries to remove message in dm
+    resp = requests.delete(config.url + 'message/remove/v1', 
+                          json = {'token': token_1, 'message_id': message_id})
+    assert resp.status_code == 200
+
+
+@pytest.mark.usefixtures('clear_register_createchannel_sendmsg')
+def test_dm_fail_message_remove(clear_register_createchannel_sendmsg):
+    """ testing if message removing fails if user does not have access
+    """
+    
+    token_1 = clear_register_createchannel_sendmsg[0]
+    dm_id = clear_register_createchannel_sendmsg[5]
+    token_2 = clear_register_createchannel_sendmsg[4]
+
+    # user 1 sends message in dm
+    send_message = requests.post(config.url + 'message/senddm/v1', 
+                          json={'token': token_1,
+                                'dm_id': dm_id, 
+                                'message': 'hewwooooo'})
+    assert send_message.status_code == 200
+    dm_message = send_message.json()
+    message_id = dm_message['message_id']
+
+    # raise access error when user 2 tries to remove user 1's message
+    resp = requests.delete(config.url + 'message/remove/v1', 
+                          json = {'token': token_2, 'message_id': message_id})
+    assert resp.status_code == 403

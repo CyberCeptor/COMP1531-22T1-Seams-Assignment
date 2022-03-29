@@ -277,7 +277,7 @@ def test_successful_message_edit_global_owner(\
 
 @pytest.mark.usefixtures('clear_register_createchannel_sendmsg')
 def test_message_edit_empty(clear_register_createchannel_sendmsg):
-    """ testing if entered message is empty, the message is deleted """
+    """ testing if entered message is empty, the message is put """
 
     token = clear_register_createchannel_sendmsg[0]
     message_id = clear_register_createchannel_sendmsg[2]
@@ -287,4 +287,56 @@ def test_message_edit_empty(clear_register_createchannel_sendmsg):
                           'message': ''})
     assert resp.status_code == 200
 
-requests.delete(config.url + 'clear/v1')
+
+@pytest.mark.usefixtures('clear_register_createchannel_sendmsg')
+def test_dm_successful_message_edit_by_user(clear_register_createchannel_sendmsg):
+    """ testing if message removing is successful by user who sent the message 
+    """
+    
+    message_id =  clear_register_createchannel_sendmsg[3]
+    token_2 = clear_register_createchannel_sendmsg[4]
+
+    # successful removal when user 2 tries to edit own message in dm
+    resp = requests.put(config.url + 'message/edit/v1', 
+                          json={'token': token_2, 'message_id': message_id, 
+                          'message': 'edit'})
+    assert resp.status_code == 200
+
+@pytest.mark.usefixtures('clear_register_createchannel_sendmsg')
+def test_dm_successful_message_edit_by_owner(clear_register_createchannel_sendmsg):
+    """ testing if message removing is successful by owner
+    """
+    
+    message_id =  clear_register_createchannel_sendmsg[3]
+    token_1 = clear_register_createchannel_sendmsg[0]
+
+    # successful removal when user 1 who is owner of dm tries to edit message in dm
+    resp = requests.put(config.url + 'message/edit/v1', 
+                          json = {'token': token_1, 'message_id': message_id,
+                          'message': 'edit'})
+    assert resp.status_code == 200
+
+
+@pytest.mark.usefixtures('clear_register_createchannel_sendmsg')
+def test_dm_fail_message_edit(clear_register_createchannel_sendmsg):
+    """ testing if message removing is successful by user who sent the message 
+    """
+    
+    token_1 = clear_register_createchannel_sendmsg[0]
+    dm_id = clear_register_createchannel_sendmsg[5]
+    token_2 = clear_register_createchannel_sendmsg[4]
+
+    # user 1 sends message in dm
+    send_message = requests.post(config.url + 'message/senddm/v1', 
+                          json={'token': token_1,
+                                'dm_id': dm_id, 
+                                'message': 'hewwooooo'})
+    assert send_message.status_code == 200
+    dm_message = send_message.json()
+    message_id = dm_message['message_id']
+
+    # raise access error when user 2 tries to edit user 1's message
+    resp = requests.put(config.url + 'message/edit/v1', 
+                          json = {'token': token_2, 'message_id': message_id,
+                          'message': 'edit'})
+    assert resp.status_code == 403
