@@ -1,17 +1,17 @@
 """
-Filename: channel_test.py
+Filename: channel_invite_test.py
 
 Author: Zefan Cao(z5237177)
-Created: 28/02/2022 - 06/03/2022
+Created: 28/02/2022 - 27/03/2022
 
 Description: pytests for channel_invite_v1
 """
 
 import pytest
+
 import requests
+
 from src import config
-
-
 
 @pytest.mark.usefixtures('clear_register_createchannel')
 def test_channel_invite_invalid_channel(clear_register_createchannel):
@@ -60,7 +60,6 @@ def test_channel_invite_invalid_channel(clear_register_createchannel):
                                 'u_id': id2})
     assert add.status_code == 400
 
-
 @pytest.mark.usefixtures('clear_register_createchannel')
 def test_channel_invite_self(clear_register_createchannel):
     """
@@ -81,7 +80,6 @@ def test_channel_invite_self(clear_register_createchannel):
                         json={'token': token, 'channel_id': chan_id1,
                                 'u_id': id})
     assert add.status_code == 400
-
 
 @pytest.mark.usefixtures('clear_register_createchannel')
 def test_channel_invite_invalid_inviter(clear_register_createchannel):

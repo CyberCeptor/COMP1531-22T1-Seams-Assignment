@@ -1,31 +1,23 @@
 """
-Filename: channel_test.py
+Filename: channel_details_test.py
 
 Author: Yangjun Yue(z5317840)
-Created: 28/02/2022 - 06/03/2022
+Created: 28/02/2022 - 27/03/2022
 
 Description: pytests for channel_details_v1
 """
 
 import pytest
+
 import requests
 
 from src import config
 
+from src.global_vars import expired_token, unsaved_token
+
 @pytest.mark.usefixtures('clear_register_createchannel')
 def test_channel_details_invalid_token(clear_register_createchannel):
-    """
-    testing invalid user type to raise input error
-
-    Arguments: clear_and_register_and_create (fixture)
-
-    Exceptions:
-        InputError - Raised for all test cases listed below
-
-    Return Value: N/A
-    """
-    # pylint: disable=unused-argument
-
+    """ testing invalid user type to raise input error """
 
     # token is int
     chan_id = clear_register_createchannel[1]
@@ -42,36 +34,23 @@ def test_channel_details_invalid_token(clear_register_createchannel):
     assert resp2.status_code == 400
     # wrong token input
     resp3 = requests.get(config.url + 'channel/details/v2', 
-                          params={'token': 'not right string', 'channel_id': chan_id})
+                          params={'token': 'not right string',
+                                  'channel_id': chan_id})
     assert resp3.status_code == 403
-    # expired token
-    expired_token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MSwic2Vzc\
-        2lvbl9pZCI6MSwiaGFuZGxlIjoiZmlyc3RsYXN0IiwiZXhwIjoxNTQ3\
-            OTc3ODgwfQ.366QLXfCURopcjJbAheQYLVNlGLX_INKVwr8_TVXYEQ'
-    resp4 = requests.get(config.url + 'channel/details/v2', 
-                          params={'token': expired_token, 'channel_id': chan_id})
-    assert resp4.status_code == 403
-    # unsaved token
-    unsaved_token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MSwic2Vzc2lvbl9pZCI6MSw\
-            iaGFuZGxlIjoiZmlyc3RsYXN0IiwiZXhwIjoyNTQ3OTc3ODgwfQ.ckPPWiR-m6x0IRq\
-            pQtKmJgNLiD8eAEiTv2i8ToK3mkY'
-    resp5 = requests.get(config.url + 'channel/details/v2', 
-                          params={'token': unsaved_token, 'channel_id': chan_id})
-    assert resp5.status_code == 403
 
+    # expired token
+    resp4 = requests.get(config.url + 'channel/details/v2', 
+                         params={'token': expired_token, 'channel_id': chan_id})
+    assert resp4.status_code == 403
+
+    # unsaved token
+    resp5 = requests.get(config.url + 'channel/details/v2', 
+                         params={'token': unsaved_token, 'channel_id': chan_id})
+    assert resp5.status_code == 403
 
 @pytest.mark.usefixtures('clear_register_createchannel')
 def test_channel_details_invalid_channel(clear_register_createchannel):
-    """
-    testing invalid channel id to raise input error
-
-    Arguments: clear_and_register_and_create (fixture)
-
-    Exceptions:
-        InputError - Raised for all test cases listed below
-
-    Return Value: N/A
-    """
+    """ testing invalid channel id to raise input error """
   
     token = clear_register_createchannel[0]['token']
     # no channel id input
@@ -91,25 +70,15 @@ def test_channel_details_invalid_channel(clear_register_createchannel):
                           params={'token': token, 'channel_id': 2})
     assert resp3.status_code == 400
     
-
 @pytest.mark.usefixtures('clear_register_createchannel')
-def test_user_not_belong(clear_register_createchannel):
-    """
-    testing if user belongs to the channel
-
-    Arguments: clear_and_register_and_create (fixture)
-
-    Exceptions: 
-        Access Error - Raised for all test cases below
-
-    Return Value: N/A
-    """
+def test_channel_details_user_not_belong(clear_register_createchannel):
+    """ testing if user belongs to the channel """
     
     chan_id = clear_register_createchannel[1]
 
     # create user 2
     user2 = requests.post(config.url + 'auth/register/v2', 
-                            json={'email': 'def@abc.com', 'password': 'password',
+                          json={'email': 'def@abc.com', 'password': 'password',
                                'name_first': 'first2', 'name_last': 'last2'}) 
     user2_data = user2.json()
     token_2 = user2_data['token']
@@ -120,20 +89,10 @@ def test_user_not_belong(clear_register_createchannel):
     
     requests.delete(config.url + 'clear/v1')
 
-
 @pytest.mark.usefixtures('clear_register_createchannel')
 def test_channel_details_return(clear_register_createchannel):
-    """
-    testing if channel_details_v1 returns right values
-
-    Arguments: clear_and_register_and_create (fixture)
-
-    Exceptions: N/A
-
-    Return Value: N/A
-    """
+    """ testing if channel_details_v1 returns right values """
     
-
     # pylint: disable=unused-argument
     token = clear_register_createchannel[0]['token']
     chan_id = clear_register_createchannel[1]
@@ -144,21 +103,24 @@ def test_channel_details_return(clear_register_createchannel):
                           params={'token': token, 'channel_id': chan_id})
     assert resp.status_code == 200
 
-    channel_details = resp.json()
-    owner_members = [{
-            'u_id': u_id,
-            'email': 'abc@def.com',
-            'name_first': 'first',
-            'name_last': 'last',
-            'handle_str': 'firstlast'
-        }]
+    chan_details = resp.json()
 
     # check matching information
-    assert channel_details['name'] == 'channel_name'
-    assert channel_details['is_public'] == True
-    assert channel_details['owner_members'] == owner_members
+    assert chan_details['name'] == 'channel_name'
+    assert chan_details['is_public'] == True
+
     # user 1 is the only member in this channel for now
-    assert channel_details['all_members']== owner_members
+    assert u_id in [k['u_id'] for k in chan_details['owner_members']]
+    assert 'abc@def.com' in [k['email'] for k in chan_details['owner_members']]
+    assert 'first' in [k['name_first'] for k in chan_details['owner_members']]
+    assert 'last' in [k['name_last'] for k in chan_details['owner_members']]
+    assert 'firstlast' in [k['handle_str'] for k in chan_details['owner_members']]
+
+    assert u_id in [k['u_id'] for k in chan_details['all_members']]
+    assert 'abc@def.com' in [k['email'] for k in chan_details['all_members']]
+    assert 'first' in [k['name_first'] for k in chan_details['all_members']]
+    assert 'last' in [k['name_last'] for k in chan_details['all_members']]
+    assert 'firstlast' in [k['handle_str'] for k in chan_details['all_members']]
 
 requests.delete(config.url + 'clear/v1')
 

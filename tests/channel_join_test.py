@@ -1,27 +1,24 @@
 """
-Filename: channel_test.py
+Filename: channel_join_test.py
 
 Author: Zefan Cao(z5237177)
-Created: 28/02/2022 - 06/03/2022
+Created: 28/02/2022 - 27/03/2022
 
 Description: pytests for channel join_v1
 """
+
 import pytest
+
 import requests
+
 from src import config
 
 @pytest.mark.usefixtures('clear_register_createchannel')
 def test_channel_join_successfully(clear_register_createchannel):
-    """
-    clears any data stored in data_store and registers a invitee, a inviter
+    """ clears any data stored in data_store and registers a invitee, a inviter
     with given information, create a channel with user id, add user with token
-
-    Arguments: clear_register_createchannel (fixture)
-
-    Exceptions: N/A
-
-    Return Value: N/A
     """
+
     chan1_id = clear_register_createchannel[1]
     resp1 = requests.post(config.url + 'auth/register/v2', 
                         json={'email': 'xue2@gmail.com', 'password': 'xzq19112',
@@ -34,17 +31,9 @@ def test_channel_join_successfully(clear_register_createchannel):
 
 @pytest.mark.usefixtures('clear_register_createchannel')
 def test_channel_join_invalid_token(clear_register_createchannel):
-    """
-    clears any data stored in data_store and registers a inviter
-    with given information, testing invalid token to raise input error
+    """ clears any data stored in data_store and registers a inviter
+    with given information, testing invalid token to raise input error """
 
-    Arguments: clear_register_createchannel (fixture)
-
-    Exceptions:
-        InputError - Raised for an invlaid inviter
-
-    Return Value: N/A
-    """
     chan_id1 = clear_register_createchannel[1]
     add = requests.post(config.url + 'channel/join/v2',
                         json={'token': 2, 'channel_id': chan_id1})
@@ -68,17 +57,9 @@ def test_channel_join_invalid_token(clear_register_createchannel):
 
 @pytest.mark.usefixtures('clear_register_createchannel')
 def test_channel_join_invalid_channel(clear_register_createchannel):
-    """
-    clears any data stored in data_store and registers a invitee with
-    given information, testing an invalid channel to raise input error
+    """ clears any data stored in data_store and registers a invitee with
+    given information, testing an invalid channel to raise input error """
 
-    Arguments: clear_register_createchannel (fixture)
-
-    Exceptions:
-        InputError - Raised for an invalid channel
-
-    Return Value: N/A
-    """
     id1 = clear_register_createchannel[0]['token']
     add = requests.post(config.url + 'channel/join/v2',
                         json={'token': id1, 'channel_id': 5})
@@ -102,18 +83,9 @@ def test_channel_join_invalid_channel(clear_register_createchannel):
 
 @pytest.mark.usefixtures('clear_register_createchannel')
 def test_channel_join_user_already_in_channel(clear_register_createchannel):
-    """
-    clears any data stored in data_store and registers a invitee with
-    given information, testing a invitee is alredy in channel to raise input
-    error
+    """ clears any data stored in data_store and registers a invitee with
+    given information, testing a invitee is alredy in channel to raise input """
 
-    Arguments: clear_register_createchannel (fixture)
-
-    Exceptions:
-        InputError - Raised for a invitee(already in channel)
-
-    Return Value: N/A
-    """
     id1 = clear_register_createchannel[0]['token']
     chan_id1 = clear_register_createchannel[1]
     add = requests.post(config.url + 'channel/join/v2',
@@ -122,18 +94,10 @@ def test_channel_join_user_already_in_channel(clear_register_createchannel):
 
 @pytest.mark.usefixtures('clear_register_createchannel')
 def test_channel_join_private_channel():
-    """
-    clears any data stored in data_store and registers a invitee, a inviter
+    """ clears any data stored in data_store and registers a invitee, a inviter
     with given information, create a channel with user id, testing the channel
-    is private to raise a access error
+    is private to raise a access error """
 
-    Arguments: N/A
-
-    Exceptions:
-        AccessError - Raised for a channel is private
-
-    Return Value: N/A
-    """
     requests.delete(config.url + 'clear/v1')
     resp = requests.post(config.url + 'auth/register/v2', 
                         json={'email': 'abc@def.com', 'password': 'password',

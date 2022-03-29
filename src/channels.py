@@ -3,33 +3,39 @@ Filename: channels.py
 
 Author: Jenson Morgan(z5360181), Yangjun Yue(z5317840)
 Created: 24/02/2022 - 04/03/2022
-from src.other import check_valid_auth_id
-from src.other import check_user_is_member_or_owner
+
 Description: implementation for
     - creating either a public or a private channel with given name
     - listing all channels the user is part of and gives the channel id and name
     - listing all valid channels and provide their channel id and name
 """
+
 from src.error import InputError
 from src.other import check_valid_auth_id, check_user_is_member
-from src.data_store import data_store
 from src.token import token_valid_check, token_get_user_id
+
+from src.data_store import data_store
 
 def channels_list_v2(token):
     """
-    Provides a channel list of all the public channels
-    the user is a member of.
+    Validates the user token, gets the user_id from the decoded
+    token, validates the user id, searches all channels and 
+    appends the channel name and id when the user is a member.
+
+    Channels_list will be ordered by the channel_id, so regardless
+    of when the user joins the channel, the return value will be ordered
+    by the lowest value channel_id first to the next greatest value.
 
     Arguments:
-        auth_user_id(int)    - must be a valid user id.
+        token   - token must be valid.
 
-    Exceptions:
-        null
+    Exceptions: N/A
 
     Return Value:
         Returns a dict containing the channel_id and name of the channels
         the user is a member of
     """
+
     token_valid_check(token)
     auth_user_id = token_get_user_id(token)
 
@@ -45,6 +51,7 @@ def channels_list_v2(token):
                 'name': channel['name'],
             }
             channels_list.append(channel_data)
+
     return {
         'channels': channels_list
     }
@@ -57,8 +64,7 @@ def channels_listall_v2(token):
     Arguments:
         auth_user_id (int)      - an integer that specifies user id
 
-    Exceptions:
-        N/A
+    Exceptions: N/A
 
     Return Value:
         Returns list of dictionaries containing channel id as int
@@ -73,18 +79,12 @@ def channels_listall_v2(token):
     # check that the auth_user_id exists
     check_valid_auth_id(auth_user_id)
 
-    # create list of dictionaries to store each channel_return
-    dict_list = []
-    for channel in store['channels']:
-        channel_return = {
-            'channel_id': channel['channel_id'],
-            'name': channel['name']
-        }
-        dict_list.append(channel_return)
-
     # return lists of all channels(including private ones) with details
     return {
-        'channels': dict_list
+        'channels': [{
+            'channel_id': channel['channel_id'],
+            'name': channel['name']
+        } for channel in store['channels']]
     }
 
 def channels_create_v2(token, name, is_public):
@@ -119,16 +119,18 @@ def channels_create_v2(token, name, is_public):
     token_valid_check(token)
     auth_user_id = token_get_user_id(token)
 
-    check_valid_auth_id(auth_user_id)
+    user_info = check_valid_auth_id(auth_user_id)
 
     if len(name) > 20:
-        raise InputError(description='The channel name must be less than 20 characters')
+        raise InputError(description='The channel name must be less than 20 \
+                                      characters')
 
     if name == '':
         raise InputError(description='No channel name was entered')
 
     if not isinstance(is_public, bool):
-        raise InputError(description='The public/private value given is not of type bool')
+        raise InputError(description='The public/private value given is not of\
+                                      type bool')
 
     # Loops through data_store['channels'] to check channel names if they
     # already exist. Having two channles with the same name is fine,
@@ -140,10 +142,6 @@ def channels_create_v2(token, name, is_public):
     # get the number of channels created so far, incremented for the new channel
     # id.
     channel_id = len(store['channels']) + 1
-
-    for user in store['users']:
-        if user['id'] == auth_user_id:
-            user_info = user
 
     # Storing the channel information
     channel_data = {

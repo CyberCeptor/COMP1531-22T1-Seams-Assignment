@@ -58,10 +58,10 @@ def admin_userpermission_change(token, u_id, permission_id):
 
     # check for invalid permission_id inputs
     if not isinstance(permission_id, int) or type(permission_id) is bool:
-        raise InputError('Permission id is not of valid type')
+        raise InputError(description='Permission id is not of valid type')
 
     if permission_id not in [1, 2]:
-        raise InputError('Invalid permission id')
+        raise InputError(description='Invalid permission id')
 
     # count the number of global users
     num_global_owners = len([user for user in store['users'] if 
@@ -71,9 +71,11 @@ def admin_userpermission_change(token, u_id, permission_id):
     if (check_user_is_global_owner(u_id) and num_global_owners == 1 and
         permission_id == 2):
         raise InputError(description='Cannot demote the only global owner')
-    elif check_user_is_global_owner(u_id) and permission_id == 1:
+    
+    if check_user_is_global_owner(u_id) and permission_id == 1:
         raise InputError(description='User is already a global owner')
-    elif not check_user_is_global_owner(u_id) and permission_id == 2:
+    
+    if not check_user_is_global_owner(u_id) and permission_id == 2:
         raise InputError(description='User is already a member')
 
     change_permission(u_id, permission_id)

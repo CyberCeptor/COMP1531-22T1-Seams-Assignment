@@ -20,15 +20,13 @@ from src.error import InputError
 from src.data_store import data_store
 from src.token import token_generate, token_valid_check, token_remove
 
-from src.global_vars import valid_email_regex
-
 def auth_login_v2(email, password):
     """
     logs a user in with the given email and password and returns their
     authorised user id
 
     Arguments:
-        email (str)    - a string that matches the VALID_EMAIL_REGEX above
+        email (str)    - a string that matches the valid_email_regex above
         password (str) - a string that can contain any characters
 
     Exceptions:
@@ -75,7 +73,7 @@ def auth_register_v2(email, password, name_first, name_last):
     name_last and stores this information in data_store
 
     Arguments:
-        email (str)      - a string that matches the VALID_EMAIL_REGEX above
+        email (str)      - a string that matches the valid_email_regex
         password (str)   - a string that can contain any characters
         name_first (str) - a string that can contain a-z, A-Z, -, ' and spaces
         name_last (str)  - a string that can contain a-z, A-Z, -, ' and spaces
@@ -91,7 +89,7 @@ def auth_register_v2(email, password, name_first, name_last):
     # generate user id
     u_id = len(store['users']) + 1
 
-    check_invalid_email(store, valid_email_regex, email)
+    check_invalid_email(store, email)
 
     # check for invalid password
     if len(password) < 6:
@@ -126,15 +124,15 @@ def auth_register_v2(email, password, name_first, name_last):
         'auth_user_id': u_id,
     }
 
-def check_invalid_email(store, valid_email_regex, email):
+def check_invalid_email(store, email):
     """
-    tests if the given email is valid using the VALID_EMAIL_REGEX and checks
+    tests if the given email is valid using the valid_email_regex and checks
     if there is already another user with that email
 
     Arguments:
         store (dict) - a dict that stores user and channel data
         valid_email_regex (regex) - a string that can contain any characters
-        email (str)  - a string that matches the VALID_EMAIL_REGEX above
+        email (str)  - a string that matches the valid_email_regex above
 
     Exceptions:
         InputError - Occurs if the email doesn't match the regex and if there is
@@ -142,6 +140,9 @@ def check_invalid_email(store, valid_email_regex, email):
 
     Return Value: N/A
     """
+
+    # valid email regex from spec
+    valid_email_regex = r'^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}$'
 
     # check for valid email address
     if not re.fullmatch(valid_email_regex, str(email)):
