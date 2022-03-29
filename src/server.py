@@ -111,7 +111,6 @@ def logout():
 def get_all_users():
     token = request.args.get('token')
     users = users_all_v1(token)
-    print(users)
     save_data()
     return dumps(users)
 
@@ -124,7 +123,6 @@ def user_profile():
     token = request.args.get('token')
     u_id = request.args.get('u_id')
     profile = user_profile_v1(token, u_id)
-    print(profile)
     save_data()
     return jsonify(profile)
 
