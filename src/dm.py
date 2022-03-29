@@ -84,6 +84,9 @@ def dm_create_v1(token, u_ids):
         'creator': owner,
         'messages': []
     }
+
+    print(dm_name)
+
     store['dms'].append(new_dm)
     # Save data
     data_store.set(store)

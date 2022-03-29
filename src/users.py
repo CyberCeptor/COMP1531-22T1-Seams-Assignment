@@ -2,7 +2,7 @@
 Filename: users.py
 
 Author: Aleesha Bunrith(z5371516)
-Created: 21/03/2022 - 28/03/2022
+Created: 21/03/2022 - 30/03/2022
 
 Description: Implementation for getting the info of all current users
 """
@@ -36,5 +36,5 @@ def users_all_v1(token):
             'name_first': user['first'],
             'name_last': user['last'],
             'handle_str': user['handle'],
-        } for user in store['users']]
+        } for user in store['users'] if user['removed'] is False]
     }

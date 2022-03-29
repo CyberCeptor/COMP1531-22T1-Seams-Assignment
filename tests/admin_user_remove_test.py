@@ -91,9 +91,8 @@ def test_admin_user_remove_works(clear_register_two):
     resp8 = requests.get(config.url + 'users/all/v1', params={'token': token1})
     assert resp8.status_code == 200
     users = resp8.json()
-    assert len(users['users']) == 2
-    assert 'Removed' in [k['name_first'] for k in users['users']]
-    assert 'user' in [k['name_last'] for k in users['users']]
+    assert id2 not in [k['u_id'] for k in users['users']]
+    assert len(users['users']) == 1
 
     # there will only be one channel member left and no channel owners
     resp9 = requests.get(config.url + 'channel/details/v2',
