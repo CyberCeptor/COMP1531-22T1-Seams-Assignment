@@ -79,46 +79,40 @@ def message_edit_v1(token, message_id, message):
     auth_user_id = token_get_user_id(token)
     check_valid_auth_id(auth_user_id)
 
+    # is user is a global member and is member in the channel
+    global_owner = check_user_is_global_owner(auth_user_id)
+
     message_data = check_message_id_valid(message_id)[0]
     channel_sent = check_message_id_valid(message_id)[1]
     info = check_message_id_valid(message_id)[2]
     
-    # is user is a global member and is member in the channel
-
     if channel_sent is False:
-        # check is user is in the dm
-        if check_user_is_member(auth_user_id, info, 'members'):
-            if (info['creator']['u_id'] == auth_user_id 
-            or message_data['u_id'] == auth_user_id):
-                # if user is either creator or it's the user 
-                # who sent the message
-                message_data['message'] = message
-                if message == '':
-                    message_remove_v1(token, message_id)
-            else:
-                raise AccessError(description='User has no access to \
-                this specified message')
+        # if user is either creator or it's the user who sent the message
+        if (message_data['u_id'] == auth_user_id or 
+        info['creator']['u_id'] == auth_user_id):
+            message_data['message'] = message
+            # remove message when message input is empty
+            if message == '':
+                message_remove_v1(token, message_id)
         else:
-            raise AccessError(description='User has no access to this specified \
-                                        message')
-    else:                                    
-        # check global owner case
-        global_owner = check_user_is_global_owner(auth_user_id)
-        # check is user is in the channel
-        if check_user_is_member(auth_user_id, info, 'all_members'):
-            if (check_user_is_member(auth_user_id, info, 'owner_members') or 
-                global_owner is True or message_data['u_id'] == auth_user_id):
-                # if user is either owner or global owner or it's the user 
-                # who sent the message
-                message_data['message'] = message
-                if message == '':
-                    message_remove_v1(token, message_id)
-            else:
-                raise AccessError(description='User has no access to \
-                this specified message')
+            raise AccessError(description='User has no access to this specified message')
+    else:
+        # if user is either owner or it's the user who sent the message
+        if (message_data['u_id'] == auth_user_id or
+        check_user_is_member(auth_user_id, info, 'owner_members')):
+            message_data['message'] = message
+            # remove message when message input is empty
+            if message == '':
+                message_remove_v1(token, message_id)
+        # member is global owner in channel
+        elif (check_user_is_member(auth_user_id, info, 'all_members') and
+        global_owner is True):
+            message_data['message'] = message
+            # remove message when message input is empty
+            if message == '':
+                message_remove_v1(token, message_id)
         else:
-            raise AccessError(description='User has no access to this specified \
-                                        message')
+            raise AccessError(description='User has no access to this specified message')
 
     data_store.set(store)
 
@@ -154,48 +148,27 @@ def message_remove_v1(token, message_id):
     channel_sent = check_message_id_valid(message_id)[1]
     info = check_message_id_valid(message_id)[2]
     
-    # # is user is a global member and is member in the channel
-    # global_owner = check_user_is_global_owner(auth_user_id)
-    # if message_data['u_id'] == auth_user_id:
-    #     info['messages'].remove(message_data)
-    # elif check_user_is_member(auth_user_id, info, 'owner_members'):
-    #     info['messages'].remove(message_data)
-    # elif check_user_is_member(auth_user_id, info, 'all_members') and\
-    #     global_owner is True:
-    #     info['messages'].remove(message_data)
-    # else:
-    #     raise AccessError(description='User has no access to this specified message')
-
     if channel_sent is False:
-        # check is user is in the dm
-        if check_user_is_member(auth_user_id, info, 'members'):
-            if (info['creator']['u_id'] == auth_user_id 
-            or message_data['u_id'] == auth_user_id):
-                # if user is either creator or it's the user 
-                # who sent the message
-                info['messages'].remove(message_data)
-            else:
-                raise AccessError(description='User has no access to \
-                this specified message')
+        # if user is either creator or it's the user who sent the message
+        if (message_data['u_id'] == auth_user_id or 
+        info['creator']['u_id'] == auth_user_id):
+            info['messages'].remove(message_data)
         else:
-            raise AccessError(description='User has no access to this specified \
-                                        message')
+            raise AccessError(description='User has no access to this specified message')
     else:
-        # check global owner case
+        # is user is a global member and is member in the channel
         global_owner = check_user_is_global_owner(auth_user_id)
-        # check is user is in the channel
-        if check_user_is_member(auth_user_id, info, 'all_members'):
-            if (check_user_is_member(auth_user_id, info, 'owner_members') or 
-                global_owner is True or message_data['u_id'] == auth_user_id):
-                # if user is either owner or global owner or it's the user 
-                # who sent the message
-                info['messages'].remove(message_data)
-            else:
-                raise AccessError(description='User has no access to \
-                this specified message')
+
+        # if user is either owner or it's the user who sent the message
+        if (message_data['u_id'] == auth_user_id or
+        check_user_is_member(auth_user_id, info, 'owner_members')):
+            info['messages'].remove(message_data)
+        # member is global owner in channel
+        elif (check_user_is_member(auth_user_id, info, 'all_members') and
+        global_owner is True):
+            info['messages'].remove(message_data)
         else:
-            raise AccessError(description='User has no access to this specified \
-                                        message')
+            raise AccessError(description='User has no access to this specified message')
 
     data_store.set(store)
 

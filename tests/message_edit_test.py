@@ -269,12 +269,17 @@ def test_successful_message_edit_global_owner(\
     message_id_2 = message['message_id']
 
     # successful edit when user 1 who is the owner edits user2's message 
-    # since user 1 is global owner
+    # since user 1 is global owner, for empty string case as well
     resp = requests.put(config.url + 'message/edit/v1', 
                           json={'token': token, 'message_id': message_id_2,
-                          'message': 'attempt'})
+                          'message': 'edit'})
     assert resp.status_code == 200
 
+    resp = requests.put(config.url + 'message/edit/v1', 
+                          json={'token': token, 'message_id': message_id_2,
+                          'message': ''})
+    assert resp.status_code == 200
+    
 @pytest.mark.usefixtures('clear_register_createchannel_sendmsg')
 def test_message_edit_empty(clear_register_createchannel_sendmsg):
     """ testing if entered message is empty, the message is put """
@@ -282,7 +287,7 @@ def test_message_edit_empty(clear_register_createchannel_sendmsg):
     token = clear_register_createchannel_sendmsg[0]
     chan_message_id = clear_register_createchannel_sendmsg[2]
     dm_message_id = clear_register_createchannel_sendmsg[3]
-
+    
     # test successful run when message is empty
     resp = requests.put(config.url + 'message/edit/v1', 
                           json={'token': token, 'message_id': chan_message_id, 
