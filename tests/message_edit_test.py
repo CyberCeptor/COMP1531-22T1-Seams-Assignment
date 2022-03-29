@@ -280,10 +280,17 @@ def test_message_edit_empty(clear_register_createchannel_sendmsg):
     """ testing if entered message is empty, the message is put """
 
     token = clear_register_createchannel_sendmsg[0]
-    message_id = clear_register_createchannel_sendmsg[2]
+    chan_message_id = clear_register_createchannel_sendmsg[2]
+    dm_message_id = clear_register_createchannel_sendmsg[3]
+
     # test successful run when message is empty
     resp = requests.put(config.url + 'message/edit/v1', 
-                          json={'token': token, 'message_id': message_id, 
+                          json={'token': token, 'message_id': chan_message_id, 
+                          'message': ''})
+    assert resp.status_code == 200
+    # test dm case
+    resp = requests.put(config.url + 'message/edit/v1', 
+                          json={'token': token, 'message_id': dm_message_id, 
                           'message': ''})
     assert resp.status_code == 200
 

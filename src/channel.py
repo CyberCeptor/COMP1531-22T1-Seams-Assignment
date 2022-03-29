@@ -332,7 +332,7 @@ def channel_addremove_owner_valid_check(token, channel_id, u_id, option):
             
         #add the member_data to the owner_members_dict
         channel['owner_members'].append(member_data)
-    elif option == 'remove':
+    if option == 'remove':
         if check_user_is_member(u_id, channel, 'owner_members') is None:
             raise InputError(description='The user is already an owner_member')
 

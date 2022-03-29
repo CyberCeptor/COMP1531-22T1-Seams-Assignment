@@ -183,7 +183,7 @@ def message_remove_v1(token, message_id):
         else:
             raise AccessError(description='User has no access to this specified \
                                         message')
-    elif channel_sent is False:
+    else:
         # check is user is in the dm
         if check_user_is_member(auth_user_id, info, 'members'):
             if (info['creator']['u_id'] == auth_user_id 
