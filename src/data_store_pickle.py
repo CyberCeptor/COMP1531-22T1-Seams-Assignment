@@ -1,3 +1,12 @@
+"""
+Filename: data_store_pickle.py
+
+Author: Aleesha Bunrith(z5371516)
+Created: 15/03/2022 - 21/03/2022
+
+Description: pickles the data from data_store into the datastore.p file
+"""
+
 import pickle
 
 from src.data_store import data_store

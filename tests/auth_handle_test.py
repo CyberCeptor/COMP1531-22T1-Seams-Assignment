@@ -47,7 +47,8 @@ def test_create_handle_longer_than_twenty():
     # create a user with a first name longer than 20 characters
     resp0 = requests.post(config.url + 'auth/register/v2', 
                          json={'email': 'abc@def.com', 'password': 'password',
-                               'name_first': name_22_chars, 'name_last': 'last'})
+                               'name_first': name_22_chars,
+                               'name_last': 'last'})
     assert resp0.status_code == 200
     user1 = resp0.json()
     token = user1['token']
@@ -55,7 +56,8 @@ def test_create_handle_longer_than_twenty():
     # create a second user with a last name longer than 20 characters
     resp1 = requests.post(config.url + 'auth/register/v2', 
                          json={'email': 'def@ghi.com', 'password': 'password',
-                               'name_first': 'first', 'name_last': name_22_chars})
+                               'name_first': 'first',
+                               'name_last': name_22_chars})
     assert resp1.status_code == 200
 
     # create a third user with a full name longer than 20 characters
@@ -84,14 +86,16 @@ def test_create_handle_longer_than_twenty_duplicate():
 
     resp0 = requests.post(config.url + 'auth/register/v2', 
                          json={'email': 'abc@def.com', 'password': 'password',
-                               'name_first': name_22_chars, 'name_last': 'last'})
+                               'name_first': name_22_chars,
+                               'name_last': 'last'})
     assert resp0.status_code == 200
     user1 = resp0.json()
     token = user1['token']
 
     resp1 = requests.post(config.url + 'auth/register/v2', 
                          json={'email': 'def@ghi.com', 'password': 'password',
-                               'name_first': name_22_chars, 'name_last': 'last'})
+                               'name_first': name_22_chars,
+                               'name_last': 'last'})
     assert resp1.status_code == 200
 
     resp2 = requests.get(config.url + 'users/all/v1', params={'token': token})

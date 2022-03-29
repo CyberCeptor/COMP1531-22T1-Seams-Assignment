@@ -1,5 +1,5 @@
 """
-Filename: clear_and_register_two.py
+Filename: clear_and_register.py
 
 Author: Aleesha Bunrith(z5371516)
 Created: 26/03/2022
@@ -16,7 +16,7 @@ from src import config
 @pytest.fixture
 def clear_register():
     """ clears any data stored in data_store and registers a user with the
-    given information """
+    given information and returns the json return info """
 
     requests.delete(config.url + 'clear/v1')
 

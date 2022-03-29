@@ -8,22 +8,17 @@ Description: pytests for channel_listall_v1
 """
 
 import pytest
+
 import requests
 
 from src import config
 
+from src.global_vars import expired_token, unsaved_token
+
 def test_channels_listall_invalid_token():
-    """
-    Testing invalid user id to raise input error
+    """ Testing invalid user id to raise input error  """
 
-    Arguments: clear_and_register_and_create_channel (fixture)
-
-    Exceptions:
-        InputError - non existing user id
-
-    Return Value: N/A
-    """
-    # pylint: disable=unused-argument
+    requests.delete(config.url + 'clear/v1')
 
     # token is int
     resp0 = requests.get(config.url + 'channels/listall/v2', 
@@ -45,138 +40,94 @@ def test_channels_listall_invalid_token():
     assert resp3.status_code == 403 
 
     # token is expired
-    expired_token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MSwic2Vzc2l\
-        vbl9pZCI6MSwiaGFuZGxlIjoiZmly c3RsYXN0IiwiZXhwIjoxNTQ3OTc3ODgwfQ.366Q\
-        LXfCURopcjJbAheQYLVNlGLX_INKVwr8_TVXYEQ'
     resp4 = requests.get(config.url + 'channels/listall/v2', 
-        params={'token': expired_token})
+                            params={'token': expired_token})
     assert resp4.status_code == 403
     # token is unsaved
-    unsaved_token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MSwic2Vzc2l\
-        vbl9pZCI6MSwiaGFuZGxlIjoiZmlyc3RsYXN0IiwiZXhwIjoyNTQ3OTc3ODgwfQ.ckPPW\
-        iR-m6x0IRqpQtKmJgNLiD8eAEiTv2i8ToK3mkY'
     resp5 = requests.get(config.url + 'channels/listall/v2', 
-        params={'token': unsaved_token})
+                            params={'token': unsaved_token})
     assert resp5.status_code == 403
 
-def test_channels_listall_v1_return():
-    """ testing if listall returns right type of value
+@pytest.mark.usefixtures('clear_register_two_createchannel')
+def test_channels_listall_v1_return(clear_register_two_createchannel):
+    """ testing if listall returns right type of value """
 
-    Arguments: clear_and_register_and_create_channel (fixture)
-
-    Exceptions: N/A
-
-    Return Value: N/A
-    """
-
-    # pylint: disable=unused-argument
-
-    requests.delete(config.url + 'clear/v1')
-    
-    # create user1
-    user1 = requests.post(config.url + 'auth/register/v2', 
-                            json={'email': 'abc@def.com', 'password': 'password',
-                               'name_first': 'first', 'name_last': 'last'})
-    user1_json = user1.json()
-
-    # create user2
-    user2 = requests.post(config.url + 'auth/register/v2', 
-                            json={'email': 'def@abc.com', 'password': 'password',
-                               'name_first': 'first2', 'name_last': 'last2'}) 
-    user2_json = user2.json()
-
-    # create the 3 channels for user1
-    channel1 = requests.post(config.url + 'channels/create/v2', 
-                            json={'token': user1_json['token'], 
-                            'name': 'channel_name1', 'is_public': True})
-
-    assert channel1.status_code == 200
-    channel1_json = channel1.json()
+    user1_token = clear_register_two_createchannel[0]['token']
+    user2_token = clear_register_two_createchannel[1]['token']
+    channel_id1 = clear_register_two_createchannel[2]
 
     channel2 = requests.post(config.url + 'channels/create/v2', 
-                            json={'token': user1_json['token'], 
+                            json={'token': user1_token, 
                             'name': 'channel_name2', 'is_public': True})
     channel2_json = channel2.json()
 
     # 3rd channel is private
     channel3 = requests.post(config.url + 'channels/create/v2', 
-                            json={'token': user1_json['token'], 
+                            json={'token': user1_token, 
                             'name': 'private_channel1', 'is_public': False})
     channel3_json = channel3.json()
 
-    
     # create public channel for user2
     channel4 = requests.post(config.url + 'channels/create/v2', 
-                            json={'token': user2_json['token'], 
+                            json={'token': user2_token, 
                             'name': 'pub_channel_user2', 'is_public': True})
     channel4_json = channel4.json()
 
     # create private channel for user2
     channel5 = requests.post(config.url + 'channels/create/v2', 
-                            json={'token': user2_json['token'], 
-                            'name': 'pri_channel_user2', 'is_public': False})
+                            json={'token': user2_token, 
+                               'name': 'pri_channel_user2', 'is_public': False})
     channel5_json = channel5.json()
 
     # channel_list for user 1, should return all channels
     channels_listall = requests.get(config.url + 'channels/listall/v2', 
-    params={'token': user1_json['token']})
-    channels_listall_json = channels_listall.json()
-
+                                        params={'token': user1_token})
+    channels = channels_listall.json()
 
     # check the channels_list function has worked.
     assert channels_listall.status_code == 200
     # check the number of channels is all channels
-    assert len(channels_listall_json['channels']) == 5
+    assert len(channels['channels']) == 5
     # check that the channel_list info matches what was created.
-    assert channels_listall_json['channels'][0]['channel_id']\
-        == channel1_json['channel_id']
-    assert channels_listall_json['channels'][1]['channel_id']\
-        == channel2_json['channel_id']
-    assert channels_listall_json['channels'][2]['channel_id']\
-        == channel3_json['channel_id']
-    assert channels_listall_json['channels'][3]['channel_id']\
-        == channel4_json['channel_id']
-    assert channels_listall_json['channels'][4]['channel_id']\
-        == channel5_json['channel_id']
-    assert channels_listall_json['channels'][0]['name'] == \
-        'channel_name1'
-    assert channels_listall_json['channels'][1]['name'] == \
-        'channel_name2'
-    assert channels_listall_json['channels'][2]['name'] == \
-        'private_channel1'
-    assert channels_listall_json['channels'][3]['name'] == \
-        'pub_channel_user2'
-    assert channels_listall_json['channels'][4]['name'] == \
-        'pri_channel_user2'
+    assert channel_id1 in [k['channel_id'] for k in channels['channels']]
+    assert channel2_json['channel_id'] in [k['channel_id'] for k in 
+                                            channels['channels']]
+    assert channel3_json['channel_id'] in [k['channel_id'] for k in 
+                                           channels['channels']]
+    assert channel4_json['channel_id'] in [k['channel_id'] for k in 
+                                            channels['channels']]
+    assert channel5_json['channel_id'] in [k['channel_id'] for k in 
+                                            channels['channels']]
 
+    assert 'channel_name' in [k['name'] for k in channels['channels']]
+    assert 'channel_name2' in [k['name'] for k in channels['channels']]
+    assert 'private_channel1' in [k['name'] for k in channels['channels']]
+    assert 'pub_channel_user2' in [k['name'] for k in channels['channels']]
+    assert 'pri_channel_user2' in [k['name'] for k in channels['channels']]
+    
     # check for user 2
     channels_listall_2 = requests.get(config.url + 'channels/listall/v2',
-    params={'token': user2_json['token']})
-    channels_listall_2_json = channels_listall_2.json()
+                                        params={'token': user2_token})
+    channels2 = channels_listall_2.json()
 
     assert channels_listall_2.status_code == 200
     # check the number of channels is all channels
-    assert len(channels_listall_2_json['channels']) == 5
+    assert len(channels2['channels']) == 5
     # check that the channel_list info matches what was created.
-    assert channels_listall_2_json['channels'][0]['channel_id'] == \
-        channel1_json['channel_id']
-    assert channels_listall_2_json['channels'][1]['channel_id'] == \
-    channel2_json['channel_id']
-    assert channels_listall_2_json['channels'][2]['channel_id'] == \
-        channel3_json['channel_id']
-    assert channels_listall_2_json['channels'][3]['channel_id'] == \
-        channel4_json['channel_id']
-    assert channels_listall_2_json['channels'][4]['channel_id'] == \
-        channel5_json['channel_id']
-    assert channels_listall_2_json['channels'][0]['name'] == \
-        'channel_name1'
-    assert channels_listall_2_json['channels'][1]['name'] == \
-        'channel_name2'
-    assert channels_listall_2_json['channels'][2]['name'] == \
-        'private_channel1'
-    assert channels_listall_2_json['channels'][3]['name'] == \
-        'pub_channel_user2'
-    assert channels_listall_2_json['channels'][4]['name'] == \
-        'pri_channel_user2'
+    assert channel_id1 in [k['channel_id'] for k in channels2['channels']]
+    assert channel2_json['channel_id'] in [k['channel_id'] for k in 
+                                            channels2['channels']]
+    assert channel3_json['channel_id'] in [k['channel_id'] for k in 
+                                           channels2['channels']]
+    assert channel4_json['channel_id'] in [k['channel_id'] for k in 
+                                            channels2['channels']]
+    assert channel5_json['channel_id'] in [k['channel_id'] for k in 
+                                            channels2['channels']]
+                                            
+    assert 'channel_name' in [k['name'] for k in channels2['channels']]
+    assert 'channel_name2' in [k['name'] for k in channels2['channels']]
+    assert 'private_channel1' in [k['name'] for k in channels2['channels']]
+    assert 'pub_channel_user2' in [k['name'] for k in channels2['channels']]
+    assert 'pri_channel_user2' in [k['name'] for k in channels2['channels']]
 
 requests.delete(config.url + 'clear/v1')

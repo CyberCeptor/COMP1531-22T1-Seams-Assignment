@@ -3,7 +3,7 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=emulateIE7" />
-    <title>Coverage for src/admin.py: 93%</title>
+    <title>Coverage for src/admin.py: 99%</title>
     <link rel="icon" sizes="32x32" href="favicon_32.png">
     <link rel="stylesheet" href="style.css" type="text/css">
     <script type="text/javascript" src="jquery.min.js"></script>
@@ -18,15 +18,15 @@
 <div id="header">
     <div class="content">
         <h1>Coverage for <b>src/admin.py</b> :
-            <span class="pc_cov">93%</span>
+            <span class="pc_cov">99%</span>
         </h1>
         <img id="keyboard_icon" src="keybd_closed.png" alt="Show keyboard shortcuts" />
         <h2 class="stats">
             60 statements &nbsp;
-            <button type="button" class="run shortkey_r button_toggle_run" title="Toggle lines run">58 run</button>
-            <button type="button" class="mis show_mis shortkey_m button_toggle_mis" title="Toggle lines missing">2 missing</button>
+            <button type="button" class="run shortkey_r button_toggle_run" title="Toggle lines run">60 run</button>
+            <button type="button" class="mis show_mis shortkey_m button_toggle_mis" title="Toggle lines missing">0 missing</button>
             <button type="button" class="exc show_exc shortkey_x button_toggle_exc" title="Toggle lines excluded">0 excluded</button>
-            <button type="button" class="par run show_par shortkey_p button_toggle_par" title="Toggle lines partially run">5 partial</button>
+            <button type="button" class="par run show_par shortkey_p button_toggle_par" title="Toggle lines partially run">1 partial</button>
         </h2>
     </div>
 </div>
@@ -113,10 +113,10 @@
     <p id="t58" class="pln"><span class="n"><a href="#t58">58</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p id="t59" class="pln"><span class="n"><a href="#t59">59</a></span><span class="t">    <span class="com"># check for invalid permission_id inputs</span>&nbsp;</span><span class="r"></span></p>
     <p id="t60" class="run"><span class="n"><a href="#t60">60</a></span><span class="t">    <span class="key">if</span> <span class="key">not</span> <span class="nam">isinstance</span><span class="op">(</span><span class="nam">permission_id</span><span class="op">,</span> <span class="nam">int</span><span class="op">)</span> <span class="key">or</span> <span class="nam">type</span><span class="op">(</span><span class="nam">permission_id</span><span class="op">)</span> <span class="key">is</span> <span class="nam">bool</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t61" class="run"><span class="n"><a href="#t61">61</a></span><span class="t">        <span class="key">raise</span> <span class="nam">InputError</span><span class="op">(</span><span class="str">'Permission id is not of valid type'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t61" class="run"><span class="n"><a href="#t61">61</a></span><span class="t">        <span class="key">raise</span> <span class="nam">InputError</span><span class="op">(</span><span class="nam">description</span><span class="op">=</span><span class="str">'Permission id is not of valid type'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p id="t62" class="pln"><span class="n"><a href="#t62">62</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p id="t63" class="run"><span class="n"><a href="#t63">63</a></span><span class="t">    <span class="key">if</span> <span class="nam">permission_id</span> <span class="key">not</span> <span class="key">in</span> <span class="op">[</span><span class="num">1</span><span class="op">,</span> <span class="num">2</span><span class="op">]</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t64" class="run"><span class="n"><a href="#t64">64</a></span><span class="t">        <span class="key">raise</span> <span class="nam">InputError</span><span class="op">(</span><span class="str">'Invalid permission id'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t64" class="run"><span class="n"><a href="#t64">64</a></span><span class="t">        <span class="key">raise</span> <span class="nam">InputError</span><span class="op">(</span><span class="nam">description</span><span class="op">=</span><span class="str">'Invalid permission id'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p id="t65" class="pln"><span class="n"><a href="#t65">65</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p id="t66" class="pln"><span class="n"><a href="#t66">66</a></span><span class="t">    <span class="com"># count the number of global users</span>&nbsp;</span><span class="r"></span></p>
     <p id="t67" class="run"><span class="n"><a href="#t67">67</a></span><span class="t">    <span class="nam">num_global_owners</span> <span class="op">=</span> <span class="nam">len</span><span class="op">(</span><span class="op">[</span><span class="nam">user</span> <span class="key">for</span> <span class="nam">user</span> <span class="key">in</span> <span class="nam">store</span><span class="op">[</span><span class="str">'users'</span><span class="op">]</span> <span class="key">if</span>&nbsp;</span><span class="r"></span></p>
@@ -126,10 +126,10 @@
     <p id="t71" class="run"><span class="n"><a href="#t71">71</a></span><span class="t">    <span class="key">if</span> <span class="op">(</span><span class="nam">check_user_is_global_owner</span><span class="op">(</span><span class="nam">u_id</span><span class="op">)</span> <span class="key">and</span> <span class="nam">num_global_owners</span> <span class="op">==</span> <span class="num">1</span> <span class="key">and</span>&nbsp;</span><span class="r"></span></p>
     <p id="t72" class="pln"><span class="n"><a href="#t72">72</a></span><span class="t">        <span class="nam">permission_id</span> <span class="op">==</span> <span class="num">2</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p id="t73" class="run"><span class="n"><a href="#t73">73</a></span><span class="t">        <span class="key">raise</span> <span class="nam">InputError</span><span class="op">(</span><span class="nam">description</span><span class="op">=</span><span class="str">'Cannot demote the only global owner'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t74" class="par run show_par"><span class="n"><a href="#t74">74</a></span><span class="t">    <span class="key">elif</span> <span class="nam">check_user_is_global_owner</span><span class="op">(</span><span class="nam">u_id</span><span class="op">)</span> <span class="key">and</span> <span class="nam">permission_id</span> <span class="op">==</span> <span class="num">1</span><span class="op">:</span>&nbsp;</span><span class="r"><span class="annotate short">74&#x202F;&#x219B;&#x202F;75</span><span class="annotate long">line 74 didn't jump to line 75, because the condition on line 74 was never true</span></span></p>
-    <p id="t75" class="mis show_mis"><span class="n"><a href="#t75">75</a></span><span class="t">        <span class="key">raise</span> <span class="nam">InputError</span><span class="op">(</span><span class="nam">description</span><span class="op">=</span><span class="str">'User is already a global owner'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t76" class="par run show_par"><span class="n"><a href="#t76">76</a></span><span class="t">    <span class="key">elif</span> <span class="key">not</span> <span class="nam">check_user_is_global_owner</span><span class="op">(</span><span class="nam">u_id</span><span class="op">)</span> <span class="key">and</span> <span class="nam">permission_id</span> <span class="op">==</span> <span class="num">2</span><span class="op">:</span>&nbsp;</span><span class="r"><span class="annotate short">76&#x202F;&#x219B;&#x202F;77</span><span class="annotate long">line 76 didn't jump to line 77, because the condition on line 76 was never true</span></span></p>
-    <p id="t77" class="mis show_mis"><span class="n"><a href="#t77">77</a></span><span class="t">        <span class="key">raise</span> <span class="nam">InputError</span><span class="op">(</span><span class="nam">description</span><span class="op">=</span><span class="str">'User is already a member'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t74" class="run"><span class="n"><a href="#t74">74</a></span><span class="t">    <span class="key">elif</span> <span class="nam">check_user_is_global_owner</span><span class="op">(</span><span class="nam">u_id</span><span class="op">)</span> <span class="key">and</span> <span class="nam">permission_id</span> <span class="op">==</span> <span class="num">1</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t75" class="run"><span class="n"><a href="#t75">75</a></span><span class="t">        <span class="key">raise</span> <span class="nam">InputError</span><span class="op">(</span><span class="nam">description</span><span class="op">=</span><span class="str">'User is already a global owner'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t76" class="run"><span class="n"><a href="#t76">76</a></span><span class="t">    <span class="key">elif</span> <span class="key">not</span> <span class="nam">check_user_is_global_owner</span><span class="op">(</span><span class="nam">u_id</span><span class="op">)</span> <span class="key">and</span> <span class="nam">permission_id</span> <span class="op">==</span> <span class="num">2</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p id="t77" class="run"><span class="n"><a href="#t77">77</a></span><span class="t">        <span class="key">raise</span> <span class="nam">InputError</span><span class="op">(</span><span class="nam">description</span><span class="op">=</span><span class="str">'User is already a member'</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p id="t78" class="pln"><span class="n"><a href="#t78">78</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p id="t79" class="run"><span class="n"><a href="#t79">79</a></span><span class="t">    <span class="nam">change_permission</span><span class="op">(</span><span class="nam">u_id</span><span class="op">,</span> <span class="nam">permission_id</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p id="t80" class="pln"><span class="n"><a href="#t80">80</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
@@ -171,13 +171,13 @@
     <p id="t116" class="pln"><span class="n"><a href="#t116">116</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p id="t117" class="pln"><span class="n"><a href="#t117">117</a></span><span class="t">    <span class="com"># remove user from all channels, replace their messages with 'Removed user'</span>&nbsp;</span><span class="r"></span></p>
     <p id="t118" class="run"><span class="n"><a href="#t118">118</a></span><span class="t">    <span class="key">for</span> <span class="nam">channel</span> <span class="key">in</span> <span class="nam">store</span><span class="op">[</span><span class="str">'channels'</span><span class="op">]</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t119" class="par run show_par"><span class="n"><a href="#t119">119</a></span><span class="t">        <span class="key">if</span> <span class="nam">check_user_is_member</span><span class="op">(</span><span class="nam">u_id</span><span class="op">,</span> <span class="nam">channel</span><span class="op">,</span> <span class="str">'all_members'</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"><span class="annotate short">119&#x202F;&#x219B;&#x202F;118</span><span class="annotate long">line 119 didn't jump to line 118, because the condition on line 119 was never false</span></span></p>
+    <p id="t119" class="run"><span class="n"><a href="#t119">119</a></span><span class="t">        <span class="key">if</span> <span class="nam">check_user_is_member</span><span class="op">(</span><span class="nam">u_id</span><span class="op">,</span> <span class="nam">channel</span><span class="op">,</span> <span class="str">'all_members'</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p id="t120" class="run"><span class="n"><a href="#t120">120</a></span><span class="t">            <span class="nam">channel_leave_v1</span><span class="op">(</span><span class="nam">u_id</span><span class="op">,</span> <span class="nam">channel</span><span class="op">[</span><span class="str">'channel_id'</span><span class="op">]</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p id="t121" class="run"><span class="n"><a href="#t121">121</a></span><span class="t">            <span class="nam">replace_messages</span><span class="op">(</span><span class="nam">u_id</span><span class="op">,</span> <span class="nam">channel</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p id="t122" class="pln"><span class="n"><a href="#t122">122</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p id="t123" class="pln"><span class="n"><a href="#t123">123</a></span><span class="t">    <span class="com"># remove user from all dms, replace their messages with 'Removed user'</span>&nbsp;</span><span class="r"></span></p>
     <p id="t124" class="run"><span class="n"><a href="#t124">124</a></span><span class="t">    <span class="key">for</span> <span class="nam">dm</span> <span class="key">in</span> <span class="nam">store</span><span class="op">[</span><span class="str">'dms'</span><span class="op">]</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t125" class="par run show_par"><span class="n"><a href="#t125">125</a></span><span class="t">        <span class="key">if</span> <span class="nam">check_user_is_member</span><span class="op">(</span><span class="nam">u_id</span><span class="op">,</span> <span class="nam">dm</span><span class="op">,</span> <span class="str">'members'</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"><span class="annotate short">125&#x202F;&#x219B;&#x202F;124</span><span class="annotate long">line 125 didn't jump to line 124, because the condition on line 125 was never false</span></span></p>
+    <p id="t125" class="run"><span class="n"><a href="#t125">125</a></span><span class="t">        <span class="key">if</span> <span class="nam">check_user_is_member</span><span class="op">(</span><span class="nam">u_id</span><span class="op">,</span> <span class="nam">dm</span><span class="op">,</span> <span class="str">'members'</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p id="t126" class="run"><span class="n"><a href="#t126">126</a></span><span class="t">            <span class="nam">dm_leave_v1</span><span class="op">(</span><span class="nam">u_id</span><span class="op">,</span> <span class="nam">dm</span><span class="op">[</span><span class="str">'dm_id'</span><span class="op">]</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p id="t127" class="run"><span class="n"><a href="#t127">127</a></span><span class="t">            <span class="nam">replace_messages</span><span class="op">(</span><span class="nam">u_id</span><span class="op">,</span> <span class="nam">dm</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p id="t128" class="pln"><span class="n"><a href="#t128">128</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
@@ -237,9 +237,17 @@
         <p>
             <a class="nav" href="index.html">&#xab; index</a> &nbsp; &nbsp; <a class="nav" href="https://coverage.readthedocs.io">coverage.py v5.4</a>,
 <<<<<<< HEAD
+            created at 2022-03-28 03:56 +1100
+=======
+<<<<<<< HEAD
+            created at 2022-03-28 01:12 +1100
+=======
+<<<<<<< HEAD
             created at 2022-03-27 20:06 +1100
 =======
             created at 2022-03-27 23:47 +1100
+>>>>>>> master
+>>>>>>> master
 >>>>>>> master
         </p>
     </div>

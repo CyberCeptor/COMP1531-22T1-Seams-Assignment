@@ -35,6 +35,7 @@ data = {
         'last': 'last',
         'handle': 'firstlast',
         'perm_id': 1,
+        'removed': False,
     }],
     'channels' = [{
         'channel_id': 1,
@@ -65,8 +66,31 @@ data = {
         'user_id': user_data['id'],
         'session_id': SESSION_ID_COUNTER,
         'token': token,
-        'time': datetime.datetime.now(),
     }],
+    'dms': [{
+        'dm_id': 1,
+        'name': 'dm_name',
+        'creator': {
+            'u_id': 1,
+            'email': 'abc@def.com',
+            'name_first': 'first',
+            'name_last': 'last',
+            'handle_str': 'firstlast',
+        },
+        'members': [{
+            'u_id': 1,
+            'email': 'abc@def.com',
+            'name_first': 'first',
+            'name_last': 'last',
+            'handle_str': 'firstlast',
+        }],
+        'messages' = [{
+            'message_id': 1,
+            'u_id': 1,
+            'message': 'hewwo',
+            'time_sent': datetime.datetime.now()
+        }],
+    }]
 }
 """
 
