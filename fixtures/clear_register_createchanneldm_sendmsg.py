@@ -15,10 +15,10 @@ import requests
 from src import config
 
 @pytest.fixture
-def clear_register_createchannel_sendmsg(clear_register_createchannel):
+def clear_register_createchanneldm_sendmsg(clear_register_createchannel):
     """ clears any 1 stored in 1_store and registers a user with the
-    given information, create a channel using token, send a message to channel
-    """
+    given information, create a channel and dm using token, send a message in 
+    each """
 
     user_1 = clear_register_createchannel[0]
     channel_id = clear_register_createchannel[1]
@@ -36,11 +36,14 @@ def clear_register_createchannel_sendmsg(clear_register_createchannel):
                                 'name_first': 'first', 'name_last': 'last'})
     assert resp.status_code == 200
     user2 = resp.json()
+
     # create dm for user 1 and 2
     create = requests.post(config.url + 'dm/create/v1', 
-                        json={'token': user_1['token'], 'u_ids': [user2['auth_user_id']]})
+                        json={'token': user_1['token'],
+                              'u_ids': [user2['auth_user_id']]})
     assert create.status_code == 200
     dm = create.json()
+
     # user 2 sends message in dm
     send_message = requests.post(config.url + 'message/senddm/v1', 
                           json={'token': user2['token'],
@@ -49,4 +52,5 @@ def clear_register_createchannel_sendmsg(clear_register_createchannel):
     assert send_message.status_code == 200
     dm_message = send_message.json()
 
-    return [user_1['token'], channel_id, chan_message['message_id'], dm_message['message_id'], user2['token']]
+    return [user_1['token'], channel_id, chan_message['message_id'], 
+            dm_message['message_id'], user2['token'], dm['dm_id']]
