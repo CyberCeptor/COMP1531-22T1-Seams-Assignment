@@ -1,7 +1,7 @@
 """
 Filename: message.py
 
-Author: Yangjun Yue(z5317840)
+Author: Yangjun Yue(z5317840), Aleesha Bunrith(z5371516)
 Created: 23/03/2022 - 27/03/2022
 
 Description: implementation for
@@ -86,9 +86,10 @@ def message_edit_v1(token, message_id, message):
     info = check_return[2]
     
     if channel_sent is False:
-        edit_remove_dm_message(token, message, message_data, info, 'edit')
+        edit_remove_dm_message_check(token, message, message_data, info, 'edit')
     else:
-        edit_remove_channel_message(token, message, message_data, info, 'edit')
+        edit_remove_channel_message_check(token, message, message_data, info, 
+                                            'edit')
 
     data_store.set(store)
 
@@ -125,9 +126,10 @@ def message_remove_v1(token, message_id):
     info = check_return[2]
     
     if channel_sent is False:
-        edit_remove_dm_message(token, '', message_data, info, 'remove')
+        edit_remove_dm_message_check(token, '', message_data, info, 'remove')
     else:
-        edit_remove_channel_message(token, '', message_data, info, 'remove')
+        edit_remove_channel_message_check(token, '', message_data, info, 
+                                            'remove')
 
     data_store.set(store)
 
@@ -199,9 +201,10 @@ def check_message_id_valid(message_id):
     # if message_id is not found, raise an InputError
     raise InputError(description='Message does not exist in channels database')
 
-def edit_remove_dm_message(token, message, msg_data, dm, option):
+def edit_remove_dm_message_check(token, message, msg_data, dm, option):
     """
-    edits or removes a specified message sent in a dm
+    checks if a specified message sent in a dm can be edited or removed by the 
+    user
 
     Arguments:
         token (str)     - unique str representation of user
@@ -220,19 +223,14 @@ def edit_remove_dm_message(token, message, msg_data, dm, option):
 
     # if user is either creator or it's the user who sent the message
     if msg_data['u_id'] == user_id or dm['creator']['u_id'] == user_id:
-        if option == 'remove':
-            dm['messages'].remove(msg_data)
-        elif option == 'edit' and message != '':
-            msg_data['message'] = message
-        elif option == 'edit' and message == '':
-            # remove the message if the new message input is empty
-            message_remove_v1(token, msg_data['message_id'])
+        edit_remove_message(dm, msg_data, message, option)
     else:
         raise AccessError(description='User has no access to this message')
 
-def edit_remove_channel_message(token, message, msg_data, channel, option):
+def edit_remove_channel_message_check(token, message, msg_data, channel, option):
     """
-    edits or removes a specified message sent in a channel
+    checks if a specified message sent in a channel can be edited or removed by 
+    the user
 
     Arguments:
         token (str)     - unique str representation of user
@@ -252,15 +250,35 @@ def edit_remove_channel_message(token, message, msg_data, channel, option):
     # if user is either owner or it's the user who sent the message or
     # if user is a member in channel and is a global owner
     if (check_user_is_member(user_id, channel, 'owner_members') or
-        msg_data['u_id'] == user_id or 
-        (check_user_is_member(user_id, channel, 'all_members') and
-        check_user_is_global_owner(user_id))):
-        if option == 'remove':
-            channel['messages'].remove(msg_data)
-        elif option == 'edit' and message != '':
-            msg_data['message'] = message
-        elif option == 'edit' and message == '':
-            # remove the message if the new message input is empty
-            message_remove_v1(token, msg_data['message_id'])
+        msg_data['u_id'] == user_id):
+        edit_remove_message(channel, msg_data, message, option)
+    elif (check_user_is_member(user_id, channel, 'all_members') and
+        check_user_is_global_owner(user_id)):
+        edit_remove_message(channel, msg_data, message, option)
     else:
         raise AccessError(description='User has no access to this message')
+
+def edit_remove_message(data, msg_data, message, option):
+    """
+    edits or removes a specified message
+
+    Arguments:
+        token (str)     - unique str representation of user
+        message (str)   - message that the user wishes to send
+        msg_data (dict) - the message's associated data
+        dm (dict)       - the associate dm details that the message is found in
+        option (str)    - specifies if the user is editing or removing the msg
+
+    Exceptions:
+        AccessError - If user has no access to the specified message
+
+    Return Value: N/A
+    """
+
+    if option == 'remove':
+        data['messages'].remove(msg_data)
+    elif option == 'edit' and message != '':
+        msg_data['message'] = message
+    elif option == 'edit' and message == '':
+        # remove the message if the new message input is empty
+        data['messages'].remove(msg_data)
