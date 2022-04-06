@@ -302,10 +302,8 @@ def message_pin_v1(token, message_id):
     info = check_return[2]
     
     # raise input error if message is already pinned
-    key = 'is_pinned'
-    if key in message_data:
-        if message_data['is_pinned'] == True:
-            raise InputError(description='Message is already pinned')
+    if message_data['is_pinned'] == True:
+        raise InputError(description='Message is already pinned')
 
     # if message is sent in dm
     if channel_sent is False:
