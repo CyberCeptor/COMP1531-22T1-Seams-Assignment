@@ -47,6 +47,9 @@ def dm_create_v1(token, u_ids):
         'handle_str': user_info['handle']
     }
     
+    if isinstance(u_ids, list) is False:
+        raise InputError(description='u_ids needs to be a list')
+
     # Assume the dm id start at 1 and increase by adding 1
     # for any newdm created
     dm_id = new_id('dm')
@@ -54,7 +57,7 @@ def dm_create_v1(token, u_ids):
     all_member_list = []
     all_member_list.append(owner)
     name_list.append(user_info['handle'])
-    
+
     # iterate through the list of given u_ids and check if they are not 
     # duplicates and are valid
     for u_id in u_ids:
@@ -72,7 +75,7 @@ def dm_create_v1(token, u_ids):
     #sort name list
     name_list.sort()
     #use , to separate
-    dm_name = ", ".join(name_list)
+    dm_name = ', '.join(name_list)
 
     new_dm = {
         'name': dm_name,
@@ -81,6 +84,9 @@ def dm_create_v1(token, u_ids):
         'creator': owner,
         'messages': []
     }
+
+    print(dm_name)
+
     store['dms'].append(new_dm)
     # Save data
     data_store.set(store)
@@ -107,14 +113,15 @@ def dm_list_v1(token):
     store = data_store.get()
     
     for dm in store['dms']:
-        check_user_is_member(auth_id, dm, 'members')
-        new_dict = {
-            "dm_id": dm['dm_id'], 
-            "name": dm['name']
-        }
-        dm_list.append(new_dict)
+        if check_user_is_member(auth_id, dm, 'members'):
+            dm_list.append({
+                'dm_id': dm['dm_id'], 
+                'name': dm['name']
+            })
 
-    return {"dms": dm_list}
+    return {
+        'dms': dm_list
+    }
 
 def dm_remove_v1(token, dm_id):
     """
@@ -192,15 +199,16 @@ def dm_leave_v1(auth_user_id, dm_id):
     dm = check_valid_dm_id(dm_id)
     store = data_store.get()
 
-    if(dm['creator']['u_id'] == auth_user_id):
-        dm['creator'] = {}
-
     member = check_user_is_member(auth_user_id, dm, 'members')
-    if member is None:
-        raise AccessError(description='The user is no longer in dm')
-    else:
+
+    if member:
+        if dm['creator']['u_id'] == auth_user_id:
+            dm['creator'] = {}
         dm['members'].remove(member)
-        data_store.set(store)
+    else:
+        raise AccessError(description='The user is no longer in dm')
+        
+    data_store.set(store)
 
 def check_creator_notin_u_ids_duplicate(u_id, id, u_ids):
     """

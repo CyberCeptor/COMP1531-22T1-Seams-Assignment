@@ -19,19 +19,19 @@ def test_dm_list_valid(clear_register_two_createdm):
     given information, create the dm with token and u_ids, list with token """
 
     token1 = clear_register_two_createdm[0]['token']
-    resp1 = requests.post(config.url + 'auth/register/v2', 
+    user3 = requests.post(config.url + 'auth/register/v2', 
                         json={'email': 'lmz@gmail.com', 'password': '893621',
                                 'name_first': 'li', 'name_last': 'mingzhe'})
-    data2 = resp1.json()
-    id3 = data2['auth_user_id']
+    data3 = user3.json()
+    token3 = data3['token']
+
     list1 = requests.get(config.url + 'dm/list/v1', params={'token': token1})
     assert list1.status_code == 200
     
-    requests.post(config.url + 'dm/create/v1', 
-                json={'token': token1, 'u_ids': [id3]})
-    list1 = requests.get(config.url + 'dm/list/v1',
-                params={'token': token1})
-    assert list1.status_code == 200
+    # if user is not in any dm
+    list2 = requests.get(config.url + 'dm/list/v1',
+                params={'token': token3})
+    assert list2.status_code == 200
 
 @pytest.mark.usefixtures('clear_register_two_createdm')
 def test_dm_list_invalid_token(clear_register_two_createdm):

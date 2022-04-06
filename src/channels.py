@@ -79,18 +79,12 @@ def channels_listall_v2(token):
     # check that the auth_user_id exists
     check_valid_auth_id(auth_user_id)
 
-    # create list of dictionaries to store each channel_return
-    dict_list = []
-    for channel in store['channels']:
-        channel_return = {
-            'channel_id': channel['channel_id'],
-            'name': channel['name']
-        }
-        dict_list.append(channel_return)
-
     # return lists of all channels(including private ones) with details
     return {
-        'channels': dict_list
+        'channels': [{
+            'channel_id': channel['channel_id'],
+            'name': channel['name']
+        } for channel in store['channels']]
     }
 
 def channels_create_v2(token, name, is_public):
@@ -125,7 +119,7 @@ def channels_create_v2(token, name, is_public):
     token_valid_check(token)
     auth_user_id = token_get_user_id(token)
 
-    check_valid_auth_id(auth_user_id)
+    user_info = check_valid_auth_id(auth_user_id)
 
     if len(name) > 20:
         raise InputError(description='The channel name must be less than 20 \
@@ -148,10 +142,6 @@ def channels_create_v2(token, name, is_public):
     # get the number of channels created so far, incremented for the new channel
     # id.
     channel_id = len(store['channels']) + 1
-
-    for user in store['users']:
-        if user['id'] == auth_user_id:
-            user_info = user
 
     # Storing the channel information
     channel_data = {
