@@ -22,7 +22,7 @@ from src.channel import channel_details_v2, channel_invite_v2,\
                         channel_addowner_v1, channel_removeowner_v1,\
                         channel_join_v2, channel_messages_v2, channel_leave_v1
 from src.message import message_send_v1, message_remove_v1, message_edit_v1,\
-                        message_senddm_v1
+                        message_senddm_v1, message_pin_v1
 
 from src.channels import channels_create_v2, channels_list_v2,\
                          channels_listall_v2
@@ -287,6 +287,13 @@ def message_senddm():
     msg_id = message_senddm_v1(data['token'], data['dm_id'], data['message'])
     save_data()
     return dumps(msg_id)
+
+@APP.route('/message/pin/v1', methods=['POST'])
+def message_pin():
+    data = request.get_json()
+    message_pin_v1(data['token'], data['message_id'])
+    save_data()
+    return dumps({})
 
 ################################################################################
 ##                             DM ROUTES                                      ##
