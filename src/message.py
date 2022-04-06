@@ -264,3 +264,63 @@ def edit_remove_channel_message(token, message, msg_data, channel, option):
             message_remove_v1(token, msg_data['message_id'])
     else:
         raise AccessError(description='User has no access to this message')
+
+
+
+def message_pin_v1(token, message_id):
+    """
+    If token given is authorised user, pin the message
+    specified by message id in channel/dm
+
+    Arguments:
+        token (str)          - unique str representation of user
+        message_id (int))    - integer sppcifies message
+
+    Exceptions:
+        AccessError - message_id refers to a valid message in a joined 
+        channel/DM and the authorised user does not have owner permissions
+        in the channel/DM
+        InputError  - message_id is not a valid message within a channel 
+                    or DM that the authorised user has joined
+                    - message already pinned
+
+    Return Value: N/A
+    """
+
+    store = data_store.get()
+    # check valid token
+    token_valid_check(token)
+    user_id = token_get_user_id(token)
+    check_valid_auth_id(user_id)
+
+    # check input message_id is valid
+    check_return = check_message_id_valid(message_id)
+    message_data = check_return[0]
+    # specifies whether if it's channel or dm message
+    channel_sent = check_return[1]
+    # channel or dm info data
+    info = check_return[2]
+    
+    # raise input error if message is already pinned
+    key = 'is_pinned'
+    if key in message_data:
+        if message_data['is_pinned'] == True:
+            raise InputError(description='Message is already pinned')
+
+    # if message is sent in dm
+    if channel_sent is False:
+        # user is owner of dm
+        if info['creator']['u_id'] == user_id:
+            message_data['is_pinned'] = True
+        else:
+            raise AccessError(description='User has no access to this message')
+    else:
+        # if user is owner or global owner in channel
+        if (check_user_is_member(user_id, info, 'owner_members') or 
+        (check_user_is_member(user_id, info, 'all_members') and
+        check_user_is_global_owner(user_id))):
+            message_data['is_pinned'] = True
+        else:
+            raise AccessError(description='User has no access to this message')
+
+    data_store.set(store)

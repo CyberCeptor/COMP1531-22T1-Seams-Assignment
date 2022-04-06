@@ -111,7 +111,7 @@ def test_successful_message_pin_owner(clear_register_createchanneldm_sendmsg):
     # input error when message is already pinned
     resp3 = requests.post(config.url + 'message/pin/v1', 
                           json = {'token': token_1, 'message_id': d_message_id})
-    assert resp3.status_code == 200
+    assert resp3.status_code == 400
 
 @pytest.mark.usefixtures('clear_register_createchanneldm_sendmsg')
 def test_fail_message_pin_not_owner(clear_register_createchanneldm_sendmsg):
