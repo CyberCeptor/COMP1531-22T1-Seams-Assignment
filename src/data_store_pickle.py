@@ -16,3 +16,6 @@ def pickle_data():
 
     with open('datastore.p', 'wb') as FILE:
         pickle.dump(DATA_STRUCTURE, FILE)
+
+def get_prev_data(pickled_data):
+    data_store.set(pickled_data)
