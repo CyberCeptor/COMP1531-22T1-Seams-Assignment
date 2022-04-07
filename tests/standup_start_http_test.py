@@ -4,7 +4,7 @@ Filename: standup_start_http_test.py
 Author: Zefan Cao(z5237177)
 Created: 14/03/2022 - 24/03/2022
 
-Description: http test for dm_create
+Description: http test for standup_start
 """
 
 import pytest

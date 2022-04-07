@@ -119,14 +119,12 @@ def standup_active_v1(token, channel_id):
         raise AccessError(description='Inviter is not in the channel')
     
     value = {} # create an empty dic 
-    is_active = False 
+    is_active = False
 
     if 'standup' in channel_data:
-        if datetime.now() < datetime.fromisoformat(
-        channel_data['standup']['end_time']):
-            is_active = True
-            finish_time = datetime.fromisoformat(
-                channel_data['standup']['end_time'])
+        is_active = True
+        finish_time = datetime.fromisoformat(
+            channel_data['standup']['end_time'])
 
     # Add the is_active into value dic
     value['is_active'] = is_active
@@ -153,9 +151,6 @@ def check_length(length):
     
     if isinstance(length, int) is False:
         raise InputError('Invalid length type')
-    
-    if length is None:
-        raise InputError('Invalid length')
     
     if length < 0:
         raise InputError('Length is invalid')
