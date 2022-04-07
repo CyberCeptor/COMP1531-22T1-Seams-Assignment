@@ -16,13 +16,12 @@ from src import config
 
 from src.global_vars import expired_token, unsaved_token
 
-
-@pytest.mark.usefixtures('clear_register_createchanneldm_sendmsg')
-def test_message_pin_invalid_token(clear_register_createchanneldm_sendmsg):
+@pytest.mark.usefixtures('clear_register_two_createchanneldm_sendmsg')
+def test_message_pin_invalid_token(clear_register_two_createchanneldm_sendmsg):
     """ test for invalid input of token """
 
     # token is int
-    message_id = clear_register_createchanneldm_sendmsg[2]
+    message_id = clear_register_two_createchanneldm_sendmsg[3]
     resp0 = requests.post(config.url + 'message/pin/v1', 
                           json = {'token': 0, 'message_id': message_id})
     assert resp0.status_code == 400
@@ -54,12 +53,12 @@ def test_message_pin_invalid_token(clear_register_createchanneldm_sendmsg):
                           'message_id': message_id})
     assert resp5.status_code == 403
     
-@pytest.mark.usefixtures('clear_register_createchanneldm_sendmsg')
+@pytest.mark.usefixtures('clear_register_two_createchanneldm_sendmsg')
 def test_message_pin_invalid_message_id(\
-    clear_register_createchanneldm_sendmsg):
+    clear_register_two_createchanneldm_sendmsg):
     """ test for invalid input of message id """
 
-    token = clear_register_createchanneldm_sendmsg[0]
+    token = clear_register_two_createchanneldm_sendmsg[0]['token']
     # no message id input
     resp0 = requests.post(config.url + 'message/pin/v1', 
                           json = {'token': token, 'message_id': ''})
@@ -82,14 +81,13 @@ def test_message_pin_invalid_message_id(\
                           json = {'token': token, 'message_id': 100})
     assert resp4.status_code == 400
 
-
-@pytest.mark.usefixtures('clear_register_createchanneldm_sendmsg')
-def test_successful_message_pin_owner(clear_register_createchanneldm_sendmsg):
+@pytest.mark.usefixtures('clear_register_two_createchanneldm_sendmsg')
+def test_successful_message_pin_owner(clear_register_two_createchanneldm_sendmsg):
     """ testing if message pin is successful by owner and input errors 
     """
-    token_1 = clear_register_createchanneldm_sendmsg[0]
-    c_message_id = clear_register_createchanneldm_sendmsg[2]
-    d_message_id = clear_register_createchanneldm_sendmsg[3]
+    token_1 = clear_register_two_createchanneldm_sendmsg[0]['token']
+    c_message_id = clear_register_two_createchanneldm_sendmsg[3]
+    d_message_id = clear_register_two_createchanneldm_sendmsg[5]
 
     # successful pin by user1 who is owner member
     resp0 = requests.post(config.url + 'message/pin/v1', 
@@ -113,14 +111,14 @@ def test_successful_message_pin_owner(clear_register_createchanneldm_sendmsg):
                           json = {'token': token_1, 'message_id': d_message_id})
     assert resp3.status_code == 400
 
-@pytest.mark.usefixtures('clear_register_createchanneldm_sendmsg')
-def test_fail_message_pin_not_owner(clear_register_createchanneldm_sendmsg):
+@pytest.mark.usefixtures('clear_register_two_createchanneldm_sendmsg')
+def test_fail_message_pin_not_owner(clear_register_two_createchanneldm_sendmsg):
     """ testing if message pin fails when user is not owner 
     """
-    channel_id = clear_register_createchanneldm_sendmsg[1]
-    token_2 = clear_register_createchanneldm_sendmsg[4]
-    c_message_id = clear_register_createchanneldm_sendmsg[2]
-    d_message_id = clear_register_createchanneldm_sendmsg[3]
+    channel_id = clear_register_two_createchanneldm_sendmsg[2]
+    token_2 = clear_register_two_createchanneldm_sendmsg[1]['token']
+    c_message_id = clear_register_two_createchanneldm_sendmsg[3]
+    d_message_id = clear_register_two_createchanneldm_sendmsg[5]
 
     # failed message pin by user2 who is not member
     resp = requests.post(config.url + 'message/pin/v1', 
@@ -141,3 +139,5 @@ def test_fail_message_pin_not_owner(clear_register_createchanneldm_sendmsg):
     resp1 = requests.post(config.url + 'message/pin/v1', 
                           json = {'token': token_2, 'message_id': d_message_id})
     assert resp1.status_code == 403
+
+requests.delete(config.url + 'clear/v1')
