@@ -22,7 +22,7 @@ from src.channel import channel_details_v2, channel_invite_v2,\
                         channel_addowner_v1, channel_removeowner_v1,\
                         channel_join_v2, channel_messages_v2, channel_leave_v1
 from src.message import message_send_v1, message_remove_v1, message_edit_v1,\
-                        message_senddm_v1, message_pin_v1
+                        message_senddm_v1, message_pin_v1, search_v1
 
 from src.channels import channels_create_v2, channels_list_v2,\
                          channels_listall_v2
@@ -295,6 +295,13 @@ def message_pin():
     save_data()
     return dumps({})
 
+@APP.route('/search/v1', methods=['GET'])
+def search():
+    token = request.args.get('token')
+    query_str = request.args.get('query_str')
+    message_return = search_v1(token, query_str)
+    save_data()
+    return dumps(message_return)
 ################################################################################
 ##                             DM ROUTES                                      ##
 ################################################################################
