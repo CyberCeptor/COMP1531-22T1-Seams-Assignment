@@ -27,7 +27,7 @@ from src.message import message_send_v1, message_remove_v1, message_edit_v1,\
 from src.channels import channels_create_v2, channels_list_v2,\
                          channels_listall_v2
 
-from src.data_store_pickle import pickle_data, get_prev_data
+from src.data_store_pickle import pickle_data, set_prev_data
 
 
 def quit_gracefully(*args):
@@ -63,7 +63,7 @@ def get_data():
     global DATA_STORE
     try:
         DATA_STORE = pickle.load(open('datastore.p', 'rb'))
-        get_prev_data(DATA_STORE)
+        set_prev_data(DATA_STORE)
     except Exception:
         pass
     return DATA_STORE
@@ -72,9 +72,9 @@ def save_data():
     global DATA_STORE
     pickle_data()
     DATA_STORE = get_data()
-    with open('datastore.p', 'wb') as FILE:
-        pickle.dump(DATA_STORE, FILE)
     return DATA_STORE
+
+DATA_STORE = get_data()
 
 ################################################################################
 ##                              AUTH ROUTES                                   ##
