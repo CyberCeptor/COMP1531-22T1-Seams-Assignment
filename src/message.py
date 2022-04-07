@@ -2,7 +2,7 @@
 Filename: message.py
 
 Author: Yangjun Yue(z5317840), Aleesha Bunrith(z5371516)
-Created: 23/03/2022 - 27/03/2022
+Created: 23/03/2022 - 07/04/2022
 
 Description: implementation for
     - sending message to a specified channel or dm by an authorised user

@@ -87,6 +87,8 @@ def test_search_successful(clear_register_two_createchanneldm_sendmsg):
     """ testing successful seach """
 
     token = clear_register_two_createchanneldm_sendmsg[0]['token']
+    id = clear_register_two_createchanneldm_sendmsg[0]['auth_user_id']
+    chan_msg_id = clear_register_two_createchanneldm_sendmsg[3]
 
     resp0 = requests.get(config.url + 'search/v1', 
                          params={'token': token, 'query_str': 'hewwo'})
@@ -96,8 +98,10 @@ def test_search_successful(clear_register_two_createchanneldm_sendmsg):
     assert len(searched_message) == 2
 
     # check returned first message, 'hewwo' sent by user 1 in channel 1
-    assert searched_message[0]['message_id'] == 1
-    assert searched_message[0]['u_id'] == 1
+    # assert chan_msg_id in [k['message_id'] for k in searched_message] and id in [k['u_id'] for k in searched_message]
+    assert (chan_msg_id, id) in [(k['message_id'], k['u_id']) for k in searched_message]
+    # assert searched_message[0]['message_id'] == 1
+    # assert searched_message[0]['u_id'] == 1
 
     # check returned second message, 'hewwo' sent by user 2 in dm 1
     assert searched_message[1]['message_id'] == 2
