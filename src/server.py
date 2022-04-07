@@ -29,6 +29,8 @@ from src.channels import channels_create_v2, channels_list_v2,\
 
 from src.data_store_pickle import pickle_data
 
+from src.standup import standup_start_v1, standup_active_v1
+
 
 def quit_gracefully(*args):
     '''For coverage'''
@@ -343,6 +345,29 @@ def dm_messages():
     dm_messages = dm_messages_v1(token, dm_id, start)
     save_data()
     return dumps(dm_messages)
+
+################################################################################
+##                             STANDUP ROUTES                                 ##
+################################################################################
+
+@APP.route('/standup/start/v1', methods=['POST'])
+def standup_start():
+    store = request.get_json()
+    result = standup_start_v1(
+        store['token'], store['channel_id'], store['length']
+    )
+    save_data()
+    return dumps(result)
+
+@APP.route('/standup/active/v1', methods = ['GET'])
+def standup_active_server():
+    token = request.args.get('token')
+    channel_id = request.args.get('channel_id')
+    save_data()
+    return dumps(
+        standup_active_v1(token, channel_id)
+    )
+
 
 ################################################################################
 ##                               CLEAR ROUTE                                  ##
