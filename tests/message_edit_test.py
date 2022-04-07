@@ -28,7 +28,7 @@ def test_message_edit_invalid_token(clear_register_two_createchanneldm_sendmsg):
                                 'message': 'hewwo'})
     assert resp0.status_code == 400
 
-    # token is boo
+    # token is bool
     resp1 = requests.put(config.url + 'message/edit/v1', 
                           json={'token': True, 'message_id': message_id,
                                 'message': 'hewwo'})
@@ -70,7 +70,7 @@ def test_message_edit_invalid_message_id(clear_register_two_createchanneldm_send
                                 'message': 'hewwo'})
     assert resp0.status_code == 400
 
-    # message id is boo
+    # message id is bool
     resp1 = requests.put(config.url + 'message/edit/v1', 
                           json={'token': token, 'message_id': True,
                                 'message': 'hewwo'})
@@ -82,7 +82,7 @@ def test_message_edit_invalid_message_id(clear_register_two_createchanneldm_send
                                 'message': 'hewwo'})
     assert resp2.status_code == 400
 
-    # non-existent message id
+    # non-existent message ids
     resp3 = requests.put(config.url + 'message/edit/v1', 
                           json={'token': token, 'message_id': -1, 
                                 'message': 'hewwo'})
@@ -106,7 +106,7 @@ def test_message_edit_invalid_message(clear_register_two_createchanneldm_sendmsg
                                 'message': 0})
     assert resp0.status_code == 400
 
-    # message is boo
+    # message is bool
     resp1 = requests.put(config.url + 'message/edit/v1', 
                           json={'token': token, 'message_id': message_id, 
                                 'message': True})
@@ -359,3 +359,5 @@ def test_dm_fail_message_edit(clear_register_two_createchanneldm_sendmsg):
                           json = {'token': user_3['token'], 'message_id': message_id,
                           'message': 'edit'})
     assert resp.status_code == 403
+
+requests.delete(config.url + 'clear/v1')

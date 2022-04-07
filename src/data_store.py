@@ -37,6 +37,11 @@ data = {
         'perm_id': 1,
         'removed': False,
     }],
+    'tokens' = [{
+        'user_id': user_data['id'],
+        'session_id': SESSION_ID_COUNTER,
+        'token': token,
+    }],
     'channels' = [{
         'channel_id': 1,
         'name': 'channel_name',
@@ -59,13 +64,14 @@ data = {
             'message_id': 1,
             'u_id': 1,
             'message': 'hewwo',
-            'time_sent': datetime.datetime.now()
+            'time_sent': utc_timestamp,
+            'reacts': [{
+                'react_id': 1,
+                'u_ids': [],
+                'is_this_user_reacted': False
+            }],
+            'is_pinned': False
         }],
-    }],
-    'tokens' = [{
-        'user_id': user_data['id'],
-        'session_id': SESSION_ID_COUNTER,
-        'token': token,
     }],
     'dms': [{
         'dm_id': 1,
@@ -88,7 +94,13 @@ data = {
             'message_id': 1,
             'u_id': 1,
             'message': 'hewwo',
-            'time_sent': datetime.datetime.now()
+            'time_sent': utc_timestamp,
+            'reacts': [{
+            'react_id': None,
+                'u_ids': [],
+                'is_this_user_reacted': False
+            }],
+            'is_pinned': False
         }],
     }]
 }
@@ -97,8 +109,8 @@ data = {
 ## YOU SHOULD MODIFY THIS OBJECT BELOW
 initial_object = {
     'users': [],
-    'channels': [],
     'tokens': [],
+    'channels': [],
     'dms': [],
 }
 ## YOU SHOULD MODIFY THIS OBJECT ABOVE

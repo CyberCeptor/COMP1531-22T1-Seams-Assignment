@@ -5,9 +5,11 @@ Author: Yangjun Yue(z5317840), Aleesha Bunrith(z5371516)
 Created: 23/03/2022 - 27/03/2022
 
 Description: implementation for
-    - sending message to a specified channel by an authorised user
+    - sending message to a specified channel or dm by an authorised user
     - given a specified message id and editing that message
-    - removing specified message from channel
+    - removing specified message from a channel or dm
+    - pinning a specified message from a channel or dm
+    - reacting to a specified message from a channel or dm
     - helpers for the above
 """
 
@@ -80,15 +82,18 @@ def message_edit_v1(token, message_id, message):
     auth_user_id = token_get_user_id(token)
     check_valid_auth_id(auth_user_id)
 
+    # check input message_id is valid and return the message_data, if the 
+    # message was sent in a channel or dm, and the corresponding channel or dm 
+    # data
     check_return = check_message_id_valid(message_id)
     message_data = check_return[0]
-    channel_sent = check_return[1]
-    info = check_return[2]
+    in_channel = check_return[1]
+    data = check_return[2]
     
-    if channel_sent is False:
-        edit_remove_dm_message_check(token, message, message_data, info, 'edit')
+    if in_channel is False:
+        edit_remove_dm_message_check(token, message, message_data, data, 'edit')
     else:
-        edit_remove_channel_message_check(token, message, message_data, info, 
+        edit_remove_channel_message_check(token, message, message_data, data, 
                                             'edit')
 
     data_store.set(store)
@@ -118,17 +123,19 @@ def message_remove_v1(token, message_id):
     token_valid_check(token)
     auth_user_id = token_get_user_id(token)
     check_valid_auth_id(auth_user_id)
-    # check input message_id is valid
 
+    # check input message_id is valid and return the message_data, if the 
+    # message was sent in a channel or dm, and the corresponding channel or dm 
+    # data
     check_return = check_message_id_valid(message_id)
     message_data = check_return[0]
-    channel_sent = check_return[1]
-    info = check_return[2]
+    in_channel = check_return[1]
+    data = check_return[2]
     
-    if channel_sent is False:
-        edit_remove_dm_message_check(token, '', message_data, info, 'remove')
+    if in_channel is False:
+        edit_remove_dm_message_check(token, '', message_data, data, 'remove')
     else:
-        edit_remove_channel_message_check(token, '', message_data, info, 
+        edit_remove_channel_message_check(token, '', message_data, data, 
                                             'remove')
 
     data_store.set(store)
@@ -307,29 +314,29 @@ def message_pin_v1(token, message_id):
     user_id = token_get_user_id(token)
     check_valid_auth_id(user_id)
 
-    # check input message_id is valid
+    # check input message_id is valid and return the message_data, if the 
+    # message was sent in a channel or dm, and the corresponding channel or dm 
+    # data
     check_return = check_message_id_valid(message_id)
     message_data = check_return[0]
-    # specifies whether if it's channel or dm message
-    channel_sent = check_return[1]
-    # channel or dm info data
-    info = check_return[2]
+    in_channel = check_return[1]
+    data = check_return[2]
     
     # raise input error if message is already pinned
-    if message_data['is_pinned'] == True:
+    if message_data['is_pinned'] is True:
         raise InputError(description='Message is already pinned')
 
     # if message is sent in dm
-    if channel_sent is False:
+    if in_channel is False:
         # user is owner of dm
-        if info['creator']['u_id'] == user_id:
+        if data['creator']['u_id'] == user_id:
             message_data['is_pinned'] = True
         else:
             raise AccessError(description='User has no access to this message')
     else:
         # if user is owner or global owner in channel
-        if (check_user_is_member(user_id, info, 'owner_members') or 
-        (check_user_is_member(user_id, info, 'all_members') and
+        if (check_user_is_member(user_id, data, 'owner_members') or 
+        (check_user_is_member(user_id, data, 'all_members') and
         check_user_is_global_owner(user_id))):
             message_data['is_pinned'] = True
         else:
