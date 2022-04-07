@@ -322,3 +322,46 @@ def message_pin_v1(token, message_id):
             raise AccessError(description='User has no access to this message')
 
     data_store.set(store)
+
+def search_v1(token, query_str):
+    """
+    If token given is authorised user, return a collection of messages
+    in all of the channels/DMs that the user has joined that contain 
+    the query (case-insensitive). There is no expected order for these messages.
+
+    Arguments:
+        token (str)          - unique str representation of user
+       query_str (str)       - str that searches for matching messages
+
+    Exceptions:
+        InputError  - length of query_str is less than 1 or over 1000 characters
+
+    Return Value: N/A
+    """
+
+    if query_str == '':
+        raise InputError(description='Empty query string input')
+
+    if len(query_str) > 1000:
+        raise InputError(description='Message must not exceed 1000 characters')
+    
+    # getting information from date_store
+    store = data_store.get()
+    # check valid token
+    token_valid_check(token)
+    user_id = token_get_user_id(token)
+    check_valid_auth_id(user_id)
+    
+    # create a list to store all correlated messages and return in the end
+    message_return = []
+    for channel in store['channels']:
+        for message_data in channel['messages']:
+            if message_data['message'] == query_str:
+                message_return.append(message_data)
+
+    for dm in store['dms']:
+        for message_data in dm['messages']:
+            if message_data['message_id'] == query_str:
+                message_return.append(message_data)
+    
+    return message_return
