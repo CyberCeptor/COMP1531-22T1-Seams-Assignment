@@ -2,7 +2,7 @@
 Filename: message_react_test.py
 
 Author: Aleesha Bunrith(z5371516)
-Created: 01/04/2022
+Created: 01/04/2022 - 07/04/2022
 
 Description: pytests for message/react/v1
 """
@@ -15,11 +15,6 @@ from src import config
 
 from src.global_vars import expired_token, unsaved_token
 
-"""
-create two users, create a channel and dm and send messages in both, react to msg
-and check return of message/react/v1
-"""
-
 @pytest.mark.usefixtures('clear_register_two_createchanneldm_sendmsg')
 def test_message_react_successful(clear_register_two_createchanneldm_sendmsg):
     """ test a successful case """
@@ -28,7 +23,9 @@ def test_message_react_successful(clear_register_two_createchanneldm_sendmsg):
     id1 = clear_register_two_createchanneldm_sendmsg[0]['auth_user_id']
     token2 = clear_register_two_createchanneldm_sendmsg[1]['token']
     id2 = clear_register_two_createchanneldm_sendmsg[1]['auth_user_id']
+    chan_id = clear_register_two_createchanneldm_sendmsg[2]
     chan_msg_id = clear_register_two_createchanneldm_sendmsg[3]
+    dm_id = clear_register_two_createchanneldm_sendmsg[4]
     dm_msg_id = clear_register_two_createchanneldm_sendmsg[5]
 
     # user 1 reacts with react id 1 to a channel message
@@ -39,59 +36,47 @@ def test_message_react_successful(clear_register_two_createchanneldm_sendmsg):
 
     # check the message details using user 1's token
     resp1 = requests.get(config.url + 'channel/messages/v2', 
-                         params={'token': token1, 'message_id': chan_msg_id,
+                         params={'token': token1, 'channel_id': chan_id,
                                  'start': 0})
     assert resp1.status_code == 200
     chan_msgs = resp1.json()
 
     assert len(chan_msgs['messages']) == 1
-    msg = chan_msgs['messages'][0]
+    msg_reacts = chan_msgs['messages'][0]['reacts']
 
-    assert id1 in [k['u_ids'] for k in msg['reacts']]
-    assert msg['reacts']['is_this_user_reacted'] is True
-    
-    # check the message details using user 2's token
-    resp2 = requests.get(config.url + 'channel/messages/v2', 
-                         params={'token': token2, 'message_id': chan_msg_id,
-                                 'start': 0})
-    assert resp2.status_code == 200
-    chan_msgs = resp2.json()
-    
-    msg = chan_msgs['messages'][0]
-
-    assert id2 not in [k['u_ids'] for k in msg['reacts']]
-    assert msg['reacts']['is_this_user_reacted'] is False
+    # there is only one valid react id so it will be in index 0
+    assert id1 in msg_reacts[0]['u_ids']
+    assert id2 not in msg_reacts[0]['u_ids']
+    assert msg_reacts[0]['is_this_user_reacted'] is True
 
     # user 1 reacts with react id 1 to a dm message
-    resp3 = requests.post(config.url + 'message/react/v1', 
+    resp2 = requests.post(config.url + 'message/react/v1', 
                           json={'token': token1, 'message_id': dm_msg_id, 
                                 'react_id': 1})
-    assert resp3.status_code == 200
+    assert resp2.status_code == 200
 
     # check the message details using user 1's token
-    resp4 = requests.get(config.url + 'dm/messages/v1', 
-                         params={'token': token1, 'message_id': dm_msg_id,
-                                 'start': 0})
-    assert resp4.status_code == 200
-    dm_msgs = resp4.json()
+    resp3 = requests.get(config.url + 'dm/messages/v1', 
+                         params={'token': token1, 'dm_id': dm_id, 'start': 0})
+    assert resp3.status_code == 200
+    dm_msgs = resp3.json()
 
     assert len(dm_msgs['messages']) == 1
-    msg = dm_msgs['messages'][0]
+    msg_reacts = dm_msgs['messages'][0]['reacts']
 
-    assert id1 in [k['u_ids'] for k in msg['reacts']]
-    assert msg['reacts']['is_this_user_reacted'] is True
+    assert id1 in msg_reacts[0]['u_ids']
+    assert msg_reacts[0]['is_this_user_reacted'] is True
     
     # check the message details using user 2's token
-    resp5 = requests.get(config.url + 'dm/messages/v1', 
-                         params={'token': token2, 'message_id': dm_msg_id,
-                                 'start': 0})
-    assert resp5.status_code == 200
-    dm_msgs = resp5.json()
+    resp4 = requests.get(config.url + 'dm/messages/v1', 
+                         params={'token': token2, 'dm_id': dm_id, 'start': 0})
+    assert resp4.status_code == 200
+    dm_msgs = resp4.json()
     
-    msg = dm_msgs['messages'][0]
+    msg_reacts = dm_msgs['messages'][0]['reacts']
 
-    assert id2 not in [k['u_ids'] for k in msg['reacts']]
-    assert msg['reacts']['is_this_user_reacted'] is False
+    assert id2 not in msg_reacts[0]['u_ids']
+    assert msg_reacts[0]['is_this_user_reacted'] is False
 
 @pytest.mark.usefixtures('clear_register_two_createchanneldm_sendmsg')
 def test_message_react_already_reacted(clear_register_two_createchanneldm_sendmsg):

@@ -96,7 +96,7 @@ data = {
             'message': 'hewwo',
             'time_sent': utc_timestamp,
             'reacts': [{
-            'react_id': None,
+                'react_id': 1,
                 'u_ids': [],
                 'is_this_user_reacted': False
             }],
