@@ -51,11 +51,11 @@ def test_search_invalid_token():
                          params={'token': unsaved_token, 'query_str': 'hewwo'})
     assert resp5.status_code == 403
 
-@pytest.mark.usefixtures('clear_register_createchanneldm_sendmsg')
-def test_search_invalid_query_string(clear_register_createchanneldm_sendmsg):
+@pytest.mark.usefixtures('clear_register_two_createchanneldm_sendmsg')
+def test_search_invalid_query_string(clear_register_two_createchanneldm_sendmsg):
     """ testing invalid query string to raise input error """
 
-    token = clear_register_createchanneldm_sendmsg[1]
+    token = clear_register_two_createchanneldm_sendmsg[0]['token']
     # query string less than 1 char
     resp0 = requests.get(config.url + 'search/v1', 
                          params={'token': token, 'query_str': ''})
@@ -82,11 +82,11 @@ def test_search_invalid_query_string(clear_register_createchanneldm_sendmsg):
                          params={'token': token, 'query_str': long_str})
     assert resp1.status_code == 400
 
-@pytest.mark.usefixtures('clear_register_createchanneldm_sendmsg')
-def test_search_successful(clear_register_createchanneldm_sendmsg):
+@pytest.mark.usefixtures('clear_register_two_createchanneldm_sendmsg')
+def test_search_successful(clear_register_two_createchanneldm_sendmsg):
     """ testing successful seach """
 
-    token = clear_register_createchanneldm_sendmsg[0]
+    token = clear_register_two_createchanneldm_sendmsg[0]['token']
 
     resp0 = requests.get(config.url + 'search/v1', 
                          params={'token': token, 'query_str': 'hewwo'})
