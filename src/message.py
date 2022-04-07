@@ -361,7 +361,7 @@ def search_v1(token, query_str):
 
     for dm in store['dms']:
         for message_data in dm['messages']:
-            if message_data['message_id'] == query_str:
+            if message_data['message'] == query_str:
                 message_return.append(message_data)
     
     return message_return

@@ -86,7 +86,7 @@ def test_search_invalid_query_string(clear_register_createchanneldm_sendmsg):
 def test_search_successful(clear_register_createchanneldm_sendmsg):
     """ testing successful seach """
 
-    token = clear_register_createchanneldm_sendmsg[1]
+    token = clear_register_createchanneldm_sendmsg[0]
 
     resp0 = requests.get(config.url + 'search/v1', 
                          params={'token': token, 'query_str': 'hewwo'})
