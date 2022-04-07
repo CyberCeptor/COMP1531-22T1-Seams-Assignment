@@ -329,7 +329,8 @@ def send_message(token, data_id, message, data_str):
         'message_id': message_id, 
         'u_id': auth_user_id, 
         'message': message, 
-        'time_sent': utc_timestamp
+        'time_sent': utc_timestamp,
+        'is_pinned': False
     }
 
     data_info['messages'].insert(0, message_data)
