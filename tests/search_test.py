@@ -2,7 +2,7 @@
 Filename: search_test.py
 
 Author: Yangjun Yue, z5317840
-Created: 07/03/22
+Created: 07/04/22
 
 Description: pytests for
     - searchnig correlated messages with a query string
@@ -87,8 +87,10 @@ def test_search_successful(clear_register_two_createchanneldm_sendmsg):
     """ testing successful seach """
 
     token = clear_register_two_createchanneldm_sendmsg[0]['token']
-    id = clear_register_two_createchanneldm_sendmsg[0]['auth_user_id']
-    chan_msg_id = clear_register_two_createchanneldm_sendmsg[3]
+    user1_id = clear_register_two_createchanneldm_sendmsg[0]['auth_user_id']
+    user2_id = clear_register_two_createchanneldm_sendmsg[1]['auth_user_id']
+    c_message_id = clear_register_two_createchanneldm_sendmsg[3]
+    d_message_id = clear_register_two_createchanneldm_sendmsg[5]
 
     resp0 = requests.get(config.url + 'search/v1', 
                          params={'token': token, 'query_str': 'hewwo'})
@@ -98,11 +100,76 @@ def test_search_successful(clear_register_two_createchanneldm_sendmsg):
     assert len(searched_message) == 2
 
     # check returned first message, 'hewwo' sent by user 1 in channel 1
-    # assert chan_msg_id in [k['message_id'] for k in searched_message] and id in [k['u_id'] for k in searched_message]
-    assert (chan_msg_id, id) in [(k['message_id'], k['u_id']) for k in searched_message]
-    # assert searched_message[0]['message_id'] == 1
-    # assert searched_message[0]['u_id'] == 1
+    assert (c_message_id, user1_id) in [(k['message_id'],k['u_id']) 
+                                        for k in searched_message]
 
     # check returned second message, 'hewwo' sent by user 2 in dm 1
-    assert searched_message[1]['message_id'] == 2
-    assert searched_message[1]['u_id'] == 2
+    assert (d_message_id, user2_id) in [(k['message_id'],k['u_id']) 
+                                        for k in searched_message]
+
+@pytest.mark.usefixtures('clear_register_two_createchanneldm_sendmsg')
+def test_search_successful_user2(clear_register_two_createchanneldm_sendmsg):
+    """ testing successful seach """
+
+    token_2 = clear_register_two_createchanneldm_sendmsg[1]['token']
+    user2_id = clear_register_two_createchanneldm_sendmsg[1]['auth_user_id']
+    d_message_id = clear_register_two_createchanneldm_sendmsg[5]
+
+    # user 2 queries hewwo, will only return dm message since user 2
+    # is not in channel
+    resp0 = requests.get(config.url + 'search/v1', 
+                         params={'token': token_2, 'query_str': 'hewwo'})
+    assert resp0.status_code == 200
+
+    searched_message = resp0.json()
+    assert len(searched_message) == 1
+
+    assert (d_message_id, user2_id) in [(k['message_id'],k['u_id']) 
+                                        for k in searched_message]
+
+@pytest.mark.usefixtures('clear_register_two_createchanneldm_sendmsg')
+def test_search_user_not_in_channel(clear_register_two_createchanneldm_sendmsg):
+    """ testing successful search """
+
+    # create user 3 not in channel or dm
+    resp = requests.post(config.url + 'auth/register/v2', 
+                          json={'email': 'def@hsh.com', 'password': 'password',
+                                'name_first': 'first3', 'name_last': 'last3'})
+    assert resp.status_code == 200
+    user3 = resp.json()
+    token_3 = user3['token']
+
+    # would return empty list of messages
+    resp0 = requests.get(config.url + 'search/v1', 
+                         params={'token': token_3, 'query_str': 'hewwo'})
+    assert resp0.status_code == 200
+    msg_return = resp0.json()
+    assert msg_return == []
+
+@pytest.mark.usefixtures('clear_register_two_createchannel')
+def test_search_case_insensitive(clear_register_two_createchannel):
+    """ testing successful seach """
+
+    token = clear_register_two_createchannel[0]['token']
+    user1_id = clear_register_two_createchannel[0]['auth_user_id']
+    c_id = clear_register_two_createchannel[2]
+
+    # user1 sends another message in channel 1
+    # testing case insensitive and non letters
+    resp = requests.post(config.url + 'message/send/v1', 
+                          json={'token': token,
+                                'channel_id': c_id, 
+                                'message': 'HEWWOagain@@'})
+    assert resp.status_code == 200
+    chan_message = resp.json()
+    msg_id = chan_message['message_id']
+
+    resp0 = requests.get(config.url + 'search/v1', 
+                         params={'token': token, 'query_str': 'hewwo'})
+    assert resp0.status_code == 200
+    searched_message = resp0.json()
+
+    assert (msg_id, user1_id) in [(k['message_id'],k['u_id']) 
+    for k in searched_message]
+
+requests.delete(config.url + 'clear/v1')

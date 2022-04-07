@@ -354,11 +354,6 @@ def search_v1(token, query_str):
     Exceptions:
         InputError  - length of query_str is less than 1 or over 1000 characters
     """
-    if query_str == '':
-        raise InputError(description='Empty query string input')
-
-    if len(query_str) > 1000:
-        raise InputError(description='Message must not exceed 1000 characters')
     
     # getting information from date_store
     store = data_store.get()
@@ -366,19 +361,32 @@ def search_v1(token, query_str):
     token_valid_check(token)
     user_id = token_get_user_id(token)
     check_valid_auth_id(user_id)
+
+    # checking query string input
+    if query_str == '':
+        raise InputError(description='Empty query string input')
+
+    if len(query_str) > 1000:
+        raise InputError(description='Message must not exceed 1000 characters')
+
     
     # create a list to store all correlated messages and return in the end
     message_return = []
     for channel in store['channels']:
         for message_data in channel['messages']:
-            if message_data['message'] == query_str:
-                message_return.append(message_data)
+            # account case insensitivity
+            if (query_str.lower() in message_data['message'].lower() and 
+            check_user_is_member(user_id, channel, 'all_members') is not None):
+                    message_return.append(message_data)
 
+    # checking dm case                
     for dm in store['dms']:
         for message_data in dm['messages']:
-            if message_data['message'] == query_str:
-                message_return.append(message_data)
-    
+            # account case insensitivity
+            if (query_str.lower() in message_data['message'].lower() and 
+            check_user_is_member(user_id, dm, 'members') is not None):
+                    message_return.append(message_data)
+
     return message_return
 
 def message_react_v1(token, message_id, react_id):
