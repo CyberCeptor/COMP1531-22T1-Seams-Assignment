@@ -360,6 +360,8 @@ def message_react_v1(token, message_id, react_id):
     Return Value: N/A
     """
 
+    store = data_store.get()
+
     # check valid token
     token_valid_check(token)
     auth_user_id = token_get_user_id(token)
@@ -380,27 +382,6 @@ def message_react_v1(token, message_id, react_id):
         # if message was sent in a channel, check user is in channel
         if check_user_is_member(auth_user_id, data, 'all_members') is None:
             raise AccessError(description='User does not exist in channel')
-
-    add_react(auth_user_id, message_data, react_id)
-
-def add_react(auth_user_id, message_data, react_id):
-    """
-    adds the user's react to the reacts for the given message
-
-    Arguments:
-        auth_user_id (int)  - an int specifying a user
-        message_data (dict) - data for the message being reacted to
-        react_id (int)      - an int specifying a react
-
-    Exceptions:
-        InputError  - Raised if 
-                        - react_id is not valid
-                        - message already contains the same react from the user
-
-    Return Value: N/A
-    """
-
-    store = data_store.get()
 
     # check if react_id is valid, right now only react id 1 is valid
     if react_id != 1 or type(react_id) is bool:
