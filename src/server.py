@@ -22,12 +22,12 @@ from src.channel import channel_details_v2, channel_invite_v2,\
                         channel_addowner_v1, channel_removeowner_v1,\
                         channel_join_v2, channel_messages_v2, channel_leave_v1
 from src.message import message_send_v1, message_remove_v1, message_edit_v1,\
-                        message_senddm_v1, message_pin_v1
+                        message_senddm_v1, message_pin_v1, message_react_v1
 
 from src.channels import channels_create_v2, channels_list_v2,\
                          channels_listall_v2
 
-from src.data_store_pickle import pickle_data
+from src.data_store_pickle import pickle_data, set_prev_data
 
 
 def quit_gracefully(*args):
@@ -57,14 +57,13 @@ APP.register_error_handler(Exception, defaultHandler)
 ##                            DATA_STORE PICKLING                             ##
 ################################################################################
 
-pickle_data()
-
 DATA_STORE = {}
 
 def get_data():
     global DATA_STORE
     try:
         DATA_STORE = pickle.load(open('datastore.p', 'rb'))
+        set_prev_data(DATA_STORE)
     except Exception:
         pass
     return DATA_STORE
@@ -73,9 +72,9 @@ def save_data():
     global DATA_STORE
     pickle_data()
     DATA_STORE = get_data()
-    with open('datastore.p', 'wb') as FILE:
-        pickle.dump(DATA_STORE, FILE)
     return DATA_STORE
+
+DATA_STORE = get_data()
 
 ################################################################################
 ##                              AUTH ROUTES                                   ##
@@ -292,6 +291,13 @@ def message_senddm():
 def message_pin():
     data = request.get_json()
     message_pin_v1(data['token'], data['message_id'])
+    save_data()
+    return dumps({})
+
+@APP.route('/message/react/v1', methods=['POST'])
+def message_react():
+    data = request.get_json()
+    message_react_v1(data['token'], data['message_id'], data['react_id'])
     save_data()
     return dumps({})
 

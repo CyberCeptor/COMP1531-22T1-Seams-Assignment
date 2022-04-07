@@ -1,20 +1,22 @@
 """
 Filename: message.py
 
-Author: Yangjun Yue(z5317840)
+Author: Yangjun Yue(z5317840), Aleesha Bunrith(z5371516)
 Created: 23/03/2022 - 27/03/2022
 
 Description: implementation for
-    - sending message to a specified channel by an authorised user
+    - sending message to a specified channel or dm by an authorised user
     - given a specified message id and editing that message
-    - removing specified message from channel
+    - removing specified message from a channel or dm
+    - pinning a specified message from a channel or dm
+    - reacting to a specified message from a channel or dm
     - helpers for the above
 """
 
-from src.admin import check_user_is_global_owner
 from src.error import InputError, AccessError
 from src.token import token_get_user_id, token_valid_check
-from src.other import check_valid_auth_id, check_user_is_member, send_message
+from src.other import check_user_is_member, check_user_is_global_owner, \
+                      send_message
 
 from src.data_store import data_store
 
@@ -77,18 +79,20 @@ def message_edit_v1(token, message_id, message):
 
     # check valid token and user
     token_valid_check(token)
-    auth_user_id = token_get_user_id(token)
-    check_valid_auth_id(auth_user_id)
 
+    # check input message_id is valid and return the message_data, if the 
+    # message was sent in a channel or dm, and the corresponding channel or dm 
+    # data
     check_return = check_message_id_valid(message_id)
     message_data = check_return[0]
-    channel_sent = check_return[1]
-    info = check_return[2]
+    in_channel = check_return[1]
+    data = check_return[2]
     
-    if channel_sent is False:
-        edit_remove_dm_message(token, message, message_data, info, 'edit')
+    if in_channel is False:
+        edit_remove_dm_message_check(token, message, message_data, data, 'edit')
     else:
-        edit_remove_channel_message(token, message, message_data, info, 'edit')
+        edit_remove_channel_message_check(token, message, message_data, data, 
+                                            'edit')
 
     data_store.set(store)
 
@@ -115,19 +119,20 @@ def message_remove_v1(token, message_id):
     store = data_store.get()
     # check valid token
     token_valid_check(token)
-    auth_user_id = token_get_user_id(token)
-    check_valid_auth_id(auth_user_id)
-    # check input message_id is valid
 
+    # check input message_id is valid and return the message_data, if the 
+    # message was sent in a channel or dm, and the corresponding channel or dm 
+    # data
     check_return = check_message_id_valid(message_id)
     message_data = check_return[0]
-    channel_sent = check_return[1]
-    info = check_return[2]
+    in_channel = check_return[1]
+    data = check_return[2]
     
-    if channel_sent is False:
-        edit_remove_dm_message(token, '', message_data, info, 'remove')
+    if in_channel is False:
+        edit_remove_dm_message_check(token, '', message_data, data, 'remove')
     else:
-        edit_remove_channel_message(token, '', message_data, info, 'remove')
+        edit_remove_channel_message_check(token, '', message_data, data, 
+                                            'remove')
 
     data_store.set(store)
 
@@ -199,9 +204,10 @@ def check_message_id_valid(message_id):
     # if message_id is not found, raise an InputError
     raise InputError(description='Message does not exist in channels database')
 
-def edit_remove_dm_message(token, message, msg_data, dm, option):
+def edit_remove_dm_message_check(token, message, msg_data, dm, option):
     """
-    edits or removes a specified message sent in a dm
+    checks if a specified message sent in a dm can be edited or removed by the 
+    user
 
     Arguments:
         token (str)     - unique str representation of user
@@ -220,19 +226,14 @@ def edit_remove_dm_message(token, message, msg_data, dm, option):
 
     # if user is either creator or it's the user who sent the message
     if msg_data['u_id'] == user_id or dm['creator']['u_id'] == user_id:
-        if option == 'remove':
-            dm['messages'].remove(msg_data)
-        elif option == 'edit' and message != '':
-            msg_data['message'] = message
-        elif option == 'edit' and message == '':
-            # remove the message if the new message input is empty
-            message_remove_v1(token, msg_data['message_id'])
+        edit_remove_message(dm, msg_data, message, option)
     else:
         raise AccessError(description='User has no access to this message')
 
-def edit_remove_channel_message(token, message, msg_data, channel, option):
+def edit_remove_channel_message_check(token, message, msg_data, channel, option):
     """
-    edits or removes a specified message sent in a channel
+    checks if a specified message sent in a channel can be edited or removed by 
+    the user
 
     Arguments:
         token (str)     - unique str representation of user
@@ -252,20 +253,38 @@ def edit_remove_channel_message(token, message, msg_data, channel, option):
     # if user is either owner or it's the user who sent the message or
     # if user is a member in channel and is a global owner
     if (check_user_is_member(user_id, channel, 'owner_members') or
-        msg_data['u_id'] == user_id or 
-        (check_user_is_member(user_id, channel, 'all_members') and
-        check_user_is_global_owner(user_id))):
-        if option == 'remove':
-            channel['messages'].remove(msg_data)
-        elif option == 'edit' and message != '':
-            msg_data['message'] = message
-        elif option == 'edit' and message == '':
-            # remove the message if the new message input is empty
-            message_remove_v1(token, msg_data['message_id'])
+        msg_data['u_id'] == user_id):
+        edit_remove_message(channel, msg_data, message, option)
+    elif (check_user_is_member(user_id, channel, 'all_members') and
+        check_user_is_global_owner(user_id)):
+        edit_remove_message(channel, msg_data, message, option)
     else:
         raise AccessError(description='User has no access to this message')
 
+def edit_remove_message(data, msg_data, message, option):
+    """
+    edits or removes a specified message
 
+    Arguments:
+        token (str)     - unique str representation of user
+        message (str)   - message that the user wishes to send
+        msg_data (dict) - the message's associated data
+        dm (dict)       - the associate dm details that the message is found in
+        option (str)    - specifies if the user is editing or removing the msg
+
+    Exceptions:
+        AccessError - If user has no access to the specified message
+
+    Return Value: N/A
+    """
+
+    if option == 'remove':
+        data['messages'].remove(msg_data)
+    elif option == 'edit' and message != '':
+        msg_data['message'] = message
+    elif option == 'edit' and message == '':
+        # remove the message if the new message input is empty
+        data['messages'].remove(msg_data)
 
 def message_pin_v1(token, message_id):
     """
@@ -284,41 +303,114 @@ def message_pin_v1(token, message_id):
                     or DM that the authorised user has joined
                     - message already pinned
 
-    Return Value: N/A
+    Return: N/A
     """
 
     store = data_store.get()
     # check valid token
     token_valid_check(token)
     user_id = token_get_user_id(token)
-    check_valid_auth_id(user_id)
 
-    # check input message_id is valid
+    # check input message_id is valid and return the message_data, if the 
+    # message was sent in a channel or dm, and the corresponding channel or dm 
+    # data
     check_return = check_message_id_valid(message_id)
     message_data = check_return[0]
-    # specifies whether if it's channel or dm message
-    channel_sent = check_return[1]
-    # channel or dm info data
-    info = check_return[2]
+    in_channel = check_return[1]
+    data = check_return[2]
     
     # raise input error if message is already pinned
-    if message_data['is_pinned'] == True:
+    if message_data['is_pinned'] is True:
         raise InputError(description='Message is already pinned')
 
     # if message is sent in dm
-    if channel_sent is False:
+    if in_channel is False:
         # user is owner of dm
-        if info['creator']['u_id'] == user_id:
+        if data['creator']['u_id'] == user_id:
             message_data['is_pinned'] = True
         else:
             raise AccessError(description='User has no access to this message')
     else:
         # if user is owner or global owner in channel
-        if (check_user_is_member(user_id, info, 'owner_members') or 
-        (check_user_is_member(user_id, info, 'all_members') and
+        if (check_user_is_member(user_id, data, 'owner_members') or 
+        (check_user_is_member(user_id, data, 'all_members') and
         check_user_is_global_owner(user_id))):
             message_data['is_pinned'] = True
         else:
             raise AccessError(description='User has no access to this message')
+
+    data_store.set(store)
+
+def message_react_v1(token, message_id, react_id):
+    """
+    react to a specified message with a specific react
+
+    Arguments:
+        token (str)      - a user's valid jwt token
+        message_id (int) - an int specifying a message sent in a channel or dm
+        react_id (int)   - an int specifying a react
+
+    Exceptions:
+        AccessError - Raised if user has no access to the specified message
+        InputError  - Raised if 
+                        - message_id is not valid
+                        - react_id is not valid
+                        - message already contains the same react from the user
+
+    Return Value: N/A
+    """
+
+    # check valid token
+    token_valid_check(token)
+    auth_user_id = token_get_user_id(token)
+
+    # check input message_id is valid and return the message_data, if the 
+    # message was sent in a channel or dm, and the corresponding channel or dm 
+    # data
+    check_return = check_message_id_valid(message_id)
+    message_data = check_return[0]
+    in_channel = check_return[1]
+    data = check_return[2]
+
+    if in_channel is False:
+        # if message was sent in a dm, check user is in dm
+        if check_user_is_member(auth_user_id, data, 'members') is None:
+            raise AccessError(description='User does not exist in dm')
+    else:
+        # if message was sent in a channel, check user is in channel
+        if check_user_is_member(auth_user_id, data, 'all_members') is None:
+            raise AccessError(description='User does not exist in channel')
+
+    add_react(auth_user_id, message_data, react_id)
+
+def add_react(auth_user_id, message_data, react_id):
+    """
+    adds the user's react to the reacts for the given message
+
+    Arguments:
+        auth_user_id (int)  - an int specifying a user
+        message_data (dict) - data for the message being reacted to
+        react_id (int)      - an int specifying a react
+
+    Exceptions:
+        InputError  - Raised if 
+                        - react_id is not valid
+                        - message already contains the same react from the user
+
+    Return Value: N/A
+    """
+
+    store = data_store.get()
+
+    # check if react_id is valid, right now only react id 1 is valid
+    if react_id != 1 or type(react_id) is bool:
+        raise InputError(description='Invalid react id')
+
+    # check if user has already reacted to this message with react id 1
+    if auth_user_id in message_data['reacts'][0]['u_ids']:
+        raise InputError(description='User has already reacted with this react')
+
+    # add the user id to the list of u_ids for react id 1
+    message_data['reacts'][0]['u_ids'].append(auth_user_id)
 
     data_store.set(store)
