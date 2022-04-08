@@ -14,7 +14,8 @@ import requests
 
 from src import config
 
-from src.global_vars import expired_token, unsaved_token
+from src.global_vars import expired_token, unsaved_token,\
+                status_ok, status_access_err, status_input_err
 
 @pytest.mark.usefixtures('clear_register_two_createchanneldm_sendmsg')
 def test_message_remove_invalid_token(clear_register_two_createchanneldm_sendmsg):
@@ -24,34 +25,34 @@ def test_message_remove_invalid_token(clear_register_two_createchanneldm_sendmsg
     message_id = clear_register_two_createchanneldm_sendmsg[2]
     resp0 = requests.delete(config.url + 'message/remove/v1', 
                           json = {'token': 0, 'message_id': message_id})
-    assert resp0.status_code == 400
+    assert resp0.status_code == status_input_err
 
     # token is boo
     resp1 = requests.delete(config.url + 'message/remove/v1', 
                           json = {'token': True, 'message_id': message_id})
-    assert resp1.status_code == 400
+    assert resp1.status_code == status_input_err
 
     # token input empty
     resp2 = requests.delete(config.url + 'message/remove/v1', 
                           json = {'token': '', 'message_id': message_id})
-    assert resp2.status_code == 400
+    assert resp2.status_code == status_input_err
 
     # wrong token input
     resp3 = requests.delete(config.url + 'message/remove/v1', 
                           json = {'token': 'str', 'message_id': message_id})
-    assert resp3.status_code == 403
+    assert resp3.status_code == status_access_err
 
     # expired token
     resp4 = requests.delete(config.url + 'message/remove/v1', 
                           json = {'token': expired_token, 
                           'message_id': message_id})
-    assert resp4.status_code == 403
+    assert resp4.status_code == status_access_err
 
     # unsaved token
     resp5 = requests.delete(config.url + 'message/remove/v1', 
                           json = {'token': unsaved_token, 
                           'message_id': message_id})
-    assert resp5.status_code == 403
+    assert resp5.status_code == status_access_err
     
 @pytest.mark.usefixtures('clear_register_two_createchanneldm_sendmsg')
 def test_message_remove_invalid_message_id(\
@@ -63,22 +64,22 @@ def test_message_remove_invalid_message_id(\
     # no message id input
     resp0 = requests.delete(config.url + 'message/remove/v1', 
                           json = {'token': token, 'message_id': ''})
-    assert resp0.status_code == 400
+    assert resp0.status_code == status_input_err
     # message id is boo
     resp1 = requests.delete(config.url + 'message/remove/v1', 
                           json = {'token': token, 'message_id': True})
-    assert resp1.status_code == 400
+    assert resp1.status_code == status_input_err
     # message id is string
     resp2 = requests.delete(config.url + 'message/remove/v1', 
                           json = {'token': token, 'message_id': 'str'})
-    assert resp2.status_code == 400
+    assert resp2.status_code == status_input_err
     # non-existent message id
     resp3 = requests.delete(config.url + 'message/remove/v1', 
                           json = {'token': token, 'message_id': -1})
-    assert resp3.status_code == 400
+    assert resp3.status_code == status_input_err
     resp4 = requests.delete(config.url + 'message/remove/v1', 
                           json = {'token': token, 'message_id': 100})
-    assert resp4.status_code == 400
+    assert resp4.status_code == status_input_err
     requests.delete(config.url + 'clear/v1')
 
 @pytest.mark.usefixtures('clear_register_two_createchanneldm_sendmsg')
@@ -112,7 +113,7 @@ def test_message_remove_global_user(clear_register_two_createchanneldm_sendmsg):
     # (has owner permission if is a member)
     resp = requests.delete(config.url + 'message/remove/v1', 
                           json = {'token': token_1, 'message_id': message_id_2})
-    assert resp.status_code == 200
+    assert resp.status_code == status_ok
 
 @pytest.mark.usefixtures('clear_register_two_createchanneldm_sendmsg')
 def test_message_remove_global_user_fail(\
@@ -140,7 +141,7 @@ def test_message_remove_global_user_fail(\
     # global owner(user1) cannot delete a message if not in channel
     resp = requests.delete(config.url + 'message/remove/v1', 
                           json = {'token': token_1, 'message_id': message_id_2})
-    assert resp.status_code == 403
+    assert resp.status_code == status_access_err
 
 @pytest.mark.usefixtures('clear_register_two_createchanneldm_sendmsg')
 def test_message_sent_not_belong_to_user(clear_register_two_createchanneldm_sendmsg):
@@ -158,7 +159,7 @@ def test_message_sent_not_belong_to_user(clear_register_two_createchanneldm_send
     # raise access error if user2 is trying to remove user1's message
     resp = requests.delete(config.url + 'message/remove/v1', 
                           json = {'token': token_2, 'message_id': message_id})
-    assert resp.status_code == 403 # raise access error
+    assert resp.status_code == status_access_err # raise access error
 
 @pytest.mark.usefixtures('clear_register_two_createchanneldm_sendmsg')
 def test_successful_message_remove_by_owner(\
@@ -184,7 +185,7 @@ def test_successful_message_remove_by_owner(\
     # successful removal when user 1 who is the owner 
     resp = requests.delete(config.url + 'message/remove/v1', 
                           json = {'token': token, 'message_id': message_id_2})
-    assert resp.status_code == 200
+    assert resp.status_code == status_ok
 
 @pytest.mark.usefixtures('clear_register_two_createchanneldm_sendmsg')
 def test_successful_message_remove_by_user(clear_register_two_createchanneldm_sendmsg):
@@ -209,7 +210,7 @@ def test_successful_message_remove_by_user(clear_register_two_createchanneldm_se
     # successful removal when user 2 tries to remove own message
     resp = requests.delete(config.url + 'message/remove/v1', 
                           json = {'token': token_2, 'message_id': message_id_2})
-    assert resp.status_code == 200
+    assert resp.status_code == status_ok
 
 @pytest.mark.usefixtures('clear_register_two_createchanneldm_sendmsg')
 def test_dm_successful_message_remove_by_user(clear_register_two_createchanneldm_sendmsg):
@@ -222,7 +223,7 @@ def test_dm_successful_message_remove_by_user(clear_register_two_createchanneldm
     # successful removal when user 2 tries to remove own message in dm
     resp = requests.delete(config.url + 'message/remove/v1', 
                           json = {'token': token_2, 'message_id': message_id})
-    assert resp.status_code == 200
+    assert resp.status_code == status_ok
 
 @pytest.mark.usefixtures('clear_register_two_createchanneldm_sendmsg')
 def test_dm_successful_message_remove_by_owner(clear_register_two_createchanneldm_sendmsg):
@@ -235,7 +236,7 @@ def test_dm_successful_message_remove_by_owner(clear_register_two_createchanneld
     # successful removal when user 1 who is owner of dm tries to remove message in dm
     resp = requests.delete(config.url + 'message/remove/v1', 
                           json = {'token': token_1, 'message_id': message_id})
-    assert resp.status_code == 200
+    assert resp.status_code == status_ok
 
 @pytest.mark.usefixtures('clear_register_two_createchanneldm_sendmsg')
 def test_dm_fail_message_remove(clear_register_two_createchanneldm_sendmsg):
@@ -250,7 +251,7 @@ def test_dm_fail_message_remove(clear_register_two_createchanneldm_sendmsg):
     user3 = requests.post(config.url + 'auth/register/v2', 
                   json={'email': 'iii@def.com', 'password': 'password',
                         'name_first': 'first3', 'name_last': 'last3'})
-    assert user3.status_code == 200
+    assert user3.status_code == status_ok
     user_3 = user3.json()
 
     # user 1 sends message in dm
@@ -258,17 +259,17 @@ def test_dm_fail_message_remove(clear_register_two_createchanneldm_sendmsg):
                           json={'token': token_1,
                                 'dm_id': dm_id, 
                                 'message': 'hewwooooo'})
-    assert send_message.status_code == 200
+    assert send_message.status_code == status_ok
     dm_message = send_message.json()
     message_id = dm_message['message_id']
 
     # raise access error when user 2 tries to remove user 1's message
     resp = requests.delete(config.url + 'message/remove/v1', 
                           json={'token': token_2, 'message_id': message_id})
-    assert resp.status_code == 403
+    assert resp.status_code == status_access_err
 
     # access error when user3 tries to remove the message
     resp = requests.delete(config.url + 'message/remove/v1', 
                           json={'token': user_3['token'],
                                 'message_id': message_id})
-    assert resp.status_code == 403
+    assert resp.status_code == status_access_err

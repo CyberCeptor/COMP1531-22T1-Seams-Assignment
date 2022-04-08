@@ -11,10 +11,10 @@ Description: pytests for
 import pytest
 
 import requests
-
 from src import config
 
-from src.global_vars import expired_token, unsaved_token
+from src.global_vars import expired_token, unsaved_token, status_ok,\
+                    status_access_err, status_input_err
 
 @pytest.mark.usefixtures('clear_register_createchannel')
 def test_message_send_invalid_token(clear_register_createchannel):
@@ -25,37 +25,37 @@ def test_message_send_invalid_token(clear_register_createchannel):
     resp0 = requests.post(config.url + 'message/send/v1', 
                           json = {'token': 0, 'channel_id': chan_id, 
                           'message': 'hewwo'})
-    assert resp0.status_code == 400
+    assert resp0.status_code == status_input_err
 
     # token is boo
     resp1 = requests.post(config.url + 'message/send/v1', 
                           json = {'token': True, 'channel_id': chan_id, 
                           'message': 'hewwo'})
-    assert resp1.status_code == 400
+    assert resp1.status_code == status_input_err
 
     # token input empty
     resp2 = requests.post(config.url + 'message/send/v1', 
                           json = {'token': '', 'channel_id': chan_id, 
                           'message': 'hewwo'})
-    assert resp2.status_code == 400
+    assert resp2.status_code == status_input_err
 
     # wrong token input
     resp3 = requests.post(config.url + 'message/send/v1', 
                           json = {'token': 'not right string', 
                           'channel_id': chan_id, 'message': 'hewwo'})
-    assert resp3.status_code == 403
+    assert resp3.status_code == status_access_err
 
     # expired token
     resp4 = requests.post(config.url + 'message/send/v1', 
                           json = {'token': expired_token, 
                           'channel_id': chan_id, 'message': 'hewwo'})
-    assert resp4.status_code == 403
+    assert resp4.status_code == status_access_err
 
     # unsaved token
     resp5 = requests.post(config.url + 'message/send/v1', 
                           json = {'token': unsaved_token, 
                           'channel_id': chan_id, 'message': 'hewwo'})
-    assert resp5.status_code == 403
+    assert resp5.status_code == status_access_err
 
 @pytest.mark.usefixtures('clear_register_createchannel')
 def test_message_send_invalid_channel_id(clear_register_createchannel):
@@ -66,22 +66,22 @@ def test_message_send_invalid_channel_id(clear_register_createchannel):
     resp0 = requests.post(config.url + 'message/send/v1', 
                           json = {'token': token, 'channel_id': '', 
                           'message': 'hewwo'})
-    assert resp0.status_code == 400
+    assert resp0.status_code == status_input_err
     # channel id is boo
     resp1 = requests.post(config.url + 'message/send/v1', 
                           json = {'token': token, 'channel_id': True, 
                           'message': 'hewwo'})
-    assert resp1.status_code == 400
+    assert resp1.status_code == status_input_err
     # channel id is string
     resp2 = requests.post(config.url + 'message/send/v1', 
                           json = {'token': token, 'channel_id': 'str', 
                           'message': 'hewwo'})
-    assert resp2.status_code == 400
+    assert resp2.status_code == status_input_err
     # wrong channel input
     resp3 = requests.post(config.url + 'message/send/v1', 
                           json = {'token': token, 'channel_id': 2, 
                           'message': 'hewwo'})
-    assert resp3.status_code == 400
+    assert resp3.status_code == status_input_err
 
 @pytest.mark.usefixtures('clear_register_createchannel')
 def test_message_send_invalid_message(clear_register_createchannel):
@@ -94,13 +94,13 @@ def test_message_send_invalid_message(clear_register_createchannel):
     resp0 = requests.post(config.url + 'message/send/v1', 
                           json = {'token': token, 'channel_id': chan_id, 
                           'message': 0})
-    assert resp0.status_code == 400
+    assert resp0.status_code == status_input_err
 
     # message is boo
     resp1 = requests.post(config.url + 'message/send/v1', 
                           json = {'token': token, 'channel_id': chan_id, 
                           'message': True})
-    assert resp1.status_code == 400
+    assert resp1.status_code == status_input_err
 
 @pytest.mark.usefixtures('clear_register_createchannel')
 def test_message_send_invalid_length(clear_register_createchannel):
@@ -130,13 +130,13 @@ def test_message_send_invalid_length(clear_register_createchannel):
     resp0 = requests.post(config.url + 'message/send/v1', 
                           json={'token': token, 'channel_id': chan_id, 
                           'message': ''})
-    assert resp0.status_code == 400
+    assert resp0.status_code == status_input_err
 
     # more than 1000 character
     resp1 = requests.post(config.url + 'message/send/v1', 
                           json={'token': token, 'channel_id': chan_id, 
                           'message': long_message})
-    assert resp1.status_code == 400
+    assert resp1.status_code == status_input_err
 
 @pytest.mark.usefixtures('clear_register_createchannel')
 def test_user_not_belong(clear_register_createchannel):
@@ -155,7 +155,7 @@ def test_user_not_belong(clear_register_createchannel):
     resp0 = requests.post(config.url + 'message/send/v1', 
                           json = {'token': token_2, 'channel_id': chan_id, 
                           'message': 'hewwo'})
-    assert resp0.status_code == 403 #raise access error
+    assert resp0.status_code == status_access_err #raise access error
 
 @pytest.mark.usefixtures('clear_register_createchannel')
 def test_successful_message_send(clear_register_createchannel):
@@ -167,7 +167,7 @@ def test_successful_message_send(clear_register_createchannel):
     send_message = requests.post(config.url + 'message/send/v1', 
                           json={'token': token, 'channel_id': chan_id, 
                           'message': 'hewwo'})
-    assert send_message.status_code == 200
+    assert send_message.status_code == status_ok
     message = send_message.json()
     message_id = message['message_id']
     assert message_id == 1
@@ -176,7 +176,7 @@ def test_successful_message_send(clear_register_createchannel):
     create_2_channel = requests.post(config.url + 'channels/create/v2',
                             json={'token': token, 'name': 'channel_2',
                                     'is_public': True})
-    assert create_2_channel.status_code == 200                               
+    assert create_2_channel.status_code == status_ok                               
     channel_2_data = create_2_channel.json()
     channel_2_id = channel_2_data['channel_id']
     
@@ -184,7 +184,7 @@ def test_successful_message_send(clear_register_createchannel):
     send_2_message = requests.post(config.url + 'message/send/v1', 
                           json={'token': token, 'channel_id': channel_2_id, 
                           'message': 'hewwoagain'})
-    assert send_2_message.status_code == 200
+    assert send_2_message.status_code == status_ok
     message2 = send_2_message.json()
     message_2_id = message2['message_id']
     assert message_2_id == 2

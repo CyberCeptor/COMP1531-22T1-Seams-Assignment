@@ -13,7 +13,9 @@ import requests
 
 from src import config
 
-from src.global_vars import expired_token, unsaved_token
+from src.global_vars import expired_token, unsaved_token, status_ok,\
+                            status_input_err, status_access_err
+
 
 @pytest.mark.usefixtures('clear_register_createchannel')
 def test_channel_details_invalid_token(clear_register_createchannel):
@@ -23,30 +25,30 @@ def test_channel_details_invalid_token(clear_register_createchannel):
     chan_id = clear_register_createchannel[1]
     resp0 = requests.get(config.url + 'channel/details/v2', 
                           params={'token': 0, 'channel_id': chan_id})
-    assert resp0.status_code == 400
+    assert resp0.status_code == status_input_err
     # token is boo
     resp1 = requests.get(config.url + 'channel/details/v2', 
                           params={'token': True, 'channel_id': chan_id})
-    assert resp1.status_code == 400
+    assert resp1.status_code == status_input_err
     # token input empty
     resp2 = requests.get(config.url + 'channel/details/v2', 
                           params={'token': '', 'channel_id': chan_id})
-    assert resp2.status_code == 400
+    assert resp2.status_code == status_input_err
     # wrong token input
     resp3 = requests.get(config.url + 'channel/details/v2', 
                           params={'token': 'not right string',
                                   'channel_id': chan_id})
-    assert resp3.status_code == 403
+    assert resp3.status_code == status_access_err
 
     # expired token
     resp4 = requests.get(config.url + 'channel/details/v2', 
                          params={'token': expired_token, 'channel_id': chan_id})
-    assert resp4.status_code == 403
+    assert resp4.status_code == status_access_err
 
     # unsaved token
     resp5 = requests.get(config.url + 'channel/details/v2', 
                          params={'token': unsaved_token, 'channel_id': chan_id})
-    assert resp5.status_code == 403
+    assert resp5.status_code == status_access_err
 
 @pytest.mark.usefixtures('clear_register_createchannel')
 def test_channel_details_invalid_channel(clear_register_createchannel):
@@ -56,19 +58,19 @@ def test_channel_details_invalid_channel(clear_register_createchannel):
     # no channel id input
     resp0 = requests.get(config.url + 'channel/details/v2', 
                           params={'token': token, 'channel_id': ''})
-    assert resp0.status_code == 400
+    assert resp0.status_code == status_input_err
     # channel id is boo
     resp1 = requests.get(config.url + 'channel/details/v2', 
                           params={'token': token, 'channel_id': True})
-    assert resp1.status_code == 400
+    assert resp1.status_code == status_input_err
     # channel id is string
     resp2 = requests.get(config.url + 'channel/details/v2', 
                           params={'token': token, 'channel_id': 'str'})
-    assert resp2.status_code == 400
+    assert resp2.status_code == status_input_err
     # wrong channel input
     resp3 = requests.get(config.url + 'channel/details/v2', 
                           params={'token': token, 'channel_id': 2})
-    assert resp3.status_code == 400
+    assert resp3.status_code == status_input_err
     
 @pytest.mark.usefixtures('clear_register_createchannel')
 def test_channel_details_user_not_belong(clear_register_createchannel):
@@ -85,7 +87,7 @@ def test_channel_details_user_not_belong(clear_register_createchannel):
     # raise access error when user is not in the channel
     resp0 = requests.get(config.url + 'channel/details/v2', 
                           params={'token': token_2, 'channel_id': chan_id})
-    assert resp0.status_code == 403
+    assert resp0.status_code == status_access_err
     
     requests.delete(config.url + 'clear/v1')
 
@@ -101,7 +103,7 @@ def test_channel_details_return(clear_register_createchannel):
     # success run
     resp = requests.get(config.url + 'channel/details/v2', 
                           params={'token': token, 'channel_id': chan_id})
-    assert resp.status_code == 200
+    assert resp.status_code == status_ok
 
     chan_details = resp.json()
 

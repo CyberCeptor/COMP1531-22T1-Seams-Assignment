@@ -22,6 +22,7 @@ from src.token import token_valid_check, token_get_user_id
 
 from src.data_store import data_store
 
+
 def channel_invite_v2(token, channel_id, u_id):
     """
     check if given user id and channel id are valid,
