@@ -100,7 +100,6 @@ for style (over the weekend):
 - pytests functions can just have one description at the top with comments throughout if theres a lot of tests
 - error messages should have description= in front of it 
 
-
 4.1
 Members present: Aleesha, Aisha, Jenson, Van, Jed
 Meeting type: Lab
@@ -117,3 +116,9 @@ Meeting type: teams
 - Discussing Jed's functions together(message share, message send later) and test cases
 - Jenson starts this week but needs to do other assignments first
 - Van has already started and has standup/start/v1 and standup/active/v1 finished half
+
+08.04
+Members present: Aleesha, Aisha, Jenson, Van, Jed
+Meeting type: Lab
+- finish at least one function by Monday night
+- can push tests for one function then implementation, no need to push tests for all functions
