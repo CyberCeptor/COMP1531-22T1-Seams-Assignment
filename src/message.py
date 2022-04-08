@@ -374,7 +374,7 @@ def search_v1(token, query_str):
     message_return = []
     for channel in store['channels']:
         for message_data in channel['messages']:
-            # account case insensitivity
+            # change everything in lower case,account case insensitivity
             if (query_str.lower() in message_data['message'].lower() and 
             check_user_is_member(user_id, channel, 'all_members') is not None):
                     message_return.append(message_data)
@@ -382,7 +382,7 @@ def search_v1(token, query_str):
     # checking dm case                
     for dm in store['dms']:
         for message_data in dm['messages']:
-            # account case insensitivity
+            # change everything in lower case, account case insensitivity
             if (query_str.lower() in message_data['message'].lower() and 
             check_user_is_member(user_id, dm, 'members') is not None):
                     message_return.append(message_data)
