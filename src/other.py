@@ -39,6 +39,7 @@ def clear_v1():
 
     Return Value: N/A
     """
+
     store = data_store.get()
     store['users'].clear()
     store['channels'].clear()
@@ -239,8 +240,6 @@ def get_messages(auth_user_id, data, start, data_str):
     # get end
     end = start + 50
 
-    print(total_messages)
-
     # make sure end is suitable index place
     if end > total_messages:
         end = -1
@@ -253,13 +252,18 @@ def get_messages(auth_user_id, data, start, data_str):
     if end == -1:
         if start == total_messages - 1:
             # if there is only 1 message
+            set_is_this_user_reacted(auth_user_id, data['messages'], start, 
+                                     start + 1)
             to_return.append(data['messages'][start])
         else:
             # if there are less than 50 messages from the index start or
             # if there are only 50 messages
+            set_is_this_user_reacted(auth_user_id, data['messages'], start, 
+                                     total_messages)
             to_return = [data['messages'][index] for index in
                          range(start, total_messages)]
     else:
+        set_is_this_user_reacted(auth_user_id, data['messages'], start, end)
         to_return = [data['messages'][index] for index in range(start, end)]
 
     return {
@@ -267,6 +271,31 @@ def get_messages(auth_user_id, data, start, data_str):
         'start': start,
         'end': end,
     }
+
+def set_is_this_user_reacted(auth_user_id, messages, start, end):
+    """
+    sets the is_this_user_reacted to True or False for the given range of 
+    messages data
+
+    Arguments:
+        auth_user_id (int) - the user id of the user that is requesting the 
+                             channel or dm messages
+        messages (dict)    - data of a channel or dm
+        start (int)        - an int specifying the start index
+        end (int)          - an int specifying the end index
+
+    Exceptions: N/A
+
+    Return Value: N/A
+    """
+
+    # loop through and set the is_this_user_reacted to the appropriate value
+    for index in range(start, end):
+        for react in messages[index]['reacts']:
+            if auth_user_id in react['u_ids']:
+                react['is_this_user_reacted'] = True
+            else:
+                react['is_this_user_reacted'] = False
 
 def send_message(token, data_id, message, data_str):
     """
@@ -283,8 +312,8 @@ def send_message(token, data_id, message, data_str):
                          sent to a channel or dm
 
     Exceptions:
-        AccessError - 
-        InputError  - 
+        AccessError - Raised if the user is not a member of the channel or dm
+        InputError  - Raised if message is not of a valid type or length
 
     Return Value:
         Message_id - int to specifies each message
@@ -329,7 +358,13 @@ def send_message(token, data_id, message, data_str):
         'message_id': message_id, 
         'u_id': auth_user_id, 
         'message': message, 
-        'time_sent': utc_timestamp
+        'time_sent': utc_timestamp,
+        'reacts': [{
+            'react_id': 1,
+            'u_ids': [],
+            'is_this_user_reacted': False,
+        }],
+        'is_pinned': False
     }
 
     data_info['messages'].insert(0, message_data)

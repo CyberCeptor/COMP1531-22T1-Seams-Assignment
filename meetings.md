@@ -101,4 +101,19 @@ for style (over the weekend):
 - error messages should have description= in front of it 
 
 
+4.1
+Members present: Aleesha, Aisha, Jenson, Van, Jed
+Meeting type: Lab
+- allocating tasks and schedule new meeting time
+- push regularly
+- Jed should be more responsive in terms of participating n meeting and replying messages
+- finish by 13 of April
 
+4.4
+Members present: Aisha, Jenson, Van, Jed
+Meeting type: teams
+- describing thoughts and steps for individual functions
+- Aisha start on 5th to finish message/pin/v1 so Jed could do unpin 
+- Discussing Jed's functions together(message share, message send later) and test cases
+- Jenson starts this week but needs to do other assignments first
+- Van has already started and has standup/start/v1 and standup/active/v1 finished half
