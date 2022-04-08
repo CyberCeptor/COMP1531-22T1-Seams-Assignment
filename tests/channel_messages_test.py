@@ -13,7 +13,8 @@ import requests
 
 from src import config
 
-from src.global_vars import expired_token, unsaved_token
+from src.global_vars import expired_token, unsaved_token, status_ok,\
+                            status_access_err, status_input_err
 
 @pytest.mark.usefixtures('clear_register_createchannel')
 def test_channel_messages_invalid_channel(clear_register_createchannel):
@@ -25,30 +26,30 @@ def test_channel_messages_invalid_channel(clear_register_createchannel):
     resp0 = requests.get(config.url + 'channel/messages/v2', 
                           params = {'token': token, 'channel_id': '', 
                                     'start': 0})
-    assert resp0.status_code == 400
+    assert resp0.status_code == status_input_err
 
     # channel id is boo
     resp1 = requests.get(config.url + 'channel/messages/v2', 
                           params = {'token': token, 'channel_id': True, 
                                     'start': 0})
-    assert resp1.status_code == 400
+    assert resp1.status_code == status_input_err
 
     # channel id is string
     resp2 = requests.get(config.url + 'channel/messages/v2', 
                           params = {'token': token, 'channel_id': 'not int', 
                                     'start': 0})
-    assert resp2.status_code == 400
+    assert resp2.status_code == status_input_err
 
     # wrong channel input
     resp3 = requests.get(config.url + 'channel/messages/v2', 
                           params = {'token': token, 'channel_id': 5, 
                                     'start': 0})
-    assert resp3.status_code == 400
+    assert resp3.status_code == status_input_err
 
     resp4 = requests.get(config.url + 'channel/messages/v2', 
                           params = {'token': token, 'channel_id': -1, 
                                     'start': 0})
-    assert resp4.status_code == 400
+    assert resp4.status_code == status_input_err
 
 @pytest.mark.usefixtures('clear_register_createchannel')
 def test_channel_messages_invalid_token(clear_register_createchannel):
@@ -60,18 +61,18 @@ def test_channel_messages_invalid_token(clear_register_createchannel):
     resp0 = requests.get(config.url + 'channel/messages/v2', 
                           params = {'token': '', 'channel_id': chan_id, 
                                     'start': 0})
-    assert resp0.status_code == 400
+    assert resp0.status_code == status_input_err
 
     # token is boo
     resp1 = requests.get(config.url + 'channel/messages/v2', 
                           params = {'token': True, 'channel_id': chan_id, 
                                     'start': 0})
-    assert resp1.status_code == 400
+    assert resp1.status_code == status_input_err
 
     resp2 = requests.get(config.url + 'channel/messages/v2', 
                           params = {'token': False, 'channel_id': chan_id, 
                                     'start': 0})
-    assert resp2.status_code == 400
+    assert resp2.status_code == status_input_err
 
     # wrong token input
     resp3 = requests.get(config.url + 'channel/messages/v2', 
@@ -79,23 +80,23 @@ def test_channel_messages_invalid_token(clear_register_createchannel):
                                     'start': 0})
 
     # wrong token type int                      
-    assert resp3.status_code == 403
+    assert resp3.status_code == status_access_err
     resp4 = requests.get(config.url + 'channel/messages/v2', 
                           params = {'token': 0, 'channel_id': chan_id, 
                                     'start': 0})
-    assert resp4.status_code == 400
+    assert resp4.status_code == status_input_err
 
     # expired token
     resp5 = requests.get(config.url + 'channel/messages/v2', 
                           params = {'token': expired_token, 
                                     'channel_id': chan_id, 'start': 0})
-    assert resp5.status_code == 403
+    assert resp5.status_code == status_access_err
 
     # unsaved token
     resp6 = requests.get(config.url + 'channel/messages/v2', 
                           params = {'token': unsaved_token, 
                                     'channel_id': chan_id, 'start': 0})
-    assert resp6.status_code == 403
+    assert resp6.status_code == status_access_err
     
     requests.delete(config.url + 'clear/v1')
 
@@ -110,34 +111,34 @@ def test_channel_messages_invalid_start(clear_register_createchannel):
     resp0 = requests.get(config.url + 'channel/messages/v2', 
                           params = {'token': token, 'channel_id': chan_id, 
                                     'start': True})
-    assert resp0.status_code == 400
+    assert resp0.status_code == status_input_err
 
     resp1 = requests.get(config.url + 'channel/messages/v2', 
                           params = {'token': token, 'channel_id': chan_id, 
                                     'start': False})
-    assert resp1.status_code == 400
+    assert resp1.status_code == status_input_err
 
     # start is str
     resp2 = requests.get(config.url + 'channel/messages/v2', 
                           params = {'token': token, 'channel_id': chan_id, 
                                     'start': ''})
-    assert resp2.status_code == 400
+    assert resp2.status_code == status_input_err
 
     resp3 = requests.get(config.url + 'channel/messages/v2', 
                           params = {'token': token, 'channel_id': chan_id, 
                                     'start': 'str'})
-    assert resp3.status_code == 400
+    assert resp3.status_code == status_input_err
 
     # start is too big or negative
     resp4 = requests.get(config.url + 'channel/messages/v2', 
                           params = {'token': token, 'channel_id': chan_id, 
                                     'start': -5})
-    assert resp4.status_code == 400
+    assert resp4.status_code == status_input_err
 
     resp5 = requests.get(config.url + 'channel/messages/v2', 
                           params = {'token': token, 'channel_id': chan_id, 
                                     'start': 1000})
-    assert resp5.status_code == 400
+    assert resp5.status_code == status_input_err
 
     requests.delete(config.url + 'clear/v1')
 
@@ -157,7 +158,7 @@ def test_user_not_belong(clear_register_createchannel):
     resp0 = requests.get(config.url + 'channel/messages/v2', 
                           params = {'token': token_2, 'channel_id': chan_id, 
                                     'start': True})
-    assert resp0.status_code == 403
+    assert resp0.status_code == status_access_err
 
     requests.delete(config.url + 'clear/v1')
     
@@ -172,7 +173,7 @@ def test_channel_messages_return(clear_register_createchannel):
     resp = requests.get(config.url + 'channel/messages/v2', 
                           params = {'token': token, 'channel_id': chan_id, 
                                     'start': 0})
-    assert resp.status_code == 200
+    assert resp.status_code == status_ok
     channel_messages = resp.json()
 
     assert channel_messages['messages'] == []
@@ -190,33 +191,33 @@ def test_channel_messages_return_less_than_50(clear_register_createchannel):
     resp = requests.post(config.url + 'message/send/v1', 
                           json={'token': token, 'channel_id': chan_id,
                                 'message': 'hewwo'})
-    assert resp.status_code == 200
+    assert resp.status_code == status_ok
 
     resp = requests.post(config.url + 'message/send/v1', 
                           json={'token': token, 'channel_id': chan_id,
                                 'message': 'hewwo'})
-    assert resp.status_code == 200
+    assert resp.status_code == status_ok
 
     resp = requests.post(config.url + 'message/send/v1', 
                           json={'token': token, 'channel_id': chan_id,
                                 'message': 'hewwo'})
-    assert resp.status_code == 200
+    assert resp.status_code == status_ok
 
     resp = requests.post(config.url + 'message/send/v1', 
                           json={'token': token, 'channel_id': chan_id,
                                 'message': 'hewwo'})
-    assert resp.status_code == 200
+    assert resp.status_code == status_ok
 
     resp = requests.post(config.url + 'message/send/v1', 
                           json={'token': token, 'channel_id': chan_id,
                                 'message': 'hewwo'})
-    assert resp.status_code == 200
+    assert resp.status_code == status_ok
 
     # test success run
     resp = requests.get(config.url + 'channel/messages/v2', 
                           params = {'token': token, 'channel_id': chan_id, 
                                     'start': 0})
-    assert resp.status_code == 200
+    assert resp.status_code == status_ok
     channel_messages = resp.json()
 
     assert len(channel_messages['messages']) == 5
@@ -234,7 +235,7 @@ def test_channel_messages_return_50(clear_register_createchannel_send50msgs):
     resp = requests.get(config.url + 'channel/messages/v2', 
                           params = {'token': token, 'channel_id': chan_id, 
                                     'start': 0})
-    assert resp.status_code == 200
+    assert resp.status_code == status_ok
     channel_messages = resp.json()
 
     assert len(channel_messages['messages']) == 50
@@ -251,33 +252,33 @@ def test_channel_messages_return_more_than_50(clear_register_createchannel_send5
     resp = requests.post(config.url + 'message/send/v1', 
                           json={'token': token, 'channel_id': chan_id,
                                 'message': 'hewwo'})
-    assert resp.status_code == 200
+    assert resp.status_code == status_ok
 
     resp = requests.post(config.url + 'message/send/v1', 
                           json={'token': token, 'channel_id': chan_id,
                                 'message': 'hewwo'})
-    assert resp.status_code == 200
+    assert resp.status_code == status_ok
 
     resp = requests.post(config.url + 'message/send/v1', 
                           json={'token': token, 'channel_id': chan_id,
                                 'message': 'hewwo'})
-    assert resp.status_code == 200
+    assert resp.status_code == status_ok
 
     resp = requests.post(config.url + 'message/send/v1', 
                           json={'token': token, 'channel_id': chan_id,
                                 'message': 'hewwo'})
-    assert resp.status_code == 200
+    assert resp.status_code == status_ok
 
     resp = requests.post(config.url + 'message/send/v1', 
                           json={'token': token, 'channel_id': chan_id,
                                 'message': 'hewwo'})
-    assert resp.status_code == 200
+    assert resp.status_code == status_ok
 
     # test success run
     resp = requests.get(config.url + 'channel/messages/v2', 
                           params = {'token': token, 'channel_id': chan_id, 
                                     'start': 0})
-    assert resp.status_code == 200
+    assert resp.status_code == status_ok
     channel_messages = resp.json()
 
     assert len(channel_messages['messages']) == 50

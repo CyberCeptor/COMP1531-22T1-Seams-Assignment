@@ -100,11 +100,11 @@ def test_search_successful(clear_register_two_createchanneldm_sendmsg):
 
     # check returned first message, 'hewwo' sent by user 1 in channel 1
     assert (c_message_id, user1_id) in [(k['message_id'],k['u_id']) 
-    for k in searched_message]
+                                        for k in searched_message]
 
     # check returned second message, 'hewwo' sent by user 2 in dm 1
     assert (d_message_id, user2_id) in [(k['message_id'],k['u_id']) 
-    for k in searched_message]
+                                        for k in searched_message]
 
 
 
@@ -126,7 +126,7 @@ def test_search_successful_user2(clear_register_two_createchanneldm_sendmsg):
     assert len(searched_message) == 1
 
     assert (d_message_id, user2_id) in [(k['message_id'],k['u_id']) 
-    for k in searched_message]
+                                        for k in searched_message]
 
 @pytest.mark.usefixtures('clear_register_two_createchanneldm_sendmsg')
 def test_search_user_not_in_channel(clear_register_two_createchanneldm_sendmsg):
@@ -146,6 +146,8 @@ def test_search_user_not_in_channel(clear_register_two_createchanneldm_sendmsg):
     assert resp0.status_code == 200
     msg_return = resp0.json()
     assert msg_return == []
+
+requests.delete(config.url + 'clear/v1')
 
 @pytest.mark.usefixtures('clear_register_two_createchannel')
 def test_search_case_insensitive(clear_register_two_createchannel):
@@ -171,6 +173,6 @@ def test_search_case_insensitive(clear_register_two_createchannel):
     searched_message = resp0.json()
 
     assert (msg_id, user1_id) in [(k['message_id'],k['u_id']) 
-    for k in searched_message]
+                                    for k in searched_message]
 
 

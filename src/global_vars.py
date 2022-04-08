@@ -20,6 +20,10 @@ expired_token = jwt.encode({'id': 44, 'session_id': 200, 'handle': 'firstlast',
 unsaved_token = jwt.encode({'id': 44, 'session_id': 200, 'handle': 'firstlast',
                             'exp': 2548474355}, key, algorithm=algorithm)
 
+status_ok = 200
+status_input_err = 400
+status_access_err = 403
+
 DM_ID_COUNTER = 0
 MESSAGE_ID_COUNTER = 0
 SESSION_ID_COUNTER = 0
