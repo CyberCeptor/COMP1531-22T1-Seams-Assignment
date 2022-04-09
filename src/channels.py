@@ -147,22 +147,14 @@ def channels_create_v2(token, name, is_public):
     channel_data = {
         'channel_id': channel_id,
         'name': name,
-        'owner_members': [{
-            'u_id': user_info['id'],
-            'email': user_info['email'],
-            'name_first': user_info['first'],
-            'name_last': user_info['last'],
-            'handle_str': user_info['handle']
-        }],
-        'all_members': [{
-            'u_id': user_info['id'],
-            'email': user_info['email'],
-            'name_first': user_info['first'],
-            'name_last': user_info['last'],
-            'handle_str': user_info['handle']
-        }],
+        'owner_members': [user_info['return_data']],
+        'all_members': [user_info['return_data']],
         'is_public': is_public,
-        'messages': []
+        'messages': [], 
+        'standup': {
+            'is_active': False,
+            'time_finish': None,
+        }
     }
 
     store['channels'].append(channel_data)

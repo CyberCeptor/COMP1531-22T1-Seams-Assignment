@@ -44,13 +44,7 @@ def user_profile_v1(token, u_id):
     user = check_valid_auth_id(u_id)
 
     return {
-        'user': {
-            'u_id': user['id'],
-            'email': user['email'],
-            'name_first': user['first'],
-            'name_last': user['last'],
-            'handle_str': user['handle'],
-        }
+        'user': user['return_data']
     }
 
 @token_valid_check
@@ -210,7 +204,7 @@ def user_profile_sethandle_v1(token, handle_str):
     """
 
     store = data_store.get()
-    
+
     user_id = token_get_user_id(token)
 
     check_invalid_handle(store, handle_str)

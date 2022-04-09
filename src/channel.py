@@ -16,11 +16,13 @@ Description: implementation for
 """
 
 from src.error import InputError, AccessError
-from src.other import check_valid_auth_id, get_messages, check_user_is_member,\
+from src.other import check_valid_auth_id, check_user_is_member, \
                       check_valid_channel_id, check_user_is_global_owner
 from src.token import token_valid_check, token_get_user_id
 
 from src.data_store import data_store
+
+from src.channel_dm_helpers import get_messages
 
 @token_valid_check
 def channel_invite_v2(token, channel_id, u_id):
@@ -180,15 +182,7 @@ def add_invitee(user_data, channel):
 
     store = data_store.get()
 
-    new_member = {
-        'u_id': user_data['id'],
-        'email': user_data['email'],
-        'name_first': user_data['first'],
-        'name_last': user_data['last'],
-        'handle_str': user_data['handle']
-    }
-
-    channel['all_members'].append(new_member)
+    channel['all_members'].append(user_data['return_data'])
     data_store.set(store)
 
 def channel_leave_v1(auth_user_id, channel_id):
@@ -211,6 +205,7 @@ def channel_leave_v1(auth_user_id, channel_id):
     """
 
     store = data_store.get()
+
     channel_data = check_valid_channel_id(channel_id)
     member_data = check_user_is_member(auth_user_id, channel_data, 
                                        'all_members')
@@ -306,7 +301,7 @@ def channel_addremove_owner_valid_check(token, channel_id, u_id, option):
     """
 
     store = data_store.get()
-    
+
     check_valid_auth_id(u_id)
     channel = check_valid_channel_id(channel_id)
     chan_owner = token_get_user_id(token)

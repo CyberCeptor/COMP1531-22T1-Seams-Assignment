@@ -16,9 +16,11 @@ Description: implementation for
 from src.error import InputError, AccessError
 from src.token import token_get_user_id, token_valid_check
 from src.other import check_user_is_member, check_user_is_global_owner, \
-                      send_message, check_valid_auth_id
+                      check_valid_auth_id
 
 from src.data_store import data_store
+
+from channel_dm_helpers import send_message
 
 @token_valid_check
 def message_send_v1(token, channel_id, message):
@@ -44,6 +46,33 @@ def message_send_v1(token, channel_id, message):
     """
 
     message_id = send_message(token, channel_id, message, 'channel')
+
+    return message_id
+
+@token_valid_check
+def message_senddm_v1(token, dm_id, message):
+    """
+    If token given is authorised user, sends the message
+    to a specified dm with input dm_id
+
+    Arguments:
+        token (str)          - unique str representation of user
+        dm_id (int))    - integer sppcifies dm
+        message (str)        - message that the user wishes to send
+
+    Exceptions:
+        AccessError - when message_id refers to a valid message in a joined 
+            channel/DM and none of the following are true:
+            - the message was sent by the authorised user making this request
+            - the authorised user has owner permissions in the channel/DM
+        InputError  - dm_id does not refer to valid dm
+                    - length of message is less than 1 or over 1000 characters
+
+    Return Value:
+        Message_id - int to specifies each message
+    """
+
+    message_id = send_message(token, dm_id, message, 'dm')
 
     return message_id
 
@@ -133,33 +162,6 @@ def message_remove_v1(token, message_id):
                                             'remove')
 
     data_store.set(store)
-
-@token_valid_check
-def message_senddm_v1(token, dm_id, message):
-    """
-    If token given is authorised user, sends the message
-    to a specified dm with input dm_id
-
-    Arguments:
-        token (str)          - unique str representation of user
-        dm_id (int))    - integer sppcifies dm
-        message (str)        - message that the user wishes to send
-
-    Exceptions:
-        AccessError - when message_id refers to a valid message in a joined 
-            channel/DM and none of the following are true:
-            - the message was sent by the authorised user making this request
-            - the authorised user has owner permissions in the channel/DM
-        InputError  - dm_id does not refer to valid dm
-                    - length of message is less than 1 or over 1000 characters
-
-    Return Value:
-        Message_id - int to specifies each message
-    """
-
-    message_id = send_message(token, dm_id, message, 'dm')
-
-    return message_id
 
 def check_message_id_valid(message_id):
     """

@@ -18,7 +18,7 @@ import hashlib
 from src.error import InputError
 
 from src.data_store import data_store
-from src.token import token_generate, token_valid_check, token_remove
+from src.token import token_generate
 
 def auth_login_v2(email, password):
     """
@@ -238,19 +238,4 @@ def create_handle(store, full_name):
         handle = handle + str(duplicate_count)
 
     return handle
-
-@token_valid_check
-def auth_logout_v1(token):
-    """
-    logs out a user using their current valid token, checks if it is valid then
-    removes the token info from the data
-
-    Arguments:
-        token (jwt token str) - a user's valid jwt token
-
-    Exceptions: N/A
-
-    Return Value: N/A
-    """
-
-    token_remove(token)
+    

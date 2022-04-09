@@ -105,7 +105,7 @@ def admin_user_remove(token, u_id):
     store = data_store.get()
 
     auth_user_id = token_get_user_id(token)
-    user_data = check_valid_auth_id(u_id)
+    user_data = check_valid_auth_id(u_id)['all_data']
  
     # if user with the token is not a global owner, they cannot remove a user
     if check_user_is_global_owner(auth_user_id) is False:

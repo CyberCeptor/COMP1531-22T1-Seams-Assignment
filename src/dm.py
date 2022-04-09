@@ -12,13 +12,14 @@ Description: implementation for
 """
 from src.error import InputError, AccessError
 
-from src.other import check_valid_auth_id, check_user_is_member, get_messages, \
-                      check_valid_dm_id
+from src.other import check_valid_auth_id, check_user_is_member
 from src.token import token_valid_check, token_get_user_id
 
 from src.data_store import data_store
 
 from src.global_vars import new_id
+
+from src.channel_dm_helpers import get_messages, check_valid_dm_id
 
 @token_valid_check
 def dm_create_v1(token, u_ids):
@@ -39,14 +40,8 @@ def dm_create_v1(token, u_ids):
     store = data_store.get()
 
     auth_id = token_get_user_id(token)
-    user_info = check_valid_auth_id(auth_id)
-    owner = {
-        'u_id': user_info['id'],
-        'email': user_info['email'],
-        'name_first': user_info['first'],
-        'name_last': user_info['last'],
-        'handle_str': user_info['handle']
-    }
+    user_info = check_valid_auth_id(auth_id)['return_data']
+    owner = user_info
     
     if isinstance(u_ids, list) is False:
         raise InputError(description='u_ids needs to be a list')
@@ -57,21 +52,15 @@ def dm_create_v1(token, u_ids):
     name_list = []
     all_member_list = []
     all_member_list.append(owner)
-    name_list.append(user_info['handle'])
+    name_list.append(user_info['handle_str'])
 
     # iterate through the list of given u_ids and check if they are not 
     # duplicates and are valid
     for u_id in u_ids:
         check_creator_notin_u_ids_duplicate(auth_id, u_id, u_ids)
-        user = check_valid_auth_id(u_id)
-        name_list.append(user['handle'])
-        all_member_list.append({
-            'u_id': user['id'],
-            'email': user['email'],
-            'name_first': user['first'],
-            'name_last': user['last'],
-            'handle_str': user['handle']
-        })
+        user = check_valid_auth_id(u_id)['return_data']
+        name_list.append(user['handle_str'])
+        all_member_list.append(user)
     
     #sort name list
     name_list.sort()

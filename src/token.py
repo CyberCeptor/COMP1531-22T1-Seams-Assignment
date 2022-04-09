@@ -100,24 +100,6 @@ def token_locate_in_data_store(token):
             return stored_token
     raise AccessError(description='Invalid token')
 
-def token_remove(token):
-    """
-    remove a token from the tokens data if it is expired or if a user logs out
-
-    Arguments:
-        token (str) - a valid jwt token string
-
-    Exceptions:
-        AccessError - Raised if token is not saved in the tokens data
-
-    Return Value: N/A
-    """
-
-    token_to_remove = token_locate_in_data_store(token)
-    store = data_store.get()
-    store['tokens'].remove(token_to_remove)
-    data_store.set(store)
-
 def token_valid_check(function):
     """
     checks that the passed in token is of a valid type, is not expired, is a
@@ -136,6 +118,7 @@ def token_valid_check(function):
  
     def inner(*args, **kwargs):
         token_to_check = args[0]
+        print(token_to_check)
 
         # invalid input types for tokens
         if token_to_check in ['True', 'False', '']:
@@ -160,4 +143,23 @@ def token_valid_check(function):
         token_locate_in_data_store(token_to_check)
         return function(*args, **kwargs)
     return inner
+
+@token_valid_check
+def token_remove(token):
+    """
+    remove a token from the tokens data if it is expired or if a user logs out
+
+    Arguments:
+        token (str) - a valid jwt token string
+
+    Exceptions:
+        AccessError - Raised if token is not saved in the tokens data
+
+    Return Value: N/A
+    """
+
+    token_to_remove = token_locate_in_data_store(token)
+    store = data_store.get()
+    store['tokens'].remove(token_to_remove)
+    data_store.set(store)
  
