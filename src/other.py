@@ -23,7 +23,7 @@ import datetime
 from datetime import timezone
 
 from src.error import InputError, AccessError
-from src.token import token_valid_check, token_get_user_id
+from src.token import token_get_user_id
 
 from src.data_store import data_store
 
@@ -321,7 +321,6 @@ def send_message(token, data_id, message, data_str):
 
     store = data_store.get()
 
-    token_valid_check(token)
     auth_user_id = token_get_user_id(token)
 
     # check if dm_id/channel_id are valid

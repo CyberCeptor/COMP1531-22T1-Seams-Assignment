@@ -10,15 +10,15 @@ Description: global variables and functions used across files
 import jwt
 
 KEY = 'hotpot'
-ALOGRITHM = 'HS256'
+ALGORITHM = 'HS256'
 
 # an expired, unsaved token
 EXPIRED_TOKEN = jwt.encode({'id': 44, 'session_id': 200, 'handle': 'firstlast',
-                            'exp': 1448474355}, KEY, algorithm=ALOGRITHM)
+                            'exp': 1448474355}, KEY, algorithm=ALGORITHM)
 
 # an unexpired, unsaved token
 UNSAVED_TOKEN = jwt.encode({'id': 44, 'session_id': 200, 'handle': 'firstlast',
-                            'exp': 2548474355}, KEY, algorithm=ALOGRITHM)
+                            'exp': 2548474355}, KEY, algorithm=ALGORITHM)
 
 STATUS_OK = 200
 STATUS_INPUT_ERR = 400

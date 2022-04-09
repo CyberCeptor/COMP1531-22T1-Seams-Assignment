@@ -15,7 +15,7 @@ from src.dm import dm_leave_v1
 from src.error import AccessError, InputError
 from src.other import check_valid_auth_id, check_user_is_global_owner,\
                       check_user_is_member
-from src.token import token_valid_check, token_get_user_id
+from src.token import token_get_user_id, token_valid_check
 
 from src.channel import channel_leave_v1
 
@@ -23,6 +23,7 @@ from src.data_store import data_store
 
 from src.global_vars import GLOBAL_OWNER, USER
 
+@token_valid_check
 def admin_userpermission_change(token, u_id, permission_id):
     """
     changes the permission of a specified user using a global owner's token
@@ -49,7 +50,6 @@ def admin_userpermission_change(token, u_id, permission_id):
 
     store = data_store.get()
 
-    token_valid_check(token)
     auth_user_id = token_get_user_id(token)
 
     # the token must belong to a user who is a global owner
@@ -82,6 +82,7 @@ def admin_userpermission_change(token, u_id, permission_id):
 
     change_permission(u_id, permission_id)
 
+@token_valid_check
 def admin_user_remove(token, u_id):
     """
     removes a user from Seams, they will be removed from all channels and dms,
@@ -103,7 +104,6 @@ def admin_user_remove(token, u_id):
 
     store = data_store.get()
 
-    token_valid_check(token)
     auth_user_id = token_get_user_id(token)
     user_data = check_valid_auth_id(u_id)
  

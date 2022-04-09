@@ -22,10 +22,7 @@ from src.error import InputError, AccessError
 
 from src.data_store import data_store
 
-from src.global_vars import new_id
-
-key = 'hotpot'
-algorithm = 'HS256'
+from src.global_vars import new_id, KEY, ALGORITHM
 
 def token_generate(user_data):
     """
@@ -49,7 +46,7 @@ def token_generate(user_data):
 
     # encode the above data into a token
     token = jwt.encode({'id': id, 'session_id': session_id, 'handle': handle,
-                        'exp': expiry_time}, key, algorithm)
+                        'exp': expiry_time}, KEY, ALGORITHM)
 
     # save token and associated details into a dict to be stored in the list of
     # token data
@@ -79,7 +76,7 @@ def token_get_user_id(token):
         Returns the user id of the user that the token belongs to
     """
 
-    decoded = jwt.decode(token, key, algorithm)
+    decoded = jwt.decode(token, KEY, ALGORITHM)
     return int(decoded['id'])
 
 def token_locate_in_data_store(token):
@@ -121,7 +118,7 @@ def token_remove(token):
     store['tokens'].remove(token_to_remove)
     data_store.set(store)
 
-def token_valid_check(token):
+def token_valid_check(function):
     """
     checks that the passed in token is of a valid type, is not expired, is a
     valid jwt token string, and is stored in the tokens data
@@ -136,25 +133,31 @@ def token_valid_check(token):
 
     Return Value: N/A
     """
+ 
+    def inner(*args, **kwargs):
+        token_to_check = args[0]
 
-    # invalid input types for tokens
-    if token in ['True', 'False', '']:
-        raise InputError(description='Invalid token')
+        # invalid input types for tokens
+        if token_to_check in ['True', 'False', '']:
+            raise InputError(description='Invalid token')
 
-    # if the token can be casted to an int, it is of the wrong type
-    try:
-        token = int(token)
-        raise InputError(description='Invalid token')
-    except ValueError:
-        pass
+        # if the token can be casted to an int, it is of the wrong type
+        try:
+            token_to_check = int(token_to_check)
+            raise InputError(description='Invalid token')
+        except ValueError:
+            pass
 
-    # if token can be successfully decoded with no errors, it is valid
-    try:
-        jwt.decode(token, key, algorithms=[algorithm])
-    except jwt.ExpiredSignatureError:
-        raise AccessError(description='Token has expired') from AccessError
-    except jwt.DecodeError:
-        raise AccessError(description='Invalid token') from InputError
+        # if token can be successfully decoded with no errors, it is valid
+        try:
+            jwt.decode(token_to_check, KEY, algorithms=[ALGORITHM])
+        except jwt.ExpiredSignatureError:
+            raise AccessError(description='Token has expired') from AccessError
+        except jwt.DecodeError:
+            raise AccessError(description='Invalid token') from InputError
 
-    # check if the valid token is stored in the data
-    token_locate_in_data_store(token)
+        # check if the valid token is stored in the data
+        token_locate_in_data_store(token_to_check)
+        return function(*args, **kwargs)
+    return inner
+ 

@@ -20,6 +20,7 @@ from src.other import check_user_is_member, check_user_is_global_owner, \
 
 from src.data_store import data_store
 
+@token_valid_check
 def message_send_v1(token, channel_id, message):
     """
     If token given is authorised user, sends the message
@@ -46,6 +47,7 @@ def message_send_v1(token, channel_id, message):
 
     return message_id
 
+@token_valid_check
 def message_edit_v1(token, message_id, message):
     """
     If token given is authorised user, updates the message
@@ -77,9 +79,6 @@ def message_edit_v1(token, message_id, message):
     if len(message) > 1000:
         raise InputError(description='Message must not exceed 1000 characters')
 
-    # check valid token and user
-    token_valid_check(token)
-
     # check input message_id is valid and return the message_data, if the 
     # message was sent in a channel or dm, and the corresponding channel or dm 
     # data
@@ -96,6 +95,7 @@ def message_edit_v1(token, message_id, message):
 
     data_store.set(store)
 
+@token_valid_check
 def message_remove_v1(token, message_id):
     """
     If token given is authorised user, remove the message
@@ -117,8 +117,6 @@ def message_remove_v1(token, message_id):
     """
 
     store = data_store.get()
-    # check valid token
-    token_valid_check(token)
 
     # check input message_id is valid and return the message_data, if the 
     # message was sent in a channel or dm, and the corresponding channel or dm 
@@ -136,6 +134,7 @@ def message_remove_v1(token, message_id):
 
     data_store.set(store)
 
+@token_valid_check
 def message_senddm_v1(token, dm_id, message):
     """
     If token given is authorised user, sends the message
@@ -286,6 +285,7 @@ def edit_remove_message(data, msg_data, message, option):
         # remove the message if the new message input is empty
         data['messages'].remove(msg_data)
 
+@token_valid_check
 def message_pin_v1(token, message_id):
     """
     If token given is authorised user, pin the message
@@ -307,8 +307,7 @@ def message_pin_v1(token, message_id):
     """
 
     store = data_store.get()
-    # check valid token
-    token_valid_check(token)
+
     user_id = token_get_user_id(token)
 
     # check input message_id is valid and return the message_data, if the 
@@ -341,6 +340,7 @@ def message_pin_v1(token, message_id):
 
     data_store.set(store)
 
+@token_valid_check
 def search_v1(token, query_str):
     """
     If token given is authorised user, return a collection of messages
@@ -357,8 +357,7 @@ def search_v1(token, query_str):
     
     # getting information from date_store
     store = data_store.get()
-    # check valid token
-    token_valid_check(token)
+    
     user_id = token_get_user_id(token)
     check_valid_auth_id(user_id)
 
@@ -376,19 +375,20 @@ def search_v1(token, query_str):
         for message_data in channel['messages']:
             # change everything in lower case,account case insensitivity
             if (query_str.lower() in message_data['message'].lower() and 
-            check_user_is_member(user_id, channel, 'all_members') is not None):
-                    message_return.append(message_data)
+                check_user_is_member(user_id, channel, 'all_members')):
+                message_return.append(message_data)
 
     # checking dm case                
     for dm in store['dms']:
         for message_data in dm['messages']:
             # change everything in lower case, account case insensitivity
             if (query_str.lower() in message_data['message'].lower() and 
-            check_user_is_member(user_id, dm, 'members') is not None):
-                    message_return.append(message_data)
+                check_user_is_member(user_id, dm, 'members')):
+                message_return.append(message_data)
 
     return message_return
 
+@token_valid_check
 def message_react_v1(token, message_id, react_id):
     """
     react to a specified message with a specific react
@@ -408,8 +408,6 @@ def message_react_v1(token, message_id, react_id):
     Return Value: N/A
     """
 
-    # check valid token
-    token_valid_check(token)
     auth_user_id = token_get_user_id(token)
 
     # check input message_id is valid and return the message_data, if the 
@@ -472,6 +470,7 @@ def edit_react(auth_user_id, message_data, react_id, option):
 
     data_store.set(store)
 
+@token_valid_check
 def message_unreact_v1(token, message_id, react_id):
     """
     unreact to a specified message with a react id 1
@@ -491,8 +490,6 @@ def message_unreact_v1(token, message_id, react_id):
     Return Value: N/A
     """
 
-    # check valid token
-    token_valid_check(token)
     auth_user_id = token_get_user_id(token)
 
     # check input message_id is valid and return the message_data, if the 

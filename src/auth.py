@@ -239,6 +239,7 @@ def create_handle(store, full_name):
 
     return handle
 
+@token_valid_check
 def auth_logout_v1(token):
     """
     logs out a user using their current valid token, checks if it is valid then
@@ -252,5 +253,4 @@ def auth_logout_v1(token):
     Return Value: N/A
     """
 
-    token_valid_check(token)
     token_remove(token)

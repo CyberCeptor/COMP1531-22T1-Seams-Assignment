@@ -20,6 +20,7 @@ from src.data_store import data_store
 
 from src.global_vars import new_id
 
+@token_valid_check
 def dm_create_v1(token, u_ids):
     """
     clears any data stored in data_store and registers users with the
@@ -36,7 +37,7 @@ def dm_create_v1(token, u_ids):
 
     #get the data in data_store
     store = data_store.get()
-    token_valid_check(token)
+
     auth_id = token_get_user_id(token)
     user_info = check_valid_auth_id(auth_id)
     owner = {
@@ -93,6 +94,7 @@ def dm_create_v1(token, u_ids):
         'dm_id': dm_id
     }
 
+@token_valid_check
 def dm_list_v1(token):
     """
     clears any data stored in data_store and registers users with the
@@ -105,7 +107,6 @@ def dm_list_v1(token):
     Return Value: dms(dic)            -a dic including dm id and name
     """
 
-    token_valid_check(token)
     auth_id = token_get_user_id(token)
     dm_list = []
     store = data_store.get()
@@ -121,6 +122,7 @@ def dm_list_v1(token):
         'dms': dm_list
     }
 
+@token_valid_check
 def dm_remove_v1(token, dm_id):
     """
     clears any data stored in data_store and registers users with the
@@ -138,7 +140,7 @@ def dm_remove_v1(token, dm_id):
     """
 
     store = data_store.get()
-    token_valid_check(token)
+
     dm = check_valid_dm_id(dm_id)
     auth_id = token_get_user_id(token)
 
@@ -152,6 +154,7 @@ def dm_remove_v1(token, dm_id):
     
     data_store.set(store)
 
+@token_valid_check
 def dm_details_v1(token, dm_id):
     """
     clears any data stored in data_store and registers users with the
@@ -167,7 +170,6 @@ def dm_details_v1(token, dm_id):
     Return Value: a dic             -including name and members
     """
 
-    token_valid_check(token)
     auth_id = token_get_user_id(token)
     dm = check_valid_dm_id(dm_id)
 
@@ -226,6 +228,7 @@ def check_creator_notin_u_ids_duplicate(u_id, id, u_ids):
     elif u_ids.count(id) > 1:
         raise InputError(description='There are duplicate u_ids')
 
+@token_valid_check
 def dm_messages_v1(token, dm_id, start):
     """
     check if given user id and dm id are valid,
@@ -246,7 +249,6 @@ def dm_messages_v1(token, dm_id, start):
         start and end if given user id and dm id are valid
     """
 
-    token_valid_check(token)
     auth_user_id = token_get_user_id(token)
 
     # see if given auth_user_id and dm_id are valid
