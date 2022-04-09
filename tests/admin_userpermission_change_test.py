@@ -13,7 +13,8 @@ import requests
 
 from src import config
 
-from src.global_vars import expired_token, unsaved_token
+from src.global_vars import EXPIRED_TOKEN, UNSAVED_TOKEN, STATUS_OK, \
+                            STATUS_INPUT_ERR, STATUS_ACCESS_ERR
 
 @pytest.mark.usefixtures('clear_register_two')
 def test_admin_userpermission_change_works(clear_register_two):
@@ -30,13 +31,13 @@ def test_admin_userpermission_change_works(clear_register_two):
     resp0 = requests.post(config.url + 'admin/userpermission/change/v1',
                           json={'token': token1, 'u_id': id2,
                                 'permission_id': 1})
-    assert resp0.status_code == 200
+    assert resp0.status_code == STATUS_OK
 
     # user2 can now demote user1 to a normal user
     resp0 = requests.post(config.url + 'admin/userpermission/change/v1',
                           json={'token': token2, 'u_id': id1,
                                 'permission_id': 2})
-    assert resp0.status_code == 200
+    assert resp0.status_code == STATUS_OK
 
 @pytest.mark.usefixtures('clear_register_two')
 def test_admin_userpermission_change_invalid_token(clear_register_two):
@@ -48,36 +49,36 @@ def test_admin_userpermission_change_invalid_token(clear_register_two):
     resp0 = requests.post(config.url + 'admin/userpermission/change/v1',
                           json={'token': 1, 'u_id': id2,
                                 'permission_id': 1})
-    assert resp0.status_code == 400
+    assert resp0.status_code == STATUS_INPUT_ERR
 
     # input error: normal string is passed in as token
     resp1 = requests.post(config.url + 'admin/userpermission/change/v1',
                           json={'token': 'not a valid jwt token str',
                                 'u_id': id2, 'permission_id': 1})
-    assert resp1.status_code == 403
+    assert resp1.status_code == STATUS_ACCESS_ERR
 
     # input error: bool is passed in as token
     resp2 = requests.post(config.url + 'admin/userpermission/change/v1',
                           json={'token': True, 'u_id': id2,
                                 'permission_id': 1})
-    assert resp2.status_code == 400
+    assert resp2.status_code == STATUS_INPUT_ERR
 
     # access error: expired, unsaved token
     resp3 = requests.post(config.url + 'admin/userpermission/change/v1',
-                          json={'token': expired_token, 'u_id': id2,
+                          json={'token': EXPIRED_TOKEN, 'u_id': id2,
                                 'permission_id': 1})
-    assert resp3.status_code == 403
+    assert resp3.status_code == STATUS_ACCESS_ERR
 
     # access error: unexpired, unsaved token
     resp4 = requests.post(config.url + 'admin/userpermission/change/v1',
-                          json={'token': unsaved_token, 'u_id': id2,
+                          json={'token': UNSAVED_TOKEN, 'u_id': id2,
                                 'permission_id': 1})
-    assert resp4.status_code == 403
+    assert resp4.status_code == STATUS_ACCESS_ERR
 
     # input error: empty str is passed in as token
     resp5 = requests.post(config.url + 'admin/userpermission/change/v1',
                           json={'token': '', 'u_id': id2, 'permission_id': 1})
-    assert resp5.status_code == 400
+    assert resp5.status_code == STATUS_INPUT_ERR
 
 @pytest.mark.usefixtures('clear_register_two')
 def test_admin_userpermission_change_invalid_u_id(clear_register_two):
@@ -89,35 +90,35 @@ def test_admin_userpermission_change_invalid_u_id(clear_register_two):
     resp0 = requests.post(config.url + 'admin/userpermission/change/v1',
                           json={'token': token, 'u_id': -1,
                                 'permission_id': 1})
-    assert resp0.status_code == 400
+    assert resp0.status_code == STATUS_INPUT_ERR
 
     # input error: non-existant u_id
     resp1 = requests.post(config.url + 'admin/userpermission/change/v1',
                           json={'token': token, 'u_id': 44, 'permission_id': 1})
-    assert resp1.status_code == 400
+    assert resp1.status_code == STATUS_INPUT_ERR
 
     # input error: bool
     resp2 = requests.post(config.url + 'admin/userpermission/change/v1',
                           json={'token': token, 'u_id': True,
                                 'permission_id': 1})
-    assert resp2.status_code == 400
+    assert resp2.status_code == STATUS_INPUT_ERR
 
     resp3 = requests.post(config.url + 'admin/userpermission/change/v1',
                           json={'token': token, 'u_id': False,
                                 'permission_id': 1})
-    assert resp3.status_code == 400
+    assert resp3.status_code == STATUS_INPUT_ERR
 
     # input error: str is passed in as u_id
     resp4 = requests.post(config.url + 'admin/userpermission/change/v1',
                           json={'token': token, 'u_id': 'str',
                                 'permission_id': 1})
-    assert resp4.status_code == 400
+    assert resp4.status_code == STATUS_INPUT_ERR
 
     # input error: empty str is passed in as u_id
     resp5 = requests.post(config.url + 'admin/userpermission/change/v1',
                           json={'token': token, 'u_id': '',
                                 'permission_id': 1})
-    assert resp5.status_code == 400 
+    assert resp5.status_code == STATUS_INPUT_ERR 
 
 @pytest.mark.usefixtures('clear_register_two')
 def test_admin_userpermission_change_invalid_perm_id(clear_register_two):
@@ -130,25 +131,25 @@ def test_admin_userpermission_change_invalid_perm_id(clear_register_two):
     resp0 = requests.post(config.url + 'admin/userpermission/change/v1',
                           json={'token': token, 'u_id': id2,
                                 'permission_id': 4})
-    assert resp0.status_code == 400
+    assert resp0.status_code == STATUS_INPUT_ERR
 
     # input error: bool is passed in as permission id
     resp1 = requests.post(config.url + 'admin/userpermission/change/v1',
                           json={'token': token, 'u_id': id2,
                                 'permission_id': True})
-    assert resp1.status_code == 400
+    assert resp1.status_code == STATUS_INPUT_ERR
 
     # input error: str is passed in as permission id
     resp2 = requests.post(config.url + 'admin/userpermission/change/v1',
                           json={'token': token, 'u_id': id2,
                                 'permission_id': 'global'})
-    assert resp2.status_code == 400
+    assert resp2.status_code == STATUS_INPUT_ERR
 
     # input error: empty str is passed in as permission id
     resp3 = requests.post(config.url + 'admin/userpermission/change/v1',
                           json={'token': token, 'u_id': id2,
                                 'permission_id': ''})
-    assert resp3.status_code == 400
+    assert resp3.status_code == STATUS_INPUT_ERR
 
 @pytest.mark.usefixtures('clear_register_two')
 def test_admin_userpermission_change_not_global_owner(clear_register_two):
@@ -161,7 +162,7 @@ def test_admin_userpermission_change_not_global_owner(clear_register_two):
     resp0 = requests.post(config.url + 'auth/register/v2', 
                           json={'email': 'ghi@jkl.com', 'password': 'password',
                                 'name_first': 'first', 'name_last': 'last'})
-    assert resp0.status_code == 200
+    assert resp0.status_code == STATUS_OK
     user3 = resp0.json()
     id3 = user3['auth_user_id']
 
@@ -169,7 +170,7 @@ def test_admin_userpermission_change_not_global_owner(clear_register_two):
     resp1 = requests.post(config.url + 'admin/userpermission/change/v1',
                           json={'token': token2, 'u_id': id3,
                                 'permission_id': 1})
-    assert resp1.status_code == 403
+    assert resp1.status_code == STATUS_ACCESS_ERR
 
 @pytest.mark.usefixtures('clear_register_two')
 def test_admin_userpermission_change_one_global_owner(clear_register_two):
@@ -183,7 +184,7 @@ def test_admin_userpermission_change_one_global_owner(clear_register_two):
     resp = requests.post(config.url + 'admin/userpermission/change/v1',
                           json={'token': token, 'u_id': id,
                                 'permission_id': 2})
-    assert resp.status_code == 400
+    assert resp.status_code == STATUS_INPUT_ERR
 
 @pytest.mark.usefixtures('clear_register_two')
 def test_admin_userpermission_change_unchanged_perms(clear_register_two):
@@ -198,12 +199,12 @@ def test_admin_userpermission_change_unchanged_perms(clear_register_two):
     resp0 = requests.post(config.url + 'admin/userpermission/change/v1',
                           json={'token': token, 'u_id': id1,
                                 'permission_id': 1})
-    assert resp0.status_code == 400
+    assert resp0.status_code == STATUS_INPUT_ERR
 
     # already a member
     resp1 = requests.post(config.url + 'admin/userpermission/change/v1',
                           json={'token': token, 'u_id': id2,
                                 'permission_id': 2})
-    assert resp1.status_code == 400
+    assert resp1.status_code == STATUS_INPUT_ERR
 
 requests.delete(config.url + 'clear/v1')

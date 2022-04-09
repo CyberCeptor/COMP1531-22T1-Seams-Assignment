@@ -13,7 +13,8 @@ import requests
 
 from src import config
 
-from src.global_vars import expired_token, unsaved_token
+from src.global_vars import EXPIRED_TOKEN, UNSAVED_TOKEN, STATUS_OK, \
+                            STATUS_INPUT_ERR, STATUS_ACCESS_ERR
 
 def test_channels_listall_invalid_token():
     """ Testing invalid user id to raise input error  """
@@ -23,30 +24,30 @@ def test_channels_listall_invalid_token():
     # token is int
     resp0 = requests.get(config.url + 'channels/listall/v2', 
         params={'token': 0})
-    assert resp0.status_code == 400
+    assert resp0.status_code == STATUS_INPUT_ERR
 
     # token is bool
     resp1 = requests.get(config.url + 'channels/listall/v2', 
         params={'token': True})
-    assert resp1.status_code == 400
+    assert resp1.status_code == STATUS_INPUT_ERR
     
     resp2 = requests.get(config.url + 'channels/listall/v2', 
         params={'token': False})
-    assert resp2.status_code == 400
+    assert resp2.status_code == STATUS_INPUT_ERR
 
     # wrong string to raise access error
     resp3 = requests.get(config.url + 'channels/listall/v2', 
         params={'token': 'str'})
-    assert resp3.status_code == 403 
+    assert resp3.status_code == STATUS_ACCESS_ERR 
 
     # token is expired
     resp4 = requests.get(config.url + 'channels/listall/v2', 
-                            params={'token': expired_token})
-    assert resp4.status_code == 403
+                            params={'token': EXPIRED_TOKEN})
+    assert resp4.status_code == STATUS_ACCESS_ERR
     # token is unsaved
     resp5 = requests.get(config.url + 'channels/listall/v2', 
-                            params={'token': unsaved_token})
-    assert resp5.status_code == 403
+                            params={'token': UNSAVED_TOKEN})
+    assert resp5.status_code == STATUS_ACCESS_ERR
 
 @pytest.mark.usefixtures('clear_register_two_createchannel')
 def test_channels_listall_v1_return(clear_register_two_createchannel):
@@ -85,7 +86,7 @@ def test_channels_listall_v1_return(clear_register_two_createchannel):
     channels = channels_listall.json()
 
     # check the channels_list function has worked.
-    assert channels_listall.status_code == 200
+    assert channels_listall.status_code == STATUS_OK
     # check the number of channels is all channels
     assert len(channels['channels']) == 5
     # check that the channel_list info matches what was created.
@@ -110,7 +111,7 @@ def test_channels_listall_v1_return(clear_register_two_createchannel):
                                         params={'token': user2_token})
     channels2 = channels_listall_2.json()
 
-    assert channels_listall_2.status_code == 200
+    assert channels_listall_2.status_code == STATUS_OK
     # check the number of channels is all channels
     assert len(channels2['channels']) == 5
     # check that the channel_list info matches what was created.

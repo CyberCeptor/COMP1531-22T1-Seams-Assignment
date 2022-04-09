@@ -21,6 +21,8 @@ from src.channel import channel_leave_v1
 
 from src.data_store import data_store
 
+from src.global_vars import GLOBAL_OWNER, USER
+
 def admin_userpermission_change(token, u_id, permission_id):
     """
     changes the permission of a specified user using a global owner's token
@@ -60,22 +62,22 @@ def admin_userpermission_change(token, u_id, permission_id):
     if not isinstance(permission_id, int) or type(permission_id) is bool:
         raise InputError(description='Permission id is not of valid type')
 
-    if permission_id not in [1, 2]:
+    if permission_id not in [GLOBAL_OWNER, USER]:
         raise InputError(description='Invalid permission id')
 
     # count the number of global users
     num_global_owners = len([user for user in store['users'] if 
-                             user['perm_id'] == 1])
+                             user['perm_id'] == GLOBAL_OWNER])
 
     # check three invalid cases of permission changes
     if (check_user_is_global_owner(u_id) and num_global_owners == 1 and
-        permission_id == 2):
+        permission_id == USER):
         raise InputError(description='Cannot demote the only global owner')
     
-    if check_user_is_global_owner(u_id) and permission_id == 1:
+    if check_user_is_global_owner(u_id) and permission_id == GLOBAL_OWNER:
         raise InputError(description='User is already a global owner')
     
-    if not check_user_is_global_owner(u_id) and permission_id == 2:
+    if not check_user_is_global_owner(u_id) and permission_id == USER:
         raise InputError(description='User is already a member')
 
     change_permission(u_id, permission_id)
@@ -111,7 +113,7 @@ def admin_user_remove(token, u_id):
 
     # if there is only one global owner, they cannot remove themselves
     num_global_owners = len([user for user in store['users'] if 
-                             user['perm_id'] == 1])
+                             user['perm_id'] == GLOBAL_OWNER])
 
     if check_user_is_global_owner(u_id) and num_global_owners == 1:
         raise InputError(description='Cannot remove the only global owner')

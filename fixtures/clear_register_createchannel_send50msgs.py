@@ -14,6 +14,8 @@ import requests
 
 from src import config
 
+from src.global_vars import STATUS_OK
+
 @pytest.fixture
 def clear_register_createchannel_send50msgs(clear_register_createchannel):
     """ clears any data stored in data_store and registers a user with the
@@ -28,251 +30,251 @@ def clear_register_createchannel_send50msgs(clear_register_createchannel):
     resp = requests.post(config.url + 'message/send/v1', 
                           json={'token': token, 'channel_id': channel_id,
                                 'message': 'hewwo'})
-    assert resp.status_code == 200
+    assert resp.status_code == STATUS_OK
 
     resp = requests.post(config.url + 'message/send/v1', 
                           json={'token': token, 'channel_id': channel_id,
                                 'message': 'hewwo'})
-    assert resp.status_code == 200
+    assert resp.status_code == STATUS_OK
 
     resp = requests.post(config.url + 'message/send/v1', 
                           json={'token': token, 'channel_id': channel_id,
                                 'message': 'hewwo'})
-    assert resp.status_code == 200
+    assert resp.status_code == STATUS_OK
 
     resp = requests.post(config.url + 'message/send/v1', 
                           json={'token': token, 'channel_id': channel_id,
                                 'message': 'hewwo'})
-    assert resp.status_code == 200
+    assert resp.status_code == STATUS_OK
 
     resp = requests.post(config.url + 'message/send/v1', 
                           json={'token': token, 'channel_id': channel_id,
                                 'message': 'hewwo'})
-    assert resp.status_code == 200
+    assert resp.status_code == STATUS_OK
 
     resp = requests.post(config.url + 'message/send/v1', 
                           json={'token': token, 'channel_id': channel_id,
                                 'message': 'hewwo'})
-    assert resp.status_code == 200
+    assert resp.status_code == STATUS_OK
 
     resp = requests.post(config.url + 'message/send/v1', 
                           json={'token': token, 'channel_id': channel_id,
                                 'message': 'hewwo'})
-    assert resp.status_code == 200
+    assert resp.status_code == STATUS_OK
 
     resp = requests.post(config.url + 'message/send/v1', 
                           json={'token': token, 'channel_id': channel_id,
                                 'message': 'hewwo'})
-    assert resp.status_code == 200
+    assert resp.status_code == STATUS_OK
 
     resp = requests.post(config.url + 'message/send/v1', 
                           json={'token': token, 'channel_id': channel_id,
                                 'message': 'hewwo'})
-    assert resp.status_code == 200
+    assert resp.status_code == STATUS_OK
 
     resp = requests.post(config.url + 'message/send/v1', 
                           json={'token': token, 'channel_id': channel_id,
                                 'message': 'hewwo'})
-    assert resp.status_code == 200
+    assert resp.status_code == STATUS_OK
 
     resp = requests.post(config.url + 'message/send/v1', 
                           json={'token': token, 'channel_id': channel_id,
                                 'message': 'hewwo'})
-    assert resp.status_code == 200
+    assert resp.status_code == STATUS_OK
 
     resp = requests.post(config.url + 'message/send/v1', 
                           json={'token': token, 'channel_id': channel_id,
                                 'message': 'hewwo'})
-    assert resp.status_code == 200
+    assert resp.status_code == STATUS_OK
 
     resp = requests.post(config.url + 'message/send/v1', 
                           json={'token': token, 'channel_id': channel_id,
                                 'message': 'hewwo'})
-    assert resp.status_code == 200
+    assert resp.status_code == STATUS_OK
 
     resp = requests.post(config.url + 'message/send/v1', 
                           json={'token': token, 'channel_id': channel_id,
                                 'message': 'hewwo'})
-    assert resp.status_code == 200
+    assert resp.status_code == STATUS_OK
 
     resp = requests.post(config.url + 'message/send/v1', 
                           json={'token': token, 'channel_id': channel_id,
                                 'message': 'hewwo'})
-    assert resp.status_code == 200
+    assert resp.status_code == STATUS_OK
 
     resp = requests.post(config.url + 'message/send/v1', 
                           json={'token': token, 'channel_id': channel_id,
                                 'message': 'hewwo'})
-    assert resp.status_code == 200
+    assert resp.status_code == STATUS_OK
 
     resp = requests.post(config.url + 'message/send/v1', 
                           json={'token': token, 'channel_id': channel_id,
                                 'message': 'hewwo'})
-    assert resp.status_code == 200
+    assert resp.status_code == STATUS_OK
 
     resp = requests.post(config.url + 'message/send/v1', 
                           json={'token': token, 'channel_id': channel_id,
                                 'message': 'hewwo'})
-    assert resp.status_code == 200
+    assert resp.status_code == STATUS_OK
 
     resp = requests.post(config.url + 'message/send/v1', 
                           json={'token': token, 'channel_id': channel_id,
                                 'message': 'hewwo'})
-    assert resp.status_code == 200
+    assert resp.status_code == STATUS_OK
 
     resp = requests.post(config.url + 'message/send/v1', 
                           json={'token': token, 'channel_id': channel_id,
                                 'message': 'hewwo'})
-    assert resp.status_code == 200
+    assert resp.status_code == STATUS_OK
 
     resp = requests.post(config.url + 'message/send/v1', 
                           json={'token': token, 'channel_id': channel_id,
                                 'message': 'hewwo'})
-    assert resp.status_code == 200
+    assert resp.status_code == STATUS_OK
 
     resp = requests.post(config.url + 'message/send/v1', 
                           json={'token': token, 'channel_id': channel_id,
                                 'message': 'hewwo'})
-    assert resp.status_code == 200
+    assert resp.status_code == STATUS_OK
 
     resp = requests.post(config.url + 'message/send/v1', 
                           json={'token': token, 'channel_id': channel_id,
                                 'message': 'hewwo'})
-    assert resp.status_code == 200
+    assert resp.status_code == STATUS_OK
 
     resp = requests.post(config.url + 'message/send/v1', 
                           json={'token': token, 'channel_id': channel_id,
                                 'message': 'hewwo'})
-    assert resp.status_code == 200
+    assert resp.status_code == STATUS_OK
 
     resp = requests.post(config.url + 'message/send/v1', 
                           json={'token': token, 'channel_id': channel_id,
                                 'message': 'hewwo'})
-    assert resp.status_code == 200
+    assert resp.status_code == STATUS_OK
 
     resp = requests.post(config.url + 'message/send/v1', 
                           json={'token': token, 'channel_id': channel_id,
                                 'message': 'hewwo'})
-    assert resp.status_code == 200
+    assert resp.status_code == STATUS_OK
 
     resp = requests.post(config.url + 'message/send/v1', 
                           json={'token': token, 'channel_id': channel_id,
                                 'message': 'hewwo'})
-    assert resp.status_code == 200
+    assert resp.status_code == STATUS_OK
 
     resp = requests.post(config.url + 'message/send/v1', 
                           json={'token': token, 'channel_id': channel_id,
                                 'message': 'hewwo'})
-    assert resp.status_code == 200
+    assert resp.status_code == STATUS_OK
 
     resp = requests.post(config.url + 'message/send/v1', 
                           json={'token': token, 'channel_id': channel_id,
                                 'message': 'hewwo'})
-    assert resp.status_code == 200
+    assert resp.status_code == STATUS_OK
 
     resp = requests.post(config.url + 'message/send/v1', 
                           json={'token': token, 'channel_id': channel_id,
                                 'message': 'hewwo'})
-    assert resp.status_code == 200
+    assert resp.status_code == STATUS_OK
 
     resp = requests.post(config.url + 'message/send/v1', 
                           json={'token': token, 'channel_id': channel_id,
                                 'message': 'hewwo'})
-    assert resp.status_code == 200
+    assert resp.status_code == STATUS_OK
 
     resp = requests.post(config.url + 'message/send/v1', 
                           json={'token': token, 'channel_id': channel_id,
                                 'message': 'hewwo'})
-    assert resp.status_code == 200
+    assert resp.status_code == STATUS_OK
 
     resp = requests.post(config.url + 'message/send/v1', 
                           json={'token': token, 'channel_id': channel_id,
                                 'message': 'hewwo'})
-    assert resp.status_code == 200
+    assert resp.status_code == STATUS_OK
 
     resp = requests.post(config.url + 'message/send/v1', 
                           json={'token': token, 'channel_id': channel_id,
                                 'message': 'hewwo'})
-    assert resp.status_code == 200
+    assert resp.status_code == STATUS_OK
 
     resp = requests.post(config.url + 'message/send/v1', 
                           json={'token': token, 'channel_id': channel_id,
                                 'message': 'hewwo'})
-    assert resp.status_code == 200
+    assert resp.status_code == STATUS_OK
 
     resp = requests.post(config.url + 'message/send/v1', 
                           json={'token': token, 'channel_id': channel_id,
                                 'message': 'hewwo'})
-    assert resp.status_code == 200
+    assert resp.status_code == STATUS_OK
 
     resp = requests.post(config.url + 'message/send/v1', 
                           json={'token': token, 'channel_id': channel_id,
                                 'message': 'hewwo'})
-    assert resp.status_code == 200
+    assert resp.status_code == STATUS_OK
 
     resp = requests.post(config.url + 'message/send/v1', 
                           json={'token': token, 'channel_id': channel_id,
                                 'message': 'hewwo'})
-    assert resp.status_code == 200
+    assert resp.status_code == STATUS_OK
 
     resp = requests.post(config.url + 'message/send/v1', 
                           json={'token': token, 'channel_id': channel_id,
                                 'message': 'hewwo'})
-    assert resp.status_code == 200
+    assert resp.status_code == STATUS_OK
 
     resp = requests.post(config.url + 'message/send/v1', 
                           json={'token': token, 'channel_id': channel_id,
                                 'message': 'hewwo'})
-    assert resp.status_code == 200
+    assert resp.status_code == STATUS_OK
 
     resp = requests.post(config.url + 'message/send/v1', 
                           json={'token': token, 'channel_id': channel_id,
                                 'message': 'hewwo'})
-    assert resp.status_code == 200
+    assert resp.status_code == STATUS_OK
 
     resp = requests.post(config.url + 'message/send/v1', 
                           json={'token': token, 'channel_id': channel_id,
                                 'message': 'hewwo'})
-    assert resp.status_code == 200
+    assert resp.status_code == STATUS_OK
 
     resp = requests.post(config.url + 'message/send/v1', 
                           json={'token': token, 'channel_id': channel_id,
                                 'message': 'hewwo'})
-    assert resp.status_code == 200
+    assert resp.status_code == STATUS_OK
 
     resp = requests.post(config.url + 'message/send/v1', 
                           json={'token': token, 'channel_id': channel_id,
                                 'message': 'hewwo'})
-    assert resp.status_code == 200
+    assert resp.status_code == STATUS_OK
 
     resp = requests.post(config.url + 'message/send/v1', 
                           json={'token': token, 'channel_id': channel_id,
                                 'message': 'hewwo'})
-    assert resp.status_code == 200
+    assert resp.status_code == STATUS_OK
 
     resp = requests.post(config.url + 'message/send/v1', 
                           json={'token': token, 'channel_id': channel_id,
                                 'message': 'hewwo'})
-    assert resp.status_code == 200
+    assert resp.status_code == STATUS_OK
 
     resp = requests.post(config.url + 'message/send/v1', 
                           json={'token': token, 'channel_id': channel_id,
                                 'message': 'hewwo'})
-    assert resp.status_code == 200
+    assert resp.status_code == STATUS_OK
 
     resp = requests.post(config.url + 'message/send/v1', 
                           json={'token': token, 'channel_id': channel_id,
                                 'message': 'hewwo'})
-    assert resp.status_code == 200
+    assert resp.status_code == STATUS_OK
 
     resp = requests.post(config.url + 'message/send/v1', 
                           json={'token': token, 'channel_id': channel_id,
                                 'message': 'hewwo'})
-    assert resp.status_code == 200
+    assert resp.status_code == STATUS_OK
 
     resp = requests.post(config.url + 'message/send/v1', 
                           json={'token': token, 'channel_id': channel_id,
                                 'message': 'hewwo'})
-    assert resp.status_code == 200
+    assert resp.status_code == STATUS_OK
  
     return [user_data['token'], channel_id]

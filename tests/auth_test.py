@@ -13,7 +13,8 @@ import requests
 
 from src import config
 
-from src.global_vars import expired_token, unsaved_token
+from src.global_vars import EXPIRED_TOKEN, UNSAVED_TOKEN, STATUS_OK, \
+                            STATUS_INPUT_ERR, STATUS_ACCESS_ERR
 
 name_22_chars = 'abcdefghijklmnopqrstuv'
 name_52_chars = 'abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz'
@@ -27,67 +28,67 @@ def test_register_invalid_email(clear_register):
     resp0 = requests.post(config.url + 'auth/register/v2',
                          json={'email': '', 'password': 'password',
                                'name_first': 'first', 'name_last': 'last'})
-    assert resp0.status_code == 400
+    assert resp0.status_code == STATUS_INPUT_ERR
 
     # missing @ and .
     resp1 = requests.post(config.url + 'auth/register/v2',
                          json={'email': 'abc', 'password': 'password',
                                'name_first': 'first', 'name_last': 'last'})
-    assert resp1.status_code == 400
+    assert resp1.status_code == STATUS_INPUT_ERR
 
     # missing @
     resp2 = requests.post(config.url + 'auth/register/v2',
                          json={'email': 'abc.def', 'password': 'password',
                                'name_first': 'first', 'name_last': 'last'})
-    assert resp2.status_code == 400
+    assert resp2.status_code == STATUS_INPUT_ERR
 
     # missing .
     resp3 = requests.post(config.url + 'auth/register/v2', 
                          json={'email': 'abc@def', 'password': 'password',
                                'name_first': 'first', 'name_last': 'last'})
-    assert resp3.status_code == 400
+    assert resp3.status_code == STATUS_INPUT_ERR
 
     # missing characters before @
     resp4 = requests.post(config.url + 'auth/register/v2', 
                          json={'email': '@def.com', 'password': 'password',
                                'name_first': 'first', 'name_last': 'last'})
-    assert resp4.status_code == 400
+    assert resp4.status_code == STATUS_INPUT_ERR
 
     # missing characters between @ and .
     resp5 = requests.post(config.url + 'auth/register/v2', 
                          json={'email': 'abc@.com', 'password': 'password',
                                'name_first': 'first', 'name_last': 'last'})
-    assert resp5.status_code == 400
+    assert resp5.status_code == STATUS_INPUT_ERR
 
     # missing characters after .
     resp6 = requests.post(config.url + 'auth/register/v2', 
                          json={'email': 'abc@def.', 'password': 'password',
                                'name_first': 'first', 'name_last': 'last'})
-    assert resp6.status_code == 400
+    assert resp6.status_code == STATUS_INPUT_ERR
 
     # numbers after .
     resp7 = requests.post(config.url + 'auth/register/v2', 
                          json={'email': 'abc@def.123', 'password': 'password',
                                'name_first': 'first', 'name_last': 'last'})
-    assert resp7.status_code == 400
+    assert resp7.status_code == STATUS_INPUT_ERR
 
     # email is bool
     resp7 = requests.post(config.url + 'auth/register/v2', 
                          json={'email': True, 'password': 'password',
                                'name_first': 'first', 'name_last': 'last'})
-    assert resp7.status_code == 400
+    assert resp7.status_code == STATUS_INPUT_ERR
 
     # email is int
     resp7 = requests.post(config.url + 'auth/register/v2', 
                          json={'email': 666, 'password': 'password',
                                'name_first': 'first', 'name_last': 'last'})
-    assert resp7.status_code == 400
+    assert resp7.status_code == STATUS_INPUT_ERR
 
     # missing . and @
     resp8 = requests.post(config.url + 'auth/register/v2', 
                          json={'email': 'abcdef', 'password': 'password',
                                'name_first': 'first', 'name_last': 'last'})
-    assert resp8.status_code == 400
+    assert resp8.status_code == STATUS_INPUT_ERR
 
 # based on code Haydon wrote in project starter video
 @pytest.mark.usefixtures('clear_register')
@@ -98,7 +99,7 @@ def test_register_duplicate_email(clear_register):
     resp = requests.post(config.url + 'auth/register/v2', 
                          json={'email': 'abc@def.com', 'password': 'password',
                                'name_first': 'first', 'name_last': 'last'})
-    assert resp.status_code == 400
+    assert resp.status_code == STATUS_INPUT_ERR
 
 @pytest.mark.usefixtures('clear_register')
 def test_register_invalid_password(clear_register):
@@ -109,7 +110,7 @@ def test_register_invalid_password(clear_register):
     resp = requests.post(config.url + 'auth/register/v2', 
                          json={'email': 'def@ghi.com', 'password': 'pass',
                                'name_first': 'first', 'name_last': 'last'})
-    assert resp.status_code == 400
+    assert resp.status_code == STATUS_INPUT_ERR
 
 @pytest.mark.usefixtures('clear_register')
 def test_register_invalid_name(clear_register):
@@ -120,57 +121,57 @@ def test_register_invalid_name(clear_register):
     resp0 = requests.post(config.url + 'auth/register/v2', 
                          json={'email': 'def@ghi.com', 'password': 'password',
                                'name_first': '', 'name_last': 'last'})
-    assert resp0.status_code == 400
+    assert resp0.status_code == STATUS_INPUT_ERR
 
     # last name too short
     resp1 = requests.post(config.url + 'auth/register/v2', 
                          json={'email': 'def@ghi.com', 'password': 'password',
                                'name_first': 'first', 'name_last': ''})
-    assert resp1.status_code == 400
+    assert resp1.status_code == STATUS_INPUT_ERR
 
     # first name too long
     resp2 = requests.post(config.url + 'auth/register/v2', 
                          json={'email': 'def@ghi.com', 'password': 'password',
                                'name_first': name_52_chars, 'name_last': 'last'}
                         )
-    assert resp2.status_code == 400
+    assert resp2.status_code == STATUS_INPUT_ERR
 
     # last name too long
     resp3 = requests.post(config.url + 'auth/register/v2', 
                          json={'email': 'def@ghi.com', 'password': 'password',
                                'name_first': 'first',
                                'name_last': name_52_chars})
-    assert resp3.status_code == 400
+    assert resp3.status_code == STATUS_INPUT_ERR
 
     # name has no letters -> would create an empty handle
     resp4 = requests.post(config.url + 'auth/register/v2', 
                          json={'email': 'def@ghi.com', 'password': 'password',
                                'name_first': '-', 'name_last': ' '})
-    assert resp4.status_code == 400
+    assert resp4.status_code == STATUS_INPUT_ERR
 
     # first name is a bool
     resp5 = requests.post(config.url + 'auth/register/v2', 
                          json={'email': 'def@ghi.com', 'password': 'password',
                                'name_first': True, 'name_last': 'last'})
-    assert resp5.status_code == 400
+    assert resp5.status_code == STATUS_INPUT_ERR
 
     # first name is an int
     resp6 = requests.post(config.url + 'auth/register/v2', 
                          json={'email': 'def@ghi.com', 'password': 'password',
                                'name_first': 44, 'name_last': 'last'})
-    assert resp6.status_code == 400
+    assert resp6.status_code == STATUS_INPUT_ERR
 
     # last name is a bool
     resp7 = requests.post(config.url + 'auth/register/v2', 
                          json={'email': 'def@ghi.com', 'password': 'password',
                                'name_first': 'first', 'name_last': True})
-    assert resp7.status_code == 400
+    assert resp7.status_code == STATUS_INPUT_ERR
 
     # last name is an int
     resp7 = requests.post(config.url + 'auth/register/v2', 
                          json={'email': 'def@ghi.com', 'password': 'password',
                                'name_first': 'first', 'name_last': 44})
-    assert resp7.status_code == 400
+    assert resp7.status_code == STATUS_INPUT_ERR
 
 @pytest.mark.usefixtures('clear_register')
 def test_register_works(clear_register):
@@ -186,7 +187,7 @@ def test_register_works(clear_register):
     # log the user in
     resp1 = requests.post(config.url + 'auth/login/v2', 
                   json={'email': 'abc@def.com', 'password': 'password'})
-    assert resp1.status_code == 200
+    assert resp1.status_code == STATUS_OK
 
     # get the returned data from login
     login_data = resp1.json()
@@ -205,12 +206,12 @@ def test_login_invalid(clear_register):
     # email does not belong to a user
     resp0 = requests.post(config.url + 'auth/login/v2', 
                           json={'email': 'ghi@jkl.com', 'password': 'password'})
-    assert resp0.status_code == 400
+    assert resp0.status_code == STATUS_INPUT_ERR
 
     # incorrect password
     resp1 = requests.post(config.url + 'auth/login/v2', 
                           json={'email': 'abc@def.com', 'password': 'wordpass'})
-    assert resp1.status_code == 400
+    assert resp1.status_code == STATUS_INPUT_ERR
 
 @pytest.mark.usefixtures('clear_register')
 def test_logout_works(clear_register):
@@ -218,7 +219,7 @@ def test_logout_works(clear_register):
     token = clear_register['token']
 
     resp = requests.post(config.url + 'auth/logout/v1', json={'token': token})
-    assert resp.status_code == 200
+    assert resp.status_code == STATUS_OK
 
 @pytest.mark.usefixtures('clear_register')
 def test_logout_user_logged_out(clear_register):
@@ -229,11 +230,11 @@ def test_logout_user_logged_out(clear_register):
 
     # log user out
     resp0 = requests.post(config.url + 'auth/logout/v1', json={'token': token})
-    assert resp0.status_code == 200
+    assert resp0.status_code == STATUS_OK
 
     # user cannot be logged out again since the token is now invalid
     resp1 = requests.post(config.url + 'auth/logout/v1', json={'token': token})
-    assert resp1.status_code == 403
+    assert resp1.status_code == STATUS_ACCESS_ERR
 
 @pytest.mark.usefixtures('clear_register')
 def test_logout_invalid_token(clear_register):
@@ -241,25 +242,25 @@ def test_logout_invalid_token(clear_register):
 
     # input error: int is passed in as token
     resp0 = requests.post(config.url + 'auth/logout/v1', json={'token': 1})
-    assert resp0.status_code == 400
+    assert resp0.status_code == STATUS_INPUT_ERR
 
     # access error: non-jwt token str is passed in as token
     resp1 = requests.post(config.url + 'auth/logout/v1',
                          json={'token': 'not a valid jwt token str'})
-    assert resp1.status_code == 403
+    assert resp1.status_code == STATUS_ACCESS_ERR
 
     # input error: bool is passed in as token
     resp2 = requests.post(config.url + 'auth/logout/v1', json={'token': True})
-    assert resp2.status_code == 400
+    assert resp2.status_code == STATUS_INPUT_ERR
 
     # access error: expired, unsaved token
     resp3 = requests.post(config.url + 'auth/logout/v1',
-                         json={'token': expired_token})
-    assert resp3.status_code == 403
+                         json={'token': EXPIRED_TOKEN})
+    assert resp3.status_code == STATUS_ACCESS_ERR
 
     # access error: unexpired, unsaved token
     resp4 = requests.post(config.url + 'auth/logout/v1',
-                         json={'token': unsaved_token})
-    assert resp4.status_code == 403
+                         json={'token': UNSAVED_TOKEN})
+    assert resp4.status_code == STATUS_ACCESS_ERR
 
 requests.delete(config.url + 'clear/v1')

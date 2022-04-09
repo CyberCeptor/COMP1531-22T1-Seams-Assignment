@@ -13,7 +13,8 @@ import requests
 
 from src import config
 
-from src.global_vars import expired_token, unsaved_token
+from src.global_vars import EXPIRED_TOKEN, UNSAVED_TOKEN, STATUS_OK, \
+                            STATUS_INPUT_ERR, STATUS_ACCESS_ERR
 
 @pytest.mark.usefixtures('clear_register')
 def test_users_all_return(clear_register):
@@ -26,14 +27,14 @@ def test_users_all_return(clear_register):
     resp0 = requests.post(config.url + 'auth/register/v2', 
                   json={'email': 'def@ghi.com', 'password': 'password',
                         'name_first': 'first', 'name_last': 'last'})
-    assert resp0.status_code == 200
+    assert resp0.status_code == STATUS_OK
     user2 = resp0.json()
     token2 = user2['token']
     id2 = user2['auth_user_id']
 
     # use user1's token to get the info of all users
     resp1 = requests.get(config.url + 'users/all/v1', params={'token': token1})
-    assert resp1.status_code == 200
+    assert resp1.status_code == STATUS_OK
     get1 = resp1.json()
 
     # check the response is same as expected
@@ -53,7 +54,7 @@ def test_users_all_return(clear_register):
 
     # use user1's token to get the info of all users, reponse will be the same
     resp2 = requests.get(config.url + 'users/all/v1', params={'token': token2})
-    assert resp2.status_code == 200
+    assert resp2.status_code == STATUS_OK
     get2 = resp2.json()
     assert get1 == get2
 
@@ -63,29 +64,29 @@ def test_users_all_invalid_token(clear_register):
 
     # input error: int is passed in as token
     resp0 = requests.get(config.url + 'users/all/v1', params={'token': 1})
-    assert resp0.status_code == 400
+    assert resp0.status_code == STATUS_INPUT_ERR
 
     # input error: not jwt token str is passed in as token
     resp1 = requests.get(config.url + 'users/all/v1',
                          params={'token': 'not a valid jwt token str'})
-    assert resp1.status_code == 403
+    assert resp1.status_code == STATUS_ACCESS_ERR
 
     # input error: bool is passed in as token
     resp2 = requests.get(config.url + 'users/all/v1', params={'token': True})
-    assert resp2.status_code == 400
+    assert resp2.status_code == STATUS_INPUT_ERR
 
     # access error: expired, unsaved token
     resp3 = requests.get(config.url + 'users/all/v1',
-                         params={'token': expired_token})
-    assert resp3.status_code == 403
+                         params={'token': EXPIRED_TOKEN})
+    assert resp3.status_code == STATUS_ACCESS_ERR
 
     # access error: unexpired, unsaved token
     resp3 = requests.get(config.url + 'users/all/v1', 
-                         params={'token': unsaved_token})
-    assert resp3.status_code == 403
+                         params={'token': UNSAVED_TOKEN})
+    assert resp3.status_code == STATUS_ACCESS_ERR
 
     # input error: empty str passed in as token 
     resp4 = requests.get(config.url + 'users/all/v1', params={'token': ''})
-    assert resp4.status_code == 400
+    assert resp4.status_code == STATUS_INPUT_ERR
 
 requests.delete(config.url + 'clear/v1')

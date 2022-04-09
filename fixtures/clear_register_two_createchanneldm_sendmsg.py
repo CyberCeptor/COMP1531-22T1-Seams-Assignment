@@ -14,6 +14,8 @@ import requests
 
 from src import config
 
+from src.global_vars import STATUS_OK
+
 @pytest.fixture
 def clear_register_two_createchanneldm_sendmsg(clear_register_two_createchannel):
     """ clears any 1 stored in 1_store and registers a user with the
@@ -29,14 +31,14 @@ def clear_register_two_createchanneldm_sendmsg(clear_register_two_createchannel)
                           json={'token': user_1['token'],
                                 'channel_id': channel_id, 
                                 'message': 'hewwo'})
-    assert send_message.status_code == 200
+    assert send_message.status_code == STATUS_OK
     chan_message = send_message.json()
 
     # create dm for user 1 and 2
     create = requests.post(config.url + 'dm/create/v1', 
                         json={'token': user_1['token'],
                               'u_ids': [user_2['auth_user_id']]})
-    assert create.status_code == 200
+    assert create.status_code == STATUS_OK
     dm = create.json()
 
     # user 2 sends message in dm
@@ -44,7 +46,7 @@ def clear_register_two_createchanneldm_sendmsg(clear_register_two_createchannel)
                           json={'token': user_2['token'],
                                 'dm_id': dm['dm_id'], 
                                 'message': 'hewwo'})
-    assert send_message.status_code == 200
+    assert send_message.status_code == STATUS_OK
     dm_message = send_message.json()
 
     return [user_1, user_2, channel_id, chan_message['message_id'], dm['dm_id'],

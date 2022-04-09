@@ -14,6 +14,8 @@ import requests
 
 from src import config
 
+from src.global_vars import STATUS_OK
+
 @pytest.fixture
 def clear_register_two_createchannel_twoowners(clear_register_two_createchannel):
     """ clears any data stored in data_store, registers two users, creates a
@@ -28,13 +30,13 @@ def clear_register_two_createchannel_twoowners(clear_register_two_createchannel)
     channel_join = requests.post(config.url + 'channel/join/v2',
                         json={'token': user2['token'],
                               'channel_id': channel_id})
-    assert channel_join.status_code == 200
+    assert channel_join.status_code == STATUS_OK
 
     # add user2 to be an owner, with user1's token as they are owner_member
     addowner = requests.post(config.url + 'channel/addowner/v1',
                         json={'token': user1['token'], 
                               'channel_id': channel_id,
                               'u_id': user2['auth_user_id']})
-    assert addowner.status_code == 200
+    assert addowner.status_code == STATUS_OK
 
     return [user1, user2, channel_id]

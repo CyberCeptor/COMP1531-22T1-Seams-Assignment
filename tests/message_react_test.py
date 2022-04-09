@@ -13,7 +13,8 @@ import requests
 
 from src import config
 
-from src.global_vars import expired_token, unsaved_token
+from src.global_vars import EXPIRED_TOKEN, UNSAVED_TOKEN, STATUS_OK, \
+                            STATUS_INPUT_ERR, STATUS_ACCESS_ERR
 
 @pytest.mark.usefixtures('clear_register_two_createchanneldm_sendmsg')
 def test_message_react_successful(clear_register_two_createchanneldm_sendmsg):
@@ -32,13 +33,13 @@ def test_message_react_successful(clear_register_two_createchanneldm_sendmsg):
     resp0 = requests.post(config.url + 'message/react/v1', 
                           json={'token': token1, 'message_id': chan_msg_id, 
                                 'react_id': 1})
-    assert resp0.status_code == 200
+    assert resp0.status_code == STATUS_OK
 
     # check the message details using user 1's token
     resp1 = requests.get(config.url + 'channel/messages/v2', 
                          params={'token': token1, 'channel_id': chan_id,
                                  'start': 0})
-    assert resp1.status_code == 200
+    assert resp1.status_code == STATUS_OK
     chan_msgs = resp1.json()
 
     assert len(chan_msgs['messages']) == 1
@@ -53,12 +54,12 @@ def test_message_react_successful(clear_register_two_createchanneldm_sendmsg):
     resp2 = requests.post(config.url + 'message/react/v1', 
                           json={'token': token1, 'message_id': dm_msg_id, 
                                 'react_id': 1})
-    assert resp2.status_code == 200
+    assert resp2.status_code == STATUS_OK
 
     # check the message details using user 1's token
     resp3 = requests.get(config.url + 'dm/messages/v1', 
                          params={'token': token1, 'dm_id': dm_id, 'start': 0})
-    assert resp3.status_code == 200
+    assert resp3.status_code == STATUS_OK
     dm_msgs = resp3.json()
 
     assert len(dm_msgs['messages']) == 1
@@ -70,7 +71,7 @@ def test_message_react_successful(clear_register_two_createchanneldm_sendmsg):
     # check the message details using user 2's token
     resp4 = requests.get(config.url + 'dm/messages/v1', 
                          params={'token': token2, 'dm_id': dm_id, 'start': 0})
-    assert resp4.status_code == 200
+    assert resp4.status_code == STATUS_OK
     dm_msgs = resp4.json()
     
     msg_reacts = dm_msgs['messages'][0]['reacts']
@@ -91,25 +92,25 @@ def test_message_react_already_reacted(clear_register_two_createchanneldm_sendms
     resp0 = requests.post(config.url + 'message/react/v1', 
                            json={'token': token1, 'message_id': chan_msg_id, 
                                  'react_id': 1})
-    assert resp0.status_code == 200
+    assert resp0.status_code == STATUS_OK
     
     # user 1 tries to react with react id 1 again
     resp1 = requests.post(config.url + 'message/react/v1', 
                            json={'token': token1, 'message_id': chan_msg_id, 
                                  'react_id': 1})
-    assert resp1.status_code == 400
+    assert resp1.status_code == STATUS_INPUT_ERR
 
     # user 1 reacts with react id 1 to a dm message
     resp2 = requests.post(config.url + 'message/react/v1', 
                            json={'token': token1, 'message_id': dm_msg_id, 
                                  'react_id': 1})
-    assert resp2.status_code == 200
+    assert resp2.status_code == STATUS_OK
 
     # user 1 tries to react with react id 1 again
     resp3 = requests.post(config.url + 'message/react/v1', 
                            json={'token': token1, 'message_id': dm_msg_id, 
                                  'react_id': 1})
-    assert resp3.status_code == 400
+    assert resp3.status_code == STATUS_INPUT_ERR
 
 @pytest.mark.usefixtures('clear_register_two_createchanneldm_sendmsg')
 def test_message_react_invalid_token(clear_register_two_createchanneldm_sendmsg):
@@ -121,39 +122,39 @@ def test_message_react_invalid_token(clear_register_two_createchanneldm_sendmsg)
     resp0 = requests.post(config.url + 'message/react/v1', 
                           json={'token': 0, 'message_id': chan_msg_id, 
                                 'react_id': 1})
-    assert resp0.status_code == 400
+    assert resp0.status_code == STATUS_INPUT_ERR
 
     # token is bool
     resp1 = requests.post(config.url + 'message/react/v1', 
                           json={'token': True, 'message_id': chan_msg_id, 
                                 'react_id': 1})
-    assert resp1.status_code == 400
+    assert resp1.status_code == STATUS_INPUT_ERR
 
     # token input empty
     resp2 = requests.post(config.url + 'message/react/v1', 
                           json={'token': '', 'message_id': chan_msg_id, 
                                 'react_id': 1})
-    assert resp2.status_code == 400
+    assert resp2.status_code == STATUS_INPUT_ERR
 
     # not a valid jwt token str
     resp3 = requests.post(config.url + 'message/react/v1', 
                           json={'token': 'str', 'message_id': chan_msg_id, 
                                 'react_id': 1})
-    assert resp3.status_code == 403
+    assert resp3.status_code == STATUS_ACCESS_ERR
 
     # expired token
     resp4 = requests.post(config.url + 'message/react/v1', 
-                          json={'token': expired_token,
+                          json={'token': EXPIRED_TOKEN,
                                 'message_id': chan_msg_id, 
                                 'react_id': 1})
-    assert resp4.status_code == 403
+    assert resp4.status_code == STATUS_ACCESS_ERR
 
     # unsaved token
     resp4 = requests.post(config.url + 'message/react/v1', 
-                          json={'token': unsaved_token, 
+                          json={'token': UNSAVED_TOKEN, 
                                 'message_id': chan_msg_id, 
                                 'react_id': 1})
-    assert resp4.status_code == 403
+    assert resp4.status_code == STATUS_ACCESS_ERR
 
 @pytest.mark.usefixtures('clear_register_two_createchanneldm_sendmsg')
 def test_message_react_invalid_msg_id(clear_register_two_createchanneldm_sendmsg):
@@ -165,30 +166,30 @@ def test_message_react_invalid_msg_id(clear_register_two_createchanneldm_sendmsg
     resp0 = requests.post(config.url + 'message/react/v1', 
                           json={'token': token, 'message_id': '', 
                                 'react_id': 1})
-    assert resp0.status_code == 400
+    assert resp0.status_code == STATUS_INPUT_ERR
 
     # message id is bool
     resp1 = requests.post(config.url + 'message/react/v1', 
                           json={'token': token, 'message_id': True, 
                                 'react_id': 1})
-    assert resp1.status_code == 400
+    assert resp1.status_code == STATUS_INPUT_ERR
 
     # message id is string
     resp2 = requests.post(config.url + 'message/react/v1', 
                           json={'token': token, 'message_id': 'str', 
                                 'react_id': 1})
-    assert resp2.status_code == 400
+    assert resp2.status_code == STATUS_INPUT_ERR
 
     # non-existent message ids
     resp3 = requests.post(config.url + 'message/react/v1', 
                           json={'token': token, 'message_id': -1, 
                                 'react_id': 1})
-    assert resp3.status_code == 400
+    assert resp3.status_code == STATUS_INPUT_ERR
 
     resp4 = requests.post(config.url + 'message/react/v1', 
                           json={'token': token, 'message_id': 100, 
                                 'react_id': 1})
-    assert resp4.status_code == 400
+    assert resp4.status_code == STATUS_INPUT_ERR
 
 @pytest.mark.usefixtures('clear_register_two_createchanneldm_sendmsg')
 def test_message_react_invalid_react_id(clear_register_two_createchanneldm_sendmsg):
@@ -201,30 +202,30 @@ def test_message_react_invalid_react_id(clear_register_two_createchanneldm_sendm
     resp0 = requests.post(config.url + 'message/react/v1', 
                           json={'token': token, 'message_id': chan_msg_id, 
                                 'react_id': ''})
-    assert resp0.status_code == 400
+    assert resp0.status_code == STATUS_INPUT_ERR
 
     # message id is bool
     resp1 = requests.post(config.url + 'message/react/v1', 
                           json={'token': token, 'message_id': chan_msg_id, 
                                 'react_id': True})
-    assert resp1.status_code == 400
+    assert resp1.status_code == STATUS_INPUT_ERR
 
     # message id is string
     resp2 = requests.post(config.url + 'message/react/v1', 
                           json={'token': token, 'message_id': chan_msg_id, 
                                 'react_id': 'str'})
-    assert resp2.status_code == 400
+    assert resp2.status_code == STATUS_INPUT_ERR
 
     # non-existent message ids
     resp3 = requests.post(config.url + 'message/react/v1', 
                           json={'token': token, 'message_id': chan_msg_id, 
                                 'react_id': -1})
-    assert resp3.status_code == 400
+    assert resp3.status_code == STATUS_INPUT_ERR
 
     resp4 = requests.post(config.url + 'message/react/v1', 
                           json={'token': token, 'message_id': chan_msg_id, 
                                 'react_id': 100})
-    assert resp4.status_code == 400
+    assert resp4.status_code == STATUS_INPUT_ERR
 
 @pytest.mark.usefixtures('clear_register_two_createchanneldm_sendmsg')
 def test_message_react_not_a_member(clear_register_two_createchanneldm_sendmsg):
@@ -239,13 +240,13 @@ def test_message_react_not_a_member(clear_register_two_createchanneldm_sendmsg):
     resp0 = requests.post(config.url + 'message/react/v1', 
                           json={'token': token2, 'message_id': chan_msg_id, 
                                 'react_id': 1})
-    assert resp0.status_code == 403
+    assert resp0.status_code == STATUS_ACCESS_ERR
 
     # register user 3
     resp1 = requests.post(config.url + 'auth/register/v2', 
                           json={'email': 'ghu@jkl.com', 'password': 'password',
                                 'name_first': 'first', 'name_last': 'last'})
-    assert resp1.status_code == 200
+    assert resp1.status_code == STATUS_OK
     token3 = resp1.json()['token']
 
     # user 3 is trying to react to a message sent in a dm they're not a member 
@@ -253,6 +254,6 @@ def test_message_react_not_a_member(clear_register_two_createchanneldm_sendmsg):
     resp2 = requests.post(config.url + 'message/react/v1', 
                           json={'token': token3, 'message_id': dm_msg_id, 
                                 'react_id': 1})
-    assert resp2.status_code == 403
+    assert resp2.status_code == STATUS_ACCESS_ERR
 
 requests.delete(config.url + 'clear/v1')

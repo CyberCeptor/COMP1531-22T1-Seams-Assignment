@@ -13,7 +13,7 @@ import requests
 
 from src import config
 
-from src.global_vars import expired_token, unsaved_token
+from src.global_vars import EXPIRED_TOKEN, UNSAVED_TOKEN
 
 @pytest.mark.usefixtures('clear_register_two')
 def test_admin_user_remove_works(clear_register_two):
@@ -287,12 +287,12 @@ def test_admin_user_remove_invalid_token(clear_register_two):
 
     # access error: unexpired, unsaved token
     resp4 = requests.delete(config.url + 'admin/user/remove/v1', 
-                          json={'token': unsaved_token, 'u_id': id2})
+                          json={'token': UNSAVED_TOKEN, 'u_id': id2})
     assert resp4.status_code == 403
 
     # access error: expired, unsaved token
     resp5 = requests.delete(config.url + 'admin/user/remove/v1', 
-                          json={'token': expired_token, 'u_id': id2})
+                          json={'token': EXPIRED_TOKEN, 'u_id': id2})
     assert resp5.status_code == 403
 
 @pytest.mark.usefixtures('clear_register_two')

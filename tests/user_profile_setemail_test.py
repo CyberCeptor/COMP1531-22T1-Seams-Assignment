@@ -13,7 +13,8 @@ import requests
 
 from src import config
 
-from src.global_vars import expired_token, unsaved_token
+from src.global_vars import EXPIRED_TOKEN, UNSAVED_TOKEN, STATUS_OK, \
+                            STATUS_INPUT_ERR, STATUS_ACCESS_ERR
 
 @pytest.mark.usefixtures('clear_register_two')
 def test_user_setemail_working(clear_register_two):
@@ -32,7 +33,7 @@ def test_user_setemail_working(clear_register_two):
     channel1 = requests.post(config.url + 'channels/create/v2', 
                             json={'token': user1['token'],
                                     'name': 'channel_name', 'is_public': True})
-    assert channel1.status_code == 200
+    assert channel1.status_code == STATUS_OK
     channel1 = channel1.json()
     channel_id = channel1['channel_id']
 
@@ -40,21 +41,21 @@ def test_user_setemail_working(clear_register_two):
     join = requests.post(config.url + 'channel/join/v2',
                         json={'token': user2['token'], 
                                 'channel_id': channel_id})
-    assert join.status_code == 200
+    assert join.status_code == STATUS_OK
 
     # add them as an owner of the channel
     addowner = requests.post(config.url + 'channel/addowner/v1',
                         json={'token': user1['token'], 
                             'channel_id': channel_id, 
                             'u_id': user2['auth_user_id']})
-    assert addowner.status_code == 200
+    assert addowner.status_code == STATUS_OK
 
     # create a dm, add the other user as a member, 
     # to Test that all information is updated
     dm1 = requests.post(config.url + 'dm/create/v1', 
                              json={'token': user1['token'],
                                    'u_ids': [user2['auth_user_id']]})
-    assert dm1.status_code == 200
+    assert dm1.status_code == STATUS_OK
     dm1_json = dm1.json()
     dm_id = dm1_json['dm_id']
 
@@ -62,18 +63,18 @@ def test_user_setemail_working(clear_register_two):
     setemail = requests.put(config.url + 'user/profile/setemail/v1', 
                             json={'token': user1['token'], 
                                     'email': 'abc3@def.com'})
-    assert setemail.status_code == 200
+    assert setemail.status_code == STATUS_OK
 
     setemail = requests.put(config.url + 'user/profile/setemail/v1', 
                             json={'token': user2['token'], 
                                     'email': 'abc4@def.com'})
-    assert setemail.status_code == 200
+    assert setemail.status_code == STATUS_OK
 
     # test using the email that user1 previously had.
     setemail = requests.put(config.url + 'user/profile/setemail/v1', 
                             json={'token': user2['token'], 
                                     'email': 'abc@def.com'})
-    assert setemail.status_code == 200
+    assert setemail.status_code == STATUS_OK
 
     # Assert that the all_members and owner_members channel email has also been updated
     # check the data in the channel is correct
@@ -118,39 +119,39 @@ def test_user_setemail_bad_email(clear_register_two):
     setemail = requests.put(config.url + 'user/profile/setemail/v1', 
                             json={'token': user1['token'], 
                                 'email': 'def@ghi.com'})
-    assert setemail.status_code == 400
+    assert setemail.status_code == STATUS_INPUT_ERR
 
     # test another users email with 2nd user
     setemail = requests.put(config.url + 'user/profile/setemail/v1', 
                             json={'token': user2['token'], 
                                     'email': 'abc@def.com'})
-    assert setemail.status_code == 400
+    assert setemail.status_code == STATUS_INPUT_ERR
 
     # test bad string
     setemail = requests.put(config.url + 'user/profile/setemail/v1', 
                             json={'token': user1['token'], 
                                     'email': 'abcdef.com'})
-    assert setemail.status_code == 400
+    assert setemail.status_code == STATUS_INPUT_ERR
 
     # test empty string
     setemail = requests.put(config.url + 'user/profile/setemail/v1', 
                             json={'token': user1['token'], 'email': ''})
-    assert setemail.status_code == 400
+    assert setemail.status_code == STATUS_INPUT_ERR
 
     # test boolean 
     setemail = requests.put(config.url + 'user/profile/setemail/v1', 
                             json={'token': user1['token'], 'email': True})
-    assert setemail.status_code == 400
+    assert setemail.status_code == STATUS_INPUT_ERR
 
     # test int
     setemail = requests.put(config.url + 'user/profile/setemail/v1', 
                             json={'token': user1['token'], 'email': 1})
-    assert setemail.status_code == 400
+    assert setemail.status_code == STATUS_INPUT_ERR
 
     # test negative int
     setemail = requests.put(config.url + 'user/profile/setemail/v1', 
                             json={'token': user1['token'], 'email': -1})
-    assert setemail.status_code == 400
+    assert setemail.status_code == STATUS_INPUT_ERR
 
 @pytest.mark.usefixtures('clear_register')
 def test_user_setemail_bad_token(clear_register):
@@ -164,32 +165,32 @@ def test_user_setemail_bad_token(clear_register):
 
     setemail = requests.put(config.url + 'user/profile/setemail/v1', 
                             json={'token': '', 'email': 'abc2@def.com'})
-    assert setemail.status_code == 400
+    assert setemail.status_code == STATUS_INPUT_ERR
 
     setemail = requests.put(config.url + 'user/profile/setemail/v1', 
                             json={'token': 'string', 'email': 'abc2@def.com'})
-    assert setemail.status_code == 403
+    assert setemail.status_code == STATUS_ACCESS_ERR
 
     setemail = requests.put(config.url + 'user/profile/setemail/v1', 
                             json={'token': 444, 'email': 'abc2@def.com'})
-    assert setemail.status_code == 400
+    assert setemail.status_code == STATUS_INPUT_ERR
 
     setemail = requests.put(config.url + 'user/profile/setemail/v1', 
                             json={'token': -1, 'email': 'abc2@def.com'})
-    assert setemail.status_code == 400
+    assert setemail.status_code == STATUS_INPUT_ERR
 
     setemail = requests.put(config.url + 'user/profile/setemail/v1', 
                             json={'token': True, 'email': 'abc2@def.com'})
-    assert setemail.status_code == 400
+    assert setemail.status_code == STATUS_INPUT_ERR
 
     setemail = requests.put(config.url + 'user/profile/setemail/v1', 
-                            json={'token': expired_token, 
+                            json={'token': EXPIRED_TOKEN, 
                                     'email': 'abc2@def.com'})
-    assert setemail.status_code == 403
+    assert setemail.status_code == STATUS_ACCESS_ERR
 
     setemail = requests.put(config.url + 'user/profile/setemail/v1', 
-                            json={'token': unsaved_token, 
+                            json={'token': UNSAVED_TOKEN, 
                                     'email': 'abc2@def.com'})
-    assert setemail.status_code == 403
+    assert setemail.status_code == STATUS_ACCESS_ERR
 
 requests.delete(config.url + 'clear/v1')

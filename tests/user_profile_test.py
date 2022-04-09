@@ -13,7 +13,8 @@ import requests
 
 from src import config
 
-from src.global_vars import expired_token, unsaved_token
+from src.global_vars import EXPIRED_TOKEN, UNSAVED_TOKEN, STATUS_OK, \
+                            STATUS_INPUT_ERR, STATUS_ACCESS_ERR
 
 @pytest.mark.usefixtures('clear_register_two')
 def test_user_profile_working(clear_register_two):
@@ -29,7 +30,7 @@ def test_user_profile_working(clear_register_two):
     user_profile = requests.get(config.url + 'user/profile/v1', 
                     params={'token': user2['token'], 
                             'u_id': user1['auth_user_id']})
-    assert user_profile.status_code == 200
+    assert user_profile.status_code == STATUS_OK
     profile = user_profile.json()
 
     assert profile['user']['u_id'] == user1['auth_user_id']
@@ -42,7 +43,7 @@ def test_user_profile_working(clear_register_two):
     user_profile = requests.get(config.url + 'user/profile/v1', 
                     params={'token': user1['token'], 
                             'u_id': user1['auth_user_id']})
-    assert user_profile.status_code == 200
+    assert user_profile.status_code == STATUS_OK
     profile = user_profile.json()
 
     assert profile['user']['u_id'] == user1['auth_user_id']
@@ -55,7 +56,7 @@ def test_user_profile_working(clear_register_two):
     user_profile = requests.get(config.url + 'user/profile/v1', 
                     params={'token': user2['token'], 
                             'u_id': user2['auth_user_id']})
-    assert user_profile.status_code == 200
+    assert user_profile.status_code == STATUS_OK
     profile = user_profile.json()
 
     assert profile['user']['u_id'] == user2['auth_user_id']
@@ -78,30 +79,30 @@ def test_profile_bad_token_input(clear_register):
     user_json = clear_register
     user_profile = requests.get(config.url + 'user/profile/v1', 
                     params={'token': 'bad_token', 'u_id': user_json['auth_user_id']})
-    assert user_profile.status_code == 403
+    assert user_profile.status_code == STATUS_ACCESS_ERR
 
     # tesing with a bad token as int
     user_profile = requests.get(config.url + 'user/profile/v1', 
                     params={'token': 4444, 'u_id': user_json['auth_user_id']})
-    assert user_profile.status_code == 400
+    assert user_profile.status_code == STATUS_INPUT_ERR
 
     # tesing with a bad token as bool
     user_profile = requests.get(config.url + 'user/profile/v1', 
                     params={'token': True, 'u_id': user_json['auth_user_id']})
-    assert user_profile.status_code == 400
+    assert user_profile.status_code == STATUS_INPUT_ERR
 
     # tesing with a bad token as an empty string
     user_profile = requests.get(config.url + 'user/profile/v1', 
                     params={'token': '', 'u_id': user_json['auth_user_id']})
-    assert user_profile.status_code == 400
+    assert user_profile.status_code == STATUS_INPUT_ERR
 
     user_profile = requests.get(config.url + 'user/profile/v1', 
-                    params={'token': expired_token, 'u_id': user_json['auth_user_id']})
-    assert user_profile.status_code == 403
+                    params={'token': EXPIRED_TOKEN, 'u_id': user_json['auth_user_id']})
+    assert user_profile.status_code == STATUS_ACCESS_ERR
 
     user_profile = requests.get(config.url + 'user/profile/v1', 
-                    params={'token': unsaved_token, 'u_id': user_json['auth_user_id']})
-    assert user_profile.status_code == 403
+                    params={'token': UNSAVED_TOKEN, 'u_id': user_json['auth_user_id']})
+    assert user_profile.status_code == STATUS_ACCESS_ERR
 
 @pytest.mark.usefixtures('clear_register')
 def test_profile_bad_u_id_input(clear_register):
@@ -116,31 +117,31 @@ def test_profile_bad_u_id_input(clear_register):
     # tesing with a bad id as an int
     user_profile = requests.get(config.url + 'user/profile/v1', 
                     params={'token': user_json['token'], 'u_id': 100})
-    assert user_profile.status_code == 400
+    assert user_profile.status_code == STATUS_INPUT_ERR
 
     # tesing with a bad id as a negative int
     user_profile = requests.get(config.url + 'user/profile/v1', 
                     params={'token': user_json['token'], 'u_id': -100})
-    assert user_profile.status_code == 400
+    assert user_profile.status_code == STATUS_INPUT_ERR
     
     # tesing with a bad user_id as bool
     user_profile = requests.get(config.url + 'user/profile/v1', 
                     params={'token': user_json['token'], 'u_id': True})
-    assert user_profile.status_code == 400
+    assert user_profile.status_code == STATUS_INPUT_ERR
 
     # tesing with a bad user_id as bool
     user_profile = requests.get(config.url + 'user/profile/v1', 
                     params={'token': user_json['token'], 'u_id': False})
-    assert user_profile.status_code == 400
+    assert user_profile.status_code == STATUS_INPUT_ERR
 
     # tesing with a bad user_id as an empty string
     user_profile = requests.get(config.url + 'user/profile/v1', 
                     params={'token': user_json['token'], 'u_id': ''})
-    assert user_profile.status_code == 400
+    assert user_profile.status_code == STATUS_INPUT_ERR
 
     # tesing with a bad user_id as a string
     user_profile = requests.get(config.url + 'user/profile/v1', 
                     params={'token': user_json['token'], 'u_id': 'bad_user_id'})
-    assert user_profile.status_code == 400
+    assert user_profile.status_code == STATUS_INPUT_ERR
 
 requests.delete(config.url + 'clear/v1')

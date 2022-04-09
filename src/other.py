@@ -27,7 +27,7 @@ from src.token import token_valid_check, token_get_user_id
 
 from src.data_store import data_store
 
-from src.global_vars import new_id, reset_id
+from src.global_vars import new_id, reset_id, GLOBAL_OWNER
 
 def clear_v1():
     """
@@ -158,7 +158,7 @@ def check_user_is_global_owner(auth_user_id):
 
     store = data_store.get()
     for user in store['users']:
-        if user['id'] == auth_user_id and user['perm_id'] == 1:
+        if user['id'] == auth_user_id and user['perm_id'] == GLOBAL_OWNER:
             return True
     return False
 
@@ -210,10 +210,10 @@ def get_messages(auth_user_id, data, start, data_str):
 
     # grab the correct members key depending on if messages are being returned
     # from channel or dm data
-    if data_str == "channel":
-        key = "all_members"
-    elif data_str == "dm":
-        key = "members"
+    if data_str == 'channel':
+        key = 'all_members'
+    elif data_str == 'dm':
+        key = 'members'
 
     # check whether given user is in the given channel
     if check_user_is_member(auth_user_id, data, key) is None:
@@ -358,7 +358,7 @@ def send_message(token, data_id, message, data_str):
         'message_id': message_id, 
         'u_id': auth_user_id, 
         'message': message, 
-        'time_sent': utc_timestamp,
+        'time_sent': int(utc_timestamp),
         'reacts': [{
             'react_id': 1,
             'u_ids': [],

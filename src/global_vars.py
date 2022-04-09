@@ -9,16 +9,23 @@ Description: global variables and functions used across files
 
 import jwt
 
-key = 'hotpot'
-algorithm = 'HS256'
+KEY = 'hotpot'
+ALOGRITHM = 'HS256'
 
 # an expired, unsaved token
-expired_token = jwt.encode({'id': 44, 'session_id': 200, 'handle': 'firstlast',
-                            'exp': 1448474355}, key, algorithm=algorithm)
+EXPIRED_TOKEN = jwt.encode({'id': 44, 'session_id': 200, 'handle': 'firstlast',
+                            'exp': 1448474355}, KEY, algorithm=ALOGRITHM)
 
 # an unexpired, unsaved token
-unsaved_token = jwt.encode({'id': 44, 'session_id': 200, 'handle': 'firstlast',
-                            'exp': 2548474355}, key, algorithm=algorithm)
+UNSAVED_TOKEN = jwt.encode({'id': 44, 'session_id': 200, 'handle': 'firstlast',
+                            'exp': 2548474355}, KEY, algorithm=ALOGRITHM)
+
+STATUS_OK = 200
+STATUS_INPUT_ERR = 400
+STATUS_ACCESS_ERR = 403
+
+GLOBAL_OWNER = 1
+USER = 2
 
 DM_ID_COUNTER = 0
 MESSAGE_ID_COUNTER = 0

@@ -15,7 +15,8 @@ import requests
 
 from src import config
 
-from src.global_vars import expired_token, unsaved_token
+from src.global_vars import EXPIRED_TOKEN, UNSAVED_TOKEN, STATUS_OK, \
+                            STATUS_INPUT_ERR, STATUS_ACCESS_ERR
 
 @pytest.mark.usefixtures('clear_register_two_createchannel')
 def test_channel_leave_works(clear_register_two_createchannel):
@@ -32,13 +33,13 @@ def test_channel_leave_works(clear_register_two_createchannel):
     # User2 joins the channel (now a all_member)
     join_2 = requests.post(config.url + 'channel/join/v2',
                         json={'token': user2_token, 'channel_id': channel_id})
-    assert join_2.status_code == 200
+    assert join_2.status_code == STATUS_OK
     
     # Get the channel information.
     channel_details = requests.get(config.url + 'channel/details/v2', 
                           params = {'token': user1_token, 
                                     'channel_id': channel_id})
-    assert channel_details.status_code == 200
+    assert channel_details.status_code == STATUS_OK
     channel_json = channel_details.json()
 
     # Assert user2 has joined the channel.
@@ -49,13 +50,13 @@ def test_channel_leave_works(clear_register_two_createchannel):
     channel_leave = requests.post(config.url + 'channel/leave/v1', 
                             json={'token': user2_token, 
                                   'channel_id': channel_id})
-    assert channel_leave.status_code == 200
+    assert channel_leave.status_code == STATUS_OK
 
     # Get the channel information again.
     channel_details = requests.get(config.url + 'channel/details/v2', 
                           params = {'token': user1_token, 
                                     'channel_id': channel_id})
-    assert channel_details.status_code == 200
+    assert channel_details.status_code == STATUS_OK
     channel_json = channel_details.json()
 
     # Assert user2 has left the channel.
@@ -75,7 +76,7 @@ def test_channel_leave_unknown_user(clear_register_two_createchannel):
     channel_leave = requests.post(config.url + 'channel/leave/v1', 
                             json={'token': user2_token, 
                                   'channel_id': channel_id})
-    assert channel_leave.status_code == 403
+    assert channel_leave.status_code == STATUS_ACCESS_ERR
 
 @pytest.mark.usefixtures('clear_register_createchannel')
 def test_channel_leave_invalid_channel_id(clear_register_createchannel):
@@ -87,22 +88,22 @@ def test_channel_leave_invalid_channel_id(clear_register_createchannel):
     # Incorrect channel id
     channel_leave = requests.post(config.url + 'channel/leave/v1', 
                             json={'token': token, 'channel_id': 444})
-    assert channel_leave.status_code == 400
+    assert channel_leave.status_code == STATUS_INPUT_ERR
 
     # Incorrect channel id, empty string
     channel_leave = requests.post(config.url + 'channel/leave/v1', 
                             json={'token': token, 'channel_id': ''})
-    assert channel_leave.status_code == 400
+    assert channel_leave.status_code == STATUS_INPUT_ERR
 
     # Incorrect channel id as bool
     channel_leave = requests.post(config.url + 'channel/leave/v1', 
                             json={'token': token, 'channel_id': True})
-    assert channel_leave.status_code == 400
+    assert channel_leave.status_code == STATUS_INPUT_ERR
 
     # Incorrect channel id as negative number
     channel_leave = requests.post(config.url + 'channel/leave/v1', 
                             json={'token': token, 'channel_id': -1})
-    assert channel_leave.status_code == 400
+    assert channel_leave.status_code == STATUS_INPUT_ERR
 
 @pytest.mark.usefixtures('clear_register_createchannel')
 def test_channel_leave_invalid_token(clear_register_createchannel):
@@ -110,31 +111,31 @@ def test_channel_leave_invalid_token(clear_register_createchannel):
 
     channel_id = clear_register_createchannel[1]
     channel_leave = requests.post(config.url + 'channel/leave/v1', 
-                            json={'token': expired_token, 'channel_id': channel_id})
-    assert channel_leave.status_code == 403
+                            json={'token': EXPIRED_TOKEN, 'channel_id': channel_id})
+    assert channel_leave.status_code == STATUS_ACCESS_ERR
 
     channel_leave = requests.post(config.url + 'channel/leave/v1', 
-                            json={'token': unsaved_token, 'channel_id': channel_id})
-    assert channel_leave.status_code == 403
+                            json={'token': UNSAVED_TOKEN, 'channel_id': channel_id})
+    assert channel_leave.status_code == STATUS_ACCESS_ERR
 
     # Input Error token int
     channel_leave = requests.post(config.url + 'channel/leave/v1', 
                             json={'token': 4444, 'channel_id': channel_id})
-    assert channel_leave.status_code == 400
+    assert channel_leave.status_code == STATUS_INPUT_ERR
 
     # Input error token bool
     channel_leave = requests.post(config.url + 'channel/leave/v1', 
                             json={'token': True, 'channel_id': channel_id})
-    assert channel_leave.status_code == 400
+    assert channel_leave.status_code == STATUS_INPUT_ERR
 
     # Input error token empty string
     channel_leave = requests.post(config.url + 'channel/leave/v1', 
                             json={'token': '', 'channel_id': channel_id})
-    assert channel_leave.status_code == 400
+    assert channel_leave.status_code == STATUS_INPUT_ERR
 
     # Input error token empty string
     channel_leave = requests.post(config.url + 'channel/leave/v1', 
                             json={'token': 'bad_token', 'channel_id': channel_id})
-    assert channel_leave.status_code == 403
+    assert channel_leave.status_code == STATUS_ACCESS_ERR
 
 requests.delete(config.url + 'clear/v1')

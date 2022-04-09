@@ -13,7 +13,8 @@ import requests
 
 from src import config
 
-from src.global_vars import expired_token, unsaved_token
+from src.global_vars import EXPIRED_TOKEN, UNSAVED_TOKEN, STATUS_OK, \
+                            STATUS_INPUT_ERR, STATUS_ACCESS_ERR
 
 @pytest.mark.usefixtures('clear_register_two_createchannel')
 def test_channels_list_working(clear_register_two_createchannel):
@@ -34,46 +35,46 @@ def test_channels_list_working(clear_register_two_createchannel):
     channel2 = requests.post(config.url + 'channels/create/v2', 
                             json={'token': user1_token, 'name': 'channel_name2', 
                                   'is_public': True})
-    assert channel2.status_code == 200
+    assert channel2.status_code == STATUS_OK
     channel2_json = channel2.json()
 
     # create channel3 (Private)
     channel3 = requests.post(config.url + 'channels/create/v2', 
                             json={'token': user1_token, 
                                 'name': 'private_channel1', 'is_public': False})
-    assert channel3.status_code == 200
+    assert channel3.status_code == STATUS_OK
     channel3_json = channel3.json()
 
     # Create channel4 for user2 (Public)
     channel4 = requests.post(config.url + 'channels/create/v2', 
                             json={'token': user2_token, 
                                 'name': 'test_pub_channel', 'is_public': True})
-    assert channel4.status_code == 200
+    assert channel4.status_code == STATUS_OK
     channel4_json = channel4.json()
 
     # Create channel5 for user2 (Private)
     channel5 = requests.post(config.url + 'channels/create/v2', 
                             json={'token': user2_token, 
                                 'name': 'test_pri_channel', 'is_public': False})
-    assert channel5.status_code == 200
+    assert channel5.status_code == STATUS_OK
     channel5_json = channel5.json()
 
 
     # User2 joins user1's first channels
     join = requests.post(config.url + 'channel/join/v2',
                         json={'token': user2_token, 'channel_id': channel_id1})
-    assert join.status_code == 200   
+    assert join.status_code == STATUS_OK   
 
     # Channel_list for user 1.
     channels = requests.get(config.url + 'channels/list/v2', 
                                 params = {'token': user1_token})
-    assert channels.status_code == 200
+    assert channels.status_code == STATUS_OK
     channels_list = channels.json()
 
     # Channel_list2 for user2. Test if it interefere's with user1's list.
     channels2 = requests.get(config.url + 'channels/list/v2', 
                                     params = {'token': user2_token})
-    assert channels2.status_code == 200
+    assert channels2.status_code == STATUS_OK
     channels_list2 = channels2.json()
 
     # Check that the channel_list info matches what was created.
@@ -125,37 +126,37 @@ def test_channels_list_invalid_token(clear_register_createchannel):
     # passing incorrect string as token.
     channels_list_json = requests.get(config.url + 'channels/list/v2', 
                                         params = {'token': 'SomeWordsHere'})
-    assert channels_list_json.status_code == 403 # AccessError
+    assert channels_list_json.status_code == STATUS_ACCESS_ERR # AccessError
 
     # passing incorrect string as token.
     channels_list_json = requests.get(config.url + 'channels/list/v2', 
                                         params = {'token': ''})
-    assert channels_list_json.status_code == 400 
+    assert channels_list_json.status_code == STATUS_INPUT_ERR 
 
     # passing int as a token.
     channels_list_json = requests.get(config.url + 'channels/list/v2', 
                                         params = {'token': 4444})
-    assert channels_list_json.status_code == 400
+    assert channels_list_json.status_code == STATUS_INPUT_ERR
 
     channels_list_json = requests.get(config.url + 'channels/list/v2', 
                                         params = {'token': -1})
-    assert channels_list_json.status_code == 400
+    assert channels_list_json.status_code == STATUS_INPUT_ERR
     # passing a True bool as a token
     channels_list_json = requests.get(config.url + 'channels/list/v2', 
                                         params = {'token': True})
-    assert channels_list_json.status_code == 400
+    assert channels_list_json.status_code == STATUS_INPUT_ERR
 
     # passing a False bool as a token
     channels_list_json = requests.get(config.url + 'channels/list/v2', 
                                         params = {'token': False})
-    assert channels_list_json.status_code == 400
+    assert channels_list_json.status_code == STATUS_INPUT_ERR
 
     channels_list_json = requests.get(config.url + 'channels/list/v2', 
-                                        params = {'token': expired_token})
-    assert channels_list_json.status_code == 403
+                                        params = {'token': EXPIRED_TOKEN})
+    assert channels_list_json.status_code == STATUS_ACCESS_ERR
 
     channels_list_json = requests.get(config.url + 'channels/list/v2', 
-                                        params = {'token': unsaved_token})
-    assert channels_list_json.status_code == 403
+                                        params = {'token': UNSAVED_TOKEN})
+    assert channels_list_json.status_code == STATUS_ACCESS_ERR
 
 requests.delete(config.url + 'clear/v1')

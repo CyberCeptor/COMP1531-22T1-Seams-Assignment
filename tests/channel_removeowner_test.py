@@ -16,7 +16,8 @@ import requests
 
 from src import config
 
-from src.global_vars import expired_token, unsaved_token
+from src.global_vars import EXPIRED_TOKEN, UNSAVED_TOKEN, STATUS_OK, \
+                            STATUS_INPUT_ERR, STATUS_ACCESS_ERR
 
 @pytest.mark.usefixtures('clear_register_two_createchannel_twoowners')
 def test_channel_removeowner_working(clear_register_two_createchannel_twoowners):
@@ -35,19 +36,19 @@ def test_channel_removeowner_working(clear_register_two_createchannel_twoowners)
     remove = requests.post(config.url + 'channel/removeowner/v1', 
                         json={'token': user2_token, 'channel_id': channel_id, 
                               'u_id': user2_id})
-    assert remove.status_code == 200
+    assert remove.status_code == STATUS_OK
 
     # add user2 to be an owner, with user1's token as they are owner_member
     addowner = requests.post(config.url + 'channel/addowner/v1',
                         json={'token': user1_token, 'channel_id': channel_id, 
                               'u_id': user2_id})
-    assert addowner.status_code == 200
+    assert addowner.status_code == STATUS_OK
 
     # user2 being removed as owner_member with user1's token
     remove = requests.post(config.url + 'channel/removeowner/v1', 
                         json={'token': user1_token, 'channel_id': channel_id, 
                               'u_id': user2_id})
-    assert remove.status_code == 200
+    assert remove.status_code == STATUS_OK
 
     # check the data in the channel is correct
     channels_details = requests.get(config.url + 'channel/details/v2', 
@@ -84,7 +85,7 @@ def test_channel_removeowner_permission_id(clear_register_two_createchannel_twoo
     addowner = requests.post(config.url + 'channel/removeowner/v1',
                         json={'token': user2_token, 'channel_id': channel_id, 
                               'u_id': user2_id})
-    assert addowner.status_code == 200
+    assert addowner.status_code == STATUS_OK
 
     # create user3 and set them as an owner_member of the channel
     user3 = requests.post(config.url + 'auth/register/v2', 
@@ -98,31 +99,31 @@ def test_channel_removeowner_permission_id(clear_register_two_createchannel_twoo
     channel_join = requests.post(config.url + 'channel/join/v2',
                         json={'token': user3_token,
                         'channel_id': channel_id})
-    assert channel_join.status_code == 200
+    assert channel_join.status_code == STATUS_OK
 
     # add user3 to be an owner, with user1's token as they are owner_member
     addowner = requests.post(config.url + 'channel/addowner/v1',
                         json={'token': user1_token, 'channel_id': channel_id, 
                               'u_id': user3_id})
-    assert addowner.status_code == 200
+    assert addowner.status_code == STATUS_OK
 
     # user2 cant remove user1 as they are not a global member or an owner_member
     removeowner = requests.post(config.url + 'channel/removeowner/v1',
                         json={'token': user2_token, 'channel_id': channel_id, 
                               'u_id': user1_id})
-    assert removeowner.status_code == 403
+    assert removeowner.status_code == STATUS_ACCESS_ERR
 
     # setting user2 to global owner
     global_perm = requests.post(config.url + 'admin/userpermission/change/v1', 
                         json={'token': user1_token, 'u_id': user2_id, 
                               'permission_id': 1})
-    assert global_perm.status_code == 200
+    assert global_perm.status_code == STATUS_OK
 
     # user2 can now remove user3 as they are not a owner_member, but are a global owner
     addowner = requests.post(config.url + 'channel/removeowner/v1',
                         json={'token': user2_token, 'channel_id': channel_id, 
                               'u_id': user1_id})
-    assert addowner.status_code == 200
+    assert addowner.status_code == STATUS_OK
 
 @pytest.mark.usefixtures('clear_register_two_createchannel_twoowners')
 def test_channel_removeowner_not_an_owner(clear_register_two_createchannel_twoowners):
@@ -140,7 +141,7 @@ def test_channel_removeowner_not_an_owner(clear_register_two_createchannel_twoow
     remove = requests.post(config.url + 'channel/removeowner/v1', 
                         json={'token': user1_token, 'channel_id': channel_id, 
                               'u_id': user2_id})
-    assert remove.status_code == 200
+    assert remove.status_code == STATUS_OK
 
     # Test that user2 is still an all_members member.
     channels_details = requests.get(config.url + 'channel/details/v2', 
@@ -158,7 +159,7 @@ def test_channel_removeowner_not_an_owner(clear_register_two_createchannel_twoow
     remove = requests.post(config.url + 'channel/removeowner/v1', 
                         json={'token': user1_token, 'channel_id': channel_id, 
                               'u_id': user2_id})
-    assert remove.status_code == 400
+    assert remove.status_code == STATUS_INPUT_ERR
 
 @pytest.mark.usefixtures('clear_register_two_createchannel_twoowners')
 def test_channel_removeowner_only_owner_member(clear_register_two_createchannel_twoowners):
@@ -178,13 +179,13 @@ def test_channel_removeowner_only_owner_member(clear_register_two_createchannel_
     remove = requests.post(config.url + 'channel/removeowner/v1', 
                         json={'token': user1_token, 'channel_id': channel_id, 
                               'u_id': user2_id})
-    assert remove.status_code == 200
+    assert remove.status_code == STATUS_OK
 
     # User1 is the only owner Here.
     remove = requests.post(config.url + 'channel/removeowner/v1', 
                         json={'token': user1_token, 'channel_id': channel_id, 
                               'u_id': user1_id})
-    assert remove.status_code == 400
+    assert remove.status_code == STATUS_INPUT_ERR
 
 @pytest.mark.usefixtures('clear_register_two_createchannel_twoowners')
 # Channel ID is valid, Token is not authorised with owner permissions.
@@ -209,14 +210,14 @@ def test_channel_removeowner_not_authorised(clear_register_two_createchannel_two
     channel_join = requests.post(config.url + 'channel/join/v2',
                         json={'token': user3_token,
                         'channel_id': channel_id})
-    assert channel_join.status_code == 200
+    assert channel_join.status_code == STATUS_OK
 
     # Using user3's token to try and remove user2 as an owner
     # user3 is only a member, NOT an owner.
     remove = requests.post(config.url + 'channel/removeowner/v1', 
                         json={'token': user3_token, 'channel_id': channel_id, 
                               'u_id': user2_id})
-    assert remove.status_code == 403
+    assert remove.status_code == STATUS_ACCESS_ERR
 
 @pytest.mark.usefixtures('clear_register_two_createchannel_twoowners')
 def test_channel_removeowner_bad_channel_id(clear_register_two_createchannel_twoowners):
@@ -233,27 +234,27 @@ def test_channel_removeowner_bad_channel_id(clear_register_two_createchannel_two
     remove = requests.post(config.url + 'channel/removeowner/v1', 
                         json={'token': user2_token, 'channel_id': '', 
                               'u_id': user2_id})
-    assert remove.status_code == 400
+    assert remove.status_code == STATUS_INPUT_ERR
 
     remove = requests.post(config.url + 'channel/removeowner/v1', 
                         json={'token': user2_token, 
                             'channel_id': 'bad_channel_id', 'u_id': user2_id})
-    assert remove.status_code == 400
+    assert remove.status_code == STATUS_INPUT_ERR
 
     remove = requests.post(config.url + 'channel/removeowner/v1', 
                         json={'token': user2_token, 'channel_id': 444, 
                               'u_id': user2_id})
-    assert remove.status_code == 400
+    assert remove.status_code == STATUS_INPUT_ERR
 
     remove = requests.post(config.url + 'channel/removeowner/v1', 
                         json={'token': user2_token, 'channel_id': -1,  
                               'u_id': user2_id})
-    assert remove.status_code == 400
+    assert remove.status_code == STATUS_INPUT_ERR
 
     remove = requests.post(config.url + 'channel/removeowner/v1', 
                         json={'token': user2_token, 'channel_id': True, 
                               'u_id': user2_id})
-    assert remove.status_code == 400
+    assert remove.status_code == STATUS_INPUT_ERR
 
 @pytest.mark.usefixtures('clear_register_two_createchannel_twoowners')
 def test_channel_removeowner_bad_user_id(clear_register_two_createchannel_twoowners):
@@ -279,34 +280,34 @@ def test_channel_removeowner_bad_user_id(clear_register_two_createchannel_twoown
     remove = requests.post(config.url + 'channel/removeowner/v1', 
                         json={'token': user1_token, 'channel_id': channel_id, 
                               'u_id': ''})
-    assert remove.status_code == 400
+    assert remove.status_code == STATUS_INPUT_ERR
 
     remove = requests.post(config.url + 'channel/removeowner/v1', 
                         json={'token': user1_token, 'channel_id': channel_id, 
                               'u_id': 'string'})
-    assert remove.status_code == 400
+    assert remove.status_code == STATUS_INPUT_ERR
 
     remove = requests.post(config.url + 'channel/removeowner/v1', 
                         json={'token': user1_token, 'channel_id': channel_id, 
                               'u_id': 444})
-    assert remove.status_code == 400
+    assert remove.status_code == STATUS_INPUT_ERR
 
     remove = requests.post(config.url + 'channel/removeowner/v1', 
                         json={'token': user1_token, 'channel_id': channel_id, 
                               'u_id': -1})
-    assert remove.status_code == 400
+    assert remove.status_code == STATUS_INPUT_ERR
 
     remove = requests.post(config.url + 'channel/removeowner/v1', 
                         json={'token': user1_token, 'channel_id': channel_id, 
                               'u_id': True})
-    assert remove.status_code == 400
+    assert remove.status_code == STATUS_INPUT_ERR
 
     # Using an user_id of a user who isnt in the channel, (NOT in all_members or
     # owner_members).
     remove = requests.post(config.url + 'channel/removeowner/v1', 
                         json={'token': user1_token, 'channel_id': channel_id, 
                               'u_id': user3_id})
-    assert remove.status_code == 400
+    assert remove.status_code == STATUS_INPUT_ERR
 
 @pytest.mark.usefixtures('clear_register_two_createchannel_twoowners')
 def test_channel_removeowner_bad_token(clear_register_two_createchannel_twoowners):
@@ -326,36 +327,36 @@ def test_channel_removeowner_bad_token(clear_register_two_createchannel_twoowner
     remove = requests.post(config.url + 'channel/removeowner/v1', 
                         json={'token': '', 'channel_id': channel_id,
                               'u_id': user2_id})
-    assert remove.status_code == 400
+    assert remove.status_code == STATUS_INPUT_ERR
 
     remove = requests.post(config.url + 'channel/removeowner/v1', 
                         json={'token': 'string', 'channel_id': channel_id, 
                               'u_id': user2_id})
-    assert remove.status_code == 403
+    assert remove.status_code == STATUS_ACCESS_ERR
 
     remove = requests.post(config.url + 'channel/removeowner/v1', 
                         json={'token': 444, 'channel_id': channel_id, 
                               'u_id': user2_id})
-    assert remove.status_code == 400
+    assert remove.status_code == STATUS_INPUT_ERR
 
     remove = requests.post(config.url + 'channel/removeowner/v1', 
                         json={'token': -1, 'channel_id': channel_id, 
                               'u_id': user2_id})
-    assert remove.status_code == 400
+    assert remove.status_code == STATUS_INPUT_ERR
 
     remove = requests.post(config.url + 'channel/removeowner/v1', 
                         json={'token': True, 'channel_id': channel_id, 
                               'u_id': user2_id})
-    assert remove.status_code == 400
+    assert remove.status_code == STATUS_INPUT_ERR
 
     remove = requests.post(config.url + 'channel/removeowner/v1', 
-                        json={'token': expired_token, 'channel_id': channel_id, 
+                        json={'token': EXPIRED_TOKEN, 'channel_id': channel_id, 
                               'u_id': user2_id})
-    assert remove.status_code == 403
+    assert remove.status_code == STATUS_ACCESS_ERR
 
     remove = requests.post(config.url + 'channel/removeowner/v1', 
-                        json={'token': unsaved_token, 'channel_id': channel_id, 
+                        json={'token': UNSAVED_TOKEN, 'channel_id': channel_id, 
                               'u_id': user2_id})
-    assert remove.status_code == 403
+    assert remove.status_code == STATUS_ACCESS_ERR
 
 requests.delete(config.url + 'clear/v1')
