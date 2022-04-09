@@ -39,24 +39,28 @@ def test_message_edit_invalid_token(clear_register_two_createchanneldm_sendmsg):
     resp2 = requests.put(config.url + 'message/edit/v1', 
                           json={'token': '', 'message_id': message_id, 
                                 'message': 'hewwo'})
+ 
     assert resp2.status_code == STATUS_INPUT_ERR
 
     # wrong token input
     resp3 = requests.put(config.url + 'message/edit/v1', 
                           json={'token': 'str', 'message_id': message_id, 
                                 'message': 'hewwo'})
+ 
     assert resp3.status_code == STATUS_ACCESS_ERR
 
     # expired token
     resp4 = requests.put(config.url + 'message/edit/v1', 
                          json={'token': EXPIRED_TOKEN, 'message_id': message_id,
                                'message': 'hewwo'})
+ 
     assert resp4.status_code == STATUS_ACCESS_ERR
 
     # unsaved token
     resp5 = requests.put(config.url + 'message/edit/v1', 
                          json={'token': UNSAVED_TOKEN, 'message_id': message_id,
                                'message': 'hewwo'})
+ 
     assert resp5.status_code == STATUS_ACCESS_ERR
     
 @pytest.mark.usefixtures('clear_register_two_createchanneldm_sendmsg')
@@ -69,29 +73,34 @@ def test_message_edit_invalid_message_id(clear_register_two_createchanneldm_send
     resp0 = requests.put(config.url + 'message/edit/v1', 
                           json={'token': token, 'message_id': '', 
                                 'message': 'hewwo'})
+ 
     assert resp0.status_code == STATUS_INPUT_ERR
 
     # message id is bool
     resp1 = requests.put(config.url + 'message/edit/v1', 
                           json={'token': token, 'message_id': True,
                                 'message': 'hewwo'})
+ 
     assert resp1.status_code == STATUS_INPUT_ERR
 
     # message id is string
     resp2 = requests.put(config.url + 'message/edit/v1', 
                           json={'token': token, 'message_id': 'str', 
                                 'message': 'hewwo'})
+ 
     assert resp2.status_code == STATUS_INPUT_ERR
 
     # non-existent message ids
     resp3 = requests.put(config.url + 'message/edit/v1', 
                           json={'token': token, 'message_id': -1, 
                                 'message': 'hewwo'})
+ 
     assert resp3.status_code == STATUS_INPUT_ERR
 
     resp4 = requests.put(config.url + 'message/edit/v1', 
                           json={'token': token, 'message_id': 100, 
                                 'message': 'hewwo'})
+ 
     assert resp4.status_code == STATUS_INPUT_ERR
 
 @pytest.mark.usefixtures('clear_register_two_createchanneldm_sendmsg')
@@ -105,12 +114,14 @@ def test_message_edit_invalid_message(clear_register_two_createchanneldm_sendmsg
     resp0 = requests.put(config.url + 'message/edit/v1', 
                           json={'token': token, 'message_id': message_id, 
                                 'message': 0})
+ 
     assert resp0.status_code == STATUS_INPUT_ERR
 
     # message is bool
     resp1 = requests.put(config.url + 'message/edit/v1', 
                           json={'token': token, 'message_id': message_id, 
                                 'message': True})
+ 
     assert resp1.status_code == STATUS_INPUT_ERR
 
 @pytest.mark.usefixtures('clear_register_two_createchanneldm_sendmsg')
@@ -142,6 +153,7 @@ def test_message_send_invalid_length(clear_register_two_createchanneldm_sendmsg)
     resp1 = requests.put(config.url + 'message/edit/v1', 
                           json={'token': token, 'message_id': message_id, 
                           'message': long_message})
+ 
     assert resp1.status_code == STATUS_INPUT_ERR
 
 @pytest.mark.usefixtures('clear_register_two_createchanneldm_sendmsg')
@@ -170,6 +182,7 @@ def test_message_edit_different_message(clear_register_two_createchanneldm_sendm
     resp = requests.put(config.url + 'message/edit/v1', 
                           json={'token': token_1, 'message_id': message_id_2, 
                                 'message': 'attempt'})
+ 
     assert resp.status_code == STATUS_ACCESS_ERR
 
 @pytest.mark.usefixtures('clear_register_two_createchanneldm_sendmsg')
@@ -189,6 +202,7 @@ def test_message_sent_not_belong_to_user(clear_register_two_createchanneldm_send
     resp = requests.put(config.url + 'message/edit/v1', 
                           json={'token': token_2, 'message_id': message_id, 
                           'message': 'attempt'})
+ 
     assert resp.status_code == STATUS_ACCESS_ERR # raise access error
 
 @pytest.mark.usefixtures('clear_register_two_createchanneldm_sendmsg')
@@ -217,12 +231,14 @@ def test_successful_message_edit_owner(clear_register_two_createchanneldm_sendms
     resp = requests.put(config.url + 'message/edit/v1', 
                           json={'token': token_1, 'message_id': message_id_2, 
                           'message': 'attempt'})
+ 
     assert resp.status_code == STATUS_OK
 
     # successful edit when user 2 tries to edit user2's message
     resp1 = requests.put(config.url + 'message/edit/v1', 
                           json={'token': token_2, 'message_id': message_id_2, 
                           'message': 'attempt'})
+ 
     assert resp1.status_code == STATUS_OK
 
 @pytest.mark.usefixtures('clear_register_two_createchanneldm_sendmsg')
@@ -260,11 +276,13 @@ def test_successful_message_edit_global_owner(\
     resp = requests.put(config.url + 'message/edit/v1', 
                           json={'token': token_1, 'message_id': message_id_2,
                           'message': 'edit'})
+ 
     assert resp.status_code == STATUS_OK
 
     resp = requests.put(config.url + 'message/edit/v1', 
                           json={'token': token_1, 'message_id': message_id_2,
                           'message': ''})
+ 
     assert resp.status_code == STATUS_OK
     
 @pytest.mark.usefixtures('clear_register_two_createchanneldm_sendmsg')
@@ -279,24 +297,28 @@ def test_message_edit_empty(clear_register_two_createchanneldm_sendmsg):
     resp = requests.put(config.url + 'message/edit/v1', 
                           json={'token': token, 'message_id': chan_message_id, 
                           'message': ''})
+ 
     assert resp.status_code == STATUS_OK
 
     # message will no longer exist
     resp = requests.put(config.url + 'message/edit/v1', 
                           json={'token': token, 'message_id': chan_message_id, 
                           'message': 'hewwo'})
+ 
     assert resp.status_code == STATUS_INPUT_ERR
 
     # test dm case
     resp = requests.put(config.url + 'message/edit/v1', 
                           json={'token': token, 'message_id': dm_message_id, 
                           'message': ''})
+ 
     assert resp.status_code == STATUS_OK
 
     # message will no longer exist
     resp = requests.put(config.url + 'message/edit/v1', 
                           json={'token': token, 'message_id': dm_message_id, 
                           'message': 'hewwo'})
+ 
     assert resp.status_code == STATUS_INPUT_ERR
 
 @pytest.mark.usefixtures('clear_register_two_createchanneldm_sendmsg')
@@ -311,6 +333,7 @@ def test_dm_successful_message_edit_by_user(clear_register_two_createchanneldm_s
     resp = requests.put(config.url + 'message/edit/v1', 
                           json={'token': token_2, 'message_id': message_id, 
                           'message': 'edit'})
+ 
     assert resp.status_code == STATUS_OK
 
 @pytest.mark.usefixtures('clear_register_two_createchanneldm_sendmsg')
@@ -324,6 +347,7 @@ def test_dm_successful_message_edit_by_owner(clear_register_two_createchanneldm_
     resp = requests.put(config.url + 'message/edit/v1', 
                           json = {'token': token_1, 'message_id': message_id,
                           'message': 'edit'})
+ 
     assert resp.status_code == STATUS_OK
 
 @pytest.mark.usefixtures('clear_register_two_createchanneldm_sendmsg')
@@ -337,6 +361,7 @@ def test_dm_fail_message_edit(clear_register_two_createchanneldm_sendmsg):
     user3 = requests.post(config.url + 'auth/register/v2', 
                   json={'email': 'iii@def.com', 'password': 'password',
                         'name_first': 'first3', 'name_last': 'last3'})
+ 
     assert user3.status_code == STATUS_OK
     user_3 = user3.json()
 
@@ -345,6 +370,7 @@ def test_dm_fail_message_edit(clear_register_two_createchanneldm_sendmsg):
                           json={'token': token_1,
                                 'dm_id': dm_id, 
                                 'message': 'hewwooooo'})
+ 
     assert send_message.status_code == STATUS_OK
     dm_message = send_message.json()
     message_id = dm_message['message_id']
@@ -353,12 +379,14 @@ def test_dm_fail_message_edit(clear_register_two_createchanneldm_sendmsg):
     resp = requests.put(config.url + 'message/edit/v1', 
                           json = {'token': token_2, 'message_id': message_id,
                           'message': 'edit'})
+ 
     assert resp.status_code == STATUS_ACCESS_ERR
 
     # raise access error when user 3 tries to edit user 1's message
     resp = requests.put(config.url + 'message/edit/v1', 
                           json = {'token': user_3['token'], 'message_id': message_id,
                           'message': 'edit'})
+ 
     assert resp.status_code == STATUS_ACCESS_ERR
 
 requests.delete(config.url + 'clear/v1')

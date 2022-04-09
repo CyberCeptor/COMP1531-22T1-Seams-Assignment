@@ -374,7 +374,7 @@ def search_v1(token, query_str):
     message_return = []
     for channel in store['channels']:
         for message_data in channel['messages']:
-            # account case insensitivity
+            # change everything in lower case,account case insensitivity
             if (query_str.lower() in message_data['message'].lower() and 
             check_user_is_member(user_id, channel, 'all_members') is not None):
                     message_return.append(message_data)
@@ -382,7 +382,7 @@ def search_v1(token, query_str):
     # checking dm case                
     for dm in store['dms']:
         for message_data in dm['messages']:
-            # account case insensitivity
+            # change everything in lower case, account case insensitivity
             if (query_str.lower() in message_data['message'].lower() and 
             check_user_is_member(user_id, dm, 'members') is not None):
                     message_return.append(message_data)
@@ -408,8 +408,6 @@ def message_react_v1(token, message_id, react_id):
     Return Value: N/A
     """
 
-    store = data_store.get()
-
     # check valid token
     token_valid_check(token)
     auth_user_id = token_get_user_id(token)
@@ -431,15 +429,88 @@ def message_react_v1(token, message_id, react_id):
         if check_user_is_member(auth_user_id, data, 'all_members') is None:
             raise AccessError(description='User does not exist in channel')
 
+    edit_react(auth_user_id, message_data, react_id, 'add')
+
+def edit_react(auth_user_id, message_data, react_id, option):
+    """
+    adds the user's react to the reacts for the given message
+
+    Arguments:
+        auth_user_id (int)  - an int specifying a user
+        message_data (dict) - data for the message being reacted to
+        react_id (int)      - an int specifying a react
+
+    Exceptions:
+        InputError  - Raised if 
+                        - react_id is not valid
+                        - message already contains the same react from the user
+
+    Return Value: N/A
+    """
+
+    store = data_store.get()
+
     # check if react_id is valid, right now only react id 1 is valid
     if react_id != 1 or type(react_id) is bool:
         raise InputError(description='Invalid react id')
 
-    # check if user has already reacted to this message with react id 1
-    if auth_user_id in message_data['reacts'][0]['u_ids']:
-        raise InputError(description='User has already reacted with this react')
+    if option == 'add':
+        # check if user has already reacted to this message with react id 1
+        if auth_user_id in message_data['reacts'][0]['u_ids']:
+            raise InputError(description='User has already reacted with this react')
 
-    # add the user id to the list of u_ids for react id 1
-    message_data['reacts'][0]['u_ids'].append(auth_user_id)
+        # add the user id to the list of u_ids for react id 1
+        message_data['reacts'][0]['u_ids'].append(auth_user_id)
+    
+    if option == 'remove':
+        # check if user has reacted to this specific message
+        if auth_user_id not in message_data['reacts'][0]['u_ids']:
+            raise InputError(description='User has no react to this message')
+
+        # add the user id to the list of u_ids for react id 1
+        message_data['reacts'][0]['u_ids'].remove(auth_user_id)
 
     data_store.set(store)
+
+def message_unreact_v1(token, message_id, react_id):
+    """
+    unreact to a specified message with a react id 1
+
+    Arguments:
+        token (str)      - a user's valid jwt token
+        message_id (int) - an int specifying a message sent in a channel or dm
+        react_id (int)   - an int specifying a react
+
+    Exceptions:
+        AccessError - Raised if user has no access to the specified message
+        InputError  - Raised if 
+                        - message_id is not valid
+                        - react_id is not valid
+                        - message has no react from the user
+
+    Return Value: N/A
+    """
+
+    # check valid token
+    token_valid_check(token)
+    auth_user_id = token_get_user_id(token)
+
+    # check input message_id is valid and return the message_data, if the 
+    # message was sent in a channel or dm, and the corresponding channel or dm 
+    # data
+    check_return = check_message_id_valid(message_id)
+    message_data = check_return[0]
+    in_channel = check_return[1]
+    data = check_return[2]
+
+    # if message is sent in dm
+    if in_channel is False:
+        # check if user is in dm
+        if check_user_is_member(auth_user_id, data, 'members') is None:
+            raise AccessError(description='User does not exist in dm')
+    else:
+        # if message was sent in a channel, check user is in channel
+        if check_user_is_member(auth_user_id, data, 'all_members') is None:
+            raise AccessError(description='User does not exist in channel')
+
+    edit_react(auth_user_id, message_data, react_id, 'remove')

@@ -147,6 +147,8 @@ def test_search_user_not_in_channel(clear_register_two_createchanneldm_sendmsg):
     msg_return = resp0.json()
     assert msg_return == []
 
+requests.delete(config.url + 'clear/v1')
+
 @pytest.mark.usefixtures('clear_register_two_createchannel')
 def test_search_case_insensitive(clear_register_two_createchannel):
     """ testing successful seach """

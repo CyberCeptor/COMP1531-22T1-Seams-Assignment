@@ -27,6 +27,10 @@ STATUS_ACCESS_ERR = 403
 GLOBAL_OWNER = 1
 USER = 2
 
+status_ok = 200
+status_input_err = 400
+status_access_err = 403
+
 DM_ID_COUNTER = 0
 MESSAGE_ID_COUNTER = 0
 SESSION_ID_COUNTER = 0

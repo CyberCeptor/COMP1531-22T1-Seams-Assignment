@@ -111,17 +111,23 @@ def test_channel_details_return(clear_register_createchannel):
     assert chan_details['is_public'] == True
 
     # user 1 is the only member in this channel for now
-    assert u_id in [k['u_id'] for k in chan_details['owner_members']]
-    assert 'abc@def.com' in [k['email'] for k in chan_details['owner_members']]
-    assert 'first' in [k['name_first'] for k in chan_details['owner_members']]
-    assert 'last' in [k['name_last'] for k in chan_details['owner_members']]
-    assert 'firstlast' in [k['handle_str'] for k in chan_details['owner_members']]
+    assert (u_id, 'abc@def.com', 'first', 'last', 'firstlast') in \
+        [(k['u_id'], k['email'], k['name_first'], k['name_last'], k['handle_str'])
+        for k in chan_details['owner_members']]
+    # assert 'abc@def.com' in [k['email'] for k in chan_details['owner_members']]
+    # assert 'first' in [k['name_first'] for k in chan_details['owner_members']]
+    # assert 'last' in [k['name_last'] for k in chan_details['owner_members']]
+    # assert 'firstlast' in [k['handle_str'] for k in chan_details['owner_members']]
 
-    assert u_id in [k['u_id'] for k in chan_details['all_members']]
-    assert 'abc@def.com' in [k['email'] for k in chan_details['all_members']]
-    assert 'first' in [k['name_first'] for k in chan_details['all_members']]
-    assert 'last' in [k['name_last'] for k in chan_details['all_members']]
-    assert 'firstlast' in [k['handle_str'] for k in chan_details['all_members']]
+    assert (u_id, 'abc@def.com', 'first', 'last', 'firstlast') in \
+        [(k['u_id'], k['email'], k['name_first'], k['name_last'], k['handle_str'])
+        for k in chan_details['all_members']]
+
+    # assert u_id in [k['u_id'] for k in chan_details['all_members']]
+    # assert 'abc@def.com' in [k['email'] for k in chan_details['all_members']]
+    # assert 'first' in [k['name_first'] for k in chan_details['all_members']]
+    # assert 'last' in [k['name_last'] for k in chan_details['all_members']]
+    # assert 'firstlast' in [k['handle_str'] for k in chan_details['all_members']]
 
 requests.delete(config.url + 'clear/v1')
 
