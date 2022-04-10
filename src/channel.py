@@ -22,6 +22,8 @@ from src.token import token_valid_check, token_get_user_id
 
 from src.data_store import data_store
 
+from src.notifications import join_channel_dm_notification
+
 from src.channel_dm_helpers import get_messages
 
 @token_valid_check
@@ -60,6 +62,8 @@ def channel_invite_v2(token, channel_id, u_id):
         raise InputError(description='Invitee is already in the channel')
     else:
         add_invitee(user_data, channel_data) #add user
+
+    join_channel_dm_notification(auth_user_id, u_id, channel_data, 'channel')
 
 @token_valid_check
 def channel_details_v2(token, channel_id):

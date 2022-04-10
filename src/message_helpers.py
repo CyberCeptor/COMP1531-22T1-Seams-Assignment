@@ -17,6 +17,8 @@ from src.token import token_get_user_id
 
 from src.data_store import data_store
 
+from src.notifications import tag_notification, react_notification
+
 def check_message_id_valid(message_id):
     """
     checks if the given message_id is valid by checking if it exists in stored
@@ -81,7 +83,7 @@ def edit_remove_dm_message_check(token, message, msg_data, dm, option):
 
     # if user is either creator or it's the user who sent the message
     if msg_data['u_id'] == user_id or dm['creator']['u_id'] == user_id:
-        edit_remove_message(dm, msg_data, message, option)
+        edit_remove_message(user_id, dm, msg_data, message, option)
     else:
         raise AccessError(description='User has no access to this message')
 
@@ -109,23 +111,24 @@ def edit_remove_channel_message_check(token, message, msg_data, channel, option)
     # if user is a member in channel and is a global owner
     if (check_user_is_member(user_id, channel, 'owner_members') or
         msg_data['u_id'] == user_id):
-        edit_remove_message(channel, msg_data, message, option)
+        edit_remove_message(user_id, channel, msg_data, message, option)
     elif (check_user_is_member(user_id, channel, 'all_members') and
         check_user_is_global_owner(user_id)):
-        edit_remove_message(channel, msg_data, message, option)
+        edit_remove_message(user_id, channel, msg_data, message, option)
     else:
         raise AccessError(description='User has no access to this message')
 
-def edit_remove_message(data, msg_data, message, option):
+def edit_remove_message(auth_user_id, data, msg_data, message, option):
     """
     edits or removes a specified message
 
     Arguments:
-        token (str)     - unique str representation of user
-        message (str)   - message that the user wishes to send
-        msg_data (dict) - the message's associated data
-        dm (dict)       - the associate dm details that the message is found in
-        option (str)    - specifies if the user is editing or removing the msg
+        auth_user_id (int) - unique str representation of user
+        message (str)      - message that the user wishes to send
+        msg_data (dict)    - the message's associated data
+        data (dict)        - the data of the channel or dm the message is in
+        option (str)       - specifies if the user is editing or removing the msg
+        option2 (str)      - specifies if the message is in a channel or dm
 
     Exceptions:
         AccessError - If user has no access to the specified message
@@ -136,17 +139,23 @@ def edit_remove_message(data, msg_data, message, option):
     if option == 'remove':
         data['messages'].remove(msg_data)
     elif option == 'edit' and message != '':
+        old_msg = msg_data['message']
         msg_data['message'] = message
+        if 'channel_id' in data.keys():
+            tag_notification(auth_user_id, old_msg, message, data, 'channel')
+        elif 'dm_id' in data.keys():
+            tag_notification(auth_user_id, old_msg, message, data, 'dm')
     elif option == 'edit' and message == '':
         # remove the message if the new message input is empty
         data['messages'].remove(msg_data)
 
-def edit_react(auth_user_id, message_data, react_id, option):
+def edit_react(auth_user_id, data, message_data, react_id, option):
     """
     adds the user's react to the reacts for the given message
 
     Arguments:
         auth_user_id (int)  - an int specifying a user
+        data (dict)         - data for the channel or dm the message is in
         message_data (dict) - data for the message being reacted to
         react_id (int)      - an int specifying a react
 
@@ -171,6 +180,11 @@ def edit_react(auth_user_id, message_data, react_id, option):
 
         # add the user id to the list of u_ids for react id 1
         message_data['reacts'][0]['u_ids'].append(auth_user_id)
+
+        if 'channel_id' in data.keys():
+            react_notification(auth_user_id, data, message_data, 'channel')
+        elif 'dm_id' in data.keys():
+            react_notification(auth_user_id, data, message_data, 'dm')
     
     if option == 'remove':
         # check if user has reacted to this specific message

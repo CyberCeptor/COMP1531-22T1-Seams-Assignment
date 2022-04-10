@@ -19,6 +19,8 @@ from src.data_store import data_store
 
 from src.global_vars import new_id
 
+from src.notifications import join_channel_dm_notification
+
 from src.channel_dm_helpers import get_messages, check_valid_dm_id
 
 @token_valid_check
@@ -76,8 +78,12 @@ def dm_create_v1(token, u_ids):
     }
 
     store['dms'].append(new_dm)
+
     # Save data
     data_store.set(store)
+
+    for u_id in u_ids:
+        join_channel_dm_notification(auth_id, u_id, new_dm, 'dm')
 
     return {
         'dm_id': dm_id

@@ -255,7 +255,7 @@ def message_react_v1(token, message_id, react_id):
         if check_user_is_member(auth_user_id, data, 'all_members') is None:
             raise AccessError(description='User does not exist in channel')
 
-    edit_react(auth_user_id, message_data, react_id, 'add')
+    edit_react(auth_user_id, data, message_data, react_id, 'add')
 
 @token_valid_check
 def message_unreact_v1(token, message_id, react_id):
@@ -297,4 +297,4 @@ def message_unreact_v1(token, message_id, react_id):
         if check_user_is_member(auth_user_id, data, 'all_members') is None:
             raise AccessError(description='User does not exist in channel')
 
-    edit_react(auth_user_id, message_data, react_id, 'remove')
+    edit_react(auth_user_id, data, message_data, react_id, 'remove')

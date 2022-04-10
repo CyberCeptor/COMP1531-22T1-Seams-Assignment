@@ -17,10 +17,37 @@ from src.token import token_valid_check, token_get_user_id
 
 from src.data_store import data_store
 
-def check_for_tags(auth_user_id, old_msg, new_msg, data, option):
+@token_valid_check
+def notifications_get_v1(token):
     """
-    checks if there are any tags in the message and creates a notification for 
-    the tagged user if any are found
+    returns the 20 notifications the user received
+
+    Arguments:
+        token (str) - a valid jwt token str
+
+    Exceptions: 
+        AccessError - Raised if the token is invalid
+
+    Return:
+        Returns the list of notification dictionaries
+    """
+
+    auth_user_id = token_get_user_id(token)
+
+    user = check_valid_auth_id(auth_user_id)
+
+    user_notifs = user['all_data']['notifications']
+
+    del user_notifs[20:]
+
+    return {
+        'notifications': user_notifs
+    }
+
+def tag_notification(auth_user_id, old_msg, new_msg, data, option):
+    """
+    creates a notification for any tagged user in a message that is being sent
+    or edited
 
     Arguments:
         auth_user_id (int) - an int representing a user
@@ -60,29 +87,75 @@ def check_for_tags(auth_user_id, old_msg, new_msg, data, option):
     
     data_store.set(store)
 
-@token_valid_check
-def notifications_get_v1(token):
+def react_notification(auth_user_id, data, message_data, option):
     """
-    returns the 20 notifications the user received
+    creates a notification for the user whose messaged was reacted to
 
     Arguments:
-        token (str) - a valid jwt token str
+        auth_user_id (int)  - an int representing a user
+        data (dict)         - the data of a channel or dm
+        message_data (dict) - data for the message being reacted to
+        option (str)        - denotes whether the given data belongs to a 
+                              channel or dm
 
-    Exceptions: 
-        AccessError - Raised if the token is invalid
+    Exceptions: N/A
 
-    Return:
-        Returns the list of notification dictionaries
+    Return: N/A
     """
 
-    auth_user_id = token_get_user_id(token)
+    store = data_store.get()
 
-    user = check_valid_auth_id(auth_user_id)
+    reactor = check_valid_auth_id(auth_user_id)['all_data']['handle']
+    chan_dm_name = data['name']
+
+    user_id = message_data['u_id']
+
+    user = check_valid_auth_id(user_id)
 
     user_notifs = user['all_data']['notifications']
 
-    del user_notifs[20:]
+    # notifications are ordered from most recent to least recent
+    user_notifs.insert(0, {
+        'channel_id': data['channel_id'] if option == 'channel' else -1,
+        'dm_id': data['dm_id'] if option == 'dm' else -1,
+        'notification_message': 
+            f'{reactor} reacted to your message in {chan_dm_name}'
+    })
+    
+    data_store.set(store)
 
-    return {
-        'notifications': user_notifs
-    }
+def join_channel_dm_notification(auth_user_id, user_id, data, option):
+    """
+    creates a notification for a user who was added to a channel or dm
+
+    Arguments:
+        auth_user_id (int)  - an int representing a user who is adding another
+                              to the channel or dm
+        auth_user_id (int)  - an int representing the user being added to the 
+                              channel or dm
+        data (dict)         - the data of a channel or dm
+        option (str)        - denotes whether the given data belongs to a 
+                              channel or dm
+
+    Exceptions: N/A
+
+    Return: N/A
+    """
+
+    store = data_store.get()
+
+    inviter = check_valid_auth_id(auth_user_id)['all_data']['handle']
+    chan_dm_name = data['name']
+
+    user = check_valid_auth_id(user_id)
+
+    user_notifs = user['all_data']['notifications']
+
+    # notifications are ordered from most recent to least recent
+    user_notifs.insert(0, {
+        'channel_id': data['channel_id'] if option == 'channel' else -1,
+        'dm_id': data['dm_id'] if option == 'dm' else -1,
+        'notification_message': f'{inviter} added you to {chan_dm_name}'
+    })
+    
+    data_store.set(store)

@@ -45,15 +45,14 @@ def test_notifications_get_works(clear_register_two_createchanneldm_sendmsg):
     resp1 = requests.get(config.url + 'notifications/get/v1',
                          params={'token': user2['token']})
     assert resp1.status_code == STATUS_OK
-    notifs = resp1.json()
+    notifs = resp1.json()['notifications']
 
     assert len(notifs) == 4
 
     # notification messages in order from least recent to most recent
     dm_add_notif = f'{USER1_HANDLE} added you to {DM_NAME}'
     chan_add_notif = f'{USER1_HANDLE} added you to {CHAN_NAME}'
-    tagged_notif = f'{USER1_HANDLE} tagged you in {CHAN_NAME}: \
-                     @{USER2_HANDLE} hewwo'
+    tagged_notif = f'{USER1_HANDLE} tagged you in {CHAN_NAME}: @{USER2_HANDLE} hewwo'
     react_notif = f'{USER1_HANDLE} reacted to your message in {DM_NAME}'
 
     # notifications are returned in order from most recent to least recent
@@ -92,7 +91,7 @@ def test_notifications_get_tagged_message_long(clear_register_two_createchanneld
     resp1 = requests.get(config.url + 'notifications/get/v1',
                          params={'token': user2['token']})
     assert resp1.status_code == STATUS_OK
-    notifs = resp1.json()
+    notifs = resp1.json()['notifications']
 
     assert len(notifs) == 3
 
@@ -109,7 +108,7 @@ def test_notifications_get_tagged_message_long(clear_register_two_createchanneld
     resp3 = requests.get(config.url + 'notifications/get/v1',
                          params={'token': user2['token']})
     assert resp3.status_code == STATUS_OK
-    notifs = resp3.json()
+    notifs = resp3.json()['notifications']
 
     # notifications will increase by 1
     assert len(notifs) == 4
@@ -127,7 +126,7 @@ def test_notifications_get_more_than_20(clear_register_two_createchannel_join_se
     resp = requests.get(config.url + 'notifications/get/v1',
                          params={'token': token2})
     assert resp.status_code == STATUS_OK
-    notifs = resp.json()
+    notifs = resp.json()['notifications']
 
     assert len(notifs) == 20
 

@@ -25,7 +25,7 @@ from src.data_store import data_store
 
 from src.global_vars import new_id
 
-from src.notifications import check_for_tags
+from src.notifications import tag_notification
 
 def get_messages(auth_user_id, data, start, data_str):
     """
@@ -227,7 +227,7 @@ def send_message(token, data_id, message, data_str):
 
     data_store.set(store)
 
-    check_for_tags(auth_user_id, '', message, data_info, data_str)
+    tag_notification(auth_user_id, '', message, data_info, data_str)
 
     return {
         'message_id': message_id
