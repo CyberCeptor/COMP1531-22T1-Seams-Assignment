@@ -16,7 +16,7 @@ import requests
 
 from src import config
 
-from src.global_vars import expired_token, unsaved_token
+from src.global_vars import EXPIRED_TOKEN, UNSAVED_TOKEN
 
 @pytest.mark.usefixtures('clear_register_two_createchannel_twoowners')
 def test_channel_removeowner_working(clear_register_two_createchannel_twoowners):
@@ -347,12 +347,12 @@ def test_channel_removeowner_bad_token(clear_register_two_createchannel_twoowner
     assert remove.status_code == 400
 
     remove = requests.post(config.url + 'channel/removeowner/v1', 
-                        json={'token': expired_token, 'channel_id': channel_id, 
+                        json={'token': EXPIRED_TOKEN, 'channel_id': channel_id, 
                               'u_id': user2_id})
     assert remove.status_code == 403
 
     remove = requests.post(config.url + 'channel/removeowner/v1', 
-                        json={'token': unsaved_token, 'channel_id': channel_id, 
+                        json={'token': UNSAVED_TOKEN, 'channel_id': channel_id, 
                               'u_id': user2_id})
     assert remove.status_code == 403
 

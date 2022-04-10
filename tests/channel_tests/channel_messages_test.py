@@ -220,12 +220,12 @@ def test_channel_messages_return_less_than_50(clear_register_createchannel):
     assert channel_messages['start'] == 0
     assert channel_messages['end'] == -1
 
-@pytest.mark.usefixtures('clear_register_createchannel_send50msgs')
-def test_channel_messages_return_50(clear_register_createchannel_send50msgs):
+@pytest.mark.usefixtures('clear_register_two_createchannel_join_send50msgs')
+def test_channel_messages_return_50(clear_register_two_createchannel_join_send50msgs):
     """ testing channel_message returns empty if no message """
 
-    token = clear_register_createchannel_send50msgs[0]
-    chan_id = clear_register_createchannel_send50msgs[1]
+    token = clear_register_two_createchannel_join_send50msgs[0]
+    chan_id = clear_register_two_createchannel_join_send50msgs[2]
 
     # test success run
     resp = requests.get(config.url + 'channel/messages/v2', 
@@ -238,12 +238,12 @@ def test_channel_messages_return_50(clear_register_createchannel_send50msgs):
     assert channel_messages['start'] == 0
     assert channel_messages['end'] == -1
 
-@pytest.mark.usefixtures('clear_register_createchannel_send50msgs')
-def test_channel_messages_return_more_than_50(clear_register_createchannel_send50msgs):
+@pytest.mark.usefixtures('clear_register_two_createchannel_join_send50msgs')
+def test_channel_messages_return_more_than_50(clear_register_two_createchannel_join_send50msgs):
     """ testing channel_message returns empty if no message """
 
-    token = clear_register_createchannel_send50msgs[0]
-    chan_id = clear_register_createchannel_send50msgs[1]
+    token = clear_register_two_createchannel_join_send50msgs[0]
+    chan_id = clear_register_two_createchannel_join_send50msgs[2]
 
     resp = requests.post(config.url + 'message/send/v1', 
                           json={'token': token, 'channel_id': chan_id,

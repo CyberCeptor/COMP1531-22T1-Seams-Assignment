@@ -17,8 +17,8 @@ from src import config
 from src.global_vars import EXPIRED_TOKEN, UNSAVED_TOKEN, STATUS_OK, \
                             STATUS_INPUT_ERR, STATUS_ACCESS_ERR
 
-@pytest.mark.usefixtures()
-def test_search_invalid_token():
+@pytest.mark.usefixtures('clear_register_two_createchanneldm_sendmsg')
+def test_search_invalid_token(clear_register_two_createchanneldm_sendmsg):
     """ testing invalid user type to raise input error """
 
     # token is int
@@ -105,26 +105,6 @@ def test_search_successful(clear_register_two_createchanneldm_sendmsg):
                                         for k in searched_message]
 
     # check returned second message, 'hewwo' sent by user 2 in dm 1
-    assert (d_message_id, user2_id) in [(k['message_id'], k['u_id']) 
-                                        for k in searched_message]
-
-@pytest.mark.usefixtures('clear_register_two_createchanneldm_sendmsg')
-def test_search_successful_user2(clear_register_two_createchanneldm_sendmsg):
-    """ testing successful seach """
-
-    token_2 = clear_register_two_createchanneldm_sendmsg[1]['token']
-    user2_id = clear_register_two_createchanneldm_sendmsg[1]['auth_user_id']
-    d_message_id = clear_register_two_createchanneldm_sendmsg[5]
-
-    # user 2 queries hewwo, will only return dm message since user 2
-    # is not in channel
-    resp0 = requests.get(config.url + 'search/v1', 
-                         params={'token': token_2, 'query_str': 'hewwo'})
-    assert resp0.status_code == STATUS_OK
-
-    searched_message = resp0.json()
-    assert len(searched_message) == 1
-
     assert (d_message_id, user2_id) in [(k['message_id'], k['u_id']) 
                                         for k in searched_message]
 

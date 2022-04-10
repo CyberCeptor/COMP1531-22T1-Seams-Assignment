@@ -81,7 +81,7 @@ def test_channels_list_working(clear_register_two_createchannel):
     assert len(channels_list['channels']) == 3
     assert (channel_id1, 'channel_name') in \
             [(k['channel_id'], k['name']) for k in channels_list['channels']]
-    assert (channel2_json['channel_id'], 'channel_name') in \
+    assert (channel2_json['channel_id'], 'channel_name2') in \
             [(k['channel_id'], k['name']) for k in channels_list['channels']]
     assert (channel3_json['channel_id'], 'private_channel1') in \
             [(k['channel_id'], k['name']) for k in channels_list['channels']]

@@ -44,7 +44,7 @@ def test_users_all_return(clear_register):
         [(k['u_id'], k['email'], k['name_first'], k['name_last'], k['handle_str'])
         for k in get1['users']]
 
-    assert (id2, 'def@ghi.comabc@def.com', 'first', 'last', 'firstlast0') in \
+    assert (id2, 'def@ghi.com', 'first', 'last', 'firstlast0') in \
         [(k['u_id'], k['email'], k['name_first'], k['name_last'], k['handle_str'])
         for k in get1['users']]
 

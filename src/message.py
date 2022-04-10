@@ -19,6 +19,10 @@ from src.other import check_user_is_member, check_user_is_global_owner
 
 from src.data_store import data_store
 
+from src.message_helpers import check_message_id_valid, edit_react, \
+                                edit_remove_dm_message_check, \
+                                edit_remove_channel_message_check
+
 from src.channel_dm_helpers import send_message, check_valid_message
 
 @token_valid_check

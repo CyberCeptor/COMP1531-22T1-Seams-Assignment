@@ -231,23 +231,22 @@ def test_message_react_invalid_react_id(clear_register_two_createchanneldm_sendm
 def test_message_react_not_a_member(clear_register_two_createchanneldm_sendmsg):
     """ test with a user who is not in the channel or dm """
 
-    token2 = clear_register_two_createchanneldm_sendmsg[1]['token']
     chan_msg_id = clear_register_two_createchanneldm_sendmsg[3]
     dm_msg_id = clear_register_two_createchanneldm_sendmsg[5]
 
-    # user 2 is trying to react to a message sent in a channel they're not a 
-    # member of
-    resp0 = requests.post(config.url + 'message/react/v1', 
-                          json={'token': token2, 'message_id': chan_msg_id, 
-                                'react_id': 1})
-    assert resp0.status_code == STATUS_ACCESS_ERR
-
     # register user 3
-    resp1 = requests.post(config.url + 'auth/register/v2', 
+    resp0 = requests.post(config.url + 'auth/register/v2', 
                           json={'email': 'ghu@jkl.com', 'password': 'password',
                                 'name_first': 'first', 'name_last': 'last'})
-    assert resp1.status_code == STATUS_OK
-    token3 = resp1.json()['token']
+    assert resp0.status_code == STATUS_OK
+    token3 = resp0.json()['token']
+
+    # user 3 is trying to react to a message sent in a channel they're not a 
+    # member of
+    resp1 = requests.post(config.url + 'message/react/v1', 
+                          json={'token': token3, 'message_id': chan_msg_id, 
+                                'react_id': 1})
+    assert resp1.status_code == STATUS_ACCESS_ERR
 
     # user 3 is trying to react to a message sent in a dm they're not a member 
     # of
