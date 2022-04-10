@@ -20,7 +20,7 @@ from src.other import check_user_is_member, check_user_is_global_owner, \
 
 from src.data_store import data_store
 
-from channel_dm_helpers import send_message
+from src.channel_dm_helpers import send_message
 
 @token_valid_check
 def message_send_v1(token, channel_id, message):

@@ -18,13 +18,10 @@ import datetime
 
 from datetime import timezone
 
-from src.dm import dm_leave_v1
-
 from src.error import InputError, AccessError
-from src.other import check_user_is_member, check_valid_channel_id
+from src.other import check_user_is_member, check_valid_channel_id, \
+                      cast_to_int_get_requests
 from src.token import token_get_user_id, token_valid_check
-
-from src.channel import channel_leave_v1
 
 from src.data_store import data_store
 
@@ -250,24 +247,95 @@ def set_is_this_user_reacted(auth_user_id, messages, start, end):
                 react['is_this_user_reacted'] = False
 
 @token_valid_check
-def leave_channel_dm(token, data_id, option):
+def leave_channel_dm(token, auth_user_id, data_id, option):
     """
-    checks the given token, gets the user's id, and calls the dm_leave_v1 or
-    channel_leave_v1 function depending on the option
+    Given a channel/dm id, remove the user given by token or auth_user_id from 
+    that channel/dm
 
-    Arguments: token (str)   - a valid jwt token str
-               data_id (int) - the given channel or dm id
-               option (str)  - a str denoting whether the user is leaving a dm
-                               or channel
+    Arguments: 
+        token (str)        - a valid jwt token str
+        auth_user_id (int) - an int representing a user
+        data_id (int)      - the given channel or dm id
+        option (str)       - a str denoting whether the user is leaving a dm
+                             or channel
 
-    Exceptions: N/A
+    Exceptions:
+        Access Error - Raised when
+                        - user is not a member of the channel or dm
+                        - token is invalid
+        Input Error - Raised when the given an invalid data_id
 
     Return Value: N/A
     """
 
-    auth_user_id = token_get_user_id(token)
+    store = data_store.get()
 
+    # if no auth_user_id is given, the user is trying to leave the channel/dm
+    # themselves. otherwise, someone else is removing them
+    if auth_user_id is None:
+        auth_user_id = token_get_user_id(token)
+
+    # if the user is being removed from/is leaving a dm
     if option == 'dm':
-        dm_leave_v1(auth_user_id, data_id)
-    elif option == 'channel':
-        channel_leave_v1(auth_user_id, data_id)
+        dm = check_valid_dm_id(data_id)
+        member_data = check_user_is_member(auth_user_id, dm, 'members')
+
+        remove_from_dm(dm, member_data, auth_user_id)
+
+    # if the user is being removed from/is leaving a channel
+    if option == 'channel':
+        channel = check_valid_channel_id(data_id)
+        member_data = check_user_is_member(auth_user_id, channel, 'all_members')
+        owner_data = check_user_is_member(auth_user_id, channel, 'owner_members')
+
+        remove_from_channel(channel, member_data, owner_data)
+
+    data_store.set(store)
+
+def remove_from_dm(dm, member_data, auth_user_id):
+    """
+    Given the data of a dm, remove the user's member_data
+
+    Arguments:
+        dm (dict)          - the data corresponding to a specific dm
+        member_data (dict) - the user's member_data stored in the dm
+        auth_user_id (int) - an int representing a user
+
+    Exceptions:
+        Access Error - Raised when user is not a member of the dm
+
+    Return Value: N/A
+    """
+
+    if member_data is None:
+        raise AccessError(description='The user is not a member of dm')
+    else:
+        # if the user is the dm creator, make the creator data empty
+        if dm['creator']['u_id'] == auth_user_id:
+            dm['creator'] = {}
+        dm['members'].remove(member_data)
+
+def remove_from_channel(channel, member_data, owner_data):
+    """
+    Given the data of a channel, remove the user's member_data and/or owner_data
+
+    Arguments:
+        channel (dict)     - the data corresponding to a specific channel
+        member_data (dict) - the user's member_data stored in the channel
+        owner_data (dict)  - 
+
+    Exceptions:
+        Access Error - Raised when user is not a member of the channel
+
+    Return Value: N/A
+    """
+
+    if member_data is None and owner_data is None:
+        raise AccessError(description='User is not a member of channel')
+    elif owner_data:
+        # if the user is an owner_member, then they have to also be in
+        # all_members user aswell.
+        channel['all_members'].remove(member_data)
+        channel['owner_members'].remove(owner_data)
+    elif member_data:
+        channel['all_members'].remove(member_data)

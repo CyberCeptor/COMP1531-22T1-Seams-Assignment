@@ -28,10 +28,9 @@ from src.message import message_send_v1, message_remove_v1, message_edit_v1,\
 from src.channels import channels_create_v2, channels_list_v2,\
                          channels_listall_v2
 
-from channel_dm_helpers import leave_channel_dm
+from src.channel_dm_helpers import leave_channel_dm
 
 from src.data_store_pickle import pickle_data, set_prev_data
-
 
 def quit_gracefully(*args):
     '''For coverage'''
@@ -252,7 +251,7 @@ def channel_messages():
 @APP.route('/channel/leave/v1', methods=['POST'])
 def channel_leave():
     data = request.get_json()
-    leave_channel_dm(data['token'], data['channel_id'], 'channel')
+    leave_channel_dm(data['token'], None, data['channel_id'], 'channel')
     save_data()
     return dumps({})
 
@@ -353,7 +352,7 @@ def dm_remove_server():
 @APP.route('/dm/leave/v1', methods=['POST'])
 def dm_leave():
     data = request.get_json()
-    leave_channel_dm(data['token'], data['dm_id'], 'dm')
+    leave_channel_dm(data['token'], None, data['dm_id'], 'dm')
     save_data()
     return dumps({})
 

@@ -10,18 +10,16 @@ Description: implementation for
     - helper functions for the above
 """
 
-from src.dm import dm_leave_v1
-
 from src.error import AccessError, InputError
 from src.other import check_valid_auth_id, check_user_is_global_owner,\
                       check_user_is_member
 from src.token import token_get_user_id, token_valid_check
 
-from src.channel import channel_leave_v1
-
 from src.data_store import data_store
 
 from src.global_vars import GLOBAL_OWNER, USER
+
+from src.channel_dm_helpers import leave_channel_dm
 
 @token_valid_check
 def admin_userpermission_change(token, u_id, permission_id):
@@ -121,13 +119,13 @@ def admin_user_remove(token, u_id):
     # remove user from all channels, replace their messages with 'Removed user'
     for channel in store['channels']:
         if check_user_is_member(u_id, channel, 'all_members'):
-            channel_leave_v1(u_id, channel['channel_id'])
+            leave_channel_dm(token, u_id, channel['channel_id'], 'channel')
             replace_messages(u_id, channel)
     
     # remove user from all dms, replace their messages with 'Removed user'
     for dm in store['dms']:
         if check_user_is_member(u_id, dm, 'members'):
-            dm_leave_v1(u_id, dm['dm_id'])
+            leave_channel_dm(token, u_id, dm['dm_id'], 'dm')
             replace_messages(u_id, dm)
 
     # change the user's first name to 'Removed' and last name to 'user'

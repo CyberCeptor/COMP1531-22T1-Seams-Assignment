@@ -57,7 +57,7 @@ def dm_create_v1(token, u_ids):
     # iterate through the list of given u_ids and check if they are not 
     # duplicates and are valid
     for u_id in u_ids:
-        check_creator_notin_u_ids_duplicate(auth_id, u_id, u_ids)
+        check_valid_u_ids(auth_id, u_id, u_ids)
         user = check_valid_auth_id(u_id)['return_data']
         name_list.append(user['handle_str'])
         all_member_list.append(user)
@@ -170,36 +170,7 @@ def dm_details_v1(token, dm_id):
         'members': dm['members']
     }
 
-def dm_leave_v1(auth_user_id, dm_id):
-    """
-    clears any data stored in data_store and registers users with the
-    given information, show dm details with token and dm id
-
-    Arguments: auth_user_id (int)          - unique int representation of user
-               dm_id(int)           - unique int represent no. of dm
-
-    Exceptions: InputError - raised by wrong token
-                InputError - raised by wrong dm_id
-                AccessError - raised by user no longer in dm
-
-    Return Value: a dic             -including name and members
-    """
-
-    dm = check_valid_dm_id(dm_id)
-    store = data_store.get()
-
-    member = check_user_is_member(auth_user_id, dm, 'members')
-
-    if member:
-        if dm['creator']['u_id'] == auth_user_id:
-            dm['creator'] = {}
-        dm['members'].remove(member)
-    else:
-        raise AccessError(description='The user is no longer in dm')
-        
-    data_store.set(store)
-
-def check_creator_notin_u_ids_duplicate(u_id, id, u_ids):
+def check_valid_u_ids(u_id, id, u_ids):
     """
     check the whether there is duplicate ids and whether the creator is in uids
 
