@@ -20,6 +20,8 @@ from src.error import InputError
 from src.data_store import data_store
 from src.token import token_generate
 
+from src.global_vars import Permission
+
 def auth_login_v2(email, password):
     """
     logs a user in with the given email and password and returns their
@@ -111,7 +113,8 @@ def auth_register_v2(email, password, name_first, name_last):
         'first': name_first,
         'last': name_last,
         'handle': handle,
-        'perm_id': 1 if u_id == 1 else 2,
+        'notifications': [],
+        'perm_id': Permission.OWNER.value if u_id == 1 else Permission.USER.value,
         'removed': False,
     }
 

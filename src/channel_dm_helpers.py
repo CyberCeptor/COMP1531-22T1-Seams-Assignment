@@ -25,6 +25,8 @@ from src.data_store import data_store
 
 from src.global_vars import new_id
 
+from src.notifications import check_for_tags
+
 def get_messages(auth_user_id, data, start, data_str):
     """
     returns the message data in a channel or dm from index start to start + 50
@@ -60,13 +62,7 @@ def get_messages(auth_user_id, data, start, data_str):
 
     total_messages = len(data['messages'])
 
-    # check start is of valid input type and input
-    start = cast_to_int_get_requests(start, 'start')
-
-    if start < 0:
-        raise InputError(description='Invalid start')
-    elif start > total_messages:
-        raise InputError(description='Invalid start, not enough messages')
+    start = check_start_valid(start, total_messages)
 
     # return an empty messages list if there are no messages to get
     if total_messages == 0:
@@ -89,18 +85,8 @@ def get_messages(auth_user_id, data, start, data_str):
     to_return = []
 
     if end == -1:
-        if start == total_messages - 1:
-            # if there is only 1 message
-            set_is_this_user_reacted(auth_user_id, data['messages'], start, 
-                                     start + 1)
-            to_return.append(data['messages'][start])
-        else:
-            # if there are less than 50 messages from the index start or
-            # if there are only 50 messages
-            set_is_this_user_reacted(auth_user_id, data['messages'], start, 
-                                     total_messages)
-            to_return = [data['messages'][index] for index in
-                         range(start, total_messages)]
+        to_return = add_messages_until_end(auth_user_id, data, start, 
+                                           total_messages)
     else:
         set_is_this_user_reacted(auth_user_id, data['messages'], start, end)
         to_return = [data['messages'][index] for index in range(start, end)]
@@ -110,6 +96,67 @@ def get_messages(auth_user_id, data, start, data_str):
         'start': start,
         'end': end,
     }
+
+def add_messages_until_end(auth_user_id, data, start, total_messages):
+    """
+    returns the message data in a channel or dm from index start to the end
+
+    Arguments:
+        auth_user_id (int)   - an integer that specifies a user
+        data (dict)          - a dict storing the channel or dm info
+        start (int)          - an int specifying the start index for the return 
+                               of messages data
+        total_messages (int) - number of total messages in the channel or dm
+
+    Exceptions: N/A
+
+    Return Value:
+        Returns the list of message dicts
+    """
+
+    if start == total_messages - 1:
+        # if there is only 1 message
+        set_is_this_user_reacted(auth_user_id, data['messages'], start, 
+                                    start + 1)
+        to_return = [(data['messages'][start])]
+    else:
+        # if there are less than 50 messages from the index start or
+        # if there are only 50 messages
+        set_is_this_user_reacted(auth_user_id, data['messages'], start, 
+                                    total_messages)
+        to_return = [data['messages'][index] for index in
+                        range(start, total_messages)]
+    
+    return to_return
+
+def check_start_valid(start, total_messages):
+    """
+    checks if the given dm_id actually belongs to a dm
+
+    Arguments: 
+        start (int)          - an int specifying the start index for the return 
+                               of messages data
+        total_messages (int) - number of total messages in the channel or dm
+
+    Exceptions: 
+        InputError - Raised when start is
+                        - not of a valid tpe
+                        - a negative number
+                        - larger than total_messages
+
+    Return Value: 
+        Returns start casted to an int if it is valid
+    """
+
+    # check start is of valid input type and input
+    start = cast_to_int_get_requests(start, 'start')
+
+    if start < 0:
+        raise InputError(description='Invalid start')
+    elif start > total_messages:
+        raise InputError(description='Invalid start, not enough messages')
+    
+    return start
 
 def send_message(token, data_id, message, data_str):
     """
@@ -180,6 +227,8 @@ def send_message(token, data_id, message, data_str):
 
     data_store.set(store)
 
+    check_for_tags(auth_user_id, '', message, data_info, data_str)
+
     return {
         'message_id': message_id
     }
@@ -197,7 +246,7 @@ def check_valid_dm_id(dm_id):
                         - does not belong to a dm
 
     Return Value: 
-        Reutrns the dm data if the dm is found
+        Returns the dm data if the dm is found
     """
 
     if type(dm_id) is bool:

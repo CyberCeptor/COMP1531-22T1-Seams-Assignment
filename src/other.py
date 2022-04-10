@@ -19,7 +19,7 @@ from src.error import InputError
 
 from src.data_store import data_store
 
-from src.global_vars import reset_id, GLOBAL_OWNER
+from src.global_vars import reset_id, Permission
 
 def clear_v1():
     """
@@ -159,7 +159,7 @@ def check_user_is_global_owner(auth_user_id):
 
     store = data_store.get()
     for user in store['users']:
-        if user['id'] == auth_user_id and user['perm_id'] == GLOBAL_OWNER:
+        if user['id'] == auth_user_id and user['perm_id'] == Permission.OWNER.value:
             return True
     return False
 

@@ -2,7 +2,7 @@
 Filename: notifications_get_test.py
 
 Author: Aleesha Bunrith(z5371516)
-Created: 10/04/2022 - 
+Created: 10/04/2022
 
 Description: pytests for notifications/get/v1
 """
@@ -122,7 +122,7 @@ def test_notifications_get_tagged_message_long(clear_register_two_createchanneld
 def test_notifications_get_more_than_20(clear_register_two_createchannel_join_send50msgs):
     """ test that only 20 notifications are returned"""
 
-    token2 = clear_register_two_createchannel_join_send50msgs[1]['token']
+    token2 = clear_register_two_createchannel_join_send50msgs
     
     resp = requests.get(config.url + 'notifications/get/v1',
                          params={'token': token2})

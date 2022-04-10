@@ -17,7 +17,7 @@ from src.token import token_get_user_id, token_valid_check
 
 from src.data_store import data_store
 
-from src.global_vars import GLOBAL_OWNER, USER
+from src.global_vars import Permission
 
 from src.channel_dm_helpers import leave_channel_dm
 
@@ -48,6 +48,9 @@ def admin_userpermission_change(token, u_id, permission_id):
 
     store = data_store.get()
 
+    owner_perm = Permission.OWNER.value
+    user_perm = Permission.USER.value
+
     auth_user_id = token_get_user_id(token)
 
     # the token must belong to a user who is a global owner
@@ -60,22 +63,22 @@ def admin_userpermission_change(token, u_id, permission_id):
     if not isinstance(permission_id, int) or type(permission_id) is bool:
         raise InputError(description='Permission id is not of valid type')
 
-    if permission_id not in [GLOBAL_OWNER, USER]:
+    if permission_id not in [owner_perm, user_perm]:
         raise InputError(description='Invalid permission id')
 
     # count the number of global users
     num_global_owners = len([user for user in store['users'] if 
-                             user['perm_id'] == GLOBAL_OWNER])
+                             user['perm_id'] == owner_perm])
 
     # check three invalid cases of permission changes
     if (check_user_is_global_owner(u_id) and num_global_owners == 1 and
-        permission_id == USER):
+        permission_id == user_perm):
         raise InputError(description='Cannot demote the only global owner')
     
-    if check_user_is_global_owner(u_id) and permission_id == GLOBAL_OWNER:
+    if check_user_is_global_owner(u_id) and permission_id == owner_perm:
         raise InputError(description='User is already a global owner')
     
-    if not check_user_is_global_owner(u_id) and permission_id == USER:
+    if not check_user_is_global_owner(u_id) and permission_id == user_perm:
         raise InputError(description='User is already a member')
 
     change_permission(u_id, permission_id)
@@ -111,7 +114,7 @@ def admin_user_remove(token, u_id):
 
     # if there is only one global owner, they cannot remove themselves
     num_global_owners = len([user for user in store['users'] if 
-                             user['perm_id'] == GLOBAL_OWNER])
+                             user['perm_id'] == Permission.OWNER.value])
 
     if check_user_is_global_owner(u_id) and num_global_owners == 1:
         raise InputError(description='Cannot remove the only global owner')

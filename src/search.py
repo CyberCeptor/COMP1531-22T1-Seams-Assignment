@@ -8,7 +8,7 @@ Description: implementation for
     - searching for messages containing a given query_string
 """
 
-from src.error import InputError, AccessError
+from src.error import InputError
 from src.other import check_valid_auth_id, check_user_is_member
 from src.token import token_valid_check, token_get_user_id
 

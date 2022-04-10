@@ -30,9 +30,11 @@ from src.message import message_send_v1, message_remove_v1, message_edit_v1,\
 from src.channels import channels_create_v2, channels_list_v2,\
                          channels_listall_v2
 
-from src.channel_dm_helpers import leave_channel_dm
+from src.notifications import notifications_get_v1
 
 from src.data_store_pickle import pickle_data, set_prev_data
+
+from src.channel_dm_helpers import leave_channel_dm
 
 def quit_gracefully(*args):
     '''For coverage'''
@@ -366,6 +368,17 @@ def dm_messages():
     dm_messages = dm_messages_v1(token, dm_id, start)
     save_data()
     return dumps(dm_messages)
+
+################################################################################
+##                            NOTIFICATIONS ROUTE                             ##
+################################################################################
+
+@APP.route('/notifications/get/v1', methods=['GET'])
+def get_notifs():
+    token = request.args.get('token')
+    notifs = notifications_get_v1(token)
+    save_data()
+    return dumps(notifs)
 
 ################################################################################
 ##                               CLEAR ROUTE                                  ##
