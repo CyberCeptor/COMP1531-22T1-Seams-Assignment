@@ -12,7 +12,7 @@ Description: implementation for
         - adding a notification for being added to a channel
 """
 
-from src.other import check_valid_auth_id
+from src.other import check_valid_auth_id, check_user_is_member
 from src.token import token_valid_check, token_get_user_id
 
 from src.data_store import data_store
@@ -68,15 +68,24 @@ def tag_notification(auth_user_id, old_msg, new_msg, data, option):
     tagger = check_valid_auth_id(auth_user_id)['all_data']['handle']
     chan_dm_name = data['name']
 
+    if option == 'channel':
+        key = 'all_members'
+    elif option == 'dm':
+        key = 'members'
+
     # iterate through all user handles and check if the handle is included in 
     # the message after an @
     for user in store['users']:
         handle = user['handle']
 
-        # if the message being sent contains a tag then add a notification
-        # if the message is being edited and the original message does not
-        # include the tag, add a notification
-        if f'@{handle}' in new_msg.lower() and f'@{handle}' not in old_msg.lower():
+        # do not add the notification if the user is not in the channel or dm
+        if check_user_is_member(user['id'], data, key) is None:
+            pass
+        elif f'@{handle}' in new_msg.lower() and f'@{handle}' not in old_msg.lower():
+            # if the message being sent contains a tag then add a notification
+            # if the message is being edited and the original message does not
+            # include the tag, add a notification
+
             # notifications are ordered from most recent to least recent
             user['notifications'].insert(0, {
                 'channel_id': data['channel_id'] if option == 'channel' else -1,
@@ -114,13 +123,21 @@ def react_notification(auth_user_id, data, message_data, option):
 
     user_notifs = user['all_data']['notifications']
 
-    # notifications are ordered from most recent to least recent
-    user_notifs.insert(0, {
-        'channel_id': data['channel_id'] if option == 'channel' else -1,
-        'dm_id': data['dm_id'] if option == 'dm' else -1,
-        'notification_message': 
-            f'{reactor} reacted to your message in {chan_dm_name}'
-    })
+    if option == 'channel':
+        key = 'all_members'
+    elif option == 'dm':
+        key = 'members'
+
+    # only add notification if user who originally sent the message is still
+    # in the channel or dm
+    if check_user_is_member(user['all_data']['id'], data, key):
+        # notifications are ordered from most recent to least recent
+        user_notifs.insert(0, {
+            'channel_id': data['channel_id'] if option == 'channel' else -1,
+            'dm_id': data['dm_id'] if option == 'dm' else -1,
+            'notification_message': 
+                f'{reactor} reacted to your message in {chan_dm_name}'
+        })
     
     data_store.set(store)
 
@@ -159,3 +176,4 @@ def join_channel_dm_notification(auth_user_id, user_id, data, option):
     })
     
     data_store.set(store)
+    

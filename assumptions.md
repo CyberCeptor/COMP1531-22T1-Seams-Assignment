@@ -27,3 +27,6 @@ dm.py
 - in dm_create, the dm will have the unique dm id
 
 - in dm_list, the user which matches the token is already in a dm
+
+notifications.py
+- users can tag themselves and they will receive a notification for it
