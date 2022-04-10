@@ -18,7 +18,9 @@ import hashlib
 from src.error import InputError
 
 from src.data_store import data_store
-from src.token import token_generate, token_valid_check, token_remove
+from src.token import token_generate
+
+from src.global_vars import Permission
 
 def auth_login_v2(email, password):
     """
@@ -111,7 +113,8 @@ def auth_register_v2(email, password, name_first, name_last):
         'first': name_first,
         'last': name_last,
         'handle': handle,
-        'perm_id': 1 if u_id == 1 else 2,
+        'notifications': [],
+        'perm_id': Permission.OWNER.value if u_id == 1 else Permission.USER.value,
         'removed': False,
     }
 
@@ -238,19 +241,4 @@ def create_handle(store, full_name):
         handle = handle + str(duplicate_count)
 
     return handle
-
-def auth_logout_v1(token):
-    """
-    logs out a user using their current valid token, checks if it is valid then
-    removes the token info from the data
-
-    Arguments:
-        token (jwt token str) - a user's valid jwt token
-
-    Exceptions: N/A
-
-    Return Value: N/A
-    """
-
-    token_valid_check(token)
-    token_remove(token)
+    

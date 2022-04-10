@@ -9,24 +9,30 @@ Description: global variables and functions used across files
 
 import jwt
 
-key = 'hotpot'
-algorithm = 'HS256'
+from enum import Enum
+
+KEY = 'hotpot'
+ALGORITHM = 'HS256'
 
 # an expired, unsaved token
-expired_token = jwt.encode({'id': 44, 'session_id': 200, 'handle': 'firstlast',
-                            'exp': 1448474355}, key, algorithm=algorithm)
+EXPIRED_TOKEN = jwt.encode({'id': 44, 'session_id': 200, 'handle': 'firstlast',
+                            'exp': 1448474355}, KEY, algorithm=ALGORITHM)
 
 # an unexpired, unsaved token
-unsaved_token = jwt.encode({'id': 44, 'session_id': 200, 'handle': 'firstlast',
-                            'exp': 2548474355}, key, algorithm=algorithm)
+UNSAVED_TOKEN = jwt.encode({'id': 44, 'session_id': 200, 'handle': 'firstlast',
+                            'exp': 2548474355}, KEY, algorithm=ALGORITHM)
 
-status_ok = 200
-status_input_err = 400
-status_access_err = 403
+STATUS_OK = 200
+STATUS_INPUT_ERR = 400
+STATUS_ACCESS_ERR = 403
 
 DM_ID_COUNTER = 0
 MESSAGE_ID_COUNTER = 0
 SESSION_ID_COUNTER = 0
+
+class Permission(Enum):
+    OWNER = 1
+    USER = 2
 
 def new_id(option):
     """

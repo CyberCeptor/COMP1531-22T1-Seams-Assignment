@@ -12,14 +12,18 @@ Description: implementation for
 """
 from src.error import InputError, AccessError
 
-from src.other import check_valid_auth_id, check_user_is_member, get_messages, \
-                      check_valid_dm_id
+from src.other import check_valid_auth_id, check_user_is_member
 from src.token import token_valid_check, token_get_user_id
 
 from src.data_store import data_store
 
 from src.global_vars import new_id
 
+from src.notifications import join_channel_dm_notification
+
+from src.channel_dm_helpers import get_messages, check_valid_dm_id
+
+@token_valid_check
 def dm_create_v1(token, u_ids):
     """
     clears any data stored in data_store and registers users with the
@@ -36,16 +40,10 @@ def dm_create_v1(token, u_ids):
 
     #get the data in data_store
     store = data_store.get()
-    token_valid_check(token)
+
     auth_id = token_get_user_id(token)
-    user_info = check_valid_auth_id(auth_id)
-    owner = {
-        'u_id': user_info['id'],
-        'email': user_info['email'],
-        'name_first': user_info['first'],
-        'name_last': user_info['last'],
-        'handle_str': user_info['handle']
-    }
+    user_info = check_valid_auth_id(auth_id)['return_data']
+    owner = user_info
     
     if isinstance(u_ids, list) is False:
         raise InputError(description='u_ids needs to be a list')
@@ -56,21 +54,15 @@ def dm_create_v1(token, u_ids):
     name_list = []
     all_member_list = []
     all_member_list.append(owner)
-    name_list.append(user_info['handle'])
+    name_list.append(user_info['handle_str'])
 
     # iterate through the list of given u_ids and check if they are not 
     # duplicates and are valid
     for u_id in u_ids:
-        check_creator_notin_u_ids_duplicate(auth_id, u_id, u_ids)
-        user = check_valid_auth_id(u_id)
-        name_list.append(user['handle'])
-        all_member_list.append({
-            'u_id': user['id'],
-            'email': user['email'],
-            'name_first': user['first'],
-            'name_last': user['last'],
-            'handle_str': user['handle']
-        })
+        check_valid_u_ids(auth_id, u_id, u_ids)
+        user = check_valid_auth_id(u_id)['return_data']
+        name_list.append(user['handle_str'])
+        all_member_list.append(user)
     
     #sort name list
     name_list.sort()
@@ -86,13 +78,18 @@ def dm_create_v1(token, u_ids):
     }
 
     store['dms'].append(new_dm)
+
     # Save data
     data_store.set(store)
+
+    for u_id in u_ids:
+        join_channel_dm_notification(auth_id, u_id, new_dm, 'dm')
 
     return {
         'dm_id': dm_id
     }
 
+@token_valid_check
 def dm_list_v1(token):
     """
     clears any data stored in data_store and registers users with the
@@ -105,7 +102,6 @@ def dm_list_v1(token):
     Return Value: dms(dic)            -a dic including dm id and name
     """
 
-    token_valid_check(token)
     auth_id = token_get_user_id(token)
     dm_list = []
     store = data_store.get()
@@ -121,6 +117,7 @@ def dm_list_v1(token):
         'dms': dm_list
     }
 
+@token_valid_check
 def dm_remove_v1(token, dm_id):
     """
     clears any data stored in data_store and registers users with the
@@ -138,7 +135,7 @@ def dm_remove_v1(token, dm_id):
     """
 
     store = data_store.get()
-    token_valid_check(token)
+
     dm = check_valid_dm_id(dm_id)
     auth_id = token_get_user_id(token)
 
@@ -152,6 +149,7 @@ def dm_remove_v1(token, dm_id):
     
     data_store.set(store)
 
+@token_valid_check
 def dm_details_v1(token, dm_id):
     """
     clears any data stored in data_store and registers users with the
@@ -167,7 +165,6 @@ def dm_details_v1(token, dm_id):
     Return Value: a dic             -including name and members
     """
 
-    token_valid_check(token)
     auth_id = token_get_user_id(token)
     dm = check_valid_dm_id(dm_id)
 
@@ -179,36 +176,7 @@ def dm_details_v1(token, dm_id):
         'members': dm['members']
     }
 
-def dm_leave_v1(auth_user_id, dm_id):
-    """
-    clears any data stored in data_store and registers users with the
-    given information, show dm details with token and dm id
-
-    Arguments: auth_user_id (int)          - unique int representation of user
-               dm_id(int)           - unique int represent no. of dm
-
-    Exceptions: InputError - raised by wrong token
-                InputError - raised by wrong dm_id
-                AccessError - raised by user no longer in dm
-
-    Return Value: a dic             -including name and members
-    """
-
-    dm = check_valid_dm_id(dm_id)
-    store = data_store.get()
-
-    member = check_user_is_member(auth_user_id, dm, 'members')
-
-    if member:
-        if dm['creator']['u_id'] == auth_user_id:
-            dm['creator'] = {}
-        dm['members'].remove(member)
-    else:
-        raise AccessError(description='The user is no longer in dm')
-        
-    data_store.set(store)
-
-def check_creator_notin_u_ids_duplicate(u_id, id, u_ids):
+def check_valid_u_ids(u_id, id, u_ids):
     """
     check the whether there is duplicate ids and whether the creator is in uids
 
@@ -226,6 +194,7 @@ def check_creator_notin_u_ids_duplicate(u_id, id, u_ids):
     elif u_ids.count(id) > 1:
         raise InputError(description='There are duplicate u_ids')
 
+@token_valid_check
 def dm_messages_v1(token, dm_id, start):
     """
     check if given user id and dm id are valid,
@@ -246,7 +215,6 @@ def dm_messages_v1(token, dm_id, start):
         start and end if given user id and dm id are valid
     """
 
-    token_valid_check(token)
     auth_user_id = token_get_user_id(token)
 
     # see if given auth_user_id and dm_id are valid

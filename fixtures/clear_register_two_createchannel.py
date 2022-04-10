@@ -13,6 +13,8 @@ import requests
 
 from src import config
 
+from src.global_vars import STATUS_OK
+
 @pytest.fixture
 def clear_register_two_createchannel(clear_register_two):
     """ clears any data stored in data_store, registers two users, creates a
@@ -24,7 +26,7 @@ def clear_register_two_createchannel(clear_register_two):
     chan = requests.post(config.url + 'channels/create/v2',
                         json={'token': user1['token'], 'name': 'channel_name',
                             'is_public': True})
-    assert chan.status_code == 200
+    assert chan.status_code == STATUS_OK
     chan_data = chan.json()
 
     return [user1, user2, chan_data['channel_id']]

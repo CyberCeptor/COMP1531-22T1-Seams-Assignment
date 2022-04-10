@@ -16,13 +16,17 @@ Description: implementation for
 """
 
 from src.error import InputError, AccessError
-from src.other import check_valid_auth_id, get_messages, check_user_is_member,\
+from src.other import check_valid_auth_id, check_user_is_member, \
                       check_valid_channel_id, check_user_is_global_owner
 from src.token import token_valid_check, token_get_user_id
 
 from src.data_store import data_store
 
+from src.notifications import join_channel_dm_notification
 
+from src.channel_dm_helpers import get_messages
+
+@token_valid_check
 def channel_invite_v2(token, channel_id, u_id):
     """
     check if given user id and channel id are valid,
@@ -41,7 +45,6 @@ def channel_invite_v2(token, channel_id, u_id):
     Return Value: N/A
     """
 
-    token_valid_check(token)
     auth_user_id = token_get_user_id(token)
 
     check_valid_auth_id(auth_user_id) # check the inviter is valid or not
@@ -59,7 +62,10 @@ def channel_invite_v2(token, channel_id, u_id):
         raise InputError(description='Invitee is already in the channel')
     else:
         add_invitee(user_data, channel_data) #add user
-    
+
+    join_channel_dm_notification(auth_user_id, u_id, channel_data, 'channel')
+
+@token_valid_check
 def channel_details_v2(token, channel_id):
     """
     check if given user id and channel id are valid,
@@ -78,7 +84,6 @@ def channel_details_v2(token, channel_id):
         owner members and all members if given user id and channel id are valid
     """
 
-    token_valid_check(token)
     auth_user_id = token_get_user_id(token)
 
     # see if given auth_user_id and channel_id are valid
@@ -97,6 +102,7 @@ def channel_details_v2(token, channel_id):
         'all_members': channel_info['all_members'],
     }
 
+@token_valid_check
 def channel_messages_v2(token, channel_id, start):
     """
     check if given user id and channel id are valid,
@@ -117,7 +123,6 @@ def channel_messages_v2(token, channel_id, start):
         start and end if given user id and channel id are valid
     """
 
-    token_valid_check(token)
     auth_user_id = token_get_user_id(token)
 
     # see if given auth_user_id and channel_id are valid
@@ -128,6 +133,7 @@ def channel_messages_v2(token, channel_id, start):
 
     return messages
 
+@token_valid_check
 def channel_join_v2(token, channel_id):
     """
     check if given user id and channel id are valid,
@@ -144,7 +150,6 @@ def channel_join_v2(token, channel_id):
     Return Value: N/A
     """
 
-    token_valid_check(token)
     auth_user_id = token_get_user_id(token)
 
     # check the invitee is valid or not
@@ -181,55 +186,10 @@ def add_invitee(user_data, channel):
 
     store = data_store.get()
 
-    new_member = {
-        'u_id': user_data['id'],
-        'email': user_data['email'],
-        'name_first': user_data['first'],
-        'name_last': user_data['last'],
-        'handle_str': user_data['handle']
-    }
-
-    channel['all_members'].append(new_member)
+    channel['all_members'].append(user_data['return_data'])
     data_store.set(store)
 
-def channel_leave_v1(auth_user_id, channel_id):
-    """
-    Given a channel_id that the authorised user is a member of,
-    remove them as a member of the channel. Their messages should remain in the
-    channel. If the only channel owner leaves, the channel will remain.
-    If a user is a owner_members of a channel, they have to be an all_members
-    user aswell.
-
-    Arguments:
-        -   token (string)
-        -   channel_id  (int)
-
-    Exceptions:
-        AccessError - Occurs when the user_id returned from the token is not a
-                      member of that channel, i.e. not in all_members.
-
-    Return Value: N/A
-    """
-
-    store = data_store.get()
-    channel_data = check_valid_channel_id(channel_id)
-    member_data = check_user_is_member(auth_user_id, channel_data, 
-                                       'all_members')
-    owner_data = check_user_is_member(auth_user_id, channel_data, 
-                                      'owner_members')
-
-    # if the user is an owner_member, then they have to also be an
-    # all_members user aswell.
-    if owner_data:
-        channel_data['all_members'].remove(member_data)
-        channel_data['owner_members'].remove(owner_data)
-    elif member_data:
-        channel_data['all_members'].remove(member_data)
-    else:
-        raise AccessError(description='User is not a member of that channel')
-
-    data_store.set(store)
-
+@token_valid_check
 def channel_addowner_v1(token, channel_id, u_id):
     """
     Make user with user id u_id an owner of the channel.
@@ -255,6 +215,7 @@ def channel_addowner_v1(token, channel_id, u_id):
 
     channel_addremove_owner_valid_check(token, channel_id, u_id, 'add')
 
+@token_valid_check
 def channel_removeowner_v1(token, channel_id, u_id):
     """
     Remove user with user id u_id as an owner of the channel
@@ -305,7 +266,7 @@ def channel_addremove_owner_valid_check(token, channel_id, u_id, option):
     """
 
     store = data_store.get()
-    token_valid_check(token)
+
     check_valid_auth_id(u_id)
     channel = check_valid_channel_id(channel_id)
     chan_owner = token_get_user_id(token)
