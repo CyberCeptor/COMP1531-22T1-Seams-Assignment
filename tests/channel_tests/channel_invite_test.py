@@ -229,9 +229,6 @@ def test_channel_invite_inviter_not_in_channel(clear_register_createchannel):
                                 'u_id': data2['auth_user_id']})
     assert add.status_code == 403
 
-requests.delete(config.url + 'clear/v1')
-
-
 @pytest.mark.usefixtures('clear_register_createchannel')
 def test_channel_invite_success(clear_register_createchannel):
     """
@@ -259,3 +256,5 @@ def test_channel_invite_success(clear_register_createchannel):
                         json={'token': id1, 'channel_id': chan_id1,
                                 'u_id': user2['auth_user_id']})
     assert add.status_code == 200
+
+requests.delete(config.url + 'clear/v1')

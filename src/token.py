@@ -118,7 +118,6 @@ def token_valid_check(function):
  
     def inner(*args, **kwargs):
         token_to_check = args[0]
-        print(token_to_check)
 
         # invalid input types for tokens
         if token_to_check in ['True', 'False', '']:

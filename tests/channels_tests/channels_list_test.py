@@ -79,29 +79,23 @@ def test_channels_list_working(clear_register_two_createchannel):
 
     # Check that the channel_list info matches what was created.
     assert len(channels_list['channels']) == 3
-    assert channel_id1 in [k['channel_id'] for k in channels_list['channels']]
-    assert channel2_json['channel_id'] in [k['channel_id'] for k in 
-                                            channels_list['channels']]
-    assert channel3_json['channel_id'] in [k['channel_id'] for k in 
-                                            channels_list['channels']]
-
-    assert 'channel_name' in [k['name'] for k in channels_list['channels']]
-    assert 'channel_name2' in [k['name'] for k in channels_list['channels']]
-    assert 'private_channel1' in [k['name'] for k in channels_list['channels']]
+    assert (channel_id1, 'channel_name') in \
+            [(k['channel_id'], k['name']) for k in channels_list['channels']]
+    assert (channel2_json['channel_id'], 'channel_name') in \
+            [(k['channel_id'], k['name']) for k in channels_list['channels']]
+    assert (channel3_json['channel_id'], 'private_channel1') in \
+            [(k['channel_id'], k['name']) for k in channels_list['channels']]
 
     #  Check that the channel_list2 info matches that was created.
     #  The channels_list will return in the order of channel_id, so the lowest 
     # channel_id, will be the first in the list
     assert len(channels_list2['channels']) == 3
-    assert channel_id1 in [k['channel_id'] for k in channels_list2['channels']]
-    assert channel4_json['channel_id'] in [k['channel_id'] for k in 
-                                            channels_list2['channels']]
-    assert channel5_json['channel_id'] in [k['channel_id'] for k in 
-                                            channels_list2['channels']]
-
-    assert 'channel_name' in [k['name'] for k in channels_list2['channels']]
-    assert 'test_pub_channel' in [k['name'] for k in channels_list2['channels']]
-    assert 'test_pri_channel' in [k['name'] for k in channels_list2['channels']]
+    assert (channel_id1, 'channel_name') in \
+            [(k['channel_id'], k['name']) for k in channels_list2['channels']]
+    assert (channel4_json['channel_id'], 'test_pub_channel') in \
+            [(k['channel_id'], k['name']) for k in channels_list2['channels']]
+    assert (channel5_json['channel_id'], 'test_pri_channel') in \
+            [(k['channel_id'], k['name']) for k in channels_list2['channels']]
 
 @pytest.mark.usefixtures('clear_register_two_createchannel')
 def test_channel_list_not_in_channel(clear_register_two_createchannel):

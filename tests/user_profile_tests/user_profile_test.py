@@ -78,7 +78,8 @@ def test_profile_bad_token_input(clear_register):
     # Testing with a bad token
     user_json = clear_register
     user_profile = requests.get(config.url + 'user/profile/v1', 
-                    params={'token': 'bad_token', 'u_id': user_json['auth_user_id']})
+                    params={'token': 'bad_token', 
+                            'u_id': user_json['auth_user_id']})
     assert user_profile.status_code == STATUS_ACCESS_ERR
 
     # tesing with a bad token as int
@@ -97,11 +98,13 @@ def test_profile_bad_token_input(clear_register):
     assert user_profile.status_code == STATUS_INPUT_ERR
 
     user_profile = requests.get(config.url + 'user/profile/v1', 
-                    params={'token': EXPIRED_TOKEN, 'u_id': user_json['auth_user_id']})
+                    params={'token': EXPIRED_TOKEN, 
+                            'u_id': user_json['auth_user_id']})
     assert user_profile.status_code == STATUS_ACCESS_ERR
 
     user_profile = requests.get(config.url + 'user/profile/v1', 
-                    params={'token': UNSAVED_TOKEN, 'u_id': user_json['auth_user_id']})
+                    params={'token': UNSAVED_TOKEN, 
+                            'u_id': user_json['auth_user_id']})
     assert user_profile.status_code == STATUS_ACCESS_ERR
 
 @pytest.mark.usefixtures('clear_register')

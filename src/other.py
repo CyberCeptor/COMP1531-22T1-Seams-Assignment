@@ -2,7 +2,7 @@
 Filename: other.py
 
 Author: group
-Created: 24/02/2022 - 27/03/2022
+Created: 24/02/2022 - /04/2022
 
 Description: implementation for
     - clearing all stored data in data_store
@@ -13,9 +13,6 @@ Description: implementation for
         - checking if a user is a global owner
         - casting a variable into an int to check for invalid inputs for
           GET requests
-        - getting messages from a channel or dm
-        - sending a message to a channel or dm
-        - checking if a dm id is valid
 """
 
 from src.error import InputError

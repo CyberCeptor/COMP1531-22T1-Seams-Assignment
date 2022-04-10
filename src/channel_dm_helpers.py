@@ -4,14 +4,12 @@ Filename: channel_dm_helpers.py
 Author: group
 Created: 24/02/2022 - 27/03/2022
 
-Description: implementation for
-    - clearing all stored data in data_store
-    - helper functions used over multiple files
-        - getting messages from a channel or dm
-        - sending a message to a channel or dm
-        - checking if a dm id is valid
-        - leaving a channel or dm
-        - setting the is_this_user_reacted value
+Description: helper functions used in channel and dm functions
+    - getting messages from a channel or dm
+    - sending a message to a channel or dm
+    - checking if a dm id is valid
+    - leaving a channel or dm
+    - setting the is_this_user_reacted value
 """
 
 import datetime
@@ -152,14 +150,10 @@ def send_message(token, data_id, message, data_str):
     if check_user_is_member(auth_user_id, data_info, key) is None:
         raise AccessError(description=f'User does not exist in {data_str}')
 
-    if not isinstance(message, str):
-        raise InputError(description='Message is a string')
-
     if message == '':
         raise InputError(description='Empty message input')
 
-    if len(message) > 1000:
-        raise InputError(description='Message must not exceed 1000 characters')
+    check_valid_message(message)
 
     # increament message id for the store message
     message_id = new_id('message')
@@ -192,16 +186,18 @@ def send_message(token, data_id, message, data_str):
 
 def check_valid_dm_id(dm_id):
     """
-    clears any data stored in data_store and registers users with the
-    given information, create the dm with token and u_ids
+    checks if the given dm_id actually belongs to a dm
 
-    Arguments: token
-               u_ids
+    Arguments: 
+        dm_id (int) - an int representing a dm
 
-    Exceptions: InputError - raised by duplicate ids
-                InputError - raised by invalid ids
+    Exceptions: 
+        InputError - Raised when
+                        - dm id is not of a valid tpe
+                        - does not belong to a dm
 
-    Return Value: dm_id
+    Return Value: 
+        Reutrns the dm data if the dm is found
     """
 
     if type(dm_id) is bool:
@@ -220,6 +216,27 @@ def check_valid_dm_id(dm_id):
 
     # if the dm_id is not found, raise an AccessError
     raise InputError('dm does not exist in dms')
+
+def check_valid_message(message):
+    """
+    checks if the given message is valid
+
+    Arguments: 
+        message (str) - a message string that is being sent or edited
+
+    Exceptions: 
+        InputError - Raised when
+                        - message is not a string
+                        - message is too long
+
+    Return Value: N/A
+    """
+
+    if not isinstance(message, str):
+        raise InputError(description='Message is not a string')
+
+    if len(message) > 1000:
+        raise InputError(description='Message must not exceed 1000 characters')
 
 def set_is_this_user_reacted(auth_user_id, messages, start, end):
     """

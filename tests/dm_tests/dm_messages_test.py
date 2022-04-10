@@ -84,8 +84,6 @@ def test_dm_messages_invalid_token(clear_register_two_createdm):
                                     'start': 0})
     assert resp6.status_code == STATUS_ACCESS_ERR
     
-    requests.delete(config.url + 'clear/v1')
-
 @pytest.mark.usefixtures('clear_register_two_createdm')
 def test_dm_messages_invalid_start(clear_register_two_createdm):
     """ testing if start is int """

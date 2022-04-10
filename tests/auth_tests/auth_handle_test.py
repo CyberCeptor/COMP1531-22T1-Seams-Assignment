@@ -13,7 +13,7 @@ import requests
 
 from src import config
 
-name_22_chars = 'abcdefghijklmnopqrstuv'
+NAME_22_CHARS = 'abcdefghijklmnopqrstuv'
 
 @pytest.mark.usefixtures('clear_register')
 def test_create_handle_duplicate(clear_register):
@@ -35,8 +35,8 @@ def test_create_handle_duplicate(clear_register):
 
     # user1's handle will have no changes but user2's handle will have a digit
     # at the end
-    assert get['users'][0]['handle_str'] == 'firstlast'
-    assert get['users'][1]['handle_str'] == 'firstlast0'
+    assert 'firstlast' in [k['handle_str'] for k in get['users']]
+    assert 'firstlast0' in [k['handle_str'] for k in get['users']]
 
 def test_create_handle_longer_than_twenty():
     """ testing if users/all returns the right handle values when there are
@@ -47,7 +47,7 @@ def test_create_handle_longer_than_twenty():
     # create a user with a first name longer than 20 characters
     resp0 = requests.post(config.url + 'auth/register/v2', 
                          json={'email': 'abc@def.com', 'password': 'password',
-                               'name_first': name_22_chars,
+                               'name_first': NAME_22_CHARS,
                                'name_last': 'last'})
     assert resp0.status_code == 200
     user1 = resp0.json()
@@ -57,7 +57,7 @@ def test_create_handle_longer_than_twenty():
     resp1 = requests.post(config.url + 'auth/register/v2', 
                          json={'email': 'def@ghi.com', 'password': 'password',
                                'name_first': 'first',
-                               'name_last': name_22_chars})
+                               'name_last': NAME_22_CHARS})
     assert resp1.status_code == 200
 
     # create a third user with a full name longer than 20 characters
@@ -74,9 +74,9 @@ def test_create_handle_longer_than_twenty():
 
     # assert handle strings were sliced correctly and that user2's handle will
     # have a digit at the end
-    assert get['users'][0]['handle_str'] == 'abcdefghijklmnopqrst'
-    assert get['users'][1]['handle_str'] == 'firstabcdefghijklmno'
-    assert get['users'][2]['handle_str'] == 'elevencharsninechars'
+    assert 'abcdefghijklmnopqrst' in [k['handle_str'] for k in get['users']]
+    assert 'firstabcdefghijklmno' in [k['handle_str'] for k in get['users']]
+    assert 'elevencharsninechars' in [k['handle_str'] for k in get['users']]
 
 def test_create_handle_longer_than_twenty_duplicate():
     """ testing if users/all returns the right handle value when there are two
@@ -86,7 +86,7 @@ def test_create_handle_longer_than_twenty_duplicate():
 
     resp0 = requests.post(config.url + 'auth/register/v2', 
                          json={'email': 'abc@def.com', 'password': 'password',
-                               'name_first': name_22_chars,
+                               'name_first': NAME_22_CHARS,
                                'name_last': 'last'})
     assert resp0.status_code == 200
     user1 = resp0.json()
@@ -94,7 +94,7 @@ def test_create_handle_longer_than_twenty_duplicate():
 
     resp1 = requests.post(config.url + 'auth/register/v2', 
                          json={'email': 'def@ghi.com', 'password': 'password',
-                               'name_first': name_22_chars,
+                               'name_first': NAME_22_CHARS,
                                'name_last': 'last'})
     assert resp1.status_code == 200
 
@@ -103,8 +103,8 @@ def test_create_handle_longer_than_twenty_duplicate():
     get = resp2.json()
 
     # assert handle strings were sliced correctly
-    assert get['users'][0]['handle_str'] == 'abcdefghijklmnopqrst'
-    assert get['users'][1]['handle_str'] == 'abcdefghijklmnopqrst0'
+    assert 'abcdefghijklmnopqrst' in [k['handle_str'] for k in get['users']]
+    assert 'abcdefghijklmnopqrst0' in [k['handle_str'] for k in get['users']]
 
 def test_create_handle_symbols():
     """ testing if channel_details_v1 returns the right handle value when there
@@ -128,6 +128,6 @@ def test_create_handle_symbols():
     get = resp1.json()
 
     # assert that all symbols and spaces aren't included in the handle_str
-    assert get['users'][0]['handle_str'] == 'bcdefghjklmnopqrst'
+    assert 'bcdefghjklmnopqrst' in [k['handle_str'] for k in get['users']]
 
 requests.delete(config.url + 'clear/v1')

@@ -51,11 +51,9 @@ def test_channel_addowner_working(clear_register_two_createchannel):
     # assert the data in channels_dict matches what was given.
     assert len(chan_json['owner_members']) == 2
 
-    assert user2_id in [k['u_id'] for k in chan_json['owner_members']]
-    assert 'def@ghi.com' in [k['email'] for k in chan_json['owner_members']]
-    assert 'first' in [k['name_first'] for k in chan_json['owner_members']]
-    assert 'last' in [k['name_last'] for k in chan_json['owner_members']]
-    assert 'firstlast0' in [k['handle_str'] for k in chan_json['owner_members']]
+    assert (user2_id, 'def@ghi.com', 'first', 'last', 'firstlast0') in \
+        [(k['u_id'], k['email'], k['name_first'], k['name_last'], k['handle_str'])
+        for k in chan_json['owner_members']]
 
 @pytest.mark.usefixtures('clear_register_two_createchannel')
 def test_channel_addowner_permission_id(clear_register_two_createchannel):

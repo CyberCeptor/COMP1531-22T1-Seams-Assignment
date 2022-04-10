@@ -90,22 +90,17 @@ def test_channels_listall_v1_return(clear_register_two_createchannel):
     # check the number of channels is all channels
     assert len(channels['channels']) == 5
     # check that the channel_list info matches what was created.
-    assert channel_id1 in [k['channel_id'] for k in channels['channels']]
-    assert channel2_json['channel_id'] in [k['channel_id'] for k in 
-                                            channels['channels']]
-    assert channel3_json['channel_id'] in [k['channel_id'] for k in 
-                                           channels['channels']]
-    assert channel4_json['channel_id'] in [k['channel_id'] for k in 
-                                            channels['channels']]
-    assert channel5_json['channel_id'] in [k['channel_id'] for k in 
-                                            channels['channels']]
+    assert (channel_id1, 'channel_name') in \
+            [(k['channel_id'], k['name']) for k in channels['channels']]
+    assert (channel2_json['channel_id'], 'channel_name2') in \
+            [(k['channel_id'], k['name']) for k in channels['channels']]
+    assert (channel3_json['channel_id'], 'private_channel1') in \
+            [(k['channel_id'], k['name']) for k in channels['channels']]
+    assert (channel4_json['channel_id'], 'pub_channel_user2') in \
+            [(k['channel_id'], k['name']) for k in channels['channels']]
+    assert (channel5_json['channel_id'], 'pri_channel_user2') in \
+            [(k['channel_id'], k['name']) for k in channels['channels']]
 
-    assert 'channel_name' in [k['name'] for k in channels['channels']]
-    assert 'channel_name2' in [k['name'] for k in channels['channels']]
-    assert 'private_channel1' in [k['name'] for k in channels['channels']]
-    assert 'pub_channel_user2' in [k['name'] for k in channels['channels']]
-    assert 'pri_channel_user2' in [k['name'] for k in channels['channels']]
-    
     # check for user 2
     channels_listall_2 = requests.get(config.url + 'channels/listall/v2',
                                         params={'token': user2_token})
@@ -115,20 +110,15 @@ def test_channels_listall_v1_return(clear_register_two_createchannel):
     # check the number of channels is all channels
     assert len(channels2['channels']) == 5
     # check that the channel_list info matches what was created.
-    assert channel_id1 in [k['channel_id'] for k in channels2['channels']]
-    assert channel2_json['channel_id'] in [k['channel_id'] for k in 
-                                            channels2['channels']]
-    assert channel3_json['channel_id'] in [k['channel_id'] for k in 
-                                           channels2['channels']]
-    assert channel4_json['channel_id'] in [k['channel_id'] for k in 
-                                            channels2['channels']]
-    assert channel5_json['channel_id'] in [k['channel_id'] for k in 
-                                            channels2['channels']]
+    assert (channel_id1, 'channel_name') in \
+            [(k['channel_id'], k['name']) for k in channels2['channels']]
+    assert (channel2_json['channel_id'], 'channel_name2') in \
+            [(k['channel_id'], k['name']) for k in channels2['channels']]
+    assert (channel3_json['channel_id'], 'private_channel1') in \
+            [(k['channel_id'], k['name']) for k in channels2['channels']]
+    assert (channel4_json['channel_id'], 'pub_channel_user2') in \
+            [(k['channel_id'], k['name']) for k in channels2['channels']]
+    assert (channel5_json['channel_id'], 'pri_channel_user2') in \
+            [(k['channel_id'], k['name']) for k in channels2['channels']]
                                             
-    assert 'channel_name' in [k['name'] for k in channels2['channels']]
-    assert 'channel_name2' in [k['name'] for k in channels2['channels']]
-    assert 'private_channel1' in [k['name'] for k in channels2['channels']]
-    assert 'pub_channel_user2' in [k['name'] for k in channels2['channels']]
-    assert 'pri_channel_user2' in [k['name'] for k in channels2['channels']]
-
 requests.delete(config.url + 'clear/v1')

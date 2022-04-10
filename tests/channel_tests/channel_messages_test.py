@@ -140,8 +140,6 @@ def test_channel_messages_invalid_start(clear_register_createchannel):
                                     'start': 1000})
     assert resp5.status_code == STATUS_INPUT_ERR
 
-    requests.delete(config.url + 'clear/v1')
-
 @pytest.mark.usefixtures('clear_register_createchannel')
 def test_user_not_belong(clear_register_createchannel):
     """ testing if user belongs to the channel  """
@@ -159,8 +157,6 @@ def test_user_not_belong(clear_register_createchannel):
                           params = {'token': token_2, 'channel_id': chan_id, 
                                     'start': True})
     assert resp0.status_code == STATUS_ACCESS_ERR
-
-    requests.delete(config.url + 'clear/v1')
     
 @pytest.mark.usefixtures('clear_register_createchannel')
 def test_channel_messages_return(clear_register_createchannel):
