@@ -22,6 +22,8 @@ from src.token import token_generate
 
 from src.global_vars import Permission
 
+from flask import url_for
+
 def auth_login_v2(email, password):
     """
     logs a user in with the given email and password and returns their
@@ -105,6 +107,10 @@ def auth_register_v2(email, password, name_first, name_last):
 
     handle = create_handle(store, full_name)
 
+
+    '''Get a default image.'''
+
+
     # append user data as a dictionary if everything is valid
     user_dict = {
         'id': u_id,
@@ -116,7 +122,8 @@ def auth_register_v2(email, password, name_first, name_last):
         'notifications': [],
         'perm_id': Permission.OWNER.value if u_id == 1 else Permission.USER.value,
         'removed': False,
-        'profile_img_url': None, #if they have yet to upload an image,  site-wide default image used.
+        # if they have yet to upload an image,  site-wide default image used.
+        'profile_img_url': url_for('static', filename='uploads/default.jpg'), 
     }
 
     # store the user information into the list of users

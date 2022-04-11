@@ -27,6 +27,7 @@ import urllib
 from flask import url_for #https://www.educba.com/flask-url_for/
 import requests
 import imgspy
+import os
 
 @token_valid_check
 def user_profile_v1(token, u_id):
@@ -256,30 +257,39 @@ def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
     '''Get the user ID from the token'''
     user_id = token_get_user_id(token)
 
-    file_location = f"src/uploads/{user_id}.jpg"
-
-    '''Test the URL can be opened'''
-    try:
-        urllib.request.urlretrieve(img_url, file_location)
-    except:
-        raise InputError(description="URL cannot be opened.")
-
-
+    file_location = f"uploads/{user_id}.jpg"
+    temp = f"uploads/temp.jpg"
     
-    # https://stackoverflow.com/questions/64384834/how-to-check-file-type-for-an-image-stored-as-url
+    # # https://stackoverflow.com/questions/64384834/how-to-check-file-type-for-an-image-stored-as-url
     # response = requests.get(img_url)
     # if response.headers['Content-Type'] != 'image/jpeg':
-    #     raise InputError(description="URL image is not of a JPG.")
+    #     raise InputError(description="URL image is not of a JPG.")    
+
+
+    if type(img_url) != str:
+        raise InputError("Invalid URL variable type.")
+
+    '''Test the URL can be opened
+    Stores in temp file, incase its not valid.'''
+    try:
+        urllib.request.urlretrieve(img_url, temp)
+    except:
+        raise InputError(description="URL cannot be opened.")
 
 
     
     # https://github.com/nkanaev/imgspy
     """Check the URL is of a JPG."""
     image_info = imgspy.info(img_url)
-    if image_info['type'] is not 'jpg':
+    if image_info['type'] != 'jpg':
+        os.remove(temp)
         raise InputError(description="URL image is not of a JPG.")
 
-    image = Image.open(file_location)
+
+
+    
+
+    image = Image.open(temp)
 
     width = image_info['width']
     height = image_info['height']
@@ -287,6 +297,7 @@ def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
 
     '''Check the dimensions of the image'''
     if x_start < 0 or y_start < 0 or x_end > width or y_end > height or x_start >= x_end or y_start >= y_end or x_end != y_end:
+        os.remove(temp)
         raise InputError(description="The image dimensions are too small.")
     
     '''Crop the image to fit within our requirements'''

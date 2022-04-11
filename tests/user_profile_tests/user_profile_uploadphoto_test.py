@@ -26,6 +26,7 @@ from src.global_vars import EXPIRED_TOKEN, UNSAVED_TOKEN, STATUS_OK, \
                             STATUS_INPUT_ERR, STATUS_ACCESS_ERR
 
 url = 'http://clipart-library.com/images/kiKB87aeT.jpg'
+https_url = 'http://cdn.mos.cms.futurecdn.net/iC7HBvohbJqExqvbKcV3pP.jpg'
 
 @pytest.mark.usefixtures('clear_register')
 def test_user_uploadphoto_working(clear_register):
@@ -35,6 +36,10 @@ def test_user_uploadphoto_working(clear_register):
     user = clear_register
     image = requests.post(config.url + '/user/profile/uploadphoto/v1', 
                         json={'token': user['token'], 'img_url': url, 'x_start': 0, 'y_start': 0, 'x_end': 200, 'y_end': 200})
+    assert image.status_code == STATUS_OK
+
+    image = requests.post(config.url + '/user/profile/uploadphoto/v1', 
+                        json={'token': user['token'], 'img_url': https_url, 'x_start': 0, 'y_start': 0, 'x_end': 200, 'y_end': 200})
     assert image.status_code == STATUS_OK
 
 
@@ -49,7 +54,6 @@ def test_user_uploadphoto_invalid_url(clear_register):
         - A HTTPS URL
     """
     user = clear_register
-    https_url = 'https://www.publicdomainpictures.net/pictures/150000/velka/chicken-cartoon.jpg'
 
     image = requests.post(config.url + '/user/profile/uploadphoto/v1', 
                         json={'token': user['token'], 'img_url': 'invalid_url', 'x_start': 0, 'y_start': 0, 'x_end': 300, 'y_end': 300})
@@ -63,9 +67,6 @@ def test_user_uploadphoto_invalid_url(clear_register):
                         json={'token': user['token'], 'img_url': -1, 'x_start': 0, 'y_start': 0, 'x_end': 300, 'y_end': 300})
     assert image.status_code == STATUS_INPUT_ERR
 
-    image = requests.post(config.url + '/user/profile/uploadphoto/v1', 
-                        json={'token': user['token'], 'img_url': https_url, 'x_start': 0, 'y_start': 0, 'x_end': 300, 'y_end': 300})
-    assert image.status_code == STATUS_INPUT_ERR
 
 @pytest.mark.usefixtures('clear_register')
 def test_user_uploadphoto_bad_dimensions(clear_register):
@@ -140,4 +141,7 @@ def test_user_uploadphoto_invalid_token(clear_register):
     image = requests.post(config.url + '/user/profile/uploadphoto/v1', 
                         json={'token': '', 'img_url': url, 'x_start': 0, 'y_start': 0, 'x_end': 300, 'y_end': 300})
     assert image.status_code == STATUS_INPUT_ERR
+
+
+requests.delete(config.url + 'clear/v1')
     
