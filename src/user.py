@@ -312,7 +312,6 @@ def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
     profile_img_url = url_for('static', filename=f'uploads/{user_id}.jpg')
 
     
-
     """Set the user data profile_img_url to be the URL image"""
     store = data_store.get()
     user_data = check_valid_auth_id(user_id)

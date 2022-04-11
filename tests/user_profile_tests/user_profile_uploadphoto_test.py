@@ -51,8 +51,7 @@ def test_user_uploadphoto_working(clear_register):
 #                         json={'token': user['token'], 'img_url': url, 'x_start': 0, 'y_start': 0, 'x_end': 200, 'y_end': 200})
 #     assert image.status_code == STATUS_OK
 
-#     get_image = requests.get(config.url + '/static/uploads/<filename>', 
-#                             json={'filename': 'default.jpg'})
+#     get_image = requests.get(config.url + '/static/uploads/default.jpg')
 #     assert get_image.status_code == 200
 
 
@@ -141,7 +140,7 @@ def test_user_uploadphoto_non_jpg(clear_register):
 
 
 @pytest.mark.usefixtures('clear_register')
-def test_user_uploadphoto_invalid_token(clear_register):
+def test_user_uploadphoto_invalid_token():
     """
     Tests the function agains all possible inputs for invalid tokens
     """
