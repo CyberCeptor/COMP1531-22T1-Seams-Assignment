@@ -176,11 +176,11 @@ def user_uploadphoto():
     return dumps({})
 
 
-@APP.route('/uploads/<filename>', methods=['GET'])
+@APP.route('/static/uploads/<filename>', methods=['GET'])
 def user_profile_image(filename):
     """A Route to store the profile picture"""
     # https://flask.palletsprojects.com/en/2.1.x/api/
-    return send_from_directory('uploads', filename)
+    return send_from_directory('static', filename)
 
 ################################################################################
 ##                              ADMIN ROUTES                                  ##
