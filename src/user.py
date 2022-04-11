@@ -252,7 +252,11 @@ def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
         represents the path saved to the local, and header represents the reponse header of the server.
     """
 
-
+    '''check that the x, y values are ints'''
+    dimensions_list = [x_start, y_start, x_end, y_end]
+    for item in dimensions_list:
+        if type(item) is not int or item is bool:
+            raise InputError("Invalid x and y value types.")
     
     '''Get the user ID from the token'''
     user_id = token_get_user_id(token)

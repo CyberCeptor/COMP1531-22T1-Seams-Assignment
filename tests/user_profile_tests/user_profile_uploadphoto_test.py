@@ -44,6 +44,25 @@ def test_user_uploadphoto_working(clear_register):
 
 
 
+# @pytest.mark.usefixtures('clear_register')
+# def test_user_uploadphoto_test_getting_image(clear_register):
+#     user = clear_register
+#     image = requests.post(config.url + '/user/profile/uploadphoto/v1', 
+#                         json={'token': user['token'], 'img_url': url, 'x_start': 0, 'y_start': 0, 'x_end': 200, 'y_end': 200})
+#     assert image.status_code == STATUS_OK
+
+#     get_image = requests.get(config.url + '/static/uploads/<filename>', 
+#                             json={'filename': 'default.jpg'})
+#     assert get_image.status_code == 200
+
+
+
+
+
+
+
+
+
 @pytest.mark.usefixtures('clear_register')
 def test_user_uploadphoto_invalid_url(clear_register):
     """
@@ -98,6 +117,14 @@ def test_user_uploadphoto_bad_dimensions(clear_register):
 
     image = requests.post(config.url + '/user/profile/uploadphoto/v1', 
                         json={'token': user['token'], 'img_url': url, 'x_start': 300, 'y_start': 0, 'x_end': 300, 'y_end': 300})
+    assert image.status_code == STATUS_INPUT_ERR
+
+    image = requests.post(config.url + '/user/profile/uploadphoto/v1', 
+                        json={'token': user['token'], 'img_url': url, 'x_start': True, 'y_start': 0, 'x_end': 300, 'y_end': 300})
+    assert image.status_code == STATUS_INPUT_ERR
+
+    image = requests.post(config.url + '/user/profile/uploadphoto/v1', 
+                        json={'token': user['token'], 'img_url': url, 'x_start': 'string', 'y_start': 0, 'x_end': 300, 'y_end': 300})
     assert image.status_code == STATUS_INPUT_ERR
 
 

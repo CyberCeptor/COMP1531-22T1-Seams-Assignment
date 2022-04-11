@@ -168,17 +168,19 @@ def user_uploadphoto():
     data = request.get_json()
     token = data['token']
     url = data['img_url']
-    x_start = int(data['x_start'])
-    x_end = int(data['x_end'])
-    y_start = int(data['y_start'])
-    y_end = int(data['y_end'])
+    x_start = data['x_start']
+    x_end = data['x_end']
+    y_start = data['y_start']
+    y_end = data['y_end']
     user_profile_uploadphoto_v1(token, url, x_start, y_start, x_end, y_end)
+    save_data()
     return dumps({})
 
 
-@APP.route('/uploads/', methods=['GET'])
-def user_profile_image():
-    filename = request.args.get('filename')
+@APP.route('/static/uploads/<filename>', methods=['GET'])
+def user_profile_image(filename):
+    filename = request.get_json()
+    print(filename)
     """A Route to store the profile picture"""
     # https://flask.palletsprojects.com/en/2.1.x/api/
     return send_file(filename, mimetype='image/jpeg')
