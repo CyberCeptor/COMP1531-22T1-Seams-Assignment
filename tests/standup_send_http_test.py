@@ -8,7 +8,7 @@ Description: http test for standup_send
 """
 
 import pytest
-
+import time
 import requests
 
 from src import config
@@ -23,15 +23,21 @@ def test_standup_send_valid(clear_register_createchannel):
     token = user1['token']
     channel_id = clear_register_createchannel[1]
     
-    requests.post(config.url + 'standup/start/v1',
+    start = requests.post(config.url + 'standup/start/v1',
                 json={'token': token, 'channel_id': channel_id,
                     'length': 1})
 
     stand = requests.post(config.url + 'standup/send/v1',
                         json={'token': token, 'channel_id': channel_id,
                             'message': 'hello world'})
+    time.sleep(1)
+    resp1 = requests.get(config.url + 'channel/messages/v2', 
+                          params = {'token': token, 'channel_id': channel_id, 
+                                    'start': 0})
+    info = resp1.json()
+    assert info['messages'][0]['message'] == 'firstlast: hello world'
     assert stand.status_code == 200
-
+    
 @pytest.mark.usefixtures('clear_register')
 def test_standup_send_invalid_channel(clear_register):
     """
@@ -141,6 +147,12 @@ def test_standup_send_invalid_messages(clear_register_createchannel):
                     'length': 1})
 
     message = [2]
+    stand = requests.post(config.url + 'standup/send/v1',
+                        json={'token': token, 'channel_id': channel_id,
+                            'message': message})
+    assert stand.status_code == 400
+
+    message = ''
     stand = requests.post(config.url + 'standup/send/v1',
                         json={'token': token, 'channel_id': channel_id,
                             'message': message})

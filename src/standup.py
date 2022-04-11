@@ -71,14 +71,12 @@ def standup_start_v1(token, channel_id, length):
     # add the length, begin_time, end_time into standup
     # coverting begin and end time to an isoformat.
     channel_data['standup']['is_active'] = True
-    channel_data['standup']['finish_time'] = end_time.isoformat()
-    
-    timer = Timer(length, standup_send_collect_messages, [token, channel_data])
-    timer.start()
+    channel_data['standup']['time_finish'] = time_finish
 
     # Saves data
     data_store.set(store)
-    
+    timer = Timer(length, standup_send_collect_messages, [token, channel_id])
+    timer.start()
     # return a dic
     return {'time_finish': time_finish}
 
@@ -111,19 +109,10 @@ def standup_active_v1(token, channel_id):
         raise AccessError(description='Inviter is not in the channel')
     
     value = {} # create an empty dic
-
-    if channel_data['standup']['is_active']:
-        finish_time = datetime.fromisoformat(
-            channel_data['standup']['finish_time'])
-
     # Add the is_active into value dic
     value['is_active'] = channel_data['standup']['is_active']
+    value['time_finish'] = channel_data['standup']['time_finish']
 
-    if value['is_active']:
-        value['time_finish'] = int(
-            finish_time.replace(tzinfo=timezone.utc).timestamp())
-    else:
-        value['time_finish'] = None
     return value
 
 def standup_send_v1(token, channel_id, message):
@@ -143,7 +132,7 @@ def standup_send_v1(token, channel_id, message):
     
     Return Value: N/A
     """
-    data_store.get()
+    store = data_store.get()
     # check valid token
     token_valid_check(token)
     # get user id from token
@@ -159,6 +148,9 @@ def standup_send_v1(token, channel_id, message):
     if len(message) > 1000:
         raise InputError('Length of message is over 1000 characters.')
     
+    if message == '':
+        raise InputError('This is an empty message')
+    
     # check user is not in channel
     if check_user_is_member(user_id, channel_data, 'all_members') is None:
         raise AccessError('Inviter is not in the channel')
@@ -172,10 +164,11 @@ def standup_send_v1(token, channel_id, message):
     message_name = user['handle']
     collect_messages = f'{message_name}: {message}'
     channel_data['standup']['messages_buffer'].append(collect_messages)
-
+    data_store.set(store)
+    
     return {}
 
-def standup_send_collect_messages(token, channel):
+def standup_send_collect_messages(token, channel_id):
     """
     This function is to send message in the buffer
     
@@ -187,6 +180,8 @@ def standup_send_collect_messages(token, channel):
 
     Return Value: N/A
     """
+    store = data_store.get()
+    channel = check_valid_channel_id(channel_id)
     if len(channel['standup']['messages_buffer']) > 0:
         packaged_message = '\n'.join(channel['standup']['messages_buffer'])
         message_send_v1(token, channel['channel_id'], packaged_message)
@@ -194,6 +189,7 @@ def standup_send_collect_messages(token, channel):
     channel['standup']['is_active'] = False
     channel['standup']['messages_buffer'] = []
     channel['standup']['time_finish'] = None
+    data_store.set(store)
 
 def check_length(length):
     '''
@@ -211,6 +207,6 @@ def check_length(length):
     if isinstance(length, int) is False:
         raise InputError('Invalid length type')
     
-    if length < 0:
+    if length <= 0:
         raise InputError('Length is invalid')
-
+    

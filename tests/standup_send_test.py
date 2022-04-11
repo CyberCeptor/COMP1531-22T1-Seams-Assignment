@@ -133,4 +133,4 @@ def test_standup_send_invalid_message():
     standup_start_v1(token, channel_id, 1)
 
     with pytest.raises(InputError):
-        standup_send_v1(token, channel_id, [2])
+        standup_send_v1(token, channel_id, 4)
