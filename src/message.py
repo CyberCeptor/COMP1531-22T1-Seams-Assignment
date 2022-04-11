@@ -47,8 +47,9 @@ def message_send_v1(token, channel_id, message):
     Return Value:
         Message_id - int to specifies each message
     """
-
-    message_id = send_message(token, channel_id, message, 'channel')
+    user_id = token_get_user_id(token)
+    
+    message_id = send_message(user_id, channel_id, message, 'channel', False)
 
     return message_id
 
@@ -74,8 +75,8 @@ def message_senddm_v1(token, dm_id, message):
     Return Value:
         Message_id - int to specifies each message
     """
-
-    message_id = send_message(token, dm_id, message, 'dm')
+    user_id = token_get_user_id(token)
+    message_id = send_message(user_id, dm_id, message, 'dm', False)
 
     return message_id
 
