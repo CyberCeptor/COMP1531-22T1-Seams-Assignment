@@ -176,8 +176,9 @@ def user_uploadphoto():
     return dumps({})
 
 
-@APP.route('/static/uploads/<filename>', methods=['GET'])
-def user_profile_image(filename):
+@APP.route('/uploads/', methods=['GET'])
+def user_profile_image():
+    filename = request.args.get('filename')
     """A Route to store the profile picture"""
     # https://flask.palletsprojects.com/en/2.1.x/api/
     return send_file(filename, mimetype='image/jpeg')
