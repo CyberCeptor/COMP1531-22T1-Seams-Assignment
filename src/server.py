@@ -3,7 +3,7 @@ import signal
 import pickle
 from src import config
 from json import dumps
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 
 from src.dm import dm_create_v1, dm_list_v1, dm_details_v1, dm_remove_v1,\
@@ -160,17 +160,24 @@ def user_sethandle():
     save_data()
     return dumps({})
 
-@APP.route('user/profile/uploadphoto/v1', methods=['POST'])
+@APP.route('/user/profile/uploadphoto/v1', methods=['POST'])
 def user_uploadphoto():
     data = request.get_json()
     token = data['token']
-    url = data['url']
-    x_start = data['x_start']
-    x_end = data['x_end']
-    y_start = data['y_start']
-    y_end = data['y_end']
+    url = data['img_url']
+    x_start = int(data['x_start'])
+    x_end = int(data['x_end'])
+    y_start = int(data['y_start'])
+    y_end = int(data['y_end'])
     user_profile_uploadphoto_v1(token, url, x_start, y_start, x_end, y_end)
     return dumps({})
+
+
+@APP.route('/uploads/<filename>', methods=['GET'])
+def user_profile_image(filename):
+    """A Route to store the profile picture"""
+    # https://flask.palletsprojects.com/en/2.1.x/api/
+    return send_from_directory('uploads', filename)
 
 ################################################################################
 ##                              ADMIN ROUTES                                  ##

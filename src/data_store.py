@@ -36,7 +36,8 @@ data = {
         'handle': 'firstlast',
         'perm_id': 1,
         'removed': False,
-        'profile_img_url': None,
+        'profile_img_url': None, #For any given user, if they have yet to upload an image, 
+                                    there should be a site-wide default image used.
     }],
     'tokens' = [{
         'user_id': user_data['id'],

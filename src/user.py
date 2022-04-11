@@ -1,3 +1,4 @@
+# pylint: disable=raise-missing-from
 """
 Filename: user.py
 
@@ -21,6 +22,10 @@ from src.token import token_valid_check, token_get_user_id
 from src.other import check_valid_auth_id, cast_to_int_get_requests
 from src.auth import check_invalid_email, check_invalid_name
 from src.error import InputError
+from PIL import Image # https://pillow.readthedocs.io/en/stable/
+import urllib
+from flask import url_for #https://www.educba.com/flask-url_for/
+import requests
 
 @token_valid_check
 def user_profile_v1(token, u_id):
@@ -230,3 +235,68 @@ def user_profile_sethandle_v1(token, handle_str):
                 user['handle_str'] = handle_str
 
     data_store.set(store)
+
+@token_valid_check
+def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
+    '''Check the token is valid'''
+
+    """
+    urlretrieve:
+        - url: the url to GET the JPG
+        - filename: specifies the local path (if not specified, urllib will generate a temporary file to save the data)
+        - reporthook: callback function, which will trigger when the server is connected and the corresponding 
+        data block is transferred. We can use this callback function to display the current download progress.
+        - data (data of the POST import server): returns a tuple containing two elements (filename, headers). Filename
+        represents the path saved to the local, and header represents the reponse header of the server.
+    """
+
+
+    
+    '''Get the user ID from the token'''
+    user_id = token_get_user_id(token)
+
+    file_location = f"src/uploads/{user_id}.jpg"
+
+    '''Test the URL can be opened'''
+    print(img_url)
+    print(file_location)
+    try:
+        urllib.request.urlretrieve(img_url, file_location)
+    except:
+        raise InputError(description="URL cannot be opened.")
+
+
+
+    """Check the URL is of a JPG."""
+    # https://stackoverflow.com/questions/64384834/how-to-check-file-type-for-an-image-stored-as-url
+    response = requests.get(img_url)
+    print(response.headers['Content-Type'])
+    if response.headers['Content-Type'] != 'image/jpeg':
+        raise InputError(description="URL image is not of a JPG.")
+
+
+    image = Image.open(file_location)
+
+    width, height = image.size
+
+    '''Check the dimensions of the image'''
+    if x_start < 0 or y_start < 0 or x_end > width or y_end > height or x_start >= x_end or y_start >= y_end or x_end != y_end:
+        raise InputError(description="The image dimensions are too small.")
+    
+    '''Crop the image to fit within our requirements'''
+    cropped_image = image.crop((x_start, y_start, x_end, y_end))
+    cropped_image.save(file_location)
+
+    # https://stackoverflow.com/questions/16351826/link-to-flask-static-files-with-url-for
+    profile_img_url = url_for('static', filename=f'uploads/{user_id}.jpg')
+
+    
+
+    """Set the user data profile_img_url to be the URL image"""
+    store = data_store.get()
+    for users in store['users']:
+        if users['id'] == user_id:
+            users['profile_img_url'] = profile_img_url
+
+    data_store.set(store)
+    return {}

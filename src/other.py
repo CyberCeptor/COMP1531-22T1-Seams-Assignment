@@ -77,7 +77,7 @@ def check_valid_auth_id(auth_user_id):
                     'email': user['email'],
                     'name_first': user['first'],
                     'name_last': user['last'],
-                    'handle_str': user['handle']
+                    'handle_str': user['handle'],
                 }
             }
 

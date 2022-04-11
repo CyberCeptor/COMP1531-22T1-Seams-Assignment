@@ -116,7 +116,7 @@ def auth_register_v2(email, password, name_first, name_last):
         'notifications': [],
         'perm_id': Permission.OWNER.value if u_id == 1 else Permission.USER.value,
         'removed': False,
-        'profile_img_url': None,
+        'profile_img_url': None, #if they have yet to upload an image,  site-wide default image used.
     }
 
     # store the user information into the list of users
