@@ -22,6 +22,9 @@ USER2_HANDLE = 'firstlast0'
 DM_NAME = f'{USER1_HANDLE}, {USER2_HANDLE}'
 CHAN_NAME = 'channel_name'
 
+TAGGED_NOTIF = f'{USER1_HANDLE} tagged you in {CHAN_NAME}: @{USER2_HANDLE} hewwo'
+REACT_NOTIF = f'{USER1_HANDLE} reacted to your message in {DM_NAME}'
+
 @pytest.mark.usefixtures('clear_register_two_createchanneldm_sendmsg')
 def test_notifications_get_works(clear_register_two_createchanneldm_sendmsg):
     """ test that notifications are returned correctly after a user is 
@@ -52,14 +55,12 @@ def test_notifications_get_works(clear_register_two_createchanneldm_sendmsg):
     # notification messages in order from least recent to most recent
     dm_add_notif = f'{USER1_HANDLE} added you to {DM_NAME}'
     chan_add_notif = f'{USER1_HANDLE} added you to {CHAN_NAME}'
-    tagged_notif = f'{USER1_HANDLE} tagged you in {CHAN_NAME}: @{USER2_HANDLE} hewwo'
-    react_notif = f'{USER1_HANDLE} reacted to your message in {DM_NAME}'
 
     # notifications are returned in order from most recent to least recent
-    assert notifs[0]['notification_message'] == react_notif
+    assert notifs[0]['notification_message'] == REACT_NOTIF
     assert notifs[0]['dm_id'] == dm_id
 
-    assert notifs[1]['notification_message'] == tagged_notif
+    assert notifs[1]['notification_message'] == TAGGED_NOTIF
     assert notifs[1]['channel_id'] == chan_id
 
     assert notifs[2]['notification_message'] == chan_add_notif
@@ -163,5 +164,66 @@ def test_notifications_get_invalid_token(clear_register_two_createchanneldm_send
     resp5 = requests.get(config.url + 'notifications/get/v1',
                          params={'token': UNSAVED_TOKEN})
     assert resp5.status_code == STATUS_ACCESS_ERR
+
+@pytest.mark.usefixtures('clear_register_two_createchanneldm')
+def test_notifications_get_user_not_member(clear_register_two_createchanneldm):
+    """ test that a user doesn't receive notifications from channels or dms
+    they are not a member of """
+
+    token1 = clear_register_two_createchanneldm[0]['token']
+    token2 = clear_register_two_createchanneldm[1]['token']
+    chan_id = clear_register_two_createchanneldm[2]
+    dm_id = clear_register_two_createchanneldm[3]
+
+    # user2 leaves the channel
+    resp0 = requests.post(config.url + 'channel/leave/v1', 
+                            json={'token': token2, 
+                                  'channel_id': chan_id})
+    assert resp0.status_code == STATUS_OK
+
+    # user1 sends message in channel, tagging user 2
+    resp1 = requests.post(config.url + 'message/send/v1', 
+                          json={'token': token1, 'channel_id': chan_id, 
+                                'message': '@firstlast0 hewwo'})
+    assert resp1.status_code == STATUS_OK
+
+    resp2 = requests.get(config.url + 'notifications/get/v1',
+                         params={'token': token2})
+    assert resp2.status_code == STATUS_OK
+    notifs = resp2.json()['notifications']
+
+    # user2 will only have the notification where they were invited to the 
+    # channel and added to the dm
+    assert len(notifs) == 2
+    assert TAGGED_NOTIF not in [k['notification_message'] for k in notifs]
+
+    # user2 sends a message in the dm
+    resp3 = requests.post(config.url + 'message/senddm/v1', 
+                          json={'token': token2, 'dm_id': dm_id, 
+                                'message': 'bye bye'})
+    assert resp3.status_code == STATUS_OK
+    msg_data = resp3.json()
+    msg_id = msg_data['message_id']
+
+    # user2 leaves the dm
+    resp4 = requests.post(config.url + 'dm/leave/v1', 
+                            json={'token': token2, 'dm_id': dm_id})
+    assert resp4.status_code == STATUS_OK
+
+    # user1 reacts to user2's message
+    resp5 = requests.post(config.url + 'message/react/v1', 
+                          json={'token': token1, 'message_id': msg_id, 
+                                'react_id': 1})
+    assert resp5.status_code == STATUS_OK
+
+    resp6 = requests.get(config.url + 'notifications/get/v1',
+                         params={'token': token2})
+    assert resp6.status_code == STATUS_OK
+    notifs = resp6.json()['notifications']
+
+    # user2 will still only have the notification where they were invited to the 
+    # channel and added to the dm
+    assert len(notifs) == 2
+    assert REACT_NOTIF not in [k['notification_message'] for k in notifs]
 
 requests.delete(config.url + 'clear/v1')
