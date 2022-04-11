@@ -35,6 +35,9 @@ from src.notifications import notifications_get_v1
 
 from src.data_store_pickle import pickle_data, set_prev_data
 
+from src.standup import standup_start_v1, standup_active_v1,\
+                        standup_send_v1
+
 from src.channel_dm_helpers import leave_channel_dm
 
 def quit_gracefully(*args):
@@ -390,6 +393,36 @@ def dm_messages():
     return dumps(dm_messages)
 
 ################################################################################
+##                             STANDUP ROUTES                                 ##
+################################################################################
+
+@APP.route('/standup/start/v1', methods=['POST'])
+def standup_start():
+    store = request.get_json()
+    result = standup_start_v1(
+        store['token'], store['channel_id'], store['length']
+    )
+    save_data()
+    return dumps(result)
+
+@APP.route('/standup/active/v1', methods = ['GET'])
+def standup_active_server():
+    token = request.args.get('token')
+    channel_id = request.args.get('channel_id')
+    save_data()
+    return dumps(
+        standup_active_v1(token, channel_id)
+    )
+
+@APP.route('/standup/send/v1', methods=['POST'])
+def standup_send():
+    store = request.get_json()
+    result = standup_send_v1(
+        store['token'], store['channel_id'], store['message']
+    )
+    save_data()
+    return dumps(result)
+################################################################################
 ##                            NOTIFICATIONS ROUTE                             ##
 ################################################################################
 
@@ -399,6 +432,7 @@ def get_notifs():
     notifs = notifications_get_v1(token)
     save_data()
     return dumps(notifs)
+
 
 ################################################################################
 ##                               CLEAR ROUTE                                  ##
