@@ -8,6 +8,7 @@ Description: - start the standup
              - check the standup is active
              - send messages
 """
+from email.errors import MessageParseError
 from src.data_store import data_store
 from src.error import InputError, AccessError
 from src.token import token_valid_check, token_get_user_id
@@ -15,7 +16,7 @@ from src.other import check_valid_channel_id, check_user_is_member,\
                     check_valid_auth_id
 from datetime import datetime, timedelta, timezone
 from threading import Timer
-from src.message import message_send_v1
+from src.channel_dm_helpers import send_message
 
 def standup_start_v1(token, channel_id, length):
     """
@@ -75,7 +76,7 @@ def standup_start_v1(token, channel_id, length):
 
     # Saves data
     data_store.set(store)
-    timer = Timer(length, standup_send_collect_messages, [token, channel_id])
+    timer = Timer(length, standup_send_collect_messages, [user_id, channel_id])
     timer.start()
     # return a dic
     return {'time_finish': time_finish}
@@ -168,7 +169,7 @@ def standup_send_v1(token, channel_id, message):
     
     return {}
 
-def standup_send_collect_messages(token, channel_id):
+def standup_send_collect_messages(user_id, channel_id):
     """
     This function is to send message in the buffer
     
@@ -184,7 +185,7 @@ def standup_send_collect_messages(token, channel_id):
     channel = check_valid_channel_id(channel_id)
     if len(channel['standup']['messages_buffer']) > 0:
         packaged_message = '\n'.join(channel['standup']['messages_buffer'])
-        message_send_v1(token, channel['channel_id'], packaged_message)
+        send_message(user_id, channel_id, packaged_message, 'channel', True)
 
     channel['standup']['is_active'] = False
     channel['standup']['messages_buffer'] = []
