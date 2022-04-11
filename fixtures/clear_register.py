@@ -13,6 +13,8 @@ import requests
 
 from src import config
 
+from src.global_vars import STATUS_OK
+
 @pytest.fixture
 def clear_register():
     """ clears any data stored in data_store and registers a user with the
@@ -23,7 +25,7 @@ def clear_register():
     resp = requests.post(config.url + 'auth/register/v2', 
                   json={'email': 'abc@def.com', 'password': 'password',
                         'name_first': 'first', 'name_last': 'last'})
-    assert resp.status_code == 200
+    assert resp.status_code == STATUS_OK
     user1 = resp.json()
 
     return user1

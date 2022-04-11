@@ -10,17 +10,18 @@ Description: implementation for
     - helper functions for the above
 """
 
-from src.dm import dm_leave_v1
-
 from src.error import AccessError, InputError
 from src.other import check_valid_auth_id, check_user_is_global_owner,\
                       check_user_is_member
-from src.token import token_valid_check, token_get_user_id
-
-from src.channel import channel_leave_v1
+from src.token import token_get_user_id, token_valid_check
 
 from src.data_store import data_store
 
+from src.global_vars import Permission
+
+from src.channel_dm_helpers import leave_channel_dm
+
+@token_valid_check
 def admin_userpermission_change(token, u_id, permission_id):
     """
     changes the permission of a specified user using a global owner's token
@@ -47,7 +48,9 @@ def admin_userpermission_change(token, u_id, permission_id):
 
     store = data_store.get()
 
-    token_valid_check(token)
+    owner_perm = Permission.OWNER.value
+    user_perm = Permission.USER.value
+
     auth_user_id = token_get_user_id(token)
 
     # the token must belong to a user who is a global owner
@@ -60,26 +63,27 @@ def admin_userpermission_change(token, u_id, permission_id):
     if not isinstance(permission_id, int) or type(permission_id) is bool:
         raise InputError(description='Permission id is not of valid type')
 
-    if permission_id not in [1, 2]:
+    if permission_id not in [owner_perm, user_perm]:
         raise InputError(description='Invalid permission id')
 
     # count the number of global users
     num_global_owners = len([user for user in store['users'] if 
-                             user['perm_id'] == 1])
+                             user['perm_id'] == owner_perm])
 
     # check three invalid cases of permission changes
     if (check_user_is_global_owner(u_id) and num_global_owners == 1 and
-        permission_id == 2):
+        permission_id == user_perm):
         raise InputError(description='Cannot demote the only global owner')
     
-    if check_user_is_global_owner(u_id) and permission_id == 1:
+    if check_user_is_global_owner(u_id) and permission_id == owner_perm:
         raise InputError(description='User is already a global owner')
     
-    if not check_user_is_global_owner(u_id) and permission_id == 2:
+    if not check_user_is_global_owner(u_id) and permission_id == user_perm:
         raise InputError(description='User is already a member')
 
     change_permission(u_id, permission_id)
 
+@token_valid_check
 def admin_user_remove(token, u_id):
     """
     removes a user from Seams, they will be removed from all channels and dms,
@@ -101,9 +105,8 @@ def admin_user_remove(token, u_id):
 
     store = data_store.get()
 
-    token_valid_check(token)
     auth_user_id = token_get_user_id(token)
-    user_data = check_valid_auth_id(u_id)
+    user_data = check_valid_auth_id(u_id)['all_data']
  
     # if user with the token is not a global owner, they cannot remove a user
     if check_user_is_global_owner(auth_user_id) is False:
@@ -111,7 +114,7 @@ def admin_user_remove(token, u_id):
 
     # if there is only one global owner, they cannot remove themselves
     num_global_owners = len([user for user in store['users'] if 
-                             user['perm_id'] == 1])
+                             user['perm_id'] == Permission.OWNER.value])
 
     if check_user_is_global_owner(u_id) and num_global_owners == 1:
         raise InputError(description='Cannot remove the only global owner')
@@ -119,13 +122,13 @@ def admin_user_remove(token, u_id):
     # remove user from all channels, replace their messages with 'Removed user'
     for channel in store['channels']:
         if check_user_is_member(u_id, channel, 'all_members'):
-            channel_leave_v1(u_id, channel['channel_id'])
+            leave_channel_dm(token, u_id, channel['channel_id'], 'channel')
             replace_messages(u_id, channel)
     
     # remove user from all dms, replace their messages with 'Removed user'
     for dm in store['dms']:
         if check_user_is_member(u_id, dm, 'members'):
-            dm_leave_v1(u_id, dm['dm_id'])
+            leave_channel_dm(token, u_id, dm['dm_id'], 'dm')
             replace_messages(u_id, dm)
 
     # change the user's first name to 'Removed' and last name to 'user'

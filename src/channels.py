@@ -16,6 +16,7 @@ from src.token import token_valid_check, token_get_user_id
 
 from src.data_store import data_store
 
+@token_valid_check
 def channels_list_v2(token):
     """
     Validates the user token, gets the user_id from the decoded
@@ -36,7 +37,6 @@ def channels_list_v2(token):
         the user is a member of
     """
 
-    token_valid_check(token)
     auth_user_id = token_get_user_id(token)
 
     check_valid_auth_id(auth_user_id)
@@ -56,6 +56,7 @@ def channels_list_v2(token):
         'channels': channels_list
     }
 
+@token_valid_check
 def channels_listall_v2(token):
     """
     check if user is valid then provides lists of diictionaries containing all
@@ -73,7 +74,6 @@ def channels_listall_v2(token):
 
     store = data_store.get()
 
-    token_valid_check(token)
     auth_user_id = token_get_user_id(token)
 
     # check that the auth_user_id exists
@@ -87,6 +87,7 @@ def channels_listall_v2(token):
         } for channel in store['channels']]
     }
 
+@token_valid_check
 def channels_create_v2(token, name, is_public):
     """
     Creates a new channel with the name and is_public status given.
@@ -116,7 +117,6 @@ def channels_create_v2(token, name, is_public):
 
     store = data_store.get()
 
-    token_valid_check(token)
     auth_user_id = token_get_user_id(token)
 
     user_info = check_valid_auth_id(auth_user_id)
@@ -147,26 +147,21 @@ def channels_create_v2(token, name, is_public):
     channel_data = {
         'channel_id': channel_id,
         'name': name,
-        'owner_members': [{
-            'u_id': user_info['id'],
-            'email': user_info['email'],
-            'name_first': user_info['first'],
-            'name_last': user_info['last'],
-            'handle_str': user_info['handle']
-        }],
-        'all_members': [{
-            'u_id': user_info['id'],
-            'email': user_info['email'],
-            'name_first': user_info['first'],
-            'name_last': user_info['last'],
-            'handle_str': user_info['handle']
-        }],
+        'owner_members': [user_info['return_data']],
+        'all_members': [user_info['return_data']],
         'is_public': is_public,
+<<<<<<< HEAD
         'messages': [],
         'standup': {
             'is_active': False,
             'time_finish': None,
             'messages_buffer': []
+=======
+        'messages': [], 
+        'standup': {
+            'is_active': False,
+            'time_finish': None,
+>>>>>>> master
         }
     }
 

@@ -13,6 +13,8 @@ import requests
 
 from src import config
 
+from src.global_vars import STATUS_OK
+
 @pytest.fixture
 def clear_register_two_createdm(clear_register_two):
     """ clears any data stored in data_store, registers two users, creates a dm
@@ -24,7 +26,7 @@ def clear_register_two_createdm(clear_register_two):
     create_dm = requests.post(config.url + 'dm/create/v1', 
                               json={'token': user1['token'],
                                     'u_ids': [user2['auth_user_id']]})
-    assert create_dm.status_code == 200
+    assert create_dm.status_code == STATUS_OK
     dm = create_dm.json()
     dm_id = dm['dm_id']
 
