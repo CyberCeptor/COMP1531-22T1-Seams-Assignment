@@ -1,136 +1,161 @@
 """
-Filename: standup_send_test.py
+Filename: standup_send_http_test.py
 
 Author: Zefan Cao(z5237177)
-Created: 03/04/2022 - 14/04/2022
+Created: 14/03/2022 - 24/03/2022
 
-Description: pytest for standup_send
+Description: http test for standup_send
 """
+
 import pytest
-from src.auth import auth_register_v2
-from src.channels import channels_create_v2
-from src.error import InputError, AccessError
-from src.other import clear_v1
-from src.standup import standup_start_v1, standup_send_v1
-from datetime import datetime, timezone
+import time
+import requests
 
+from src import config
 
-def test_standup_send_valid():
+@pytest.mark.usefixtures('clear_register_createchannel')
+def test_standup_send_valid(clear_register_createchannel):
     """
     clears any data stored in data_store and registers users with the
-    given information, test send valid
+    given information, test standup valid
     """
-    # Clear data
-    clear_v1()
-    
-    user1 = auth_register_v2('wky@gmail.com', '346758', 'wang', 'kaiyan')
+    user1 = clear_register_createchannel[0]
     token = user1['token']
-    channel = channels_create_v2(token, 'Channel1', False)
-    channel_id = channel['channel_id']
+    channel_id = clear_register_createchannel[1]
     
-    # start a standup
-    standup_start_v1(token, channel_id, 1)
-    return_value1 = standup_send_v1(token, channel_id, 'Hello World')
-    
-    assert isinstance(return_value1, dict)    
-    assert return_value1 == {}
+    requests.post(config.url + 'standup/start/v1',
+                json={'token': token, 'channel_id': channel_id,
+                    'length': 1})
 
-def test_standup_send_invalid_channel():
+    stand = requests.post(config.url + 'standup/send/v1',
+                        json={'token': token, 'channel_id': channel_id,
+                            'message': 'hello world'})
+    time.sleep(1)
+    resp1 = requests.get(config.url + 'channel/messages/v2', 
+                          params = {'token': token, 'channel_id': channel_id, 
+                                    'start': 0})
+    info = resp1.json()
+    assert info['messages'][0]['message'] == 'firstlast: hello world'
+    assert stand.status_code == 200
+    
+@pytest.mark.usefixtures('clear_register')
+def test_standup_send_invalid_channel(clear_register):
     """
     clears any data stored in data_store and registers users with the
     given information, test invalid channel
     """
-    # Clear data
-    clear_v1()
-
-    user1 = auth_register_v2('wky@gmail.com', '346758', 'wang', 'kaiyan')
+    user1 = clear_register
     token = user1['token']
 
-    # test invalid channel
-    with pytest.raises(InputError): 
-        standup_send_v1(token, 44, 'Hello World')
+    stand = requests.post(config.url + 'standup/send/v1',
+                        json={'token': token, 'channel_id': 44,
+                            'message': 'hello world'})
+    assert stand.status_code == 400
 
-    with pytest.raises(InputError): 
-        standup_send_v1(token, -44, 'Hello World')
+    stand = requests.post(config.url + 'standup/send/v1',
+                        json={'token': token, 'channel_id': -44,
+                            'message': 'hello world'})
+    assert stand.status_code == 400
 
-    with pytest.raises(InputError): 
-        standup_send_v1(token, '', 'Hello World')
+    stand = requests.post(config.url + 'standup/send/v1',
+                        json={'token': token, 'channel_id': False,
+                            'message': 'hello world'})
+    assert stand.status_code == 400
 
-    with pytest.raises(InputError): 
-        standup_send_v1(token, 'ste', 'Hello World')
-    
-    with pytest.raises(InputError): 
-        standup_send_v1(token, False, 'Hello World')
+    stand = requests.post(config.url + 'standup/send/v1',
+                        json={'token': token, 'channel_id': '',
+                            'message': 'hello world'})
+    assert stand.status_code == 400
 
-def test_standup_send_valid_length():
-    """
-    clears any data stored in data_store and registers users with the
-    given information, test length is over 1000 characters
-    """
-    # Clear data
-    clear_v1()
-    
-    user1 = auth_register_v2('wky@gmail.com', '346758', 'wang', 'kaiyan')
-    token = user1['token']
-    channel = channels_create_v2(token, 'Channel1', True)
-    channel_id = channel['channel_id']
-    standup_start_v1(token, channel_id, 1)
-    # create a message is over 1000 characters
-    message = 'hello' * 201
+    stand = requests.post(config.url + 'standup/send/v1',
+                        json={'token': token, 'channel_id': 'ahs',
+                            'message': 'hello world'})
+    assert stand.status_code == 400
 
-    with pytest.raises(InputError):
-        standup_send_v1(token, channel_id, message)
-
-def test_standup_send_inactive():
-    """
-    clears any data stored in data_store and registers users with the
-    given information, test standup is not currently running
-    """
-    # Clear data
-    clear_v1()
-    
-    user1 = auth_register_v2('wky@gmail.com', '346758', 'wang', 'kaiyan')
-    token = user1['token']
-    channel = channels_create_v2(token, 'Channel1', False)
-    channel_id = channel['channel_id']
-
-    with pytest.raises(InputError):
-        standup_send_v1(token, channel_id, 'message')
-
-def test_standup_send_is_not_in_channel():
-    """
-    clears any data stored in data_store and registers users with the
-    given information, test user is not in channel
-    """
-    # Clear data
-    clear_v1()
-
-    user1 = auth_register_v2('wky@gmail.com', '346758', 'wang', 'kaiyan')
-    token = user1['token'] 
-    channel = channels_create_v2(token, 'abc', True) 
-    channel_id = channel['channel_id']
-
-    user2 = auth_register_v2('lmz@gmail.com', '364832', 'li', 'mingzhe')
-    token2 = user2['token'] 
-
-    standup_start_v1(token, channel_id, 1)
-    
-    with pytest.raises(AccessError):
-        standup_send_v1(token2, channel_id, 'hello world')
-
-def test_standup_send_invalid_message():
+@pytest.mark.usefixtures('clear_register_createchannel')
+def test_standup_send_invalid_message(clear_register_createchannel):
     """
     clears any data stored in data_store and registers users with the
     given information, test invalid message
     """
-    # Clear data
-    clear_v1()
-    
-    user1 = auth_register_v2('wky@gmail.com', '346758', 'wang', 'kaiyan')
+    user1 = clear_register_createchannel[0]
     token = user1['token']
-    channel = channels_create_v2(token, 'Channel1', True)
-    channel_id = channel['channel_id']
-    standup_start_v1(token, channel_id, 1)
+    channel_id = clear_register_createchannel[1]
 
-    with pytest.raises(InputError):
-        standup_send_v1(token, channel_id, 4)
+    requests.post(config.url + 'standup/start/v1',
+                json={'token': token, 'channel_id': channel_id,
+                    'length': 1})
+
+    message = 'hello' *201
+    stand = requests.post(config.url + 'standup/send/v1',
+                        json={'token': token, 'channel_id': channel_id,
+                            'message': message})
+    assert stand.status_code == 400
+
+@pytest.mark.usefixtures('clear_register_createchannel')
+def test_standup_send_standup_not_running(clear_register_createchannel):
+    """
+    clears any data stored in data_store and registers users with the
+    given information, test a standuo is not running
+    """
+    user1 = clear_register_createchannel[0]
+    token = user1['token']
+    channel_id = clear_register_createchannel[1]
+
+    stand = requests.post(config.url + 'standup/send/v1',
+                        json={'token': token, 'channel_id': channel_id,
+                            'message': 'hello world'})
+    assert stand.status_code == 400
+
+@pytest.mark.usefixtures('clear_register_two')
+def test_standup_start_is_not_in_channel(clear_register_two):
+    """
+    clears any data stored in data_store and registers users with the
+    given information, test user is not in channel
+    """
+    user1 = clear_register_two[0]
+    user2 = clear_register_two[1]
+    token1 = user1['token']
+    token2 = user2['token']
+    chan = requests.post(config.url + 'channels/create/v2',
+                        json={'token': token1, 'name': 'channel_name',
+                            'is_public': True})
+    chan_data = chan.json()
+    channel_id = chan_data['channel_id']
+    
+    requests.post(config.url + 'standup/start/v1',
+                json={'token': token1, 'channel_id': channel_id,
+                    'length': 1})
+    
+    stand = requests.post(config.url + 'standup/send/v1',
+                        json={'token': token2, 'channel_id': channel_id,
+                            'message': 'hello world'})
+    assert stand.status_code == 403
+
+@pytest.mark.usefixtures('clear_register_createchannel')
+def test_standup_send_invalid_messages(clear_register_createchannel):
+    """
+    clears any data stored in data_store and registers users with the
+    given information, test invalid message
+    """
+    user1 = clear_register_createchannel[0]
+    token = user1['token']
+    channel_id = clear_register_createchannel[1]
+
+    requests.post(config.url + 'standup/start/v1',
+                json={'token': token, 'channel_id': channel_id,
+                    'length': 1})
+
+    message = [2]
+    stand = requests.post(config.url + 'standup/send/v1',
+                        json={'token': token, 'channel_id': channel_id,
+                            'message': message})
+    assert stand.status_code == 400
+
+    message = ''
+    stand = requests.post(config.url + 'standup/send/v1',
+                        json={'token': token, 'channel_id': channel_id,
+                            'message': message})
+    assert stand.status_code == 400
+
+requests.delete(config.url + 'clear/v1')

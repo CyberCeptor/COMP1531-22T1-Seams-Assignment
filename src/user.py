@@ -26,6 +26,7 @@ from PIL import Image # https://pillow.readthedocs.io/en/stable/
 import urllib
 from flask import url_for #https://www.educba.com/flask-url_for/
 import requests
+import imgspy
 
 @token_valid_check
 def user_profile_v1(token, u_id):
@@ -258,26 +259,31 @@ def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
     file_location = f"src/uploads/{user_id}.jpg"
 
     '''Test the URL can be opened'''
-    print(img_url)
-    print(file_location)
     try:
         urllib.request.urlretrieve(img_url, file_location)
     except:
         raise InputError(description="URL cannot be opened.")
 
 
-
-    """Check the URL is of a JPG."""
+    
     # https://stackoverflow.com/questions/64384834/how-to-check-file-type-for-an-image-stored-as-url
-    response = requests.get(img_url)
-    print(response.headers['Content-Type'])
-    if response.headers['Content-Type'] != 'image/jpeg':
-        raise InputError(description="URL image is not of a JPG.")
+    # response = requests.get(img_url)
+    # if response.headers['Content-Type'] != 'image/jpeg':
+    #     raise InputError(description="URL image is not of a JPG.")
 
+
+    
+    # https://github.com/nkanaev/imgspy
+    """Check the URL is of a JPG."""
+    image_info = imgspy.info(img_url)
+    if image_info['type'] is not 'jpg':
+        raise InputError(description="URL image is not of a JPG.")
 
     image = Image.open(file_location)
 
-    width, height = image.size
+    width = image_info['width']
+    height = image_info['height']
+
 
     '''Check the dimensions of the image'''
     if x_start < 0 or y_start < 0 or x_end > width or y_end > height or x_start >= x_end or y_start >= y_end or x_end != y_end:
@@ -294,9 +300,7 @@ def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
 
     """Set the user data profile_img_url to be the URL image"""
     store = data_store.get()
-    for users in store['users']:
-        if users['id'] == user_id:
-            users['profile_img_url'] = profile_img_url
-
+    user_data = check_valid_auth_id(user_id)
+    user_data['profile_img_url'] = profile_img_url
     data_store.set(store)
     return {}
