@@ -150,10 +150,11 @@ def channels_create_v2(token, name, is_public):
         'owner_members': [user_info['return_data']],
         'all_members': [user_info['return_data']],
         'is_public': is_public,
-        'messages': [], 
+        'messages': [],
         'standup': {
             'is_active': False,
             'time_finish': None,
+            'messages_buffer': []
         }
     }
 

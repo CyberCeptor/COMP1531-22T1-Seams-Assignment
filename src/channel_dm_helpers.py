@@ -158,14 +158,14 @@ def check_start_valid(start, total_messages):
     
     return start
 
-def send_message(token, data_id, message, data_str):
+def send_message(auth_user_id, data_id, message, data_str, standup):
     """
     Helper function for message/send and message/senddm: If token given is an
     authorised user, sends the message to a specified channel/dm with input
     data_id
 
     Arguments:
-        token (str)    - unique str representation of user
+        auth_user_id (int)    - unique str representation of user
         dm_id (int)    - integer specifies a dm or channel
         message (str)  - message that the user wishes to send
         data_str (str) - a string used to print out any error messages if
@@ -182,7 +182,6 @@ def send_message(token, data_id, message, data_str):
 
     store = data_store.get()
 
-    auth_user_id = token_get_user_id(token)
 
     # check if dm_id/channel_id are valid
     if data_str == 'channel':
@@ -226,8 +225,8 @@ def send_message(token, data_id, message, data_str):
     data_info['messages'].insert(0, message_data)
 
     data_store.set(store)
-
-    tag_notification(auth_user_id, '', message, data_info, data_str)
+    if standup is False:
+        tag_notification(auth_user_id, '', message, data_info, data_str)
 
     return {
         'message_id': message_id
