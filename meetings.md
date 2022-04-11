@@ -122,3 +122,12 @@ Members present: Aleesha, Aisha, Jenson, Van, Jed
 Meeting type: Lab
 - finish at least one function by Monday night
 - can push tests for one function then implementation, no need to push tests for all functions
+
+11.04
+Members present: Aleesha, Aisha, Jenson, Van, Jed
+Meeting type: weekly check-in
+- functions finished: Aisha + Van
+- started brainstorming questions for requirements
+- finish functions by Friday 11th for last autotest
+- Jed: finish one function by tonight. if not, two functions by Wednesday
+- deployment + fixing anything over the weekend leading up to due date
