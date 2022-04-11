@@ -179,7 +179,7 @@ def test_message_share_both_channel_id_and_dm_id_are_invalid(clear_register_shar
 
     # neither channel_id nor dm_id are -1
     resp3 = requests.post(config.url + 'message/share/v1', 
-                          json = {'token': token, 'og_message_id': og_id, 'message': 'Hello World', 'channel_id': 2, 'dm_id': 2})
+                          json = {'token': token, 'og_message_id': og_id, 'message': 'Hello World', 'channel_id': -1, 'dm_id': -1})
     assert resp3.status_code == 400
 
 @pytest.mark.usefixtures('clear_register_shared_message')
