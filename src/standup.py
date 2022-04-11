@@ -161,7 +161,7 @@ def standup_send_v1(token, channel_id, message):
             'An active standup is not currently running in this channel'
         )
 
-    message_name = user['handle']
+    message_name = user['all_data']['handle']
     collect_messages = f'{message_name}: {message}'
     channel_data['standup']['messages_buffer'].append(collect_messages)
     data_store.set(store)

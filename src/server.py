@@ -34,13 +34,10 @@ from src.notifications import notifications_get_v1
 
 from src.data_store_pickle import pickle_data, set_prev_data
 
-<<<<<<< HEAD
 from src.standup import standup_start_v1, standup_active_v1,\
                         standup_send_v1
 
-=======
 from src.channel_dm_helpers import leave_channel_dm
->>>>>>> master
 
 def quit_gracefully(*args):
     '''For coverage'''
@@ -376,7 +373,6 @@ def dm_messages():
     return dumps(dm_messages)
 
 ################################################################################
-<<<<<<< HEAD
 ##                             STANDUP ROUTES                                 ##
 ################################################################################
 
@@ -406,7 +402,7 @@ def standup_send():
     )
     save_data()
     return dumps(result)
-=======
+################################################################################
 ##                            NOTIFICATIONS ROUTE                             ##
 ################################################################################
 
@@ -416,7 +412,7 @@ def get_notifs():
     notifs = notifications_get_v1(token)
     save_data()
     return dumps(notifs)
->>>>>>> master
+
 
 ################################################################################
 ##                               CLEAR ROUTE                                  ##
