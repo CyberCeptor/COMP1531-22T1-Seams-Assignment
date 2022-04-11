@@ -32,7 +32,7 @@ def test_standup_active_valid():
     assert stand['is_active'] == False
     assert stand['time_finish'] == None
 
-    standup_start_v1(token, channel_id, 100)
+    standup_start_v1(token, channel_id, 1)
     stand1 = standup_active_v1(token, channel_id)
     assert (isinstance(stand1, dict) == True)
     assert stand1['is_active'] == True

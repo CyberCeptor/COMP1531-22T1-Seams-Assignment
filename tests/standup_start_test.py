@@ -28,7 +28,7 @@ def test_standup_start_valid():
     channel_id = channel['channel_id']
     
     # calling standup start
-    time = standup_start_v1(token, channel_id, 5)
+    time = standup_start_v1(token, channel_id, 1)
     assert (isinstance(time, dict) == True)
     time_finish = time['time_finish']
     assert (isinstance(time_finish, int) == True)
@@ -108,7 +108,7 @@ def test_standup_start_standup_repeating():
     token = user1['token']
     channel = channels_create_v2(token, 'abc', False) 
     channel_id = channel['channel_id']
-    standup_start_v1(token, channel_id, 100)
+    standup_start_v1(token, channel_id, 1)
     with pytest.raises(InputError):
         standup_start_v1(token, channel_id, 1)
 
