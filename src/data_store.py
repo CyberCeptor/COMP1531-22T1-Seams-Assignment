@@ -36,6 +36,7 @@ data = {
         'handle': 'firstlast',
         'perm_id': 1,
         'removed': False,
+        'profile_img_url': None,
     }],
     'tokens' = [{
         'user_id': user_data['id'],

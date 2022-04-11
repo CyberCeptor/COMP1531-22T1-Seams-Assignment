@@ -11,7 +11,8 @@ from src.dm import dm_create_v1, dm_list_v1, dm_details_v1, dm_remove_v1,\
 
 from src.auth import auth_register_v2, auth_login_v2
 from src.user import user_profile_v1, user_profile_setemail_v1, \
-                     user_profile_setname_v1, user_profile_sethandle_v1
+                     user_profile_setname_v1, user_profile_sethandle_v1, \
+                     user_profile_uploadphoto_v1
 
 from src.admin import admin_userpermission_change, admin_user_remove
 from src.other import clear_v1
@@ -157,6 +158,18 @@ def user_sethandle():
     handle_str = handle_data['handle_str']
     user_profile_sethandle_v1(token, handle_str)
     save_data()
+    return dumps({})
+
+@APP.route('user/profile/uploadphoto/v1', methods=['POST'])
+def user_uploadphoto():
+    data = request.get_json()
+    token = data['token']
+    url = data['url']
+    x_start = data['x_start']
+    x_end = data['x_end']
+    y_start = data['y_start']
+    y_end = data['y_end']
+    user_profile_uploadphoto_v1(token, url, x_start, y_start, x_end, y_end)
     return dumps({})
 
 ################################################################################
