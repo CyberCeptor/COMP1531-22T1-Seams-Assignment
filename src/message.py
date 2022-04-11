@@ -1,7 +1,7 @@
 """
 Filename: message.py
 
-Author: Yangjun Yue(z5317840)
+Author: Yangjun Yue(z5317840), Xingjian Dong(z5221888)
 Created: 23/03/2022 - 27/03/2022
 
 Description: implementation for
@@ -264,3 +264,50 @@ def edit_remove_channel_message(token, message, msg_data, channel, option):
             message_remove_v1(token, msg_data['message_id'])
     else:
         raise AccessError(description='User has no access to this message')
+
+def message_share_v1(token, og_message_id, message, channel_id, dm_id):
+
+    token_valid_check(token)
+
+    if og_message_id == '':
+        raise InputError(description='Empty og_message_id input')
+
+    if type(og_message_id) == bool:
+        raise InputError(description='bool og_message_id input')
+
+    if type(og_message_id) == string:
+        raise InputError(description='string og_message_id input')
+
+    if type(message) == int:
+        raise InputError(description='int message input')
+
+    if type(message) == bool:
+        raise InputError(description='bool message input')
+
+    if len(message) > 1000:
+        raise InputError(description='Message must not exceed 1000 characters')
+
+    if channel_id == '' and dm_id == -1:
+        raise InputError(description='Empty channel_id input')
+
+    if type(channel_id) == bool and dm_id == -1:
+        raise InputError(description='bool channel_id input')
+
+    if type(channel_id) == string and dm_id == -1:
+        raise InputError(description='string channel_id input')
+
+    if dm_id == '' and channel_id == -1:
+        raise InputError(description='Empty dm_id input')
+
+    if type(dm_id) == bool and channel_id == -1:
+        raise InputError(description='bool dm_id input')
+
+    if type(dm_id) == string and channel_id == -1:
+        raise InputError(description='string dm_id input')
+
+    if dm_id == -1 and channel_id == -1:
+        raise InputError(description='both -1 input')
+
+    shared_message_id = channel_id + dm_id
+
+    return shared_message_id
