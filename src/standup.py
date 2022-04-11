@@ -59,18 +59,10 @@ def standup_start_v1(token, channel_id, length):
     end_time = begin_time + timedelta(seconds = length)
 
     # check the standup whether running currently or not
-    retur = standup_active_v1(token, channel_id)
-    if retur['is_active']:
+    if channel_data['standup']['is_active']:
         raise InputError(
             'An active standup is currently running in this channel'
         )
-
-    # Add a new key - value
-    new_channel = {
-        'standup': {},
-        'messages_buffer': []
-    }
-    channel_data.update(new_channel)
 
     # get the finish time, converted it to an UTC timestamp
     # Source: https://www.geeksforgeeks.org/get-utc-timestamp-in-python/
@@ -78,9 +70,8 @@ def standup_start_v1(token, channel_id, length):
     
     # add the length, begin_time, end_time into standup
     # coverting begin and end time to an isoformat.
-    channel_data['standup']['length'] = length
-    channel_data['standup']['begin_time'] = begin_time.isoformat()
-    channel_data['standup']['end_time'] = end_time.isoformat()
+    channel_data['standup']['is_active'] = True
+    channel_data['standup']['finish_time'] = end_time.isoformat()
     
     timer = Timer(length, standup_send_collect_messages, [token, channel_data])
     timer.start()
@@ -119,16 +110,14 @@ def standup_active_v1(token, channel_id):
     if check_user_is_member(user_id, channel_data, 'all_members') is None:
         raise AccessError(description='Inviter is not in the channel')
     
-    value = {} # create an empty dic 
-    is_active = False
+    value = {} # create an empty dic
 
-    if 'standup' in channel_data:
-        is_active = True
+    if channel_data['standup']['is_active']:
         finish_time = datetime.fromisoformat(
-            channel_data['standup']['end_time'])
+            channel_data['standup']['finish_time'])
 
     # Add the is_active into value dic
-    value['is_active'] = is_active
+    value['is_active'] = channel_data['standup']['is_active']
 
     if value['is_active']:
         value['time_finish'] = int(
@@ -175,15 +164,14 @@ def standup_send_v1(token, channel_id, message):
         raise AccessError('Inviter is not in the channel')
     
     # check the standup whether running currently or not
-    retur = standup_active_v1(token, channel_id)
-    if retur['is_active'] is False:
+    if channel_data['standup']['is_active'] is False:
         raise InputError(
             'An active standup is not currently running in this channel'
         )
 
     message_name = user['handle']
     collect_messages = f'{message_name}: {message}'
-    channel_data['messages_buffer'].append(collect_messages)
+    channel_data['standup']['messages_buffer'].append(collect_messages)
 
     return {}
 
@@ -199,11 +187,13 @@ def standup_send_collect_messages(token, channel):
 
     Return Value: N/A
     """
-    if len(channel['messages_buffer']) > 0:
-        packaged_message = '\n'.join(channel['messages_buffer'])
+    if len(channel['standup']['messages_buffer']) > 0:
+        packaged_message = '\n'.join(channel['standup']['messages_buffer'])
         message_send_v1(token, channel['channel_id'], packaged_message)
 
-    del channel['standup']
+    channel['standup']['is_active'] = False
+    channel['standup']['messages_buffer'] = []
+    channel['standup']['time_finish'] = None
 
 def check_length(length):
     '''

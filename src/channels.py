@@ -162,7 +162,12 @@ def channels_create_v2(token, name, is_public):
             'handle_str': user_info['handle']
         }],
         'is_public': is_public,
-        'messages': []
+        'messages': [],
+        'standup': {
+            'is_active': False,
+            'time_finish': None,
+            'messages_buffer': []
+        }
     }
 
     store['channels'].append(channel_data)
