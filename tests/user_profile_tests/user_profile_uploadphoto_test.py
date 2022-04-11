@@ -23,10 +23,9 @@ import pytest
 import requests
 from src import config
 from src.global_vars import EXPIRED_TOKEN, UNSAVED_TOKEN, STATUS_OK, \
-                            STATUS_INPUT_ERR, STATUS_ACCESS_ERR
+                            STATUS_INPUT_ERR
 
 url = 'http://clipart-library.com/clipart/kiKB87aeT.htm'
-
 
 @pytest.mark.usefixtures('clear_register')
 def test_user_uploadphoto_working(clear_register):
@@ -36,7 +35,7 @@ def test_user_uploadphoto_working(clear_register):
     user = clear_register[0]
     image = requests.post(config.url + '/user/profile/uploadphoto', 
                         json={'token': user['token'], 'img_url': url, 'x_start': 0, 'y_start': 0, 'x_end': 300, 'y_end': 300})
-    assert image.status_code == 200
+    assert image.status_code == STATUS_OK
 
 
 
@@ -54,19 +53,19 @@ def test_user_uploadphoto_invalid_url(clear_register):
 
     image = requests.post(config.url + '/user/profile/uploadphoto', 
                         json={'token': user['token'], 'img_url': 'invalid_url', 'x_start': 0, 'y_start': 0, 'x_end': 300, 'y_end': 300})
-    assert image.status_code == 400
+    assert image.status_code == STATUS_INPUT_ERR
 
     image = requests.post(config.url + '/user/profile/uploadphoto', 
                         json={'token': user['token'], 'img_url': True, 'x_start': 0, 'y_start': 0, 'x_end': 300, 'y_end': 300})
-    assert image.status_code == 400
+    assert image.status_code == STATUS_INPUT_ERR
 
     image = requests.post(config.url + '/user/profile/uploadphoto', 
                         json={'token': user['token'], 'img_url': -1, 'x_start': 0, 'y_start': 0, 'x_end': 300, 'y_end': 300})
-    assert image.status_code == 400
+    assert image.status_code == STATUS_INPUT_ERR
 
     image = requests.post(config.url + '/user/profile/uploadphoto', 
                         json={'token': user['token'], 'img_url': https_url, 'x_start': 0, 'y_start': 0, 'x_end': 300, 'y_end': 300})
-    assert image.status_code == 400
+    assert image.status_code == STATUS_INPUT_ERR
 
 @pytest.mark.usefixtures('clear_register')
 def test_user_uploadphoto_bad_dimensions(clear_register):
@@ -78,27 +77,27 @@ def test_user_uploadphoto_bad_dimensions(clear_register):
     user = clear_register[0]
     image = requests.post(config.url + '/user/profile/uploadphoto', 
                         json={'token': user['token'], 'img_url': url, 'x_start': 0, 'y_start': 0, 'x_end': 30000, 'y_end': 30000})
-    assert image.status_code == 400
+    assert image.status_code == STATUS_INPUT_ERR
 
     image = requests.post(config.url + '/user/profile/uploadphoto', 
                         json={'token': user['token'], 'img_url': url, 'x_start': -1, 'y_start': -1, 'x_end': 300, 'y_end': 300})
-    assert image.status_code == 400
+    assert image.status_code == STATUS_INPUT_ERR
 
     image = requests.post(config.url + '/user/profile/uploadphoto', 
                         json={'token': user['token'], 'img_url': url, 'x_start': 30000, 'y_start': 30000, 'x_end': 300, 'y_end': 300})
-    assert image.status_code == 400
+    assert image.status_code == STATUS_INPUT_ERR
 
     image = requests.post(config.url + '/user/profile/uploadphoto', 
                         json={'token': user['token'], 'img_url': url, 'x_start': 0, 'y_start': 0, 'x_end': -1, 'y_end': -1})
-    assert image.status_code == 400
+    assert image.status_code == STATUS_INPUT_ERR
 
     image = requests.post(config.url + '/user/profile/uploadphoto', 
                         json={'token': user['token'], 'img_url': url, 'x_start': 0, 'y_start': 0, 'x_end': 0, 'y_end': 300})
-    assert image.status_code == 400
+    assert image.status_code == STATUS_INPUT_ERR
 
     image = requests.post(config.url + '/user/profile/uploadphoto', 
                         json={'token': user['token'], 'img_url': url, 'x_start': 300, 'y_start': 0, 'x_end': 300, 'y_end': 300})
-    assert image.status_code == 400
+    assert image.status_code == STATUS_INPUT_ERR
 
 
 @pytest.mark.usefixtures('clear_register')
@@ -110,7 +109,7 @@ def test_user_uploadphoto_non_jpg(clear_register):
     non_jpg_url = 'http://clipart-library.com/images/qiBXRy5gT.png'
     image = requests.post(config.url + '/user/profile/uploadphoto', 
                         json={'token': user['token'], 'img_url': non_jpg_url, 'x_start': 0, 'y_start': 0, 'x_end': 300, 'y_end': 300})
-    assert image.status_code == 400
+    assert image.status_code == STATUS_INPUT_ERR
 
 
 @pytest.mark.usefixtures('clear_register')
@@ -120,25 +119,25 @@ def test_user_uploadphoto_invalid_token(clear_register):
     """
     image = requests.post(config.url + '/user/profile/uploadphoto', 
                         json={'token': EXPIRED_TOKEN, 'img_url': url, 'x_start': 0, 'y_start': 0, 'x_end': 300, 'y_end': 300})
-    assert image.status_code == 400
+    assert image.status_code == STATUS_INPUT_ERR
 
     image = requests.post(config.url + '/user/profile/uploadphoto', 
                         json={'token': UNSAVED_TOKEN, 'img_url': url, 'x_start': 0, 'y_start': 0, 'x_end': 300, 'y_end': 300})
-    assert image.status_code == 400
+    assert image.status_code == STATUS_INPUT_ERR
 
     image = requests.post(config.url + '/user/profile/uploadphoto', 
                         json={'token': True, 'img_url': url, 'x_start': 0, 'y_start': 0, 'x_end': 300, 'y_end': 300})
-    assert image.status_code == 400
+    assert image.status_code == STATUS_INPUT_ERR
 
     image = requests.post(config.url + '/user/profile/uploadphoto', 
                         json={'token': -1, 'img_url': url, 'x_start': 0, 'y_start': 0, 'x_end': 300, 'y_end': 300})
-    assert image.status_code == 400
+    assert image.status_code == STATUS_INPUT_ERR
 
     image = requests.post(config.url + '/user/profile/uploadphoto', 
                         json={'token': 'string', 'img_url': url, 'x_start': 0, 'y_start': 0, 'x_end': 300, 'y_end': 300})
-    assert image.status_code == 400
+    assert image.status_code == STATUS_INPUT_ERR
 
     image = requests.post(config.url + '/user/profile/uploadphoto', 
                         json={'token': '', 'img_url': url, 'x_start': 0, 'y_start': 0, 'x_end': 300, 'y_end': 300})
-    assert image.status_code == 400
+    assert image.status_code == STATUS_INPUT_ERR
     
