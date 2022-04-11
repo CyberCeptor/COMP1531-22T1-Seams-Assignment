@@ -23,7 +23,7 @@ def test_standup_send_valid(clear_register_createchannel):
     token = user1['token']
     channel_id = clear_register_createchannel[1]
     
-    start = requests.post(config.url + 'standup/start/v1',
+    requests.post(config.url + 'standup/start/v1',
                 json={'token': token, 'channel_id': channel_id,
                     'length': 1})
 
