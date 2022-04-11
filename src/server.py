@@ -30,7 +30,8 @@ from src.channels import channels_create_v2, channels_list_v2,\
 
 from src.data_store_pickle import pickle_data, set_prev_data
 
-from src.standup import standup_start_v1, standup_active_v1
+from src.standup import standup_start_v1, standup_active_v1,\
+                        standup_send_v1
 
 
 def quit_gracefully(*args):
@@ -390,6 +391,14 @@ def standup_active_server():
         standup_active_v1(token, channel_id)
     )
 
+@APP.route('/standup/send/v1', methods=['POST'])
+def standup_send():
+    store = request.get_json()
+    result = standup_send_v1(
+        store['token'], store['channel_id'], store['message']
+    )
+    save_data()
+    return dumps(result)
 
 ################################################################################
 ##                               CLEAR ROUTE                                  ##

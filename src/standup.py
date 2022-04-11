@@ -13,12 +13,9 @@ from src.error import InputError, AccessError
 from src.token import token_valid_check, token_get_user_id
 from src.other import check_valid_channel_id, check_user_is_member,\
                     check_valid_auth_id
-import time
 from datetime import datetime, timedelta, timezone
-import threading
-
-# Global variable that contains all the messages in the buffered queue
-message_queue = []
+from threading import Timer
+from src.message import message_send_v1
 
 def standup_start_v1(token, channel_id, length):
     """
@@ -70,7 +67,8 @@ def standup_start_v1(token, channel_id, length):
 
     # Add a new key - value
     new_channel = {
-        'standup': {}
+        'standup': {},
+        'messages_buffer': []
     }
     channel_data.update(new_channel)
 
@@ -80,10 +78,13 @@ def standup_start_v1(token, channel_id, length):
     
     # add the length, begin_time, end_time into standup
     # coverting begin and end time to an isoformat.
-    channel_data['standup']["length"] = length
+    channel_data['standup']['length'] = length
     channel_data['standup']['begin_time'] = begin_time.isoformat()
     channel_data['standup']['end_time'] = end_time.isoformat()
     
+    timer = Timer(length, standup_send_collect_messages, [token, channel_data])
+    timer.start()
+
     # Saves data
     data_store.set(store)
     
@@ -135,6 +136,74 @@ def standup_active_v1(token, channel_id):
     else:
         value['time_finish'] = None
     return value
+
+def standup_send_v1(token, channel_id, message):
+    """
+    This function is to send message during the standup period
+    
+    Arguments:
+        token (str)      - an unique string match a valid user
+        channel_id (int) - the unique valid number of a channel
+        message (str)    - a string of characters
+                                                  
+    Exceptions:
+        InputError  - invalid channel id
+                    - length is invalid
+                    - a standup is currently running
+        AccessError - the user is not in the channel
+    
+    Return Value: N/A
+    """
+    data_store.get()
+    # check valid token
+    token_valid_check(token)
+    # get user id from token
+    user_id = token_get_user_id(token)
+    # check valid user id
+    user = check_valid_auth_id(user_id) 
+    # check valid channel id
+    channel_data = check_valid_channel_id(channel_id)
+
+    if isinstance(message, str) is False:
+        raise InputError('wrong type of messages')
+
+    if len(message) > 1000:
+        raise InputError('Length of message is over 1000 characters.')
+    
+    # check user is not in channel
+    if check_user_is_member(user_id, channel_data, 'all_members') is None:
+        raise AccessError('Inviter is not in the channel')
+    
+    # check the standup whether running currently or not
+    retur = standup_active_v1(token, channel_id)
+    if retur['is_active'] is False:
+        raise InputError(
+            'An active standup is not currently running in this channel'
+        )
+
+    message_name = user['handle']
+    collect_messages = f'{message_name}: {message}'
+    channel_data['messages_buffer'].append(collect_messages)
+
+    return {}
+
+def standup_send_collect_messages(token, channel):
+    """
+    This function is to send message in the buffer
+    
+    Arguments:
+        token (str)      - an unique string match a valid user
+        channel (dic)    - a dictionary in channels
+                                                  
+    Exceptions: N/A
+
+    Return Value: N/A
+    """
+    if len(channel['messages_buffer']) > 0:
+        packaged_message = '\n'.join(channel['messages_buffer'])
+        message_send_v1(token, channel['channel_id'], packaged_message)
+
+    del channel['standup']
 
 def check_length(length):
     '''
