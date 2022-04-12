@@ -22,6 +22,7 @@ from src.other import check_valid_auth_id, cast_to_int_get_requests
 from src.auth import check_invalid_email, check_invalid_name
 from src.error import InputError
 
+@token_valid_check
 def user_profile_v1(token, u_id):
     """
     For a valid user, returns information about their user_id, firstname,
@@ -36,8 +37,6 @@ def user_profile_v1(token, u_id):
     Return: Returns a user's user_id, email, name_first, name_last, handle_str
     """
 
-    token_valid_check(token)
-
     # cast u_id into an int since it is a GET request
     u_id = cast_to_int_get_requests(u_id, 'user id')
 
@@ -45,15 +44,10 @@ def user_profile_v1(token, u_id):
     user = check_valid_auth_id(u_id)
 
     return {
-        'user': {
-            'u_id': user['id'],
-            'email': user['email'],
-            'name_first': user['first'],
-            'name_last': user['last'],
-            'handle_str': user['handle'],
-        }
+        'user': user['return_data']
     }
 
+@token_valid_check
 def user_profile_setemail_v1(token, email):
     """
     Update the authorised user's email
@@ -74,7 +68,6 @@ def user_profile_setemail_v1(token, email):
     # check that the email isn't already used by another user
     # both done by check_invalid_email.
 
-    token_valid_check(token)
     user_id = token_get_user_id(token)
 
     check_invalid_email(store, str(email))
@@ -102,6 +95,7 @@ def user_profile_setemail_v1(token, email):
 
     data_store.set(store)
 
+@token_valid_check
 def user_profile_setname_v1(token, name_first, name_last):
     """
     Update the authorised user's first and last name
@@ -125,8 +119,6 @@ def user_profile_setname_v1(token, name_first, name_last):
     # both done by check_invalid_name.
     # need to check that the name is the correct format.
 
-    # check the token is current and acceptable
-    token_valid_check(token)
     user_id = token_get_user_id(token)
 
     if type(name_first) is not str or type(name_first) is bool:
@@ -196,6 +188,7 @@ def check_invalid_handle(store, handle_str):
         if user['handle'] == handle_str and user['removed'] is False:
             raise InputError(description='Handle has already been taken')
 
+@token_valid_check
 def user_profile_sethandle_v1(token, handle_str):
     """
     updates a user's handle to the given handle_str if valid
@@ -211,7 +204,7 @@ def user_profile_sethandle_v1(token, handle_str):
     """
 
     store = data_store.get()
-    token_valid_check(token)
+
     user_id = token_get_user_id(token)
 
     check_invalid_handle(store, handle_str)

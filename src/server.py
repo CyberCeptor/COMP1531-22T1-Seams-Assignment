@@ -7,28 +7,37 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 
 from src.dm import dm_create_v1, dm_list_v1, dm_details_v1, dm_remove_v1,\
-                   dm_leave_v1, dm_messages_v1
+                   dm_messages_v1
 
-from src.auth import auth_register_v2, auth_login_v2, auth_logout_v1
+from src.auth import auth_register_v2, auth_login_v2
 from src.user import user_profile_v1, user_profile_setemail_v1, \
                      user_profile_setname_v1, user_profile_sethandle_v1
 
 from src.admin import admin_userpermission_change, admin_user_remove
 from src.other import clear_v1
-from src.token import token_valid_check, token_get_user_id
+from src.token import token_remove
 from src.users import users_all_v1
+
+from src.search import search_v1
 
 from src.channel import channel_details_v2, channel_invite_v2,\
                         channel_addowner_v1, channel_removeowner_v1,\
-                        channel_join_v2, channel_messages_v2, channel_leave_v1
+                        channel_join_v2, channel_messages_v2
 from src.message import message_send_v1, message_remove_v1, message_edit_v1,\
-                        message_senddm_v1
-
+                        message_senddm_v1, message_pin_v1, message_react_v1, \
+                        message_unreact_v1
+                        
 from src.channels import channels_create_v2, channels_list_v2,\
                          channels_listall_v2
 
-from src.data_store_pickle import pickle_data
+from src.notifications import notifications_get_v1
 
+from src.data_store_pickle import pickle_data, set_prev_data
+
+from src.standup import standup_start_v1, standup_active_v1,\
+                        standup_send_v1
+
+from src.channel_dm_helpers import leave_channel_dm
 
 def quit_gracefully(*args):
     '''For coverage'''
@@ -57,14 +66,13 @@ APP.register_error_handler(Exception, defaultHandler)
 ##                            DATA_STORE PICKLING                             ##
 ################################################################################
 
-pickle_data()
-
 DATA_STORE = {}
 
 def get_data():
     global DATA_STORE
     try:
         DATA_STORE = pickle.load(open('datastore.p', 'rb'))
+        set_prev_data(DATA_STORE)
     except Exception:
         pass
     return DATA_STORE
@@ -73,9 +81,9 @@ def save_data():
     global DATA_STORE
     pickle_data()
     DATA_STORE = get_data()
-    with open('datastore.p', 'wb') as FILE:
-        pickle.dump(DATA_STORE, FILE)
     return DATA_STORE
+
+DATA_STORE = get_data()
 
 ################################################################################
 ##                              AUTH ROUTES                                   ##
@@ -99,7 +107,7 @@ def login():
 @APP.route('/auth/logout/v1', methods=['POST'])
 def logout():
     data = request.get_json()
-    auth_logout_v1(data['token'])
+    token_remove(data['token'])
     save_data()
     return dumps({})
 
@@ -250,9 +258,7 @@ def channel_messages():
 @APP.route('/channel/leave/v1', methods=['POST'])
 def channel_leave():
     data = request.get_json()
-    token_valid_check(data['token'])
-    user_id = token_get_user_id(data['token'])
-    channel_leave_v1(user_id, data['channel_id'])
+    leave_channel_dm(data['token'], None, data['channel_id'], 'channel')
     save_data()
     return dumps({})
 
@@ -288,16 +294,43 @@ def message_senddm():
     save_data()
     return dumps(msg_id)
 
+@APP.route('/message/pin/v1', methods=['POST'])
+def message_pin():
+    data = request.get_json()
+    message_pin_v1(data['token'], data['message_id'])
+    save_data()
+    return dumps({})
+
+@APP.route('/search/v1', methods=['GET'])
+def search():
+    token = request.args.get('token')
+    query_str = request.args.get('query_str')
+    message_return = search_v1(token, query_str)
+    save_data()
+    return dumps(message_return)
+    
+@APP.route('/message/react/v1', methods=['POST'])
+def message_react():
+    data = request.get_json()
+    message_react_v1(data['token'], data['message_id'], data['react_id'])
+    save_data()
+    return dumps({})
+
+@APP.route('/message/unreact/v1', methods=['POST'])
+def message_unreact():
+    data = request.get_json()
+    message_unreact_v1(data['token'], data['message_id'], data['react_id'])
+    save_data()
+    return dumps({})
+
 ################################################################################
 ##                             DM ROUTES                                      ##
 ################################################################################
 
 @APP.route('/dm/create/v1', methods=['POST'])
 def dm_create_server():
-    store = request.get_json()
-    token = store['token']
-    u_ids = store['u_ids']
-    dm = dm_create_v1(token, u_ids)
+    data = request.get_json()
+    dm = dm_create_v1(data['token'], data['u_ids'])
     save_data()
     return dumps(dm)
 
@@ -312,26 +345,21 @@ def dm_list_server():
 def dm_details_server():
     token = request.args.get('token')
     dm_id = request.args.get('dm_id')
-    dm_details = dm_details_v1(token,dm_id)
+    dm_details = dm_details_v1(token, dm_id)
     save_data()
     return dumps(dm_details)
 
 @APP.route('/dm/remove/v1', methods=['DELETE'])
 def dm_remove_server():
-    store = request.get_json()
-    token = store['token']
-    dm_id = store['dm_id']
-    dm_remove_v1(token,dm_id)
+    data = request.get_json()
+    dm_remove_v1(data['token'], data['dm_id'])
     save_data()
     return dumps({})
 
 @APP.route('/dm/leave/v1', methods=['POST'])
 def dm_leave():
-    store = request.get_json()
-    dm_id = store['dm_id']
-    token_valid_check(store['token'])
-    auth_id = token_get_user_id(store['token'])
-    dm_leave_v1(auth_id, dm_id)
+    data = request.get_json()
+    leave_channel_dm(data['token'], None, data['dm_id'], 'dm')
     save_data()
     return dumps({})
 
@@ -343,6 +371,48 @@ def dm_messages():
     dm_messages = dm_messages_v1(token, dm_id, start)
     save_data()
     return dumps(dm_messages)
+
+################################################################################
+##                             STANDUP ROUTES                                 ##
+################################################################################
+
+@APP.route('/standup/start/v1', methods=['POST'])
+def standup_start():
+    store = request.get_json()
+    result = standup_start_v1(
+        store['token'], store['channel_id'], store['length']
+    )
+    save_data()
+    return dumps(result)
+
+@APP.route('/standup/active/v1', methods = ['GET'])
+def standup_active_server():
+    token = request.args.get('token')
+    channel_id = request.args.get('channel_id')
+    save_data()
+    return dumps(
+        standup_active_v1(token, channel_id)
+    )
+
+@APP.route('/standup/send/v1', methods=['POST'])
+def standup_send():
+    store = request.get_json()
+    result = standup_send_v1(
+        store['token'], store['channel_id'], store['message']
+    )
+    save_data()
+    return dumps(result)
+################################################################################
+##                            NOTIFICATIONS ROUTE                             ##
+################################################################################
+
+@APP.route('/notifications/get/v1', methods=['GET'])
+def get_notifs():
+    token = request.args.get('token')
+    notifs = notifications_get_v1(token)
+    save_data()
+    return dumps(notifs)
+
 
 ################################################################################
 ##                               CLEAR ROUTE                                  ##

@@ -11,6 +11,7 @@ from src.token import token_valid_check
 
 from src.data_store import data_store
 
+@token_valid_check
 def users_all_v1(token):
     """
     returns the data of every user in the stored data, excluding those who have
@@ -27,7 +28,6 @@ def users_all_v1(token):
     """
 
     store = data_store.get()
-    token_valid_check(token)
 
     return {
         'users': [{
