@@ -112,6 +112,8 @@ initial_object = {
     'tokens': [],
     'channels': [],
     'dms': [],
+    'used_codes': [],
+    'current_codes': [],
 }
 ## YOU SHOULD MODIFY THIS OBJECT ABOVE
 

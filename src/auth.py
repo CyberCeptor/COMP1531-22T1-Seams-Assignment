@@ -8,6 +8,7 @@ Description: implementation for
     - registering a user using an email, password, first name, and last name
     - using an email and password to login to a user's account
     - logging out a user with their current valid token
+    - generating a reset code to be sent in a password reset email
     - helper functions for the above
 """
 
@@ -15,12 +16,17 @@ import re
 
 import hashlib
 
+import random
+
 from src.error import InputError
 
+from src.token import token_generate, token_remove
+
 from src.data_store import data_store
-from src.token import token_generate
 
 from src.global_vars import Permission
+
+MAX_NUM_CODES = 10**6
 
 def auth_login_v2(email, password):
     """
@@ -116,6 +122,7 @@ def auth_register_v2(email, password, name_first, name_last):
         'notifications': [],
         'perm_id': Permission.OWNER.value if u_id == 1 else Permission.USER.value,
         'removed': False,
+        'reset_code': None,
     }
 
     # store the user information into the list of users
@@ -241,4 +248,83 @@ def create_handle(store, full_name):
         handle = handle + str(duplicate_count)
 
     return handle
+
+def generate_reset_code(email):
+    """
+    Generates a 6 digit code string to be sent in a password reset email if the
+    given email belongs to a current user
+
+    Arguments:
+        email (str) - a address given by the user to send a reset email to
+
+    Exceptions: N/A
+
+    Return: 
+        Returns the generated code if the email belongs to a user. Otherwise, 
+        returns None
+    """
+
+    store = data_store.get()
+
+    # if all 6 digit combinations of reset codes have been generated, reset
+    # all used codes that are saved in the data so they can be regenerated
+    codes_generated = len(store['used_codes'] + store['current_codes'])
+    if codes_generated == MAX_NUM_CODES:
+        reset_used_codes()
+
+    user_data = None
+
+    # find email in stored user data and return the user's data
+    for user in store['users']:
+        if user['email'] == email and user['removed'] is False:
+            user_data = user
     
+    # if email is not found in data, no errors are raised and return None
+    if user_data is None:
+        return None
+    
+    # if email is found, generate a random 6 digit code string and return it so
+    # it can be used to send the password reset email
+    code = f'{random.randrange(0, 10**6):06}'
+
+    # if code has been generated before, generate a new one
+    while code in store['current_codes'] or code in store['used_codes']:
+        code = f'{random.randrange(0, 10**6):06}'
+
+    # store the generated code into the data
+    store['current_codes'].append(code)
+
+    # the reset code stored in the user data will be updated so only the code 
+    # that is sent the latest is valid (if the user request multiple times)
+    # any previous codes are moved to the used_codes list
+    if user['reset_code'] is not None:
+        user['used_codes'].append(user['reset_code'])
+        user['current_codes'].remove(user['reset_code'])
+    user['reset_code'] = code
+
+    # log the user out by removing any current tokens
+    for token_data in store['tokens']:
+        if token_data['user_id'] is user_data['id']:
+            token_remove(token_data['token'])
+
+    data_store.set(store)
+
+    return code
+
+def reset_used_codes():
+    """
+    resets all used reset codes stored in the stored data
+
+    Arguments: N/A
+
+    Exceptions: N/A
+
+    Return: N/A
+    """
+
+    store = data_store.get()
+
+    store['used_reset_codes'] = []
+
+    data_store.set(store)
+

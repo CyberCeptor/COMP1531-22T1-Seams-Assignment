@@ -5,11 +5,12 @@ from src import config
 from json import dumps
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+from flask_mail import Mail, Message
 
 from src.dm import dm_create_v1, dm_list_v1, dm_details_v1, dm_remove_v1,\
                    dm_messages_v1
 
-from src.auth import auth_register_v2, auth_login_v2
+from src.auth import auth_register_v2, auth_login_v2, generate_reset_code
 from src.user import user_profile_v1, user_profile_setemail_v1, \
                      user_profile_setname_v1, user_profile_sethandle_v1
 
@@ -63,6 +64,23 @@ APP.register_error_handler(Exception, defaultHandler)
 #### NO NEED TO MODIFY ABOVE THIS POINT, EXCEPT IMPORTS
 
 ################################################################################
+##                                MAIL CONFIG                                 ##
+################################################################################
+
+# following https://pythonbasics.org/flask-mail/
+
+mail = Mail(APP)
+
+APP.config['MAIL_SERVER'] = 'smtp.gmail.com'
+APP.config['MAIL_PORT'] = 465
+APP.config['MAIL_USERNAME'] = 'donotreply.pwreset@gmail.com'
+APP.config['MAIL_PASSWORD'] = 'P@ssword1531'
+APP.config['MAIL_USE_TLS'] = False
+APP.config['MAIL_USE_SSL'] = True
+
+mail = Mail(APP)
+
+################################################################################
 ##                            DATA_STORE PICKLING                             ##
 ################################################################################
 
@@ -74,7 +92,7 @@ def get_data():
         DATA_STORE = pickle.load(open('datastore.p', 'rb'))
         set_prev_data(DATA_STORE)
     except Exception:
-        pass
+        DATA_STORE = pickle_data()
     return DATA_STORE
 
 def save_data():
@@ -110,6 +128,22 @@ def logout():
     token_remove(data['token'])
     save_data()
     return dumps({})
+
+@APP.route('/auth/passwordreset/request/v1', methods=['POST'])
+def request_pwreset():
+    data = request.get_json()
+    code = generate_reset_code(data['email'])
+    if code is not None:
+        # following https://pythonbasics.org/flask-mail/
+        msg = Message('Seams Password Reset', 
+                      sender = 'donotreply.pwreset@gmail.com',
+                      recipients = [data['email']])
+        msg.body = f'Your reset code is: {code}'
+        mail.send(msg)
+    save_data()
+    return dumps({})
+
+
 
 ################################################################################
 ##                              USERS ROUTES                                  ##
@@ -412,7 +446,6 @@ def get_notifs():
     notifs = notifications_get_v1(token)
     save_data()
     return dumps(notifs)
-
 
 ################################################################################
 ##                               CLEAR ROUTE                                  ##

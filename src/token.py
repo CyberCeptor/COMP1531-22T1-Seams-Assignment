@@ -156,9 +156,10 @@ def token_remove(token):
 
     Return Value: N/A
     """
-
+    print('removing tokens')
     token_to_remove = token_locate_in_data_store(token)
     store = data_store.get()
     store['tokens'].remove(token_to_remove)
+    print(store)
     data_store.set(store)
  

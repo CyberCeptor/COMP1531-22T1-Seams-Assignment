@@ -15,19 +15,6 @@ from src import config
 
 from src.global_vars import STATUS_OK
 
-"""
-save codes that have been used/are being used in data store
-generate code
-save code in user data to check against given string in passwordreset/reset
-
-code must be string
-random number + hash for handle??
-
-cases
-- valid email
-- invalid email (raises no errors)
-"""
-
 @pytest.mark.usefixtures('clear_register')
 def test_passwordreset_request_valid_email(clear_register):
     """ checks that a 200 status code is given """

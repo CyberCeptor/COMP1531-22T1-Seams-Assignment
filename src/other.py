@@ -37,6 +37,8 @@ def clear_v1():
     store['channels'].clear()
     store['tokens'].clear()
     store['dms'].clear()
+    store['used_codes'].clear()
+    store['current_codes'].clear()
     data_store.set(store)
     
     reset_id('session')
