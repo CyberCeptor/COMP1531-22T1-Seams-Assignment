@@ -95,7 +95,7 @@ def get_data():
         DATA_STORE = pickle.load(open('datastore.p', 'rb'))
         set_prev_data(DATA_STORE)
     except Exception:
-        DATA_STORE = pickle_data()
+        pickle_data()
     return DATA_STORE
 
 def save_data():
