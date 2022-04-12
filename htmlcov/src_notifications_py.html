@@ -3,7 +3,7 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=emulateIE7" />
-    <title>Coverage for src/notifications.py: 97%</title>
+    <title>Coverage for src/notifications.py: 100%</title>
     <link rel="icon" sizes="32x32" href="favicon_32.png">
     <link rel="stylesheet" href="style.css" type="text/css">
     <script type="text/javascript" src="jquery.min.js"></script>
@@ -18,15 +18,15 @@
 <div id="header">
     <div class="content">
         <h1>Coverage for <b>src/notifications.py</b> :
-            <span class="pc_cov">97%</span>
+            <span class="pc_cov">100%</span>
         </h1>
         <img id="keyboard_icon" src="keybd_closed.png" alt="Show keyboard shortcuts" />
         <h2 class="stats">
-            46 statements &nbsp;
-            <button type="button" class="run shortkey_r button_toggle_run" title="Toggle lines run">46 run</button>
+            44 statements &nbsp;
+            <button type="button" class="run shortkey_r button_toggle_run" title="Toggle lines run">44 run</button>
             <button type="button" class="mis show_mis shortkey_m button_toggle_mis" title="Toggle lines missing">0 missing</button>
             <button type="button" class="exc show_exc shortkey_x button_toggle_exc" title="Toggle lines excluded">0 excluded</button>
-            <button type="button" class="par run show_par shortkey_p button_toggle_par" title="Toggle lines partially run">2 partial</button>
+            <button type="button" class="par run show_par shortkey_p button_toggle_par" title="Toggle lines partially run">0 partial</button>
         </h2>
     </div>
 </div>
@@ -125,7 +125,7 @@
     <p id="t70" class="pln"><span class="n"><a href="#t70">70</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p id="t71" class="run"><span class="n"><a href="#t71">71</a></span><span class="t">    <span class="key">if</span> <span class="nam">option</span> <span class="op">==</span> <span class="str">'channel'</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p id="t72" class="run"><span class="n"><a href="#t72">72</a></span><span class="t">        <span class="nam">key</span> <span class="op">=</span> <span class="str">'all_members'</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t73" class="par run show_par"><span class="n"><a href="#t73">73</a></span><span class="t">    <span class="key">elif</span> <span class="nam">option</span> <span class="op">==</span> <span class="str">'dm'</span><span class="op">:</span>&nbsp;</span><span class="r"><span class="annotate short">73&#x202F;&#x219B;&#x202F;78</span><span class="annotate long">line 73 didn't jump to line 78, because the condition on line 73 was never false</span></span></p>
+    <p id="t73" class="pln"><span class="n"><a href="#t73">73</a></span><span class="t">    <span class="key">else</span><span class="op">:</span> <span class="com"># option == 'dm'</span>&nbsp;</span><span class="r"></span></p>
     <p id="t74" class="run"><span class="n"><a href="#t74">74</a></span><span class="t">        <span class="nam">key</span> <span class="op">=</span> <span class="str">'members'</span>&nbsp;</span><span class="r"></span></p>
     <p id="t75" class="pln"><span class="n"><a href="#t75">75</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p id="t76" class="pln"><span class="n"><a href="#t76">76</a></span><span class="t">    <span class="com"># iterate through all user handles and check if the handle is included in </span>&nbsp;</span><span class="r"></span></p>
@@ -180,7 +180,7 @@
     <p id="t125" class="pln"><span class="n"><a href="#t125">125</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p id="t126" class="run"><span class="n"><a href="#t126">126</a></span><span class="t">    <span class="key">if</span> <span class="nam">option</span> <span class="op">==</span> <span class="str">'channel'</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p id="t127" class="run"><span class="n"><a href="#t127">127</a></span><span class="t">        <span class="nam">key</span> <span class="op">=</span> <span class="str">'all_members'</span>&nbsp;</span><span class="r"></span></p>
-    <p id="t128" class="par run show_par"><span class="n"><a href="#t128">128</a></span><span class="t">    <span class="key">elif</span> <span class="nam">option</span> <span class="op">==</span> <span class="str">'dm'</span><span class="op">:</span>&nbsp;</span><span class="r"><span class="annotate short">128&#x202F;&#x219B;&#x202F;133</span><span class="annotate long">line 128 didn't jump to line 133, because the condition on line 128 was never false</span></span></p>
+    <p id="t128" class="pln"><span class="n"><a href="#t128">128</a></span><span class="t">    <span class="key">else</span><span class="op">:</span> <span class="com"># option == 'dm'</span>&nbsp;</span><span class="r"></span></p>
     <p id="t129" class="run"><span class="n"><a href="#t129">129</a></span><span class="t">        <span class="nam">key</span> <span class="op">=</span> <span class="str">'members'</span>&nbsp;</span><span class="r"></span></p>
     <p id="t130" class="pln"><span class="n"><a href="#t130">130</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p id="t131" class="pln"><span class="n"><a href="#t131">131</a></span><span class="t">    <span class="com"># only add notification if user who originally sent the message is still</span>&nbsp;</span><span class="r"></span></p>
@@ -237,7 +237,7 @@
     <div class="content">
         <p>
             <a class="nav" href="index.html">&#xab; index</a> &nbsp; &nbsp; <a class="nav" href="https://coverage.readthedocs.io">coverage.py v5.4</a>,
-            created at 2022-04-11 19:07 +1000
+            created at 2022-04-13 01:16 +1000
         </p>
     </div>
 </div>

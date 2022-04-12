@@ -23,25 +23,25 @@ def test_passwordreset_reset_invalid_reset_code_and_pw(clear_register_passwordre
     # password is an empty str
     resp0 = requests.post(config.url + 'auth/passwordreset/reset/v1', 
                          json={'reset_code': '-1', 
-                               'password': ''})
+                               'new_password': ''})
     assert resp0.status_code == STATUS_INPUT_ERR
 
     # password is too short
     resp1 = requests.post(config.url + 'auth/passwordreset/reset/v1', 
                          json={'reset_code': '-1', 
-                               'password': 'pass'})
+                               'new_password': 'pass'})
     assert resp1.status_code == STATUS_INPUT_ERR
 
     # password is an int
     resp2 = requests.post(config.url + 'auth/passwordreset/reset/v1', 
                          json={'reset_code': '-1', 
-                               'password': 1})
+                               'new_password': 1})
     assert resp2.status_code == STATUS_INPUT_ERR
 
     # password is a bool
     resp3 = requests.post(config.url + 'auth/passwordreset/reset/v1', 
                          json={'reset_code': '-1', 
-                               'password': True})
+                               'new_password': True})
     assert resp3.status_code == STATUS_INPUT_ERR
 
 @pytest.mark.usefixtures('clear_register_passwordreset')
@@ -51,25 +51,25 @@ def test_passwordreset_request_invalid_reset_code(clear_register_passwordreset):
     # code is a str of a negative number
     resp = requests.post(config.url + 'auth/passwordreset/reset/v1', 
                          json={'reset_code': '-1', 
-                               'password': 'password'})
+                               'new_password': 'password'})
     assert resp.status_code == STATUS_INPUT_ERR
 
     # code is an empty str
     resp = requests.post(config.url + 'auth/passwordreset/reset/v1', 
                          json={'reset_code': '', 
-                               'password': 'password'})
+                               'new_password': 'password'})
     assert resp.status_code == STATUS_INPUT_ERR
 
     # code is a bool
     resp = requests.post(config.url + 'auth/passwordreset/reset/v1', 
                          json={'reset_code': True, 
-                               'password': 'password'})
+                               'new_password': 'password'})
     assert resp.status_code == STATUS_INPUT_ERR
 
     # code is an int
     resp = requests.post(config.url + 'auth/passwordreset/reset/v1', 
                          json={'reset_code': 1, 
-                               'password': 'password'})
+                               'new_password': 'password'})
     assert resp.status_code == STATUS_INPUT_ERR
 
 requests.delete(config.url + 'clear/v1')

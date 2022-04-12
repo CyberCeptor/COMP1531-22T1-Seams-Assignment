@@ -99,9 +99,7 @@ def auth_register_v2(email, password, name_first, name_last):
 
     check_invalid_email(store, email)
 
-    # check for invalid password
-    if len(password) < 6:
-        raise InputError(description='Password is too short')
+    check_invalid_password(password)
 
     # encrypt the given password for storage
     encrypted_pw = hashlib.sha256(password.encode()).hexdigest()
@@ -141,7 +139,6 @@ def check_invalid_email(store, email):
 
     Arguments:
         store (dict) - a dict that stores user and channel data
-        valid_email_regex (regex) - a string that can contain any characters
         email (str)  - a string that matches the valid_email_regex above
 
     Exceptions:
@@ -162,6 +159,27 @@ def check_invalid_email(store, email):
     for user in store['users']:
         if user['email'] == email and user['removed'] is False:
             raise InputError(description='Email has already been taken')
+
+def check_invalid_password(password):
+    """
+    tests if the given password is valid
+
+    Arguments:
+        password (str) - a password given by the user
+
+    Exceptions:
+        InputError - Occurs if the password is less than 6 characters long or is 
+                     of the wrong input type
+
+    Return Value: N/A
+    """
+
+    if isinstance(password, str) is False:
+        raise InputError(description='Password is not of a valid type')
+
+    # check password length
+    if len(password) < 6:
+        raise InputError(description='Password is too short')
 
 def check_invalid_name(name_first, name_last):
     """
@@ -297,14 +315,14 @@ def generate_reset_code(email):
     # the reset code stored in the user data will be updated so only the code 
     # that is sent the latest is valid (if the user request multiple times)
     # any previous codes are moved to the used_codes list
-    if user['reset_code'] is not None:
-        user['used_codes'].append(user['reset_code'])
-        user['current_codes'].remove(user['reset_code'])
-    user['reset_code'] = code
+    if user_data['reset_code'] is not None:
+        user['used_codes'].append(user_data['reset_code'])
+        user['current_codes'].remove(user_data['reset_code'])
+    user_data['reset_code'] = code
 
     # log the user out by removing any current tokens
     for token_data in store['tokens']:
-        if token_data['user_id'] is user_data['id']:
+        if token_data['user_id'] == user_data['id']:
             token_remove(token_data['token'])
 
     data_store.set(store)
@@ -324,7 +342,49 @@ def reset_used_codes():
 
     store = data_store.get()
 
-    store['used_reset_codes'] = []
+    store['used_reset_codes'].clear()
 
     data_store.set(store)
 
+def passwordreset_reset_v1(reset_code, new_password):
+    """
+    Given a reset_code and new_password, reset the user's password whom the 
+    reset_code belongs to
+
+    Arguments:
+        reset_code (str)   - a unique str that belongs to a user to reset a pw
+        new_password (str) - the new pw the user wants to use for their acc
+
+    Exceptions: 
+        InputError - Raised if reset_code is invalid or new_passord is invalid
+
+    Return: N/A
+    """
+
+    store = data_store.get()
+
+    # check if reset_code is not in list of current code, 
+    # also takes care of invalid input
+    if reset_code not in store['current_codes']:
+        raise InputError(description='Invalid reset code')
+
+    check_invalid_password(new_password)
+
+    user_data = []
+
+    # find the user which the reset code belongs to
+    for user in store['users']:
+        if user['reset_code'] == reset_code:
+            user_data = user
+    
+    # reset the user's new encrypted password
+    user_data['pw'] = hashlib.sha256(new_password.encode()).hexdigest()
+
+    # invalidate the reset code by adding it to the used_codes list, removing it 
+    # from current_codes and setting the reset code in the user data to None
+    store['used_codes'].append(user_data['reset_code'])
+    store['current_codes'].remove(user_data['reset_code'])
+
+    user_data[reset_code] = None
+
+    data_store.set(store)

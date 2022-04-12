@@ -30,13 +30,15 @@ def test_standup_send_valid(clear_register_createchannel):
     stand = requests.post(config.url + 'standup/send/v1',
                         json={'token': token, 'channel_id': channel_id,
                             'message': 'hello world'})
+    assert stand.status_code == 200
+
     time.sleep(1)
     resp1 = requests.get(config.url + 'channel/messages/v2', 
                           params = {'token': token, 'channel_id': channel_id, 
                                     'start': 0})
     info = resp1.json()
+    assert(len(info['messages']) == 1)
     assert info['messages'][0]['message'] == 'firstlast: hello world'
-    assert stand.status_code == 200
     
 @pytest.mark.usefixtures('clear_register')
 def test_standup_send_invalid_channel(clear_register):
@@ -157,5 +159,30 @@ def test_standup_send_invalid_messages(clear_register_createchannel):
                         json={'token': token, 'channel_id': channel_id,
                             'message': message})
     assert stand.status_code == 400
+
+@pytest.mark.usefixtures('clear_register_createchannel')
+def test_standup_send_no_messages(clear_register_createchannel):
+    """
+    check that a standup message is not sent if there are no messages sent 
+    during the standup
+    """
+    user1 = clear_register_createchannel[0]
+    token = user1['token']
+    channel_id = clear_register_createchannel[1]
+    
+    resp0 = requests.post(config.url + 'standup/start/v1',
+                json={'token': token, 'channel_id': channel_id,
+                    'length': 1})
+    assert resp0.status_code == 200
+
+    time.sleep(1)
+    resp1 = requests.get(config.url + 'channel/messages/v2', 
+                          params = {'token': token, 'channel_id': channel_id, 
+                                    'start': 0})
+    assert resp0.status_code == 200
+    
+    info = resp1.json()
+    assert(len(info['messages']) == 0)
+
 
 requests.delete(config.url + 'clear/v1')

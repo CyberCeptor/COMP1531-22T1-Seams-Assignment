@@ -60,6 +60,12 @@ def test_admin_user_remove_works(clear_register_two):
     assert resp3.status_code == 200
     msg_id = resp3.json()['message_id']
 
+    resp10 = requests.get(config.url + 'channel/messages/v2',
+                         params={'token': token2, 'channel_id': chan_id,
+                                 'start': 0})
+    assert resp10.status_code == 200
+    chan_msgs_data1 = resp10.json()
+
     # user2 also creates a dm consisting of themselves and user1,
     # and sends a message in it
     resp4 = requests.post(config.url + 'dm/create/v1', 
@@ -73,6 +79,11 @@ def test_admin_user_remove_works(clear_register_two):
                                 'message': 'hewwooooo'})
     assert resp5.status_code == 200
     dm_msg_id = resp5.json()['message_id']
+
+    resp12 = requests.get(config.url + 'dm/messages/v1',
+                         params={'token': token1, 'dm_id': dm_id, 'start': 0})
+    assert resp12.status_code == 200
+    dm_msgs_data1 = resp12.json()
 
     # there will only be two dm members in total
     resp6 = requests.get(config.url + 'dm/details/v1',
@@ -110,10 +121,14 @@ def test_admin_user_remove_works(clear_register_two):
                          params={'token': token1, 'channel_id': chan_id,
                                  'start': 0})
     assert resp10.status_code == 200
-    chan_msgs_data = resp10.json()
-    assert msg_id in [k['message_id'] for k in chan_msgs_data['messages']]
-    assert id2 in [k['u_id'] for k in chan_msgs_data['messages']]
-    assert 'Removed user' in [k['message'] for k in chan_msgs_data['messages']]
+    chan_msgs_data2 = resp10.json()
+    assert chan_msgs_data1 != chan_msgs_data2
+    # assert (id2, msg_id, 'Removed user') in \
+    #     [(k['u_id'], k['message_id'], k['message']) for 
+    #     k in chan_msgs_data2['messages']]
+    for msg in chan_msgs_data2['messages']:
+        if msg['u_id'] == id2:
+            assert msg['message'] == 'Removed user'
 
     # there will only be one dm member left and no channel creator
     resp11 = requests.get(config.url + 'dm/details/v1',
@@ -128,11 +143,16 @@ def test_admin_user_remove_works(clear_register_two):
     resp12 = requests.get(config.url + 'dm/messages/v1',
                          params={'token': token1, 'dm_id': dm_id, 'start': 0})
     assert resp12.status_code == 200
-    dm_msgs_data = resp12.json()
-    assert dm_msg_id in [k['message_id'] for k in dm_msgs_data['messages']]
-    assert id2 in [k['u_id'] for k in dm_msgs_data['messages']]
-    assert 'Removed user' in [k['message'] for k in dm_msgs_data['messages']]
-    
+    dm_msgs_data2 = resp12.json()
+    assert dm_msgs_data1 != dm_msgs_data2
+    assert (id2, dm_msg_id, 'Removed user') in \
+        [(k['u_id'], k['message_id'], k['message']) for 
+        k in dm_msgs_data2['messages']]
+
+    for msg in dm_msgs_data2['messages']:
+        if msg['u_id'] == id2:
+            assert msg['message'] == 'Removed user'
+
     # user2's profile can still be retrieved but their name_first will be
     # 'Removed' and their name_last will be 'user'
     resp13 = requests.get(config.url + 'user/profile/v1', 

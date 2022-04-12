@@ -10,7 +10,8 @@ from flask_mail import Mail, Message
 from src.dm import dm_create_v1, dm_list_v1, dm_details_v1, dm_remove_v1,\
                    dm_messages_v1
 
-from src.auth import auth_register_v2, auth_login_v2, generate_reset_code
+from src.auth import auth_register_v2, auth_login_v2, generate_reset_code, \
+                     passwordreset_reset_v1
 from src.user import user_profile_v1, user_profile_setemail_v1, \
                      user_profile_setname_v1, user_profile_sethandle_v1
 
@@ -71,9 +72,11 @@ APP.register_error_handler(Exception, defaultHandler)
 
 mail = Mail(APP)
 
+EMAIL = 'donotreply.pwreset@gmail.com'
+
 APP.config['MAIL_SERVER'] = 'smtp.gmail.com'
 APP.config['MAIL_PORT'] = 465
-APP.config['MAIL_USERNAME'] = 'donotreply.pwreset@gmail.com'
+APP.config['MAIL_USERNAME'] = EMAIL
 APP.config['MAIL_PASSWORD'] = 'P@ssword1531'
 APP.config['MAIL_USE_TLS'] = False
 APP.config['MAIL_USE_SSL'] = True
@@ -135,15 +138,19 @@ def request_pwreset():
     code = generate_reset_code(data['email'])
     if code is not None:
         # following https://pythonbasics.org/flask-mail/
-        msg = Message('Seams Password Reset', 
-                      sender = 'donotreply.pwreset@gmail.com',
+        msg = Message('Seams Password Reset', sender = EMAIL,
                       recipients = [data['email']])
         msg.body = f'Your reset code is: {code}'
         mail.send(msg)
     save_data()
     return dumps({})
 
-
+@APP.route('/auth/passwordreset/reset/v1', methods=['POST'])
+def pw_reset():
+    data = request.get_json()
+    passwordreset_reset_v1(data['reset_code'], data['new_password'])
+    save_data()
+    return dumps({})
 
 ################################################################################
 ##                              USERS ROUTES                                  ##
@@ -166,7 +173,7 @@ def user_profile():
     u_id = request.args.get('u_id')
     profile = user_profile_v1(token, u_id)
     save_data()
-    return jsonify(profile)
+    return dumps(profile)
 
 @APP.route('/user/profile/setemail/v1', methods=['PUT'])
 def user_setemail():

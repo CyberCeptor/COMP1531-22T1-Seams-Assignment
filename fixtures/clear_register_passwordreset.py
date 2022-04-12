@@ -17,7 +17,7 @@ from src import config
 from src.global_vars import STATUS_OK
 
 @pytest.fixture
-def test_passwordreset_reset_invalid_reset_code(clear_register):
+def clear_register_passwordreset(clear_register):
     """ clears any data stored in data_store and registers a user with the
     given information and requests a password reset """
 

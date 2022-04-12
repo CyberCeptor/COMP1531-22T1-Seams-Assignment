@@ -8,14 +8,18 @@ Description: - start the standup
              - check the standup is active
              - send messages
 """
-from email.errors import MessageParseError
-from src.data_store import data_store
+
+import time
+
+from threading import Timer
+
 from src.error import InputError, AccessError
 from src.token import token_valid_check, token_get_user_id
 from src.other import check_valid_channel_id, check_user_is_member,\
-                    check_valid_auth_id
-from datetime import datetime, timedelta, timezone
-from threading import Timer
+                      check_valid_auth_id
+
+from src.data_store import data_store
+
 from src.channel_dm_helpers import send_message
 
 def standup_start_v1(token, channel_id, length):
@@ -53,11 +57,6 @@ def standup_start_v1(token, channel_id, length):
 
     # check length
     check_length(length)
-    
-    # get the current time by calling datetime.now
-    begin_time = datetime.now()
-    # get the end time by calling timedelta with length
-    end_time = begin_time + timedelta(seconds = length)
 
     # check the standup whether running currently or not
     if channel_data['standup']['is_active']:
@@ -65,10 +64,10 @@ def standup_start_v1(token, channel_id, length):
             'An active standup is currently running in this channel'
         )
 
-    # get the finish time, converted it to an UTC timestamp
-    # Source: https://www.geeksforgeeks.org/get-utc-timestamp-in-python/
-    time_finish = int(end_time.replace(tzinfo=timezone.utc).timestamp())
-    
+    # get the current time by calling datetime.now and add length seconds to it
+    # to get the time_finish of the standup
+    time_finish = time.time() + length
+
     # add the length, begin_time, end_time into standup
     # coverting begin and end time to an isoformat.
     channel_data['standup']['is_active'] = True
@@ -188,7 +187,7 @@ def standup_send_collect_messages(user_id, channel_id):
         send_message(user_id, channel_id, packaged_message, 'channel', True)
 
     channel['standup']['is_active'] = False
-    channel['standup']['messages_buffer'] = []
+    channel['standup']['messages_buffer'].clear()
     channel['standup']['time_finish'] = None
     data_store.set(store)
 
