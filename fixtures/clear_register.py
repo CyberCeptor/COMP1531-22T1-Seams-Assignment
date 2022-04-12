@@ -23,8 +23,8 @@ def clear_register():
     requests.delete(config.url + 'clear/v1')
 
     resp = requests.post(config.url + 'auth/register/v2', 
-                  json={'email': 'abc@def.com', 'password': 'password',
-                        'name_first': 'first', 'name_last': 'last'})
+                         json={'email': 'abc@def.com', 'password': 'password',
+                               'name_first': 'first', 'name_last': 'last'})
     assert resp.status_code == STATUS_OK
     user1 = resp.json()
 
