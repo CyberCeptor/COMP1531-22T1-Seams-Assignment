@@ -49,27 +49,33 @@ def test_passwordreset_request_invalid_reset_code(clear_register_passwordreset):
     """ checks that errors are not raised when invalid reset codes are given """
 
     # code is a str of a negative number
-    resp = requests.post(config.url + 'auth/passwordreset/reset/v1', 
+    resp0 = requests.post(config.url + 'auth/passwordreset/reset/v1', 
                          json={'reset_code': '-1', 
                                'new_password': 'password'})
-    assert resp.status_code == STATUS_INPUT_ERR
+    assert resp0.status_code == STATUS_INPUT_ERR
 
     # code is an empty str
-    resp = requests.post(config.url + 'auth/passwordreset/reset/v1', 
+    resp1 = requests.post(config.url + 'auth/passwordreset/reset/v1', 
                          json={'reset_code': '', 
                                'new_password': 'password'})
-    assert resp.status_code == STATUS_INPUT_ERR
+    assert resp1.status_code == STATUS_INPUT_ERR
 
     # code is a bool
-    resp = requests.post(config.url + 'auth/passwordreset/reset/v1', 
+    resp2 = requests.post(config.url + 'auth/passwordreset/reset/v1', 
                          json={'reset_code': True, 
                                'new_password': 'password'})
-    assert resp.status_code == STATUS_INPUT_ERR
+    assert resp2.status_code == STATUS_INPUT_ERR
 
     # code is an int
-    resp = requests.post(config.url + 'auth/passwordreset/reset/v1', 
+    resp3 = requests.post(config.url + 'auth/passwordreset/reset/v1', 
                          json={'reset_code': 1, 
                                'new_password': 'password'})
-    assert resp.status_code == STATUS_INPUT_ERR
+    assert resp3.status_code == STATUS_INPUT_ERR
+
+    # code is None
+    resp3 = requests.post(config.url + 'auth/passwordreset/reset/v1', 
+                         json={'reset_code': None, 
+                               'new_password': 'password'})
+    assert resp3.status_code == STATUS_INPUT_ERR
 
 requests.delete(config.url + 'clear/v1')

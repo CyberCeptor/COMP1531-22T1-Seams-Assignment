@@ -4,7 +4,8 @@ auth.py
 - symbols from names are removed when creating handles
 - the global owner is the first user to sign up to Seams
 - if a user requests a reset code multiple times, only the last one will be valid
-- if all 6 digit codes have been used up, the used_codes in the data will be reset
+- the same randomly generated reset code can be used by a user once it has
+  been used by another user and invalidated
 
 channel.py
 - channel name can contain any character

@@ -36,6 +36,7 @@ data = {
         'handle': 'firstlast',
         'perm_id': 1,
         'removed': False,
+        'reset_code': None
     }],
     'tokens' = [{
         'user_id': user_data['id'],
@@ -70,7 +71,12 @@ data = {
                 'u_ids': [],
                 'is_this_user_reacted': False
             }],
-            'is_pinned': False
+            'is_pinned': False,
+            'standup': {
+                'is_active': False,
+                'time_finish': None,
+                'messages_buffer': [],
+            },
         }],
     }],
     'dms': [{
@@ -112,8 +118,6 @@ initial_object = {
     'tokens': [],
     'channels': [],
     'dms': [],
-    'used_codes': [],
-    'current_codes': [],
 }
 ## YOU SHOULD MODIFY THIS OBJECT ABOVE
 

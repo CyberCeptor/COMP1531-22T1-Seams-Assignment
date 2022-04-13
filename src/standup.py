@@ -20,7 +20,7 @@ from src.other import check_valid_channel_id, check_user_is_member,\
 
 from src.data_store import data_store
 
-from src.channel_dm_helpers import send_message
+from src.channel_dm_helpers import send_message, check_valid_message
 
 def standup_start_v1(token, channel_id, length):
     """
@@ -75,10 +75,14 @@ def standup_start_v1(token, channel_id, length):
 
     # Saves data
     data_store.set(store)
+
     timer = Timer(length, standup_send_collect_messages, [user_id, channel_id])
     timer.start()
-    # return a dic
-    return {'time_finish': time_finish}
+
+    # return a dict
+    return {
+        'time_finish': time_finish
+    }
 
 def standup_active_v1(token, channel_id):
     '''
@@ -108,12 +112,10 @@ def standup_active_v1(token, channel_id):
     if check_user_is_member(user_id, channel_data, 'all_members') is None:
         raise AccessError(description='Inviter is not in the channel')
     
-    value = {} # create an empty dic
-    # Add the is_active into value dic
-    value['is_active'] = channel_data['standup']['is_active']
-    value['time_finish'] = channel_data['standup']['time_finish']
-
-    return value
+    return {
+        'is_active': channel_data['standup']['is_active'],
+        'time_finish': channel_data['standup']['time_finish']
+    }
 
 def standup_send_v1(token, channel_id, message):
     """
@@ -142,11 +144,7 @@ def standup_send_v1(token, channel_id, message):
     # check valid channel id
     channel_data = check_valid_channel_id(channel_id)
 
-    if isinstance(message, str) is False:
-        raise InputError('wrong type of messages')
-
-    if len(message) > 1000:
-        raise InputError('Length of message is over 1000 characters.')
+    check_valid_message(message)
     
     if message == '':
         raise InputError('This is an empty message')
@@ -161,13 +159,11 @@ def standup_send_v1(token, channel_id, message):
             'An active standup is not currently running in this channel'
         )
 
-    message_name = user['all_data']['handle']
-    collect_messages = f'{message_name}: {message}'
-    channel_data['standup']['messages_buffer'].append(collect_messages)
+    handle = user['all_data']['handle']
+    standup_message = f'{handle}: {message}'
+    channel_data['standup']['messages_buffer'].append(standup_message)
     data_store.set(store)
     
-    return {}
-
 def standup_send_collect_messages(user_id, channel_id):
     """
     This function is to send message in the buffer
@@ -182,6 +178,7 @@ def standup_send_collect_messages(user_id, channel_id):
     """
     store = data_store.get()
     channel = check_valid_channel_id(channel_id)
+    
     if len(channel['standup']['messages_buffer']) > 0:
         packaged_message = '\n'.join(channel['standup']['messages_buffer'])
         send_message(user_id, channel_id, packaged_message, 'channel', True)

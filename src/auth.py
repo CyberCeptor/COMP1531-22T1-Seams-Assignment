@@ -284,12 +284,6 @@ def generate_reset_code(email):
 
     store = data_store.get()
 
-    # if all 6 digit combinations of reset codes have been generated, reset
-    # all used codes that are saved in the data so they can be regenerated
-    codes_generated = len(store['used_codes'] + store['current_codes'])
-    if codes_generated == MAX_NUM_CODES:
-        reset_used_codes()
-
     user_data = None
 
     # find email in stored user data and return the user's data
@@ -306,18 +300,11 @@ def generate_reset_code(email):
     code = f'{random.randrange(0, 10**6):06}'
 
     # if code has been generated before, generate a new one
-    while code in store['current_codes'] or code in store['used_codes']:
+    while code in [user['reset_code'] for user in store['users']]:
         code = f'{random.randrange(0, 10**6):06}'
-
-    # store the generated code into the data
-    store['current_codes'].append(code)
 
     # the reset code stored in the user data will be updated so only the code 
     # that is sent the latest is valid (if the user request multiple times)
-    # any previous codes are moved to the used_codes list
-    if user_data['reset_code'] is not None:
-        user['used_codes'].append(user_data['reset_code'])
-        user['current_codes'].remove(user_data['reset_code'])
     user_data['reset_code'] = code
 
     # log the user out by removing any current tokens
@@ -328,23 +315,6 @@ def generate_reset_code(email):
     data_store.set(store)
 
     return code
-
-def reset_used_codes():
-    """
-    resets all used reset codes stored in the stored data
-
-    Arguments: N/A
-
-    Exceptions: N/A
-
-    Return: N/A
-    """
-
-    store = data_store.get()
-
-    store['used_reset_codes'].clear()
-
-    data_store.set(store)
 
 def passwordreset_reset_v1(reset_code, new_password):
     """
@@ -363,28 +333,41 @@ def passwordreset_reset_v1(reset_code, new_password):
 
     store = data_store.get()
 
-    # check if reset_code is not in list of current code, 
-    # also takes care of invalid input
-    if reset_code not in store['current_codes']:
+    # if input is None, it will be considered a valid code
+    if reset_code is None:
         raise InputError(description='Invalid reset code')
+
+    user = get_user_with_reset_code(reset_code)
 
     check_invalid_password(new_password)
 
-    user_data = []
-
-    # find the user which the reset code belongs to
-    for user in store['users']:
-        if user['reset_code'] == reset_code:
-            user_data = user
-    
     # reset the user's new encrypted password
-    user_data['pw'] = hashlib.sha256(new_password.encode()).hexdigest()
+    user['pw'] = hashlib.sha256(new_password.encode()).hexdigest()
 
-    # invalidate the reset code by adding it to the used_codes list, removing it 
-    # from current_codes and setting the reset code in the user data to None
-    store['used_codes'].append(user_data['reset_code'])
-    store['current_codes'].remove(user_data['reset_code'])
-
-    user_data[reset_code] = None
+    user['reset_code'] = None
 
     data_store.set(store)
+
+def get_user_with_reset_code(reset_code):
+    """
+    Checks whether the given reset_code belongs to a user and returns that 
+    user's data
+
+    Arguments:
+        reset_code (str) - a unique str that belongs to a user to reset a pw
+
+    Exceptions: 
+        InputError - Raised if reset_code is not store in any user data
+
+    Return: Returns the user that holds the given reset_code
+    """
+
+    store = data_store.get()
+
+    # find the user which the reset code belongs to, also doubles as a valid 
+    # input check
+    for user in store['users']:
+        if user['reset_code'] == reset_code:
+            return user
+    
+    raise InputError(description='Invalid reset code')
