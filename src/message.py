@@ -300,49 +300,91 @@ def message_unreact_v1(token, message_id, react_id):
 
     edit_react(auth_user_id, data, message_data, react_id, 'remove')
 
+@token_valid_check
 def message_share_v1(token, og_message_id, message, channel_id, dm_id):
+    """
+    If token given is authorised user, share the message
+    to a specified channel/dm with input channel_id/dm_id
 
-    token_valid_check(token)
+    Arguments:
+        token (str)          - unique str representation of user
+        og_message_id (int)) - integer original message
+        message (str)        - message that the user wishes to send
+        channel_id (int))    - integer sppcifies channel
+        dm_id (int))         - integer sppcifies dm
 
-    if og_message_id == '':
-        raise InputError(description='Empty og_message_id input')
+    Exceptions:
+        AccessError - when og_message_id refers to a valid message in a joined 
+            channel/DM and none of the following are true:
+            - the message was sent by the authorised user making this request
+            - the authorised user has owner permissions in the channel/DM
+        InputError  - channel_id/dm_id does not refer to valid channel
+                    - length of message is over 1000 characters
 
-    if type(og_message_id) == bool:
-        raise InputError(description='bool og_message_id input')
+    Return Value:
+        Shared_message_id - int to specifies each message
+    """
+    user_id = token_get_user_id(token)
+    
+    if dm_id == -1:
+        shared_message_id = send_message(user_id, og_message_id, message, 'channel', False)
 
-    if type(og_message_id) == string:
-        raise InputError(description='string og_message_id input')
-
-    if type(message) == int:
-        raise InputError(description='int message input')
-
-    if type(message) == bool:
-        raise InputError(description='bool message input')
-
-    if len(message) > 1000:
-        raise InputError(description='Message must not exceed 1000 characters')
-
-    if channel_id == '' and dm_id == -1:
-        raise InputError(description='Empty channel_id input')
-
-    if type(channel_id) == bool and dm_id == -1:
-        raise InputError(description='bool channel_id input')
-
-    if type(channel_id) == string and dm_id == -1:
-        raise InputError(description='string channel_id input')
-
-    if dm_id == '' and channel_id == -1:
-        raise InputError(description='Empty dm_id input')
-
-    if type(dm_id) == bool and channel_id == -1:
-        raise InputError(description='bool dm_id input')
-
-    if type(dm_id) == string and channel_id == -1:
-        raise InputError(description='string dm_id input')
-
-    if dm_id == -1 and channel_id == -1:
-        raise InputError(description='both -1 input')
-
-    shared_message_id = channel_id + dm_id
+    if channel_id == -1:
+        shared_message_id = send_message(user_id, og_message_id, message, 'dm', False)
 
     return shared_message_id
+
+@token_valid_check
+def message_unpin_v1(token, message_id):
+    """
+    If token given is authorised user, unpin the message
+    specified by message id in channel/dm
+
+    Arguments:
+        token (str)          - unique str representation of user
+        message_id (int))    - integer sppcifies message
+
+    Exceptions:
+        AccessError - message_id refers to a valid message in a joined 
+        channel/DM and the authorised user does not have owner permissions
+        in the channel/DM
+        InputError  - message_id is not a valid message within a channel 
+                    or DM that the authorised user has joined
+                    - message already unpinned
+
+    Return: N/A
+    """
+
+    store = data_store.get()
+
+    user_id = token_get_user_id(token)
+
+    # check input message_id is valid and return the message_data, if the 
+    # message was sent in a channel or dm, and the corresponding channel or dm 
+    # data
+    check_return = check_message_id_valid(message_id)
+    message_data = check_return[0]
+    in_channel = check_return[1]
+    data = check_return[2]
+    
+    # raise input error if message is already unpinned
+    if message_data['is_pinned'] is False:
+        raise InputError(description='Message is already unpinned')
+
+    # if message is sent in dm
+    if in_channel is False:
+        # user is owner of dm
+        if data['creator']['u_id'] == user_id:
+            message_data['is_pinned'] = False
+        else:
+            raise AccessError(description='User has no access to this message')
+    else:
+        # if user is owner or global owner in channel
+        if (check_user_is_member(user_id, data, 'owner_members') or 
+        (check_user_is_member(user_id, data, 'all_members') and
+        check_user_is_global_owner(user_id))):
+            message_data['is_pinned'] = False
+        else:
+            raise AccessError(description='User has no access to this message')
+
+    data_store.set(store)

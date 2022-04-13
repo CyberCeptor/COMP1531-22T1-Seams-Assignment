@@ -239,3 +239,24 @@ def test_user_not_belong(clear_register_shared_message):
     resp0 = requests.post(config.url + 'message/share/v1', 
                           json = {'token': token_2, 'og_message_id': og_id, 'message': 'Hello World', 'channel_id': chan_id, 'dm_id': dm_id})
     assert resp0.status_code == 403 #raise access error
+
+@pytest.mark.usefixtures('clear_register_shared_message')
+def test_message_share_success(clear_register_shared_message):
+    """ test for success share"""
+
+    token = clear_register_shared_message[0]['token']
+    og_id = clear_register_shared_message[1]
+    chan_id = clear_register_shared_message[3]
+    dm_id = clear_register_shared_message[4]
+
+    # dm is -1
+    resp0 = requests.post(config.url + 'message/share/v1', 
+                          json = {'token': token, 'og_message_id': og_id, 'message': 'Hello World', 'channel_id': chan_id, 'dm_id': -1})
+    assert resp0.status_code == 200
+
+    # channel is -1
+    resp1 = requests.post(config.url + 'message/share/v1', 
+                          json = {'token': token, 'og_message_id': og_id, 'message': 'Hello World1', 'channel_id': -1, 'dm_id': dm_id})
+    assert resp1.status_code == 200
+
+requests.delete(config.url + 'clear/v1')
