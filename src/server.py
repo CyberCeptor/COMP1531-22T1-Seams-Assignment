@@ -420,29 +420,26 @@ def dm_messages():
 @APP.route('/standup/start/v1', methods=['POST'])
 def standup_start():
     store = request.get_json()
-    result = standup_start_v1(
+    time_finish = standup_start_v1(
         store['token'], store['channel_id'], store['length']
     )
     save_data()
-    return dumps(result)
+    return dumps(time_finish)
 
 @APP.route('/standup/active/v1', methods = ['GET'])
 def standup_active_server():
     token = request.args.get('token')
     channel_id = request.args.get('channel_id')
+    standup_info = standup_active_v1(token, channel_id)
     save_data()
-    return dumps(
-        standup_active_v1(token, channel_id)
-    )
+    return dumps(standup_info)
 
 @APP.route('/standup/send/v1', methods=['POST'])
 def standup_send():
     store = request.get_json()
-    result = standup_send_v1(
-        store['token'], store['channel_id'], store['message']
-    )
+    standup_send_v1(store['token'], store['channel_id'], store['message'])
     save_data()
-    return dumps(result)
+    return dumps({})
 ################################################################################
 ##                            NOTIFICATIONS ROUTE                             ##
 ################################################################################
