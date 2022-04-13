@@ -261,8 +261,12 @@ def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
     '''Get the user ID from the token'''
     user_id = token_get_user_id(token)
 
-    file_location = f"uploads/{user_id}.jpg"
-    temp = f"uploads/temp.jpg"
+
+    file_location = f"src/static/{user_id}.jpg"
+    ###################
+    print("function file location = ", file_location)
+
+    # temp = f"uploads/temp.jpg"
     
     # # https://stackoverflow.com/questions/64384834/how-to-check-file-type-for-an-image-stored-as-url
     # response = requests.get(img_url)
@@ -276,7 +280,7 @@ def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
     '''Test the URL can be opened
     Stores in temp file, incase its not valid.'''
     try:
-        urllib.request.urlretrieve(img_url, temp)
+        urllib.request.urlretrieve(img_url, file_location)
     except:
         raise InputError(description="URL cannot be opened.")
 
@@ -286,14 +290,14 @@ def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
     """Check the URL is of a JPG."""
     image_info = imgspy.info(img_url)
     if image_info['type'] != 'jpg':
-        os.remove(temp)
+        os.remove(file_location)
         raise InputError(description="URL image is not of a JPG.")
 
 
 
     
 
-    image = Image.open(temp)
+    image = Image.open(file_location)
 
     width = image_info['width']
     height = image_info['height']
@@ -301,7 +305,7 @@ def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
 
     '''Check the dimensions of the image'''
     if x_start < 0 or y_start < 0 or x_end > width or y_end > height or x_start >= x_end or y_start >= y_end or x_end != y_end:
-        os.remove(temp)
+        os.remove(file_location)
         raise InputError(description="The image dimensions are too small.")
     
     '''Crop the image to fit within our requirements'''
@@ -309,12 +313,16 @@ def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
     cropped_image.save(file_location)
 
     # https://stackoverflow.com/questions/16351826/link-to-flask-static-files-with-url-for
-    profile_img_url = url_for('static', filename=f'uploads/{user_id}.jpg')
+    profile_img_url = url_for('static', filename=f'{user_id}.jpg', _external=True)
 
     
     """Set the user data profile_img_url to be the URL image"""
     store = data_store.get()
-    user_data = check_valid_auth_id(user_id)
-    user_data['profile_img_url'] = profile_img_url
+    # user_data = check_valid_auth_id(user_id)
+    # user_data['profile_img_url'] = profile_img_url
+    for users in store['users']:
+        if user_id == users['id']:
+            users['profile_img_url'] = profile_img_url
     data_store.set(store)
+    print("function call profile_img_url = ", profile_img_url)
     return {}

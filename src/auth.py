@@ -123,7 +123,7 @@ def auth_register_v2(email, password, name_first, name_last):
         'perm_id': Permission.OWNER.value if u_id == 1 else Permission.USER.value,
         'removed': False,
         # if they have yet to upload an image,  site-wide default image used.
-        'profile_img_url': url_for('static', filename='uploads/default.jpg'), 
+        'profile_img_url': None, 
     }
 
     # store the user information into the list of users
