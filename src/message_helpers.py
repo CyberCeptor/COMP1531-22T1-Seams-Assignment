@@ -136,17 +136,14 @@ def edit_remove_message(auth_user_id, data, msg_data, message, option):
     Return Value: N/A
     """
 
-    if option == 'remove':
-        data['messages'].remove(msg_data)
-    elif option == 'edit' and message != '':
+    if option == 'edit' and message != '':
         old_msg = msg_data['message']
         msg_data['message'] = message
         if 'channel_id' in data.keys():
             tag_notification(auth_user_id, old_msg, message, data, 'channel')
-        elif 'dm_id' in data.keys():
+        else:
             tag_notification(auth_user_id, old_msg, message, data, 'dm')
-    elif option == 'edit' and message == '':
-        # remove the message if the new message input is empty
+    else: # if the new message input is empty or option == 'remove'
         data['messages'].remove(msg_data)
 
 def edit_react(auth_user_id, data, message_data, react_id, option):
@@ -183,7 +180,7 @@ def edit_react(auth_user_id, data, message_data, react_id, option):
 
         if 'channel_id' in data.keys():
             react_notification(auth_user_id, data, message_data, 'channel')
-        elif 'dm_id' in data.keys():
+        else:
             react_notification(auth_user_id, data, message_data, 'dm')
     
     if option == 'remove':

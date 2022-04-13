@@ -55,7 +55,7 @@ def new_id(option):
         global DM_ID_COUNTER 
         DM_ID_COUNTER += 1
         return DM_ID_COUNTER
-    elif option == 'session':
+    else: # option == 'session'
         global SESSION_ID_COUNTER 
         SESSION_ID_COUNTER += 1
         return SESSION_ID_COUNTER
@@ -80,7 +80,7 @@ def reset_id(option):
         global DM_ID_COUNTER 
         DM_ID_COUNTER = 0
         return DM_ID_COUNTER
-    elif option == 'session':
+    else: # option == 'session'
         global SESSION_ID_COUNTER 
         SESSION_ID_COUNTER = 0
         return SESSION_ID_COUNTER

@@ -8,6 +8,8 @@ from fixtures.clear_register_two_createdm import clear_register_two_createdm
 
 from fixtures.clear_register_createchannel import clear_register_createchannel
 
+from fixtures.clear_register_passwordreset import clear_register_passwordreset
+
 from fixtures.clear_register_two_createchannel import clear_register_two_createchannel
 
 from fixtures.clear_register_two_createchanneldm import clear_register_two_createchanneldm

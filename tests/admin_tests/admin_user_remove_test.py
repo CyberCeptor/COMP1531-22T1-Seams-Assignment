@@ -60,6 +60,12 @@ def test_admin_user_remove_works(clear_register_two):
     assert resp3.status_code == 200
     msg_id = resp3.json()['message_id']
 
+    # user1 sends a message in the channel
+    resp3 = requests.post(config.url + 'message/send/v1', 
+                          json={'token': token1, 'channel_id': chan_id,
+                                'message': 'hewwo'})
+    assert resp3.status_code == 200
+
     # user2 also creates a dm consisting of themselves and user1,
     # and sends a message in it
     resp4 = requests.post(config.url + 'dm/create/v1', 
@@ -74,31 +80,36 @@ def test_admin_user_remove_works(clear_register_two):
     assert resp5.status_code == 200
     dm_msg_id = resp5.json()['message_id']
 
-    # there will only be two dm members in total
-    resp6 = requests.get(config.url + 'dm/details/v1',
-                         params={'token': token1, 'dm_id': dm_id})
+    resp6 = requests.post(config.url + 'message/senddm/v1', 
+                          json={'token': token1, 'dm_id': dm_id,
+                                'message': 'hewwooooo'})
     assert resp6.status_code == 200
-    dm_data = resp6.json()
+
+    # there will only be two dm members in total
+    resp7 = requests.get(config.url + 'dm/details/v1',
+                         params={'token': token1, 'dm_id': dm_id})
+    assert resp7.status_code == 200
+    dm_data = resp7.json()
     assert len(dm_data['members']) == 2
     assert id2 in [k['u_id'] for k in dm_data['members']]
 
     # user1 removes user2
-    resp7 = requests.delete(config.url + 'admin/user/remove/v1', 
+    resp8 = requests.delete(config.url + 'admin/user/remove/v1', 
                           json={'token': token1, 'u_id': id2})
-    assert resp7.status_code == 200
+    assert resp8.status_code == 200
 
     # there will still be two users left but user2's name will be 'Removed user'
-    resp8 = requests.get(config.url + 'users/all/v1', params={'token': token1})
-    assert resp8.status_code == 200
-    users = resp8.json()
+    resp9 = requests.get(config.url + 'users/all/v1', params={'token': token1})
+    assert resp9.status_code == 200
+    users = resp9.json()
     assert id2 not in [k['u_id'] for k in users['users']]
     assert len(users['users']) == 1
 
     # there will only be one channel member left and no channel owners
-    resp9 = requests.get(config.url + 'channel/details/v2',
+    resp10 = requests.get(config.url + 'channel/details/v2',
                          params={'token': token1, 'channel_id': chan_id})
-    assert resp9.status_code == 200
-    chan_data = resp9.json()
+    assert resp10.status_code == 200
+    chan_data = resp10.json()
     assert len(chan_data['owner_members']) == 0
     assert len(chan_data['all_members']) == 1
     assert id2 not in [k['u_id'] for k in chan_data['owner_members']]
@@ -106,39 +117,39 @@ def test_admin_user_remove_works(clear_register_two):
 
     # all channel messages will be replaced with 'Removed user'
     # i.e. the msg 'hewwo' that user2 created will be replaced
-    resp10 = requests.get(config.url + 'channel/messages/v2',
+    resp11 = requests.get(config.url + 'channel/messages/v2',
                          params={'token': token1, 'channel_id': chan_id,
                                  'start': 0})
-    assert resp10.status_code == 200
-    chan_msgs_data = resp10.json()
-    assert msg_id in [k['message_id'] for k in chan_msgs_data['messages']]
-    assert id2 in [k['u_id'] for k in chan_msgs_data['messages']]
-    assert 'Removed user' in [k['message'] for k in chan_msgs_data['messages']]
+    assert resp11.status_code == 200
+    chan_msgs_data = resp11.json()
+    assert (id2, msg_id, 'Removed user') in \
+        [(k['u_id'], k['message_id'], k['message']) for 
+        k in chan_msgs_data['messages']]
 
     # there will only be one dm member left and no channel creator
-    resp11 = requests.get(config.url + 'dm/details/v1',
+    resp12 = requests.get(config.url + 'dm/details/v1',
                          params={'token': token1, 'dm_id': dm_id})
-    assert resp11.status_code == 200
-    dm_data = resp11.json()
+    assert resp12.status_code == 200
+    dm_data = resp12.json()
     assert len(dm_data['members']) == 1
     assert id2 not in [k['u_id'] for k in dm_data['members']]
 
     # all dm messages will be replaced with 'Removed user'
     # i.e. the msg 'hewwooooo' that user2 created will be replaced
-    resp12 = requests.get(config.url + 'dm/messages/v1',
+    resp13 = requests.get(config.url + 'dm/messages/v1',
                          params={'token': token1, 'dm_id': dm_id, 'start': 0})
-    assert resp12.status_code == 200
-    dm_msgs_data = resp12.json()
-    assert dm_msg_id in [k['message_id'] for k in dm_msgs_data['messages']]
-    assert id2 in [k['u_id'] for k in dm_msgs_data['messages']]
-    assert 'Removed user' in [k['message'] for k in dm_msgs_data['messages']]
-    
+    assert resp13.status_code == 200
+    dm_msgs_data = resp13.json()
+    assert (id2, dm_msg_id, 'Removed user') in \
+        [(k['u_id'], k['message_id'], k['message']) for 
+        k in dm_msgs_data['messages']]
+
     # user2's profile can still be retrieved but their name_first will be
     # 'Removed' and their name_last will be 'user'
-    resp13 = requests.get(config.url + 'user/profile/v1', 
+    resp14 = requests.get(config.url + 'user/profile/v1', 
                            params={'token': token1, 'u_id': id2})
-    assert resp13.status_code == 200
-    profile = resp13.json()
+    assert resp14.status_code == 200
+    profile = resp14.json()
    
     assert profile['user']['u_id'] == id2
     assert profile['user']['email'] == 'def@ghi.com'
@@ -148,18 +159,18 @@ def test_admin_user_remove_works(clear_register_two):
 
     # user2's new profile should have the same email and handle since it is now
     # reusable
-    resp14 = requests.post(config.url + 'auth/register/v2', 
+    resp15 = requests.post(config.url + 'auth/register/v2', 
                          json={'email': 'def@ghi.com', 'password': 'password',
                                'name_first': 'first', 'name_last': 'last'})
-    assert resp14.status_code == 200
-    user2_new = resp14.json()
+    assert resp15.status_code == 200
+    user2_new = resp15.json()
     id2_new = user2_new['auth_user_id']
     assert id2 != id2_new
 
-    resp15 = requests.get(config.url + 'user/profile/v1', 
+    resp16 = requests.get(config.url + 'user/profile/v1', 
                            params={'token': token1, 'u_id': id2_new})
-    assert resp15.status_code == 200
-    new_profile = resp15.json()
+    assert resp16.status_code == 200
+    new_profile = resp16.json()
     
     assert new_profile['user']['u_id'] == id2_new
     assert new_profile['user']['email'] == 'def@ghi.com'

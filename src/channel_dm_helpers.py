@@ -12,9 +12,7 @@ Description: helper functions used in channel and dm functions
     - setting the is_this_user_reacted value
 """
 
-import datetime
-
-from datetime import timezone
+import time
 
 from src.error import InputError, AccessError
 from src.other import check_user_is_member, check_valid_channel_id, \
@@ -53,7 +51,7 @@ def get_messages(auth_user_id, data, start, data_str):
     # from channel or dm data
     if data_str == 'channel':
         key = 'all_members'
-    elif data_str == 'dm':
+    else: # data_str == 'dm'
         key = 'members'
 
     # check whether given user is in the given channel
@@ -188,7 +186,7 @@ def send_message(auth_user_id, data_id, message, data_str, standup):
         data_info = check_valid_channel_id(data_id)
         data_id = data_info['channel_id']
         key = 'all_members'
-    elif data_str == 'dm':
+    else: # data_str == 'dm'
         data_info = check_valid_dm_id(data_id)
         data_id = data_info['dm_id']
         key = 'members'
@@ -204,16 +202,11 @@ def send_message(auth_user_id, data_id, message, data_str, standup):
     # increament message id for the store message
     message_id = new_id('message')
 
-    # generate timestamp
-    time = datetime.datetime.now(timezone.utc)
-    utc_time = time.replace(tzinfo=timezone.utc)
-    utc_timestamp = utc_time.timestamp()
-
     message_data = {
         'message_id': message_id, 
         'u_id': auth_user_id, 
         'message': message, 
-        'time_sent': int(utc_timestamp),
+        'time_sent': int(time.time()),
         'reacts': [{
             'react_id': 1,
             'u_ids': [],
@@ -374,11 +367,11 @@ def remove_from_dm(dm, member_data, auth_user_id):
 
     if member_data is None:
         raise AccessError(description='The user is not a member of dm')
-    else:
-        # if the user is the dm creator, make the creator data empty
-        if dm['creator']['u_id'] == auth_user_id:
-            dm['creator'] = {}
-        dm['members'].remove(member_data)
+    
+    # if the user is the dm creator, make the creator data empty
+    if dm['creator']['u_id'] == auth_user_id:
+        dm['creator'] = {}
+    dm['members'].remove(member_data)
 
 def remove_from_channel(channel, member_data, owner_data):
     """
@@ -397,10 +390,11 @@ def remove_from_channel(channel, member_data, owner_data):
 
     if member_data is None and owner_data is None:
         raise AccessError(description='User is not a member of channel')
-    elif owner_data:
+    
+    if owner_data is None:
+        channel['all_members'].remove(member_data)
+    else:
         # if the user is an owner_member, then they have to also be in
         # all_members user aswell.
         channel['all_members'].remove(member_data)
         channel['owner_members'].remove(owner_data)
-    elif member_data:
-        channel['all_members'].remove(member_data)
