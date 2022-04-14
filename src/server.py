@@ -102,7 +102,6 @@ def save_data():
     global DATA_STORE
     pickle_data()
     DATA_STORE = get_data()
-    return DATA_STORE
 
 DATA_STORE = get_data()
 
@@ -342,6 +341,13 @@ def message_pin():
     save_data()
     return dumps({})
 
+# @APP.route('/message/unpin/v1', methods=['POST'])
+# def message_unpin():
+#     data = request.get_json()
+#     message_pin_v1(data['token'], data['message_id'])
+#     save_data()
+#     return dumps({})
+
 @APP.route('/search/v1', methods=['GET'])
 def search():
     token = request.args.get('token')
@@ -440,6 +446,7 @@ def standup_send():
     standup_send_v1(store['token'], store['channel_id'], store['message'])
     save_data()
     return dumps({})
+
 ################################################################################
 ##                            NOTIFICATIONS ROUTE                             ##
 ################################################################################
