@@ -27,7 +27,7 @@ from src.channel import channel_details_v2, channel_invite_v2,\
                         channel_join_v2, channel_messages_v2
 from src.message import message_send_v1, message_remove_v1, message_edit_v1,\
                         message_senddm_v1, message_pin_v1, message_react_v1, \
-                        message_unreact_v1
+                        message_unreact_v1, message_unpin_v1
                         
 from src.channels import channels_create_v2, channels_list_v2,\
                          channels_listall_v2
@@ -341,12 +341,12 @@ def message_pin():
     save_data()
     return dumps({})
 
-# @APP.route('/message/unpin/v1', methods=['POST'])
-# def message_unpin():
-#     data = request.get_json()
-#     message_pin_v1(data['token'], data['message_id'])
-#     save_data()
-#     return dumps({})
+@APP.route('/message/unpin/v1', methods=['POST'])
+def message_unpin():
+    data = request.get_json()
+    message_unpin_v1(data['token'], data['message_id'])
+    save_data()
+    return dumps({})
 
 @APP.route('/search/v1', methods=['GET'])
 def search():

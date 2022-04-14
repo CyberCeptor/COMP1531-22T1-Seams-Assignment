@@ -82,9 +82,11 @@ def tag_notification(auth_user_id, old_msg, new_msg, data, option):
         if check_user_is_member(user['id'], data, key) is None:
             pass
         elif f'@{handle}' in new_msg.lower() and f'@{handle}' not in old_msg.lower():
-            # if the message being sent contains a tag then add a notification
+            # if the message being sent contains a tag then add a notification,
             # if the message is being edited and the original message does not
-            # include the tag, add a notification
+            # include the tag, add a notification,
+            # if a message with a tag is being shared, only send a notification
+            # if a user has been tagged in the optional message
 
             # notifications are ordered from most recent to least recent
             user['notifications'].insert(0, {

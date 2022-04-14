@@ -156,19 +156,24 @@ def check_start_valid(start, total_messages):
     
     return start
 
-def send_message(auth_user_id, data_id, message, data_str, standup):
+def send_message(auth_user_id, data_id, optional_msg, message, message_id, 
+                data_str, standup, share):
     """
     Helper function for message/send and message/senddm: If token given is an
     authorised user, sends the message to a specified channel/dm with input
     data_id
 
     Arguments:
-        auth_user_id (int)    - unique str representation of user
-        dm_id (int)    - integer specifies a dm or channel
-        message (str)  - message that the user wishes to send
-        data_str (str) - a string used to print out any error messages if
-                         InputError is raised and to check if message is being
-                         sent to a channel or dm
+        auth_user_id (int) - unique str representation of user
+        data_id (int)      - integer specifies a dm or channel
+        optional_msg (str) - the optional message sent when sharing a message
+        message (str)      - message that the user wishes to send
+        message_id (int)   - generated id for the message
+        data_str (str)     - a string used to print out any error messages if
+                            InputError is raised and to check if message is 
+                            being sent to a channel or dm
+        standup (bool)     - denotes if the msg is being sent as a standup msg
+        share (bool)       - denotes if the msg is being shared
 
     Exceptions:
         AccessError - Raised if the user is not a member of the channel or dm
@@ -199,9 +204,6 @@ def send_message(auth_user_id, data_id, message, data_str, standup):
 
     check_valid_message(message)
 
-    # increament message id for the store message
-    message_id = new_id('message')
-
     message_data = {
         'message_id': message_id, 
         'u_id': auth_user_id, 
@@ -218,12 +220,16 @@ def send_message(auth_user_id, data_id, message, data_str, standup):
     data_info['messages'].insert(0, message_data)
 
     data_store.set(store)
-    if standup is False:
-        tag_notification(auth_user_id, '', message, data_info, data_str)
 
-    return {
-        'message_id': message_id
-    }
+    # if the message is being sent as a standup message, do not send tag notifs
+    # if the message is being shared, only send tag notifs from the optional_msg
+    # otherwise, send tag notifs from the sent message
+    if standup is False and share is False:
+        tag_notification(auth_user_id, optional_msg, message, data_info, 
+                         data_str)
+    elif standup is False and share is True:
+        tag_notification(auth_user_id, message, optional_msg, data_info, 
+                         data_str)
 
 def check_valid_dm_id(dm_id):
     """

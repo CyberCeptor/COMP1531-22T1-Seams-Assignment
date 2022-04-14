@@ -20,6 +20,8 @@ from src.other import check_valid_channel_id, check_user_is_member,\
 
 from src.data_store import data_store
 
+from src.global_vars import new_id
+
 from src.channel_dm_helpers import send_message, check_valid_message
 
 def standup_start_v1(token, channel_id, length):
@@ -181,7 +183,9 @@ def standup_send_collect_messages(user_id, channel_id):
     
     if len(channel['standup']['messages_buffer']) > 0:
         packaged_message = '\n'.join(channel['standup']['messages_buffer'])
-        send_message(user_id, channel_id, packaged_message, 'channel', True)
+        message_id = new_id('message')
+        send_message(user_id, channel_id, '', packaged_message, message_id, 
+                     'channel', True, False)
 
     channel['standup']['is_active'] = False
     channel['standup']['messages_buffer'].clear()
