@@ -155,7 +155,7 @@ def check_start_valid(start, total_messages):
     return start
 
 def send_message(auth_user_id, data_id, optional_msg, message, message_id, 
-                option, standup, share):
+                option, standup):
     """
     Helper function for message/send and message/senddm: If token given is an
     authorised user, sends the message to a specified channel/dm with input
@@ -171,7 +171,6 @@ def send_message(auth_user_id, data_id, optional_msg, message, message_id,
                             InputError is raised and to check if message is 
                             being sent to a channel or dm
         standup (bool)     - denotes if the msg is being sent as a standup msg
-        share (bool)       - denotes if the msg is being shared
 
     Exceptions:
         AccessError - Raised if the user is not a member of the channel or dm
@@ -183,7 +182,7 @@ def send_message(auth_user_id, data_id, optional_msg, message, message_id,
 
     store = data_store.get()
 
-    data_info = check_member_of_valid_dm_channel_id(data_id)
+    data_info = check_member_of_valid_dm_channel_id(auth_user_id, data_id, option)
 
     if message == '':
         raise InputError(description='Empty message input')
@@ -210,11 +209,8 @@ def send_message(auth_user_id, data_id, optional_msg, message, message_id,
     # if the message is being sent as a standup message, do not send tag notifs
     # if the message is being shared, only send tag notifs from the optional_msg
     # otherwise, send tag notifs from the sent message
-    if standup is False and share is False:
+    if standup is False:
         tag_notification(auth_user_id, optional_msg, message, data_info, 
-                         option)
-    elif standup is False and share is True:
-        tag_notification(auth_user_id, message, optional_msg, data_info, 
                          option)
 
 def check_valid_message(message):

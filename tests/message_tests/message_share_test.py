@@ -200,7 +200,7 @@ def test_message_share_invalid_dm_id(clear_register_two_createchanneldm_sendmsg)
     resp3 = requests.post(config.url + 'message/share/v1', 
                           json = {'token': token, 'og_message_id': chan_msg_id, 
                                   'message': 'Hello World', 'channel_id': -1, 
-                                  'dm_id': 2})
+                                  'dm_id': 100})
     assert resp3.status_code == STATUS_INPUT_ERR
 
 @pytest.mark.usefixtures('clear_register_two_createchanneldm_sendmsg')
@@ -208,26 +208,42 @@ def test_message_share_both_channel_id_and_dm_id_are_invalid(clear_register_two_
     """ test for both channel_id and dm_id are invalid"""
 
     token = clear_register_two_createchanneldm_sendmsg[0]['token']
-    og_id = clear_register_two_createchanneldm_sendmsg[1]
+    chan_id = clear_register_two_createchanneldm_sendmsg[2]
+    dm_id = clear_register_two_createchanneldm_sendmsg[4]
 
     # both no channel_id and dm_id input
     resp0 = requests.post(config.url + 'message/share/v1', 
-                          json = {'token': token, 'og_message_id': og_id, 'message': 'Hello World', 'channel_id': '', 'dm_id': ''})
+                          json = {'token': token, 'og_message_id': chan_id, 
+                                  'message': 'Hello World', 'channel_id': '', 
+                                  'dm_id': ''})
     assert resp0.status_code == STATUS_INPUT_ERR
 
     # both channel_id and dm_id are bool
     resp1 = requests.post(config.url + 'message/share/v1', 
-                          json = {'token': token, 'og_message_id': og_id, 'message': 'Hello World', 'channel_id': True, 'dm_id': True})
+                          json = {'token': token, 'og_message_id': chan_id, 
+                                  'message': 'Hello World', 'channel_id': True, 
+                                  'dm_id': True})
     assert resp1.status_code == STATUS_INPUT_ERR
 
     # both channel_id and dm_id are string
     resp2 = requests.post(config.url + 'message/share/v1', 
-                          json = {'token': token, 'og_message_id': og_id, 'message': 'Hello World', 'channel_id': 'str', 'dm_id': 'str'})
+                          json = {'token': token, 'og_message_id': chan_id, 
+                                  'message': 'Hello World', 'channel_id': 'str', 
+                                  'dm_id': 'str'})
     assert resp2.status_code == STATUS_INPUT_ERR
 
     # neither channel_id nor dm_id are -1
     resp3 = requests.post(config.url + 'message/share/v1', 
-                          json = {'token': token, 'og_message_id': og_id, 'message': 'Hello World', 'channel_id': -1, 'dm_id': -1})
+                          json = {'token': token, 'og_message_id': chan_id, 
+                                  'message': 'Hello World', 'channel_id': -1, 
+                                  'dm_id': -1})
+    assert resp3.status_code == STATUS_INPUT_ERR
+
+    # both channel_id and dm_id are -1
+    resp3 = requests.post(config.url + 'message/share/v1', 
+                          json = {'token': token, 'og_message_id': chan_id, 
+                                  'message': 'Hello World', 
+                                  'channel_id': chan_id, 'dm_id': dm_id})
     assert resp3.status_code == STATUS_INPUT_ERR
 
 @pytest.mark.usefixtures('clear_register_two_createchanneldm_sendmsg')
@@ -235,9 +251,8 @@ def test_message_share_invalid_length(clear_register_two_createchanneldm_sendmsg
     """ test if input message length is valid(over 1000 char) """
 
     token = clear_register_two_createchanneldm_sendmsg[0]['token']
-    og_id = clear_register_two_createchanneldm_sendmsg[1]
-    chan_id = clear_register_two_createchanneldm_sendmsg[3]
-    dm_id = clear_register_two_createchanneldm_sendmsg[4]
+    chan_id = clear_register_two_createchanneldm_sendmsg[2]
+    chan_msg_id = clear_register_two_createchanneldm_sendmsg[3]
 
     # long_message is more than 1000 char
     long_message = 'MoreThanAthousandCharactersMoreThanAthousandCharactersMor\
@@ -257,54 +272,109 @@ def test_message_share_invalid_length(clear_register_two_createchanneldm_sendmsg
         ThanAthousandCharacters MoreThanAthousandCharactersMoreThanAthousandC\
         haracters'
 
-    '''# less than 1 character
-    resp0 = requests.post(config.url + 'message/share/v1', 
-                          json={'token': token, 'channel_id': chan_id, 
-                          'message': ''})
-    assert resp0.status_code == STATUS_INPUT_ERR'''
-
     # more than 1000 character
     resp1 = requests.post(config.url + 'message/share/v1', 
-                          json={'token': token, 'og_message_id': og_id, 'message': long_message, 'channel_id': chan_id, 'dm_id': dm_id})
+                          json={'token': token, 'og_message_id': chan_msg_id, 
+                                'message': long_message, 'channel_id': chan_id, 
+                                'dm_id': -1})
     assert resp1.status_code == STATUS_INPUT_ERR
 
 @pytest.mark.usefixtures('clear_register_two_createchanneldm_sendmsg')
 def test_user_not_belong(clear_register_two_createchanneldm_sendmsg):
     """ testing if user belongs to the channel """
     
-    og_id = clear_register_two_createchanneldm_sendmsg[1]
-    chan_id = clear_register_two_createchanneldm_sendmsg[3]
-    dm_id = clear_register_two_createchanneldm_sendmsg[4]
+    chan_id = clear_register_two_createchanneldm_sendmsg[2]
+    chan_msg_id = clear_register_two_createchanneldm_sendmsg[3]
 
-    # create user 2
-    user2 = requests.post(config.url + 'auth/register/v2', 
+    # create user 3
+    user3 = requests.post(config.url + 'auth/register/v2', 
                             json={'email': 'def@abc.com', 
                             'password': 'password',
                             'name_first': 'first2', 'name_last': 'last2'}) 
-    user2_data = user2.json()
-    token_2 = user2_data['token']
-    # access error when user 2 tries to share message in channel 1
+    assert user3.status_code == STATUS_OK
+    user3_data = user3.json()
+    token_3 = user3_data['token']
+
+    # access error when user 3 tries to share message in channel 1
     resp0 = requests.post(config.url + 'message/share/v1', 
-                          json = {'token': token_2, 'og_message_id': og_id, 'message': 'Hello World', 'channel_id': chan_id, 'dm_id': dm_id})
+                          json = {'token': token_3, 
+                                  'og_message_id': chan_msg_id, 
+                                  'message': 'Hello World', 
+                                  'channel_id': chan_id, 'dm_id': -1})
     assert resp0.status_code == STATUS_ACCESS_ERR #raise access error
 
 @pytest.mark.usefixtures('clear_register_two_createchanneldm_sendmsg')
-def test_message_share_success(clear_register_two_createchanneldm_sendmsg):
+def test_message_share_optional_msg(clear_register_two_createchanneldm_sendmsg):
     """ test for success share"""
 
-    token = clear_register_two_createchanneldm_sendmsg[0]['token']
-    og_id = clear_register_two_createchanneldm_sendmsg[1]
-    chan_id = clear_register_two_createchanneldm_sendmsg[3]
+    token1 = clear_register_two_createchanneldm_sendmsg[0]['token']
+    token2 = clear_register_two_createchanneldm_sendmsg[1]['token']
+    chan_id = clear_register_two_createchanneldm_sendmsg[2]
+    chan_msg_id = clear_register_two_createchanneldm_sendmsg[3]
+    dm_id = clear_register_two_createchanneldm_sendmsg[4]
+    dm_msg_id = clear_register_two_createchanneldm_sendmsg[5]
+
+    # dm is -1, user1 is tagged in optional message
+    resp0 = requests.post(config.url + 'message/share/v1', 
+                          json = {'token': token2, 'og_message_id': chan_msg_id, 
+                                  'message': '@firstlast Hello World', 
+                                  'channel_id': chan_id, 'dm_id': -1})
+    assert resp0.status_code == STATUS_OK
+
+    resp1 = requests.get(config.url + 'notifications/get/v1',
+                         params={'token': token1})
+    assert resp1.status_code == STATUS_OK
+    notifs = resp1.json()['notifications']
+
+    assert len(notifs) == 1
+
+    # tag notification should be the latest
+    # can't check notif message since the shared message will be different
+    # depending on the notification
+    assert notifs[0]['channel_id'] == chan_id
+
+    # channel is -1, user1 is tagged in optional message
+    resp2 = requests.post(config.url + 'message/share/v1', 
+                          json = {'token': token2, 'og_message_id': dm_msg_id, 
+                                  'message': '@firstlast Hello World1', 
+                                  'channel_id': -1, 'dm_id': dm_id})
+    assert resp2.status_code == STATUS_OK
+
+    resp3 = requests.get(config.url + 'notifications/get/v1',
+                         params={'token': token1})
+    assert resp3.status_code == STATUS_OK
+    notifs = resp3.json()['notifications']
+
+    assert len(notifs) == 2
+
+    # tag notification should be the latest
+    # can't check notif message since the shared message will be different
+    # depending on the notification
+    assert notifs[0]['dm_id'] == dm_id
+
+@pytest.mark.usefixtures('clear_register_two_createchanneldm_sendmsg')
+def test_message_share_no_optional_msg(clear_register_two_createchanneldm_sendmsg):
+    """ test for success share"""
+
+    token1 = clear_register_two_createchanneldm_sendmsg[0]['token']
+    token2 = clear_register_two_createchanneldm_sendmsg[1]['token']
+    chan_id = clear_register_two_createchanneldm_sendmsg[2]
+    chan_msg_id = clear_register_two_createchanneldm_sendmsg[3]
     dm_id = clear_register_two_createchanneldm_sendmsg[4]
 
-    # dm is -1
+    # dm is -1, user2 is tagged in optional message
     resp0 = requests.post(config.url + 'message/share/v1', 
-                          json = {'token': token, 'og_message_id': og_id, 'message': 'Hello World', 'channel_id': chan_id, 'dm_id': -1})
+                          json = {'token': token1, 'og_message_id': chan_msg_id, 
+                                  'message': '', 
+                                  'channel_id': chan_id, 'dm_id': -1})
     assert resp0.status_code == STATUS_OK
 
     # channel is -1
-    resp1 = requests.post(config.url + 'message/share/v1', 
-                          json = {'token': token, 'og_message_id': og_id, 'message': 'Hello World1', 'channel_id': -1, 'dm_id': dm_id})
-    assert resp1.status_code == STATUS_OK
+    resp3 = requests.post(config.url + 'message/share/v1', 
+                          json = {'token': token1, 'og_message_id': chan_msg_id, 
+                                  'message': '', 
+                                  'channel_id': -1, 'dm_id': dm_id})
+    assert resp3.status_code == STATUS_OK
+
 
 requests.delete(config.url + 'clear/v1')

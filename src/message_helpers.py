@@ -193,7 +193,7 @@ def edit_react(auth_user_id, data, message_data, react_id, option):
 
     data_store.set(store)
 
-def pin_unpin_check_dm(auth_user_id, message_data, data, option):
+def pin_unpin_check_dm(auth_user_id, message_data, dm, option):
     """
     checks if a specified message sent in a dm can be pinned or unpinned by the 
     user
@@ -211,12 +211,12 @@ def pin_unpin_check_dm(auth_user_id, message_data, data, option):
     """
 
     # user must be owner of dm
-    if data['creator']['u_id'] != auth_user_id:
+    if dm['creator']['u_id'] != auth_user_id:
         raise AccessError(description='User has no access to this message')
         
     pin_unpin(message_data, option)
 
-def pin_unpin_check_channel(auth_user_id, message_data, data, option):
+def pin_unpin_check_channel(auth_user_id, message_data, channel, option):
     """
     checks if a specified message sent in a channel can be pinned or unpinned by
     the user
@@ -234,14 +234,12 @@ def pin_unpin_check_channel(auth_user_id, message_data, data, option):
     """
 
     # user must be owner or global owner in channel
-    if check_user_is_member(auth_user_id, data, 'owner_members') is None:
+    if (check_user_is_member(auth_user_id, channel, 'owner_members') or 
+        (check_user_is_member(auth_user_id, channel, 'all_members') and
+        check_user_is_global_owner(auth_user_id))):
+        pin_unpin(message_data, option)
+    else:
         raise AccessError(description='User has no access to this message')
-    
-    if not (check_user_is_member(auth_user_id, data, 'all_members') and
-        check_user_is_global_owner(auth_user_id)):
-        raise AccessError(description='User has no access to this message')
-        
-    pin_unpin(message_data, option)
 
 def pin_unpin(message_data, option):
     """

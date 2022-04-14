@@ -185,7 +185,7 @@ def standup_send_collect_messages(user_id, channel_id):
         packaged_message = '\n'.join(channel['standup']['messages_buffer'])
         message_id = new_id('message')
         send_message(user_id, channel_id, '', packaged_message, message_id, 
-                     'channel', True, False)
+                     'channel', True)
 
     channel['standup']['is_active'] = False
     channel['standup']['messages_buffer'].clear()

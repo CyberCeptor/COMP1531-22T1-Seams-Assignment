@@ -55,8 +55,7 @@ def message_send_v1(token, channel_id, message):
     
     message_id = new_id('message')
     
-    send_message(user_id, channel_id, '', message, message_id, 'channel', False, 
-                False)
+    send_message(user_id, channel_id, '', message, message_id, 'channel', False)
 
     return {
         'message_id': message_id
@@ -88,7 +87,7 @@ def message_senddm_v1(token, dm_id, message):
 
     message_id = new_id('message')
 
-    send_message(user_id, dm_id, '', message, message_id, 'dm', False, False)
+    send_message(user_id, dm_id, '', message, message_id, 'dm', False)
 
     return {
         'message_id': message_id
@@ -209,7 +208,7 @@ def message_pin_v1(token, message_id):
 
     if in_channel is False:
         pin_unpin_check_dm(auth_user_id, message_data, data, 'pin')
-    else:
+    else: # in_channel is True
         pin_unpin_check_channel(auth_user_id, message_data, data, 'pin')
 
 @token_valid_check
@@ -245,7 +244,7 @@ def message_unpin_v1(token, message_id):
 
     if in_channel is False:
         pin_unpin_check_dm(auth_user_id, message_data, data, 'unpin')
-    else:
+    else: # in_channel is True
         pin_unpin_check_channel(auth_user_id, message_data, data, 'unpin')
 
 @token_valid_check
@@ -389,21 +388,21 @@ def message_share_v1(token, og_message_id, message, channel_id, dm_id):
         if message == '':
             # only send the original message to the channel
             send_message(auth_user_id, channel_id, message, og_message, 
-                         shared_message_id, 'channel', False, True)
+                         shared_message_id, 'channel', False)
         else:
             # send the shared_message to the channel
-            send_message(auth_user_id, channel_id, message, shared_message, 
-                         shared_message_id, 'channel', False, True)
+            send_message(auth_user_id, channel_id, og_message, shared_message, 
+                         shared_message_id, 'channel', False)
 
     if channel_id == -1:
         if message == '':
             # only send the original message to the channel
             send_message(auth_user_id, dm_id, message, og_message, 
-                         shared_message_id, 'dm', False, True)
+                         shared_message_id, 'dm', False)
         else:
             # send the shared_message to the channel
-            send_message(auth_user_id, dm_id, message, shared_message, 
-                         shared_message_id, 'dm', False, True)
+            send_message(auth_user_id, dm_id, og_message, shared_message, 
+                         shared_message_id, 'dm', False)
 
     return {
         'message_id': shared_message_id
@@ -426,10 +425,10 @@ def check_channel_dm_ids(channel_id, dm_id):
     Return Value: N/A
     """
 
-    check_valid_dm_channel_id(channel_id)
-    check_valid_dm_channel_id(dm_id)
+    check_valid_dm_channel_id(channel_id, 'channel', True)
+    check_valid_dm_channel_id(dm_id, 'dm', True)
 
     if dm_id == -1 and channel_id == -1:
         raise InputError(description='Invalid ids')
-    elif dm_id != -1 and channel_id != 1:
+    elif dm_id != -1 and channel_id != -1:
         raise InputError(description='Invalid ids')

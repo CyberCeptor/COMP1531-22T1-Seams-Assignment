@@ -62,6 +62,9 @@ def tag_notification(auth_user_id, old_msg, new_msg, data, option):
 
     Return: N/A
     """
+    print('tag:', option)
+    print('old:', old_msg)
+    print('new:', new_msg)
 
     store = data_store.get()
 

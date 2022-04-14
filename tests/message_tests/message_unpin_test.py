@@ -138,29 +138,37 @@ def test_successful_message_unpin_owner(clear_register_two_createchanneldm_sendm
 
 @pytest.mark.usefixtures('clear_register_two_createchanneldm_sendmsg')
 def test_fail_message_unpin_not_owner(clear_register_two_createchanneldm_sendmsg):
-    """ testing if message unpin fails when user is not owner 
-    """
-    channel_id = clear_register_two_createchanneldm_sendmsg[2]
+    """ testing if message unpin fails when user is not owner """
+
+    token_1 = clear_register_two_createchanneldm_sendmsg[0]['token']
     token_2 = clear_register_two_createchanneldm_sendmsg[1]['token']
     c_message_id = clear_register_two_createchanneldm_sendmsg[3]
     d_message_id = clear_register_two_createchanneldm_sendmsg[5]
 
-    # failed message unpin by user2 who is not member
+    # successful pin by user1 who is owner member
+    resp0 = requests.post(config.url + 'message/pin/v1', 
+                          json = {'token': token_1, 'message_id': c_message_id})
+ 
+    assert resp0.status_code == STATUS_OK
+
+    # register user3
+    resp0 = requests.post(config.url + 'auth/register/v2', 
+                          json={'email': 'ghu@jkl.com', 'password': 'password',
+                                'name_first': 'first', 'name_last': 'last'})
+    assert resp0.status_code == STATUS_OK
+    token_3 = resp0.json()['token']
+
+    # user3 is not a member of the channel
     resp = requests.post(config.url + 'message/unpin/v1', 
-                          json = {'token': token_2, 'message_id': c_message_id})
+                          json = {'token': token_3, 'message_id': c_message_id})
     assert resp.status_code == STATUS_ACCESS_ERR
 
-    # user 2 joins the channel 1
-    requests.post(config.url + 'channel/join/v2',
-                        json = {'token': token_2,
-                        'channel_id': channel_id})
-
-    # failed message unpin by user2 who is not owner member
+    # user2 is a member but not a global owner
     resp0 = requests.post(config.url + 'message/unpin/v1', 
                           json = {'token': token_2, 'message_id': c_message_id})
     assert resp0.status_code == STATUS_ACCESS_ERR
 
-    # fail unpin of dm message user 2 is not owner
+    # user2 is in dm but not creator
     resp1 = requests.post(config.url + 'message/unpin/v1', 
                           json = {'token': token_2, 'message_id': d_message_id})
     assert resp1.status_code == STATUS_ACCESS_ERR
