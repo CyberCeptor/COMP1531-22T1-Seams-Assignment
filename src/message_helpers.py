@@ -148,7 +148,7 @@ def edit_remove_message(auth_user_id, data, msg_data, message, option):
 
 def edit_react(auth_user_id, data, message_data, react_id, option):
     """
-    adds the user's react to the reacts for the given message
+    adds or removes the user's react to the reacts for the given message
 
     Arguments:
         auth_user_id (int)  - an int specifying a user
@@ -190,5 +190,85 @@ def edit_react(auth_user_id, data, message_data, react_id, option):
 
         # add the user id to the list of u_ids for react id 1
         message_data['reacts'][0]['u_ids'].remove(auth_user_id)
+
+    data_store.set(store)
+
+def pin_unpin_check_dm(auth_user_id, message_data, dm, option):
+    """
+    checks if a specified message sent in a dm can be pinned or unpinned by the 
+    user
+
+    Arguments:
+        auth_user_id (int)  - an int specifying a user
+        msg_data (dict)     - the message's associated data
+        data (dict)         - data for the dm the message is in
+        option (str)        - specifies if user is pinning or unpinning
+
+    Exceptions:
+        AccessError - If user is not an owner of the dm
+
+    Return Value: N/A
+    """
+
+    # user must be owner of dm
+    if dm['creator']['u_id'] != auth_user_id:
+        raise AccessError(description='User has no access to this message')
+        
+    pin_unpin(message_data, option)
+
+def pin_unpin_check_channel(auth_user_id, message_data, channel, option):
+    """
+    checks if a specified message sent in a channel can be pinned or unpinned by
+    the user
+
+    Arguments:
+        auth_user_id (int)  - an int specifying a user
+        msg_data (dict)     - the message's associated data
+        data (dict)         - data for the channel the message is in
+        option (str)        - specifies if user is pinning or unpinning
+
+    Exceptions:
+        AccessError - If user is in the channel but not a global owner
+
+    Return Value: N/A
+    """
+
+    # user must be owner or global owner in channel
+    if (check_user_is_member(auth_user_id, channel, 'owner_members') or 
+        (check_user_is_member(auth_user_id, channel, 'all_members') and
+        check_user_is_global_owner(auth_user_id))):
+        pin_unpin(message_data, option)
+    else:
+        raise AccessError(description='User has no access to this message')
+
+def pin_unpin(message_data, option):
+    """
+    pins or unpins the given message
+
+    Arguments:
+        msg_data (dict) - the message's associated data
+        option (str)    - specifies if user is pinning or unpinning
+
+    Exceptions:
+        InputError - Raised if message has already been pinned or unpinned
+
+    Return Value: N/A
+    """
+
+    store = data_store.get()
+
+    if option == 'pin':
+        # raise input error if message is already pinned
+        if message_data['is_pinned'] is True:
+            raise InputError(description='Message is already pinned')
+
+        print('is pinning message')
+        message_data['is_pinned'] = True
+    else: # option == 'unpin'
+        # raise input error if message is already unpinned
+        if message_data['is_pinned'] is False:
+            raise InputError(description='Message is already unpinned')
+
+        message_data['is_pinned'] = False
 
     data_store.set(store)

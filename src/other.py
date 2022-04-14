@@ -2,7 +2,7 @@
 Filename: other.py
 
 Author: group
-Created: 24/02/2022 - /04/2022
+Created: 24/02/2022 - 13/04/2022
 
 Description: implementation for
     - clearing all stored data in data_store
@@ -95,40 +95,50 @@ def check_valid_auth_id(auth_user_id):
     # if the auth_user_id is not found, raise an InputError
     raise InputError(description='User does not exist in users database')
 
-def check_valid_channel_id(channel_id):
+def check_valid_dm_channel_id(id, option, share):
     """
-    checks if the given channel_id is valid by checking if it is larger than
-    0 and if it is found in the stored channel data
+    checks if the given id is valid
 
     Arguments:
-        channel_id (int) - a int that represents a channel
+        id (int)     - a int that represents a channel or dm
+        option (str) - denotes if the id channel or dm
+        share (bool) - indicates if the id is being checked from message/share
 
     Exceptions:
-        InputError - Occurs if channel_id is not of type int, is less than 1 or
-        is not found in the stored channel data
+        InputError - Occurs if id is not of type int, is less than 1
+        (if share is False) or is not found in the stored channel data
 
     Return Value:
-        Returns the stored channel data if the channel_id is found
+        Returns the stored channel or dm data if the id is found
     """
-    
-    # bools are read as int's 0 & 1, so need to check prior
-    if type(channel_id) is bool:
-        raise InputError(description='Invalid channel_id type')
 
-    # for GET requests since params are taken in as strings
-    channel_id = cast_to_int_get_requests(channel_id, 'channel id')
+    if option == 'channel':
+        dict_key = 'channels'
+        id_key = 'channel_id'
+    else: # option == 'dm'
+        dict_key = 'dms'
+        id_key = 'dm_id'
 
-    if channel_id < 1:
-        raise InputError(description='The channel id is not valid')
+    if type(id) is bool:
+        raise InputError(f'{option} id is not of a valid type')
 
-    # if the channel_id is found, return the user data
+    # cast dm_id to an int since it is a GET request
+    id = cast_to_int_get_requests(id, f'{option} id')
+
+    if id < 1 and share is False:
+        raise InputError(f'The {option} id is not valid (out of bounds)')
+
+    # id -1 is only valid is share is True
+    if id == -1 and share is True:
+        return
+
     store = data_store.get()
-    for channel in store['channels']:
-        if channel['channel_id'] == channel_id:
-            return channel
+    for data in store[dict_key]:
+       if data[id_key] == id:
+            return data
 
-    # if the channel_id is not found, raise an InputError
-    raise InputError(description='Channel does not exist in channels database')
+    # if the dm_id is not found, raise an AccessError
+    raise InputError(f'{option} does not exist in data')
 
 def check_user_is_member(auth_user_id, data, key):
     """

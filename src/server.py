@@ -28,7 +28,7 @@ from src.channel import channel_details_v2, channel_invite_v2,\
                         channel_join_v2, channel_messages_v2
 from src.message import message_send_v1, message_remove_v1, message_edit_v1,\
                         message_senddm_v1, message_pin_v1, message_react_v1, \
-                        message_unreact_v1
+                        message_unreact_v1, message_unpin_v1, message_share_v1
                         
 from src.channels import channels_create_v2, channels_list_v2,\
                          channels_listall_v2
@@ -105,7 +105,6 @@ def save_data():
     global DATA_STORE
     pickle_data()
     DATA_STORE = get_data()
-    return DATA_STORE
 
 DATA_STORE = get_data()
 
@@ -371,6 +370,13 @@ def message_pin():
     save_data()
     return dumps({})
 
+@APP.route('/message/unpin/v1', methods=['POST'])
+def message_unpin():
+    data = request.get_json()
+    message_unpin_v1(data['token'], data['message_id'])
+    save_data()
+    return dumps({})
+
 @APP.route('/search/v1', methods=['GET'])
 def search():
     token = request.args.get('token')
@@ -393,26 +399,38 @@ def message_unreact():
     save_data()
     return dumps({})
 
+@APP.route('/message/share/v1', methods=['POST'])
+def message_share():
+    data = request.get_json()
+    token = data['token']
+    og_message_id = data['og_message_id']
+    message = data['message']
+    channel_id = data['channel_id']
+    dm_id = data['dm_id']
+    msg_id = message_share_v1(token, og_message_id, message, channel_id, dm_id)
+    save_data()
+    return dumps(msg_id)
+
 ################################################################################
 ##                             DM ROUTES                                      ##
 ################################################################################
 
 @APP.route('/dm/create/v1', methods=['POST'])
-def dm_create_server():
+def dm_create():
     data = request.get_json()
     dm = dm_create_v1(data['token'], data['u_ids'])
     save_data()
     return dumps(dm)
 
 @APP.route('/dm/list/v1', methods=['GET'])
-def dm_list_server():
+def dm_list():
     token = request.args.get('token')
     dms_list = dm_list_v1(token)
     save_data()
     return dumps(dms_list)
 
 @APP.route('/dm/details/v1', methods=['GET'])
-def dm_details_server():
+def dm_details():
     token = request.args.get('token')
     dm_id = request.args.get('dm_id')
     dm_details = dm_details_v1(token, dm_id)
@@ -420,7 +438,7 @@ def dm_details_server():
     return dumps(dm_details)
 
 @APP.route('/dm/remove/v1', methods=['DELETE'])
-def dm_remove_server():
+def dm_remove():
     data = request.get_json()
     dm_remove_v1(data['token'], data['dm_id'])
     save_data()
@@ -456,7 +474,7 @@ def standup_start():
     return dumps(time_finish)
 
 @APP.route('/standup/active/v1', methods = ['GET'])
-def standup_active_server():
+def standup_active():
     token = request.args.get('token')
     channel_id = request.args.get('channel_id')
     standup_info = standup_active_v1(token, channel_id)
@@ -469,6 +487,7 @@ def standup_send():
     standup_send_v1(store['token'], store['channel_id'], store['message'])
     save_data()
     return dumps({})
+
 ################################################################################
 ##                            NOTIFICATIONS ROUTE                             ##
 ################################################################################

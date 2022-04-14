@@ -17,7 +17,7 @@ Description: implementation for
 
 from src.error import InputError, AccessError
 from src.other import check_valid_auth_id, check_user_is_member, \
-                      check_valid_channel_id, check_user_is_global_owner
+                      check_valid_dm_channel_id, check_user_is_global_owner
 from src.token import token_valid_check, token_get_user_id
 
 from src.data_store import data_store
@@ -51,7 +51,7 @@ def channel_invite_v2(token, channel_id, u_id):
     user_data = check_valid_auth_id(u_id) # check the invitee is valid or not
 
     # check the channel is valid or not
-    channel_data = check_valid_channel_id(channel_id)
+    channel_data = check_valid_dm_channel_id(channel_id, 'channel', False)
 
     # if auth_user_id is a member of the channel and u_id isn't
     # then add u_id into the channel
@@ -88,7 +88,7 @@ def channel_details_v2(token, channel_id):
 
     # see if given auth_user_id and channel_id are valid
     check_valid_auth_id(auth_user_id)
-    channel_info = check_valid_channel_id(channel_id)
+    channel_info = check_valid_dm_channel_id(channel_id, 'channel', False)
 
     # is_member is a bool to check whether given user is in the given channel
     if check_user_is_member(auth_user_id, channel_info, 'all_members') is None:
@@ -127,7 +127,7 @@ def channel_messages_v2(token, channel_id, start):
 
     # see if given auth_user_id and channel_id are valid
     check_valid_auth_id(auth_user_id)
-    channel_data = check_valid_channel_id(channel_id)
+    channel_data = check_valid_dm_channel_id(channel_id, 'channel', False)
 
     messages = get_messages(auth_user_id, channel_data, start, 'channel')
 
@@ -155,7 +155,7 @@ def channel_join_v2(token, channel_id):
     # check the invitee is valid or not
     user_data = check_valid_auth_id(auth_user_id)
     # check the channel is valid or not
-    channel_data = check_valid_channel_id(channel_id)
+    channel_data = check_valid_dm_channel_id(channel_id, 'channel', False)
 
     #check the invitee whether is already in the channel
     if check_user_is_member(auth_user_id, channel_data, 'all_members'):
@@ -268,7 +268,7 @@ def channel_addremove_owner_valid_check(token, channel_id, u_id, option):
     store = data_store.get()
 
     check_valid_auth_id(u_id)
-    channel = check_valid_channel_id(channel_id)
+    channel = check_valid_dm_channel_id(channel_id, 'channel', False)
     chan_owner = token_get_user_id(token)
 
     # if check_user_is_member returns None, they are not a member of the 

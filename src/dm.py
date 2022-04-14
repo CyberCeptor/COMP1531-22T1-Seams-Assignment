@@ -21,7 +21,7 @@ from src.global_vars import new_id
 
 from src.notifications import join_channel_dm_notification
 
-from src.channel_dm_helpers import get_messages, check_valid_dm_id
+from src.channel_dm_helpers import get_messages, check_valid_dm_channel_id
 
 @token_valid_check
 def dm_create_v1(token, u_ids):
@@ -136,7 +136,7 @@ def dm_remove_v1(token, dm_id):
 
     store = data_store.get()
 
-    dm = check_valid_dm_id(dm_id)
+    dm = check_valid_dm_channel_id(dm_id, 'dm', False)
     auth_id = token_get_user_id(token)
 
     if check_user_is_member(auth_id, dm, 'members') is None:
@@ -166,7 +166,7 @@ def dm_details_v1(token, dm_id):
     """
 
     auth_id = token_get_user_id(token)
-    dm = check_valid_dm_id(dm_id)
+    dm = check_valid_dm_channel_id(dm_id, 'dm', False)
 
     if check_user_is_member(auth_id, dm, 'members') is None:
         raise AccessError(description='The user is no longer in dm')
@@ -219,7 +219,7 @@ def dm_messages_v1(token, dm_id, start):
 
     # see if given auth_user_id and dm_id are valid
     check_valid_auth_id(auth_user_id)
-    dm_data = check_valid_dm_id(dm_id)
+    dm_data = check_valid_dm_channel_id(dm_id, 'dm', False)
 
     messages = get_messages(auth_user_id, dm_data, start, 'dm')
 
