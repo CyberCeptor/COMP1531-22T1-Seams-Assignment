@@ -15,13 +15,11 @@ Description: helper functions used in channel and dm functions
 import time
 
 from src.error import InputError, AccessError
-from src.other import check_user_is_member, check_valid_channel_id, \
-                      cast_to_int_get_requests
+from src.other import check_user_is_member, check_valid_dm_channel_id, \
+                      cast_to_int_get_requests, check_valid_dm_channel_id
 from src.token import token_get_user_id, token_valid_check
 
 from src.data_store import data_store
-
-from src.global_vars import new_id
 
 from src.notifications import tag_notification
 
@@ -156,19 +154,23 @@ def check_start_valid(start, total_messages):
     
     return start
 
-def send_message(auth_user_id, data_id, message, data_str, standup):
+def send_message(auth_user_id, data_id, optional_msg, message, message_id, 
+                option, standup):
     """
     Helper function for message/send and message/senddm: If token given is an
     authorised user, sends the message to a specified channel/dm with input
     data_id
 
     Arguments:
-        auth_user_id (int)    - unique str representation of user
-        dm_id (int)    - integer specifies a dm or channel
-        message (str)  - message that the user wishes to send
-        data_str (str) - a string used to print out any error messages if
-                         InputError is raised and to check if message is being
-                         sent to a channel or dm
+        auth_user_id (int) - unique int representation of user
+        data_id (int)      - integer specifies a dm or channel
+        optional_msg (str) - the optional message sent when sharing a message
+        message (str)      - message that the user wishes to send
+        message_id (int)   - generated id for the message
+        option (str)       - a string used to print out any error messages if
+                            InputError is raised and to check if message is 
+                            being sent to a channel or dm
+        standup (bool)     - denotes if the msg is being sent as a standup msg
 
     Exceptions:
         AccessError - Raised if the user is not a member of the channel or dm
@@ -180,27 +182,12 @@ def send_message(auth_user_id, data_id, message, data_str, standup):
 
     store = data_store.get()
 
-
-    # check if dm_id/channel_id are valid
-    if data_str == 'channel':
-        data_info = check_valid_channel_id(data_id)
-        data_id = data_info['channel_id']
-        key = 'all_members'
-    else: # data_str == 'dm'
-        data_info = check_valid_dm_id(data_id)
-        data_id = data_info['dm_id']
-        key = 'members'
-
-    if check_user_is_member(auth_user_id, data_info, key) is None:
-        raise AccessError(description=f'User does not exist in {data_str}')
+    data_info = check_member_of_valid_dm_channel_id(auth_user_id, data_id, option)
 
     if message == '':
         raise InputError(description='Empty message input')
 
     check_valid_message(message)
-
-    # increament message id for the store message
-    message_id = new_id('message')
 
     message_data = {
         'message_id': message_id, 
@@ -218,45 +205,13 @@ def send_message(auth_user_id, data_id, message, data_str, standup):
     data_info['messages'].insert(0, message_data)
 
     data_store.set(store)
+
+    # if the message is being sent as a standup message, do not send tag notifs
+    # if the message is being shared, only send tag notifs from the optional_msg
+    # otherwise, send tag notifs from the sent message
     if standup is False:
-        tag_notification(auth_user_id, '', message, data_info, data_str)
-
-    return {
-        'message_id': message_id
-    }
-
-def check_valid_dm_id(dm_id):
-    """
-    checks if the given dm_id actually belongs to a dm
-
-    Arguments: 
-        dm_id (int) - an int representing a dm
-
-    Exceptions: 
-        InputError - Raised when
-                        - dm id is not of a valid tpe
-                        - does not belong to a dm
-
-    Return Value: 
-        Returns the dm data if the dm is found
-    """
-
-    if type(dm_id) is bool:
-        raise InputError('dm id is not of a valid type')
-
-    # cast dm_id to an int since it is a GET request
-    dm_id = cast_to_int_get_requests(dm_id, 'dm id')
-
-    if dm_id < 1:
-        raise InputError('The dm id is not valid (out of bounds)')
-
-    store = data_store.get()
-    for dm in store['dms']:
-       if dm['dm_id'] == dm_id:
-            return dm
-
-    # if the dm_id is not found, raise an AccessError
-    raise InputError('dm does not exist in dms')
+        tag_notification(auth_user_id, optional_msg, message, data_info, 
+                         option)
 
 def check_valid_message(message):
     """
@@ -335,14 +290,14 @@ def leave_channel_dm(token, auth_user_id, data_id, option):
 
     # if the user is being removed from/is leaving a dm
     if option == 'dm':
-        dm = check_valid_dm_id(data_id)
+        dm = check_valid_dm_channel_id(data_id, 'dm', False)
         member_data = check_user_is_member(auth_user_id, dm, 'members')
 
         remove_from_dm(dm, member_data, auth_user_id)
 
     # if the user is being removed from/is leaving a channel
     if option == 'channel':
-        channel = check_valid_channel_id(data_id)
+        channel = check_valid_dm_channel_id(data_id, 'channel', False)
         member_data = check_user_is_member(auth_user_id, channel, 'all_members')
         owner_data = check_user_is_member(auth_user_id, channel, 'owner_members')
 
@@ -398,3 +353,35 @@ def remove_from_channel(channel, member_data, owner_data):
         # all_members user aswell.
         channel['all_members'].remove(member_data)
         channel['owner_members'].remove(owner_data)
+
+def check_member_of_valid_dm_channel_id(auth_user_id, data_id, option):
+    """
+    checks if the given channel or dm id and if the user is a member
+
+    Arguments: 
+        auth_user_id (int) - an int representing a user
+        data_id (int)      - integer specifies a dm or channel
+        option (str)       - denotes whether it's a channel or dm
+
+    Exceptions: 
+        AccessError - Raised when user is not a member of the channel or dm
+
+    Return Value:
+        Returns the channel or dm data if the channel or dm is valid and the
+        user is a member
+    """
+
+    # check if dm_id/channel_id are valid
+    if option == 'channel':
+        data_info = check_valid_dm_channel_id(data_id, 'channel', False)
+        data_id = data_info['channel_id']
+        key = 'all_members'
+    else: # option == 'dm'
+        data_info = check_valid_dm_channel_id(data_id, 'dm', False)
+        data_id = data_info['dm_id']
+        key = 'members'
+
+    if check_user_is_member(auth_user_id, data_info, key) is None:
+        raise AccessError(description=f'User is not a member of {option}')
+
+    return data_info

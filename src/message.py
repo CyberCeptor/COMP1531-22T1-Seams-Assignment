@@ -1,8 +1,8 @@
 """
 Filename: message.py
 
-Author: Yangjun Yue(z5317840), Aleesha Bunrith(z5371516)
-Created: 23/03/2022 - 07/04/2022
+Author: Yangjun Yue(z5317840), Aleesha Bunrith(z5371516), Xingjian Dong(z5221888)
+Created: 23/03/2022 - 14/04/2022
 
 Description: implementation for
     - sending message to a specified channel or dm by an authorised user
@@ -13,17 +13,21 @@ Description: implementation for
     - helpers for the above
 """
 
-from src.error import InputError, AccessError
+from src.error import AccessError, InputError
 from src.token import token_get_user_id, token_valid_check
-from src.other import check_user_is_member, check_user_is_global_owner
+from src.other import check_user_is_member, check_valid_dm_channel_id
 
 from src.data_store import data_store
 
+from src.global_vars import new_id
+
 from src.message_helpers import check_message_id_valid, edit_react, \
                                 edit_remove_dm_message_check, \
-                                edit_remove_channel_message_check
+                                edit_remove_channel_message_check, \
+                                pin_unpin_check_dm, pin_unpin_check_channel
 
-from src.channel_dm_helpers import send_message, check_valid_message
+from src.channel_dm_helpers import send_message, check_valid_message, \
+                                   check_member_of_valid_dm_channel_id
 
 @token_valid_check
 def message_send_v1(token, channel_id, message):
@@ -49,9 +53,13 @@ def message_send_v1(token, channel_id, message):
     """
     user_id = token_get_user_id(token)
     
-    message_id = send_message(user_id, channel_id, message, 'channel', False)
+    message_id = new_id('message')
+    
+    send_message(user_id, channel_id, '', message, message_id, 'channel', False)
 
-    return message_id
+    return {
+        'message_id': message_id
+    }
 
 @token_valid_check
 def message_senddm_v1(token, dm_id, message):
@@ -76,9 +84,14 @@ def message_senddm_v1(token, dm_id, message):
         Message_id - int to specifies each message
     """
     user_id = token_get_user_id(token)
-    message_id = send_message(user_id, dm_id, message, 'dm', False)
 
-    return message_id
+    message_id = new_id('message')
+
+    send_message(user_id, dm_id, '', message, message_id, 'dm', False)
+
+    return {
+        'message_id': message_id
+    }
 
 @token_valid_check
 def message_edit_v1(token, message_id, message):
@@ -183,9 +196,7 @@ def message_pin_v1(token, message_id):
     Return: N/A
     """
 
-    store = data_store.get()
-
-    user_id = token_get_user_id(token)
+    auth_user_id = token_get_user_id(token)
 
     # check input message_id is valid and return the message_data, if the 
     # message was sent in a channel or dm, and the corresponding channel or dm 
@@ -194,28 +205,47 @@ def message_pin_v1(token, message_id):
     message_data = check_return[0]
     in_channel = check_return[1]
     data = check_return[2]
-    
-    # raise input error if message is already pinned
-    if message_data['is_pinned'] is True:
-        raise InputError(description='Message is already pinned')
 
-    # if message is sent in dm
     if in_channel is False:
-        # user is owner of dm
-        if data['creator']['u_id'] == user_id:
-            message_data['is_pinned'] = True
-        else:
-            raise AccessError(description='User has no access to this message')
-    else:
-        # if user is owner or global owner in channel
-        if (check_user_is_member(user_id, data, 'owner_members') or 
-        (check_user_is_member(user_id, data, 'all_members') and
-        check_user_is_global_owner(user_id))):
-            message_data['is_pinned'] = True
-        else:
-            raise AccessError(description='User has no access to this message')
+        pin_unpin_check_dm(auth_user_id, message_data, data, 'pin')
+    else: # in_channel is True
+        pin_unpin_check_channel(auth_user_id, message_data, data, 'pin')
 
-    data_store.set(store)
+@token_valid_check
+def message_unpin_v1(token, message_id):
+    """
+    If token given is authorised user, unpin the message
+    specified by message id in channel/dm
+
+    Arguments:
+        token (str)          - unique str representation of user
+        message_id (int))    - integer sppcifies message
+
+    Exceptions:
+        AccessError - message_id refers to a valid message in a joined 
+        channel/DM and the authorised user does not have owner permissions
+        in the channel/DM
+        InputError  - message_id is not a valid message within a channel 
+                    or DM that the authorised user has joined
+                    - message already unpinned
+
+    Return: N/A
+    """
+
+    auth_user_id = token_get_user_id(token)
+
+    # check input message_id is valid and return the message_data, if the 
+    # message was sent in a channel or dm, and the corresponding channel or dm 
+    # data
+    check_return = check_message_id_valid(message_id)
+    message_data = check_return[0]
+    in_channel = check_return[1]
+    data = check_return[2]
+
+    if in_channel is False:
+        pin_unpin_check_dm(auth_user_id, message_data, data, 'unpin')
+    else: # in_channel is True
+        pin_unpin_check_channel(auth_user_id, message_data, data, 'unpin')
 
 @token_valid_check
 def message_react_v1(token, message_id, react_id):
@@ -299,3 +329,106 @@ def message_unreact_v1(token, message_id, react_id):
             raise AccessError(description='User does not exist in channel')
 
     edit_react(auth_user_id, data, message_data, react_id, 'remove')
+
+@token_valid_check
+def message_share_v1(token, og_message_id, message, channel_id, dm_id):
+    """
+    If token given is authorised user, share the message
+    to a specified channel/dm with input channel_id/dm_id
+
+    Arguments:
+        token (str)          - unique str representation of user
+        og_message_id (int)) - integer original message
+        message (str)        - message that the user wishes to send
+        channel_id (int))    - integer sppcifies channel
+        dm_id (int))         - integer sppcifies dm
+
+    Exceptions:
+        AccessError - when og_message_id refers to a valid message in a joined 
+            channel/DM and none of the following are true:
+            - the message was sent by the authorised user making this request
+            - the authorised user has owner permissions in the channel/DM
+        InputError  - channel_id/dm_id does not refer to valid channel
+                    - length of message is over 1000 characters
+
+    Return Value:
+        Shared_message_id - int to specifies shared message
+    """
+    
+    auth_user_id = token_get_user_id(token)
+
+    check_channel_dm_ids(channel_id, dm_id)
+
+    if dm_id == -1:
+        check_member_of_valid_dm_channel_id(auth_user_id, channel_id, 'channel')
+    else: # channel_id == -1
+        check_member_of_valid_dm_channel_id(auth_user_id, dm_id, 'dm')
+
+    # check input message_id is valid and return the message_data, if the 
+    # message was sent in a channel or dm, and the corresponding channel or dm 
+    # data
+    check_return = check_message_id_valid(og_message_id)
+    og_message_data = check_return[0]
+
+    og_message = og_message_data['message']
+
+    shared_message_id = new_id('message')
+
+    check_valid_message(message)
+
+    # shared_message will look like:
+    # <optional message>
+    #     <message being shared>
+    if message != '':
+        shared_message = f'{message}\n\t{og_message}'
+    else:
+        shared_message = og_message
+
+    if dm_id == -1:
+        if message == '':
+            # only send the original message to the channel
+            send_message(auth_user_id, channel_id, message, og_message, 
+                         shared_message_id, 'channel', False)
+        else:
+            # send the shared_message to the channel
+            send_message(auth_user_id, channel_id, og_message, shared_message, 
+                         shared_message_id, 'channel', False)
+
+    if channel_id == -1:
+        if message == '':
+            # only send the original message to the channel
+            send_message(auth_user_id, dm_id, message, og_message, 
+                         shared_message_id, 'dm', False)
+        else:
+            # send the shared_message to the channel
+            send_message(auth_user_id, dm_id, og_message, shared_message, 
+                         shared_message_id, 'dm', False)
+
+    return {
+        'message_id': shared_message_id
+    }
+
+def check_channel_dm_ids(channel_id, dm_id):
+    """
+    checks if the given channel and dm ids from message/share are valid
+
+    Arguments: 
+        channel_id (int))    - integer sppcifies channel
+        dm_id (int))         - integer sppcifies dm
+
+    Exceptions: 
+        InputError - Raised when 
+                        - ids are of valid types
+                        - when both are -1
+                        - when one or the other isn't -1
+
+    Return Value: N/A
+    """
+
+    check_valid_dm_channel_id(channel_id, 'channel', True)
+    check_valid_dm_channel_id(dm_id, 'dm', True)
+
+    if dm_id == -1 and channel_id == -1:
+        raise InputError(description='Invalid ids')
+    elif dm_id != -1 and channel_id != -1:
+        raise InputError(description='Invalid ids')
