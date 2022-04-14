@@ -296,7 +296,6 @@ def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
 
 
     
-
     image = Image.open(file_location)
 
     width = image_info['width']
