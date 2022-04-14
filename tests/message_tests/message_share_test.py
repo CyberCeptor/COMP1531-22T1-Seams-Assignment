@@ -357,7 +357,6 @@ def test_message_share_no_optional_msg(clear_register_two_createchanneldm_sendms
     """ test for success share"""
 
     token1 = clear_register_two_createchanneldm_sendmsg[0]['token']
-    token2 = clear_register_two_createchanneldm_sendmsg[1]['token']
     chan_id = clear_register_two_createchanneldm_sendmsg[2]
     chan_msg_id = clear_register_two_createchanneldm_sendmsg[3]
     dm_id = clear_register_two_createchanneldm_sendmsg[4]
