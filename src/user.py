@@ -259,7 +259,7 @@ def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
     '''Get the user ID from the token'''
     user_id = token_get_user_id(token)
 
-    temp_image_location = "src/static/temp.jpg"
+    temp_image_location = f"src/temp/{user_id}.jpg"
     file_location = f"src/static/{user_id}.jpg"
 
     '''check that the x, y values are ints'''
@@ -279,14 +279,14 @@ def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
         # opens the image and saves at the given location
         urllib.request.urlretrieve(img_url, temp_image_location)
     except:
-        os.remove(temp_image_location)
+        # os.remove(temp_image_location)
         raise InputError(description="URL cannot be opened.")
 
     # https://github.com/nkanaev/imgspy
     """Check the URL is of a JPG."""
     image_info = imgspy.info(img_url)
     if image_info['type'] != 'jpg':
-        os.remove(temp_image_location)
+        # os.remove(temp_image_location)
         raise InputError(description="URL image is not of a JPG.")
 
     width = image_info['width']
@@ -294,11 +294,11 @@ def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
 
     '''Check the dimensions of the image'''
     if x_start < 0 or y_start < 0 or x_end > width or y_end > height or x_start >= x_end or y_start >= y_end or x_end != y_end:
-        os.remove(temp_image_location)
+        # os.remove(temp_image_location)
         raise InputError(description="The image dimensions are too small.")
     
     # Once the image/url is valid, we can open in static folder for profile picture.
-    os.remove(temp_image_location)
+    # os.remove(temp_image_location)
 
 
     ####### Cropping the image and saving in static folder with user_id as name + .jpg
