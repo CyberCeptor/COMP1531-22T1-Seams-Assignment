@@ -26,16 +26,13 @@ from src.data_store import data_store
 
 from src.global_vars import Permission
 
-<<<<<<< HEAD
 import urllib
 from flask import url_for #https://www.educba.com/flask-url_for/
 from PIL import Image # https://pillow.readthedocs.io/en/stable/
 
 # from src.other import user_profile_picture_default
 
-=======
 MAX_NUM_CODES = 10**6
->>>>>>> master
 
 def auth_login_v2(email, password):
     """
