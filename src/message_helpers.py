@@ -148,7 +148,7 @@ def edit_remove_message(auth_user_id, data, msg_data, message, option):
 
 def edit_react(auth_user_id, data, message_data, react_id, option):
     """
-    adds the user's react to the reacts for the given message
+    adds or removes the user's react to the reacts for the given message
 
     Arguments:
         auth_user_id (int)  - an int specifying a user
@@ -190,5 +190,82 @@ def edit_react(auth_user_id, data, message_data, react_id, option):
 
         # add the user id to the list of u_ids for react id 1
         message_data['reacts'][0]['u_ids'].remove(auth_user_id)
+
+    data_store.set(store)
+
+def pin_unpin_check(auth_user_id, message_data, data, option):
+    """
+    checks if a specified message sent in a dm can be pinned or unpinned by the 
+    user
+
+    Arguments:
+        auth_user_id (int)  - an int specifying a user
+        msg_data (dict)     - the message's associated data
+        data (dict)         - data for the channel or dm the message is in
+        option (str)        - specifies if the the data belongs to a channel or 
+                              dm
+
+    Exceptions:
+        AccessError - If user has no access to the specified message
+                        - user is not an owner of the channel or dm
+                        - user is in the channel but not a global owner
+
+    Return Value: N/A
+    """
+
+    # if message is sent in dm
+    if option == 'dm':
+        # user must be owner of dm
+        if data['creator']['u_id'] != auth_user_id:
+            raise AccessError(description='User has no access to this message')
+
+        # raise input error if message is already pinned
+        if message_data['is_pinned'] is True:
+            raise InputError(description='Message is already pinned')
+
+        message_data['is_pinned'] = True
+    
+    if option == 'channel':
+        # if user is owner or global owner in channel
+        if not check_user_is_member(auth_user_id, data, 'owner_members'):
+            raise AccessError(description='User has no access to this message')
+        
+        if not (check_user_is_member(auth_user_id, data, 'all_members') and
+            check_user_is_global_owner(auth_user_id)):
+            raise AccessError(description='User has no access to this message')
+        
+        
+
+def pin_unpin(message_data, option):
+    """
+    pins or unpins the given message
+
+    Arguments:
+        auth_user_id (int)  - an int specifying a user
+        data (dict)         - data for the channel or dm the message is in
+        message_data (dict) - data for the message being reacted to
+        react_id (int)      - an int specifying a react
+
+    Exceptions:
+        InputError  - Raised if 
+                        - react_id is not valid
+                        - message already contains the same react from the user
+
+    Return Value: N/A
+    """
+
+    store = data_store.get()
+
+    # raise input error if message is already pinned
+    if option == 'pin':
+        if message_data['is_pinned'] is True:
+            raise InputError(description='Message is already pinned')
+
+        message_data['is_pinned'] = True
+    else: # option == 'unpin'
+        if message_data['is_pinned'] is False:
+            raise InputError(description='Message is already unpinned')
+
+        message_data['is_pinned'] = False
 
     data_store.set(store)

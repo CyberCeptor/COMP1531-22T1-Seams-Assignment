@@ -194,26 +194,31 @@ def message_pin_v1(token, message_id):
     message_data = check_return[0]
     in_channel = check_return[1]
     data = check_return[2]
-    
-    # raise input error if message is already pinned
-    if message_data['is_pinned'] is True:
-        raise InputError(description='Message is already pinned')
 
     # if message is sent in dm
     if in_channel is False:
-        # user is owner of dm
-        if data['creator']['u_id'] == user_id:
-            message_data['is_pinned'] = True
-        else:
+        # user must be owner of dm
+        if data['creator']['u_id'] != user_id:
             raise AccessError(description='User has no access to this message')
+
+        # raise input error if message is already pinned
+        if message_data['is_pinned'] is True:
+            raise InputError(description='Message is already pinned')
+
+        message_data['is_pinned'] = True
     else:
         # if user is owner or global owner in channel
-        if (check_user_is_member(user_id, data, 'owner_members') or 
-        (check_user_is_member(user_id, data, 'all_members') and
-        check_user_is_global_owner(user_id))):
-            message_data['is_pinned'] = True
-        else:
+        if not check_user_is_member(user_id, data, 'owner_members'):
             raise AccessError(description='User has no access to this message')
+        elif not (check_user_is_member(user_id, data, 'all_members') and
+        check_user_is_global_owner(user_id)):
+            raise AccessError(description='User has no access to this message')
+        
+        # raise input error if message is already pinned
+        if message_data['is_pinned'] is True:
+            raise InputError(description='Message is already pinned')
+
+        message_data['is_pinned'] = True
 
     data_store.set(store)
 
@@ -300,39 +305,39 @@ def message_unreact_v1(token, message_id, react_id):
 
     edit_react(auth_user_id, data, message_data, react_id, 'remove')
 
-@token_valid_check
-def message_share_v1(token, og_message_id, message, channel_id, dm_id):
-    """
-    If token given is authorised user, share the message
-    to a specified channel/dm with input channel_id/dm_id
+# @token_valid_check
+# def message_share_v1(token, og_message_id, message, channel_id, dm_id):
+#     """
+#     If token given is authorised user, share the message
+#     to a specified channel/dm with input channel_id/dm_id
 
-    Arguments:
-        token (str)          - unique str representation of user
-        og_message_id (int)) - integer original message
-        message (str)        - message that the user wishes to send
-        channel_id (int))    - integer sppcifies channel
-        dm_id (int))         - integer sppcifies dm
+#     Arguments:
+#         token (str)          - unique str representation of user
+#         og_message_id (int)) - integer original message
+#         message (str)        - message that the user wishes to send
+#         channel_id (int))    - integer sppcifies channel
+#         dm_id (int))         - integer sppcifies dm
 
-    Exceptions:
-        AccessError - when og_message_id refers to a valid message in a joined 
-            channel/DM and none of the following are true:
-            - the message was sent by the authorised user making this request
-            - the authorised user has owner permissions in the channel/DM
-        InputError  - channel_id/dm_id does not refer to valid channel
-                    - length of message is over 1000 characters
+#     Exceptions:
+#         AccessError - when og_message_id refers to a valid message in a joined 
+#             channel/DM and none of the following are true:
+#             - the message was sent by the authorised user making this request
+#             - the authorised user has owner permissions in the channel/DM
+#         InputError  - channel_id/dm_id does not refer to valid channel
+#                     - length of message is over 1000 characters
 
-    Return Value:
-        Shared_message_id - int to specifies each message
-    """
-    user_id = token_get_user_id(token)
+#     Return Value:
+#         Shared_message_id - int to specifies each message
+#     """
+#     user_id = token_get_user_id(token)
     
-    if dm_id == -1:
-        shared_message_id = send_message(user_id, og_message_id, message, 'channel', False)
+#     if dm_id == -1:
+#         shared_message_id = send_message(user_id, og_message_id, message, 'channel', False)
 
-    if channel_id == -1:
-        shared_message_id = send_message(user_id, og_message_id, message, 'dm', False)
+#     if channel_id == -1:
+#         shared_message_id = send_message(user_id, og_message_id, message, 'dm', False)
 
-    return shared_message_id
+#     return shared_message_id
 
 @token_valid_check
 def message_unpin_v1(token, message_id):
