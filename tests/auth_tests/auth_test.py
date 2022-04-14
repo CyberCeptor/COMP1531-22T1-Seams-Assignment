@@ -107,10 +107,28 @@ def test_register_invalid_password(clear_register):
     raises an InputError """
 
     # password too short
-    resp = requests.post(config.url + 'auth/register/v2', 
+    resp0 = requests.post(config.url + 'auth/register/v2', 
                          json={'email': 'def@ghi.com', 'password': 'pass',
                                'name_first': 'first', 'name_last': 'last'})
-    assert resp.status_code == STATUS_INPUT_ERR
+    assert resp0.status_code == STATUS_INPUT_ERR
+
+    # password is an empty string
+    resp1 = requests.post(config.url + 'auth/register/v2', 
+                         json={'email': 'def@ghi.com', 'password': '',
+                               'name_first': 'first', 'name_last': 'last'})
+    assert resp1.status_code == STATUS_INPUT_ERR
+
+    # password is an int
+    resp2 = requests.post(config.url + 'auth/register/v2', 
+                         json={'email': 'def@ghi.com', 'password': 1,
+                               'name_first': 'first', 'name_last': 'last'})
+    assert resp2.status_code == STATUS_INPUT_ERR
+
+    # password is a bool
+    resp3 = requests.post(config.url + 'auth/register/v2', 
+                         json={'email': 'def@ghi.com', 'password': True,
+                               'name_first': 'first', 'name_last': 'last'})
+    assert resp3.status_code == STATUS_INPUT_ERR
 
 @pytest.mark.usefixtures('clear_register')
 def test_register_invalid_name(clear_register):

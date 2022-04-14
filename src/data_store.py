@@ -36,8 +36,12 @@ data = {
         'handle': 'firstlast',
         'perm_id': 1,
         'removed': False,
+<<<<<<< HEAD
         'profile_img_url': None, #For any given user, if they have yet to upload an image, 
                                     there should be a site-wide default image used.
+=======
+        'reset_code': None
+>>>>>>> master
     }],
     'tokens' = [{
         'user_id': user_data['id'],
@@ -72,7 +76,12 @@ data = {
                 'u_ids': [],
                 'is_this_user_reacted': False
             }],
-            'is_pinned': False
+            'is_pinned': False,
+            'standup': {
+                'is_active': False,
+                'time_finish': None,
+                'messages_buffer': [],
+            },
         }],
     }],
     'dms': [{

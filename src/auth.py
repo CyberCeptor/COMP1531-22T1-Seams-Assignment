@@ -8,6 +8,7 @@ Description: implementation for
     - registering a user using an email, password, first name, and last name
     - using an email and password to login to a user's account
     - logging out a user with their current valid token
+    - generating a reset code to be sent in a password reset email
     - helper functions for the above
 """
 
@@ -15,19 +16,26 @@ import re
 
 import hashlib
 
+import random
+
 from src.error import InputError
 
+from src.token import token_generate, token_remove
+
 from src.data_store import data_store
-from src.token import token_generate
 
 from src.global_vars import Permission
 
+<<<<<<< HEAD
 import urllib
 from flask import url_for #https://www.educba.com/flask-url_for/
 from PIL import Image # https://pillow.readthedocs.io/en/stable/
 
 # from src.other import user_profile_picture_default
 
+=======
+MAX_NUM_CODES = 10**6
+>>>>>>> master
 
 def auth_login_v2(email, password):
     """
@@ -100,9 +108,7 @@ def auth_register_v2(email, password, name_first, name_last):
 
     check_invalid_email(store, email)
 
-    # check for invalid password
-    if len(password) < 6:
-        raise InputError(description='Password is too short')
+    check_invalid_password(password)
 
     # encrypt the given password for storage
     encrypted_pw = hashlib.sha256(password.encode()).hexdigest()
@@ -127,6 +133,7 @@ def auth_register_v2(email, password, name_first, name_last):
         'perm_id': Permission.OWNER.value if u_id == 1 else Permission.USER.value,
         'removed': False,
         'profile_img_url': user_profile_picture_default(u_id),
+        'reset_code': None,
     }
 
 
@@ -146,7 +153,6 @@ def check_invalid_email(store, email):
 
     Arguments:
         store (dict) - a dict that stores user and channel data
-        valid_email_regex (regex) - a string that can contain any characters
         email (str)  - a string that matches the valid_email_regex above
 
     Exceptions:
@@ -167,6 +173,27 @@ def check_invalid_email(store, email):
     for user in store['users']:
         if user['email'] == email and user['removed'] is False:
             raise InputError(description='Email has already been taken')
+
+def check_invalid_password(password):
+    """
+    tests if the given password is valid
+
+    Arguments:
+        password (str) - a password given by the user
+
+    Exceptions:
+        InputError - Occurs if the password is less than 6 characters long or is 
+                     of the wrong input type
+
+    Return Value: N/A
+    """
+
+    if isinstance(password, str) is False:
+        raise InputError(description='Password is not of a valid type')
+
+    # check password length
+    if len(password) < 6:
+        raise InputError(description='Password is too short')
 
 def check_invalid_name(name_first, name_last):
     """
@@ -283,3 +310,107 @@ def user_profile_picture_default(user_id):
 
     return url_for('static', filename=f'{user_id}.jpg', _external=True)
     
+def generate_reset_code(email):
+    """
+    Generates a 6 digit code string to be sent in a password reset email if the
+    given email belongs to a current user
+
+    Arguments:
+        email (str) - a address given by the user to send a reset email to
+
+    Exceptions: N/A
+
+    Return: 
+        Returns the generated code if the email belongs to a user. Otherwise, 
+        returns None
+    """
+
+    store = data_store.get()
+
+    user_data = None
+
+    # find email in stored user data and return the user's data
+    for user in store['users']:
+        if user['email'] == email and user['removed'] is False:
+            user_data = user
+    
+    # if email is not found in data, no errors are raised and return None
+    if user_data is None:
+        return None
+    
+    # if email is found, generate a random 6 digit code string and return it so
+    # it can be used to send the password reset email
+    code = f'{random.randrange(0, 10**6):06}'
+
+    # if code has been generated before, generate a new one
+    while code in [user['reset_code'] for user in store['users']]:
+        code = f'{random.randrange(0, 10**6):06}'
+
+    # the reset code stored in the user data will be updated so only the code 
+    # that is sent the latest is valid (if the user request multiple times)
+    user_data['reset_code'] = code
+
+    # log the user out by removing any current tokens
+    for token_data in store['tokens']:
+        if token_data['user_id'] == user_data['id']:
+            token_remove(token_data['token'])
+
+    data_store.set(store)
+
+    return code
+
+def passwordreset_reset_v1(reset_code, new_password):
+    """
+    Given a reset_code and new_password, reset the user's password whom the 
+    reset_code belongs to
+
+    Arguments:
+        reset_code (str)   - a unique str that belongs to a user to reset a pw
+        new_password (str) - the new pw the user wants to use for their acc
+
+    Exceptions: 
+        InputError - Raised if reset_code is invalid or new_passord is invalid
+
+    Return: N/A
+    """
+
+    store = data_store.get()
+
+    # if input is None, it will be considered a valid code
+    if reset_code is None:
+        raise InputError(description='Invalid reset code')
+
+    user = get_user_with_reset_code(reset_code)
+
+    check_invalid_password(new_password)
+
+    # reset the user's new encrypted password
+    user['pw'] = hashlib.sha256(new_password.encode()).hexdigest()
+
+    user['reset_code'] = None
+
+    data_store.set(store)
+
+def get_user_with_reset_code(reset_code):
+    """
+    Checks whether the given reset_code belongs to a user and returns that 
+    user's data
+
+    Arguments:
+        reset_code (str) - a unique str that belongs to a user to reset a pw
+
+    Exceptions: 
+        InputError - Raised if reset_code is not store in any user data
+
+    Return: Returns the user that holds the given reset_code
+    """
+
+    store = data_store.get()
+
+    # find the user which the reset code belongs to, also doubles as a valid 
+    # input check
+    for user in store['users']:
+        if user['reset_code'] == reset_code:
+            return user
+    
+    raise InputError(description='Invalid reset code')

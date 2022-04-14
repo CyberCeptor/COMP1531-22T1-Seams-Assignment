@@ -5,11 +5,13 @@ from src import config
 from json import dumps
 from flask import Flask, request, jsonify, send_file
 from flask_cors import CORS
+from flask_mail import Mail, Message
 
 from src.dm import dm_create_v1, dm_list_v1, dm_details_v1, dm_remove_v1,\
                    dm_messages_v1
 
-from src.auth import auth_register_v2, auth_login_v2
+from src.auth import auth_register_v2, auth_login_v2, generate_reset_code, \
+                     passwordreset_reset_v1
 from src.user import user_profile_v1, user_profile_setemail_v1, \
                      user_profile_setname_v1, user_profile_sethandle_v1, \
                      user_profile_uploadphoto_v1
@@ -66,6 +68,25 @@ APP.register_error_handler(Exception, defaultHandler)
 #### NO NEED TO MODIFY ABOVE THIS POINT, EXCEPT IMPORTS
 
 ################################################################################
+##                                MAIL CONFIG                                 ##
+################################################################################
+
+# following https://pythonbasics.org/flask-mail/
+
+mail = Mail(APP)
+
+EMAIL = 'donotreply.pwreset@gmail.com'
+
+APP.config['MAIL_SERVER'] = 'smtp.gmail.com'
+APP.config['MAIL_PORT'] = 465
+APP.config['MAIL_USERNAME'] = EMAIL
+APP.config['MAIL_PASSWORD'] = 'P@ssword1531'
+APP.config['MAIL_USE_TLS'] = False
+APP.config['MAIL_USE_SSL'] = True
+
+mail = Mail(APP)
+
+################################################################################
 ##                            DATA_STORE PICKLING                             ##
 ################################################################################
 
@@ -77,7 +98,7 @@ def get_data():
         DATA_STORE = pickle.load(open('datastore.p', 'rb'))
         set_prev_data(DATA_STORE)
     except Exception:
-        pass
+        pickle_data()
     return DATA_STORE
 
 def save_data():
@@ -114,6 +135,26 @@ def logout():
     save_data()
     return dumps({})
 
+@APP.route('/auth/passwordreset/request/v1', methods=['POST'])
+def request_pwreset():
+    data = request.get_json()
+    code = generate_reset_code(data['email'])
+    if code is not None:
+        # following https://pythonbasics.org/flask-mail/
+        msg = Message('Seams Password Reset', sender = EMAIL,
+                      recipients = [data['email']])
+        msg.body = f'Your reset code is: {code}'
+        mail.send(msg)
+    save_data()
+    return dumps({})
+
+@APP.route('/auth/passwordreset/reset/v1', methods=['POST'])
+def pw_reset():
+    data = request.get_json()
+    passwordreset_reset_v1(data['reset_code'], data['new_password'])
+    save_data()
+    return dumps({})
+
 ################################################################################
 ##                              USERS ROUTES                                  ##
 ################################################################################
@@ -135,7 +176,7 @@ def user_profile():
     u_id = request.args.get('u_id')
     profile = user_profile_v1(token, u_id)
     save_data()
-    return jsonify(profile)
+    return dumps(profile)
 
 @APP.route('/user/profile/setemail/v1', methods=['PUT'])
 def user_setemail():
@@ -408,29 +449,26 @@ def dm_messages():
 @APP.route('/standup/start/v1', methods=['POST'])
 def standup_start():
     store = request.get_json()
-    result = standup_start_v1(
+    time_finish = standup_start_v1(
         store['token'], store['channel_id'], store['length']
     )
     save_data()
-    return dumps(result)
+    return dumps(time_finish)
 
 @APP.route('/standup/active/v1', methods = ['GET'])
 def standup_active_server():
     token = request.args.get('token')
     channel_id = request.args.get('channel_id')
+    standup_info = standup_active_v1(token, channel_id)
     save_data()
-    return dumps(
-        standup_active_v1(token, channel_id)
-    )
+    return dumps(standup_info)
 
 @APP.route('/standup/send/v1', methods=['POST'])
 def standup_send():
     store = request.get_json()
-    result = standup_send_v1(
-        store['token'], store['channel_id'], store['message']
-    )
+    standup_send_v1(store['token'], store['channel_id'], store['message'])
     save_data()
-    return dumps(result)
+    return dumps({})
 ################################################################################
 ##                            NOTIFICATIONS ROUTE                             ##
 ################################################################################
@@ -441,7 +479,6 @@ def get_notifs():
     notifs = notifications_get_v1(token)
     save_data()
     return dumps(notifs)
-
 
 ################################################################################
 ##                               CLEAR ROUTE                                  ##
