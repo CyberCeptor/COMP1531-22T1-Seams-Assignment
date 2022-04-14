@@ -278,7 +278,7 @@ def user_profile_picture_default(user_id):
     image = Image.open(file_location)
     
     '''Crop the image to fit within our requirements'''
-    cropped_image = image.crop((0, 0, 300, 300))
+    cropped_image = image.crop((100, 100, 400, 400))
     cropped_image.save(file_location)
 
     return url_for('static', filename=f'{user_id}.jpg', _external=True)

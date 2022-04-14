@@ -35,6 +35,11 @@ def test_user_uploadphoto_working(clear_register):
     Testing the uploadphoto works correctly, changes the users profile picture accordingly.
     """
     user = clear_register
+
+    # testing the user has a default profile picture.
+    profile_picture = requests.get(config.url + 'static/1.jpg')
+    assert profile_picture.status_code == STATUS_OK
+
     image = requests.post(config.url + 'user/profile/uploadphoto/v1', 
                         json={'token': user['token'], 'img_url': url, 'x_start': 0, 'y_start': 0, 'x_end': 200, 'y_end': 200})
     assert image.status_code == STATUS_OK
@@ -51,12 +56,6 @@ def test_user_uploadphoto_working(clear_register):
     # Check that a get request to a file that doesnt exists returns input error.
     profile_picture2 = requests.get(config.url + 'static/2.jpg')
     assert profile_picture2.status_code == STATUS_INPUT_ERR
-
-    # Check that the default picute is available. 
-    default_picture = requests.get(config.url + 'static/default.jpg')
-    assert default_picture.status_code == STATUS_OK
-
-
 
 
 

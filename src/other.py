@@ -21,6 +21,9 @@ from src.data_store import data_store
 
 from src.global_vars import reset_id, Permission
 
+import os
+import glob
+
 
 
 def clear_v1():
@@ -39,6 +42,11 @@ def clear_v1():
     store['channels'].clear()
     store['tokens'].clear()
     store['dms'].clear()
+
+    images = glob.glob('src/static/*')
+    for pic in images:
+        os.remove(pic)
+
     data_store.set(store)
     
     reset_id('session')
