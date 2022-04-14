@@ -138,26 +138,34 @@ def test_message_share_invalid_channel_id(clear_register_two_createchanneldm_sen
     """ test for invalid input of channel id """
 
     token = clear_register_two_createchanneldm_sendmsg[0]['token']
-    og_id = clear_register_two_createchanneldm_sendmsg[1]
+    chan_msg_id = clear_register_two_createchanneldm_sendmsg[3]
 
     # no channel id input
     resp0 = requests.post(config.url + 'message/share/v1', 
-                          json = {'token': token, 'og_message_id': og_id, 'message': 'Hello World', 'channel_id': '', 'dm_id': -1})
+                          json = {'token': token, 'og_message_id': chan_msg_id, 
+                                  'message': 'Hello World', 'channel_id': '', 
+                                  'dm_id': -1})
     assert resp0.status_code == STATUS_INPUT_ERR
 
     # channel id is bool
     resp1 = requests.post(config.url + 'message/share/v1', 
-                          json = {'token': token, 'og_message_id': og_id, 'message': 'Hello World', 'channel_id': True, 'dm_id': -1})
+                          json = {'token': token, 'og_message_id': chan_msg_id, 
+                                  'message': 'Hello World', 'channel_id': True, 
+                                  'dm_id': -1})
     assert resp1.status_code == STATUS_INPUT_ERR
 
     # channel id is string
     resp2 = requests.post(config.url + 'message/share/v1', 
-                          json = {'token': token, 'og_message_id': og_id, 'message': 'Hello World', 'channel_id': 'str', 'dm_id': -1})
+                          json = {'token': token, 'og_message_id': chan_msg_id, 
+                                  'message': 'Hello World', 'channel_id': 'str', 
+                                  'dm_id': -1})
     assert resp2.status_code == STATUS_INPUT_ERR
 
     # wrong channel input
     resp3 = requests.post(config.url + 'message/share/v1', 
-                          json = {'token': token, 'og_message_id': og_id, 'message': 'Hello World', 'channel_id': 2, 'dm_id': -1})
+                          json = {'token': token, 'og_message_id': chan_msg_id, 
+                                  'message': 'Hello World', 'channel_id': 2, 
+                                  'dm_id': -1})
     assert resp3.status_code == STATUS_INPUT_ERR
 
 @pytest.mark.usefixtures('clear_register_two_createchanneldm_sendmsg')
@@ -165,26 +173,34 @@ def test_message_share_invalid_dm_id(clear_register_two_createchanneldm_sendmsg)
     """ test for invalid input of dm id"""
 
     token = clear_register_two_createchanneldm_sendmsg[0]['token']
-    og_id = clear_register_two_createchanneldm_sendmsg[1]
+    chan_msg_id = clear_register_two_createchanneldm_sendmsg[1]
 
     # no dm id input
     resp0 = requests.post(config.url + 'message/share/v1', 
-                          json = {'token': token, 'og_message_id': og_id, 'message': 'Hello World', 'channel_id': -1, 'dm_id': ''})
+                          json = {'token': token, 'og_message_id': chan_msg_id, 
+                                  'message': 'Hello World', 'channel_id': -1, 
+                                  'dm_id': ''})
     assert resp0.status_code == STATUS_INPUT_ERR
 
     # dm id is bool
     resp1 = requests.post(config.url + 'message/share/v1', 
-                          json = {'token': token, 'og_message_id': og_id, 'message': 'Hello World', 'channel_id': -1, 'dm_id': True})
+                          json = {'token': token, 'og_message_id': chan_msg_id, 
+                                  'message': 'Hello World', 'channel_id': -1, 
+                                  'dm_id': True})
     assert resp1.status_code == STATUS_INPUT_ERR
 
     # dm id is string
     resp2 = requests.post(config.url + 'message/share/v1', 
-                          json = {'token': token, 'og_message_id': og_id, 'message': 'Hello World', 'channel_id': -1, 'dm_id': 'str'})
+                          json = {'token': token, 'og_message_id': chan_msg_id, 
+                                  'message': 'Hello World', 'channel_id': -1, 
+                                  'dm_id': 'str'})
     assert resp2.status_code == STATUS_INPUT_ERR
 
     # wrong dm input
     resp3 = requests.post(config.url + 'message/share/v1', 
-                          json = {'token': token, 'og_message_id': og_id, 'message': 'Hello World', 'channel_id': -1, 'dm_id': 2})
+                          json = {'token': token, 'og_message_id': chan_msg_id, 
+                                  'message': 'Hello World', 'channel_id': -1, 
+                                  'dm_id': 2})
     assert resp3.status_code == STATUS_INPUT_ERR
 
 @pytest.mark.usefixtures('clear_register_two_createchanneldm_sendmsg')

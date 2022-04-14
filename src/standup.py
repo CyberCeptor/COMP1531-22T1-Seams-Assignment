@@ -15,7 +15,7 @@ from threading import Timer
 
 from src.error import InputError, AccessError
 from src.token import token_valid_check, token_get_user_id
-from src.other import check_valid_channel_id, check_user_is_member,\
+from src.other import check_valid_dm_channel_id, check_user_is_member,\
                       check_valid_auth_id
 
 from src.data_store import data_store
@@ -51,7 +51,7 @@ def standup_start_v1(token, channel_id, length):
     # check valid user id
     check_valid_auth_id(user_id)
     # check valid channel id 
-    channel_data = check_valid_channel_id(channel_id)
+    channel_data = check_valid_dm_channel_id(channel_id, 'channel', False)
 
     # check user is not in channel
     if check_user_is_member(user_id, channel_data, 'all_members') is None:
@@ -108,7 +108,7 @@ def standup_active_v1(token, channel_id):
     # check valid user id
     check_valid_auth_id(user_id) 
     # check valid channel id
-    channel_data = check_valid_channel_id(channel_id)
+    channel_data = check_valid_dm_channel_id(channel_id, 'channel', False)
 
     # check user is not in channel
     if check_user_is_member(user_id, channel_data, 'all_members') is None:
@@ -144,7 +144,7 @@ def standup_send_v1(token, channel_id, message):
     # check valid user id
     user = check_valid_auth_id(user_id) 
     # check valid channel id
-    channel_data = check_valid_channel_id(channel_id)
+    channel_data = check_valid_dm_channel_id(channel_id, 'channel', False)
 
     check_valid_message(message)
     
@@ -179,7 +179,7 @@ def standup_send_collect_messages(user_id, channel_id):
     Return Value: N/A
     """
     store = data_store.get()
-    channel = check_valid_channel_id(channel_id)
+    channel = check_valid_dm_channel_id(channel_id, 'channel', False)
     
     if len(channel['standup']['messages_buffer']) > 0:
         packaged_message = '\n'.join(channel['standup']['messages_buffer'])

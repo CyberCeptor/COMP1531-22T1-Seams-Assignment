@@ -13,9 +13,9 @@ Description: implementation for
     - helpers for the above
 """
 
-from src.error import AccessError
+from src.error import AccessError, InputError
 from src.token import token_get_user_id, token_valid_check
-from src.other import check_user_is_member
+from src.other import check_user_is_member, check_valid_dm_channel_id
 
 from src.data_store import data_store
 
@@ -26,7 +26,8 @@ from src.message_helpers import check_message_id_valid, edit_react, \
                                 edit_remove_channel_message_check, \
                                 pin_unpin_check_dm, pin_unpin_check_channel
 
-from src.channel_dm_helpers import send_message, check_valid_message
+from src.channel_dm_helpers import send_message, check_valid_message, \
+                                   check_member_of_valid_dm_channel_id
 
 @token_valid_check
 def message_send_v1(token, channel_id, message):
@@ -357,6 +358,13 @@ def message_share_v1(token, og_message_id, message, channel_id, dm_id):
     
     auth_user_id = token_get_user_id(token)
 
+    check_channel_dm_ids(channel_id, dm_id)
+
+    if dm_id == -1:
+        check_member_of_valid_dm_channel_id(auth_user_id, channel_id, 'channel')
+    else: # channel_id == -1
+        check_member_of_valid_dm_channel_id(auth_user_id, dm_id, 'dm')
+
     # check input message_id is valid and return the message_data, if the 
     # message was sent in a channel or dm, and the corresponding channel or dm 
     # data
@@ -367,11 +375,16 @@ def message_share_v1(token, og_message_id, message, channel_id, dm_id):
 
     shared_message_id = new_id('message')
 
+    check_valid_message(message)
+
     # shared_message will look like:
     # <optional message>
     #     <message being shared>
-    shared_message = f'{message}\n\t{og_message}'
-    
+    if message != '':
+        shared_message = f'{message}\n\t{og_message}'
+    else:
+        shared_message = og_message
+
     if dm_id == -1:
         if message == '':
             # only send the original message to the channel
@@ -395,3 +408,28 @@ def message_share_v1(token, og_message_id, message, channel_id, dm_id):
     return {
         'message_id': shared_message_id
     }
+
+def check_channel_dm_ids(channel_id, dm_id):
+    """
+    checks if the given channel and dm ids from message/share are valid
+
+    Arguments: 
+        channel_id (int))    - integer sppcifies channel
+        dm_id (int))         - integer sppcifies dm
+
+    Exceptions: 
+        InputError - Raised when 
+                        - ids are of valid types
+                        - when both are -1
+                        - when one or the other isn't -1
+
+    Return Value: N/A
+    """
+
+    check_valid_dm_channel_id(channel_id)
+    check_valid_dm_channel_id(dm_id)
+
+    if dm_id == -1 and channel_id == -1:
+        raise InputError(description='Invalid ids')
+    elif dm_id != -1 and channel_id != 1:
+        raise InputError(description='Invalid ids')
