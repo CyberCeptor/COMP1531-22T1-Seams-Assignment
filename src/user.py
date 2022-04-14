@@ -250,7 +250,17 @@ def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
         data block is transferred. We can use this callback function to display the current download progress.
         - data (data of the POST import server): returns a tuple containing two elements (filename, headers). Filename
         represents the path saved to the local, and header represents the reponse header of the server.
+
+        We implement a temp folder to store the image being uploaded, and then run all validation required. 
+        Once validated, we then open the image in the static folder to be stored for the user.
+        This allows for the user to maintain their picture, even when invalid URL's or dimensions are given.
     """
+
+    '''Get the user ID from the token'''
+    user_id = token_get_user_id(token)
+
+    temp_image_location = "src/static/temp.jpg"
+    file_location = f"src/static/{user_id}.jpg"
 
     '''check that the x, y values are ints'''
     dimensions_list = [x_start, y_start, x_end, y_end]
@@ -258,21 +268,10 @@ def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
         if type(item) is not int or item is bool:
             raise InputError("Invalid x and y value types.")
     
-    '''Get the user ID from the token'''
-    user_id = token_get_user_id(token)
 
 
-    file_location = f"src/static/{user_id}.jpg"
-    ###################
-    print("function file location = ", file_location)
 
-    # temp = f"uploads/temp.jpg"
-    
-    # # https://stackoverflow.com/questions/64384834/how-to-check-file-type-for-an-image-stored-as-url
-    # response = requests.get(img_url)
-    # if response.headers['Content-Type'] != 'image/jpeg':
-    #     raise InputError(description="URL image is not of a JPG.")    
-
+    ###### Validation Tests
 
     if type(img_url) != str:
         raise InputError("Invalid URL variable type.")
@@ -280,32 +279,34 @@ def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
     '''Test the URL can be opened
     Stores in temp file, incase its not valid.'''
     try:
-        urllib.request.urlretrieve(img_url, file_location)
+        # opens the image and saves at the given location
+        urllib.request.urlretrieve(img_url, temp_image_location)
     except:
+        os.remove(temp_image_location)
         raise InputError(description="URL cannot be opened.")
 
-
-    
     # https://github.com/nkanaev/imgspy
     """Check the URL is of a JPG."""
     image_info = imgspy.info(img_url)
     if image_info['type'] != 'jpg':
-        os.remove(file_location)
+        os.remove(temp_image_location)
         raise InputError(description="URL image is not of a JPG.")
-
-
-
-    
-    image = Image.open(file_location)
 
     width = image_info['width']
     height = image_info['height']
 
-
     '''Check the dimensions of the image'''
     if x_start < 0 or y_start < 0 or x_end > width or y_end > height or x_start >= x_end or y_start >= y_end or x_end != y_end:
-        os.remove(file_location)
+        os.remove(temp_image_location)
         raise InputError(description="The image dimensions are too small.")
+    
+    # Once the image/url is valid, we can open in static folder for profile picture.
+    # os.remove(temp_image_location)
+
+
+    ####### Cropping the image and saving in static folder with user_id as name + .jpg
+    urllib.request.urlretrieve(img_url, file_location)
+    image = Image.open(file_location)
     
     '''Crop the image to fit within our requirements'''
     cropped_image = image.crop((x_start, y_start, x_end, y_end))
