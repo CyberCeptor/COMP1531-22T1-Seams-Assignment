@@ -256,19 +256,29 @@ def create_handle(store, full_name):
 
 
 def user_profile_picture_default(user_id):
-    img_url = 'https://static.wikia.nocookie.net/doomsday_animations/images/3/33/Pingu.jpg/revision/latest?cb=20200719151508'
+    """
+    Function to create a new jpg image for a user when they first register (default).
+    Sets the new image in src/static/<user_id>.jpg.
+
+    Arguments:
+            - user_id
+    Exceptions:
+            - Input Error, called when the URL is invalid. 
+    Returns:
+            - returns a URL for the location of the image for that user.
+    """
+    img_url = 'https://tvtunesquiz.com/wp-content/uploads/pingu.jpg'
     file_location = f"src/static/{user_id}.jpg"
     try:
         # opens the image and saves at the given location
         urllib.request.urlretrieve(img_url, file_location)
     except:
-        # os.remove(temp_image_location)
         raise InputError(description="URL cannot be opened.") from InputError
 
     image = Image.open(file_location)
     
     '''Crop the image to fit within our requirements'''
-    cropped_image = image.crop((200, 150, 400, 450))
+    cropped_image = image.crop((0, 0, 300, 300))
     cropped_image.save(file_location)
 
     return url_for('static', filename=f'{user_id}.jpg', _external=True)

@@ -357,10 +357,4 @@ def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
     data_store.set(store)
     print("function call profile_img_url = ", profile_img_url)
 
-
-
-
-    ### Iterate through each channel/DM and update the profile picture ##############
-
-
     return {}
