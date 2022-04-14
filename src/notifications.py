@@ -70,7 +70,7 @@ def tag_notification(auth_user_id, old_msg, new_msg, data, option):
 
     if option == 'channel':
         key = 'all_members'
-    elif option == 'dm':
+    else: # option == 'dm'
         key = 'members'
 
     # iterate through all user handles and check if the handle is included in 
@@ -125,7 +125,7 @@ def react_notification(auth_user_id, data, message_data, option):
 
     if option == 'channel':
         key = 'all_members'
-    elif option == 'dm':
+    else: # option == 'dm'
         key = 'members'
 
     # only add notification if user who originally sent the message is still

@@ -2,7 +2,7 @@
 Filename: other.py
 
 Author: group
-Created: 24/02/2022 - /04/2022
+Created: 24/02/2022 - 13/04/2022
 
 Description: implementation for
     - clearing all stored data in data_store
