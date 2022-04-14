@@ -238,6 +238,36 @@ def user_profile_sethandle_v1(token, handle_str):
 
     data_store.set(store)
 
+
+
+
+
+
+def user_profile_picture_default(user_id):
+
+    img_url = 'https://static.wikia.nocookie.net/doomsday_animations/images/3/33/Pingu.jpg/revision/latest?cb=20200719151508'
+    file_location = f"src/static/{user_id}.jpg"
+
+    try:
+        # opens the image and saves at the given location
+        urllib.request.urlretrieve(img_url, file_location)
+    except:
+        # os.remove(temp_image_location)
+        raise InputError(description="URL cannot be opened.")
+
+    image = Image.open(file_location)
+    
+    '''Crop the image to fit within our requirements'''
+    cropped_image = image.crop((200, 150, 400, 450))
+    cropped_image.save(file_location)
+
+    return url_for('static', filename=f'{user_id}.jpg', _external=True)
+
+
+
+
+
+
 @token_valid_check
 def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
     '''Check the token is valid'''
@@ -254,6 +284,10 @@ def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
         We implement a temp image to store the image being uploaded, and then run all validation required. 
         Once validated, we then open the image in the static folder to be stored for the user.
         This allows for the user to maintain their picture, even when invalid URL's or dimensions are given.
+
+
+        The channel and DM data stores a copy of the profile picture when the user is added, 
+        So need to iterate through them and update to store the new profile pictrue.
     """
 
     '''Get the user ID from the token'''
@@ -322,4 +356,11 @@ def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
             users['profile_img_url'] = profile_img_url
     data_store.set(store)
     print("function call profile_img_url = ", profile_img_url)
+
+
+
+
+    ### Iterate through each channel/DM and update the profile picture ##############
+
+
     return {}

@@ -22,7 +22,12 @@ from src.token import token_generate
 
 from src.global_vars import Permission
 
-from flask import url_for
+import urllib
+from flask import url_for #https://www.educba.com/flask-url_for/
+from PIL import Image # https://pillow.readthedocs.io/en/stable/
+
+# from src.other import user_profile_picture_default
+
 
 def auth_login_v2(email, password):
     """
@@ -110,7 +115,6 @@ def auth_register_v2(email, password, name_first, name_last):
 
     '''Get a default image.'''
 
-
     # append user data as a dictionary if everything is valid
     user_dict = {
         'id': u_id,
@@ -122,9 +126,9 @@ def auth_register_v2(email, password, name_first, name_last):
         'notifications': [],
         'perm_id': Permission.OWNER.value if u_id == 1 else Permission.USER.value,
         'removed': False,
-        # if they have yet to upload an image,  site-wide default image used.
-        'profile_img_url': None, 
+        'profile_img_url': user_profile_picture_default(u_id),
     }
+
 
     # store the user information into the list of users
     store['users'].append(user_dict)
@@ -249,4 +253,23 @@ def create_handle(store, full_name):
         handle = handle + str(duplicate_count)
 
     return handle
+
+
+def user_profile_picture_default(user_id):
+    img_url = 'https://static.wikia.nocookie.net/doomsday_animations/images/3/33/Pingu.jpg/revision/latest?cb=20200719151508'
+    file_location = f"src/static/{user_id}.jpg"
+    try:
+        # opens the image and saves at the given location
+        urllib.request.urlretrieve(img_url, file_location)
+    except:
+        # os.remove(temp_image_location)
+        raise InputError(description="URL cannot be opened.") from InputError
+
+    image = Image.open(file_location)
+    
+    '''Crop the image to fit within our requirements'''
+    cropped_image = image.crop((200, 150, 400, 450))
+    cropped_image.save(file_location)
+
+    return url_for('static', filename=f'{user_id}.jpg', _external=True)
     

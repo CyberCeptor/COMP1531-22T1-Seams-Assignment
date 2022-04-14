@@ -21,6 +21,8 @@ from src.data_store import data_store
 
 from src.global_vars import reset_id, Permission
 
+
+
 def clear_v1():
     """
     clears the stored data in data_store
@@ -187,3 +189,5 @@ def cast_to_int_get_requests(variable, var_name):
         raise InputError(description=f'Invalid {var_name}') from InputError
 
     return variable
+
+

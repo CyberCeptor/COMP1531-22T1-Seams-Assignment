@@ -25,7 +25,8 @@ from src import config
 from src.global_vars import EXPIRED_TOKEN, UNSAVED_TOKEN, STATUS_OK, \
                             STATUS_INPUT_ERR, STATUS_ACCESS_ERR
 
-url = 'http://clipart-library.com/images/kiKB87aeT.jpg'
+url = 'https://static.wikia.nocookie.net/doomsday_animations/images/3/33/Pingu.jpg/revision/latest?cb=20200719151508'
+#url = 'http://clipart-library.com/images/kiKB87aeT.jpg'
 https_url = 'http://cdn.mos.cms.futurecdn.net/iC7HBvohbJqExqvbKcV3pP.jpg'
 
 @pytest.mark.usefixtures('clear_register')
@@ -47,9 +48,13 @@ def test_user_uploadphoto_working(clear_register):
     profile_picture = requests.get(config.url + 'static/1.jpg')
     assert profile_picture.status_code == STATUS_OK
 
-    profile_picture = requests.get(config.url + 'static/2.jpg')
-    assert profile_picture.status_code == STATUS_INPUT_ERR
+    # Check that a get request to a file that doesnt exists returns input error.
+    profile_picture2 = requests.get(config.url + 'static/2.jpg')
+    assert profile_picture2.status_code == STATUS_INPUT_ERR
 
+    # Check that the default picute is available. 
+    default_picture = requests.get(config.url + 'static/default.jpg')
+    assert default_picture.status_code == STATUS_OK
 
 
 
