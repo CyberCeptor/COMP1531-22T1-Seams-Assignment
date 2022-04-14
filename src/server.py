@@ -40,6 +40,8 @@ from src.standup import standup_start_v1, standup_active_v1,\
 
 from src.channel_dm_helpers import leave_channel_dm
 
+from src.error import InputError
+
 def quit_gracefully(*args):
     '''For coverage'''
     exit(0)
@@ -180,6 +182,11 @@ def user_uploadphoto():
 @APP.route('/static/<user_id>.jpg', methods=['GET'])
 def user_profile_image(user_id):
     """A Route to store the profile picture"""
+    try:
+        send_file(f'static/{user_id}.jpg', mimetype='image/jpeg')
+        print("File exists.")
+    except:
+        raise InputError("File does not exist") from InputError
     # https://flask.palletsprojects.com/en/2.1.x/api/
     return send_file(f'static/{user_id}.jpg', mimetype='image/jpeg')
 

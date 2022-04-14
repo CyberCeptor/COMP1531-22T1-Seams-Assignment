@@ -44,10 +44,11 @@ def test_user_uploadphoto_working(clear_register):
 
 
     # Testing the get the jpg for the account
-    print(config.url + 'static/1.jpg')
-    profile_picture = requests.get(config.url + 'static/1.jpg', 
-                     json={'pathname': '1.jpg'})
+    profile_picture = requests.get(config.url + 'static/1.jpg')
     assert profile_picture.status_code == STATUS_OK
+
+    profile_picture = requests.get(config.url + 'static/2.jpg')
+    assert profile_picture.status_code == STATUS_INPUT_ERR
 
 
 
