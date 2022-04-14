@@ -251,7 +251,7 @@ def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
         - data (data of the POST import server): returns a tuple containing two elements (filename, headers). Filename
         represents the path saved to the local, and header represents the reponse header of the server.
 
-        We implement a temp folder to store the image being uploaded, and then run all validation required. 
+        We implement a temp image to store the image being uploaded, and then run all validation required. 
         Once validated, we then open the image in the static folder to be stored for the user.
         This allows for the user to maintain their picture, even when invalid URL's or dimensions are given.
     """
@@ -270,14 +270,11 @@ def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
     
 
 
-
-    ###### Validation Tests
-
+    ###### Validation Tests ###########
     if type(img_url) != str:
         raise InputError("Invalid URL variable type.")
 
-    '''Test the URL can be opened
-    Stores in temp file, incase its not valid.'''
+    ''' Test the URL can be opened '''
     try:
         # opens the image and saves at the given location
         urllib.request.urlretrieve(img_url, temp_image_location)
@@ -301,7 +298,7 @@ def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
         raise InputError(description="The image dimensions are too small.")
     
     # Once the image/url is valid, we can open in static folder for profile picture.
-    # os.remove(temp_image_location)
+    os.remove(temp_image_location)
 
 
     ####### Cropping the image and saving in static folder with user_id as name + .jpg
