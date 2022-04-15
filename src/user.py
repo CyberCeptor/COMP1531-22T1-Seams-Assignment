@@ -422,6 +422,8 @@ def user_stats_v1(token):
     print(user_data['user_stats'])
 
     data_store.set(store)
+
+    
     return user_data['user_stats']
 
 

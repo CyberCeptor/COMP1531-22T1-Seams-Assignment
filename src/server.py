@@ -19,7 +19,7 @@ from src.user import user_profile_v1, user_profile_setemail_v1, \
 from src.admin import admin_userpermission_change, admin_user_remove
 from src.other import clear_v1
 from src.token import token_remove
-from src.users import users_all_v1#, users_stats_v1
+from src.users import users_all_v1, users_stats_v1
 
 from src.search import search_v1
 
@@ -165,12 +165,12 @@ def get_all_users():
     save_data()
     return dumps(users)
 
-# @APP.route('/users/stats/v1', methods=['GET'])
-# def get_users_stats():
-#     token = request.args.get('token')
-#     stats = users_stats_v1(token)
-#     save_data()
-#     return dumps(stats)
+@APP.route('/users/stats/v1', methods=['GET'])
+def get_users_stats():
+    token = request.args.get('token')
+    stats = users_stats_v1(token)
+    save_data()
+    return dumps(stats)
 
 ################################################################################
 ##                              USER ROUTES                                   ##

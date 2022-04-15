@@ -185,6 +185,12 @@ initial_object = {
     'tokens': [],
     'channels': [],
     'dms': [],
+    'workspace_stats': {
+        'channels_exist': [],
+        'dms_exist': [],
+        'messages_exist': [],
+        'utilization_rate': 0,
+    },
 }
 ## YOU SHOULD MODIFY THIS OBJECT ABOVE
 
