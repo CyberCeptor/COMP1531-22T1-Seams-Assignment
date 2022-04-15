@@ -68,3 +68,52 @@ def test_users_stats_working(clear_register_two):
     assert len(stats['messages_sent']) == 1
     assert len(stats['utilization_rate']) == 1
 
+
+
+@pytest.mark.usefixtures('clear_register')
+def test_users_stats_invalid_token(clear_register):
+    user = clear_register
+    user1_token = user['token']
+    stats = requests.get(config.url + 'users/stats/v1', 
+                    json={'token': user1_token})
+    assert stats.status_code == STATUS_OK
+
+    # Empty String
+    stats = requests.get(config.url + 'users/stats/v1', 
+                    json={'token': ''})
+    assert stats.status_code == STATUS_INPUT_ERR
+
+    #String
+    stats = requests.get(config.url + 'users/stats/v1', 
+                    json={'token': 'token'})
+    assert stats.status_code == STATUS_ACCESS_ERR
+
+    # Expired Token
+    stats = requests.get(config.url + 'users/stats/v1', 
+                    json={'token': EXPIRED_TOKEN})
+    assert stats.status_code == STATUS_ACCESS_ERR
+
+    # Unsaved Token
+    stats = requests.get(config.url + 'users/stats/v1', 
+                    json={'token': UNSAVED_TOKEN})
+    assert stats.status_code == STATUS_ACCESS_ERR
+
+    # INT
+    stats = requests.get(config.url + 'users/stats/v1', 
+                    json={'token': 100})
+    assert stats.status_code == STATUS_INPUT_ERR
+
+    # Negative INT
+    stats = requests.get(config.url + 'users/stats/v1', 
+                    json={'token': -1})
+    assert stats.status_code == STATUS_INPUT_ERR
+
+    # Bool
+    stats = requests.get(config.url + 'users/stats/v1', 
+                    json={'token': True})
+    assert stats.status_code == STATUS_INPUT_ERR
+
+    # Bool
+    stats = requests.get(config.url + 'users/stats/v1', 
+                    json={'token': False})
+    assert stats.status_code == STATUS_INPUT_ERR
