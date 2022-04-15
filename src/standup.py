@@ -179,13 +179,14 @@ def standup_send_collect_messages(user_id, channel_id):
     Return Value: N/A
     """
     store = data_store.get()
+
     channel = check_valid_dm_channel_id(channel_id, 'channel', False)
     
     if len(channel['standup']['messages_buffer']) > 0:
         packaged_message = '\n'.join(channel['standup']['messages_buffer'])
         message_id = new_id('message')
         send_message(user_id, channel_id, '', packaged_message, message_id, 
-                     'channel', True)
+                     'channel', True, False)
 
     channel['standup']['is_active'] = False
     channel['standup']['messages_buffer'].clear()

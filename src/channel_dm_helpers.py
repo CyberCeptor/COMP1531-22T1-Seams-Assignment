@@ -154,8 +154,8 @@ def check_start_valid(start, total_messages):
     
     return start
 
-def send_message(auth_user_id, data_id, optional_msg, message, message_id, 
-                option, standup):
+def send_message(auth_user_id, data_id, old_msg, new_msg, message_id, 
+                option, standup, sendlater):
     """
     Helper function for message/send and message/senddm: If token given is an
     authorised user, sends the message to a specified channel/dm with input
@@ -182,17 +182,24 @@ def send_message(auth_user_id, data_id, optional_msg, message, message_id,
 
     store = data_store.get()
 
-    data_info = check_member_of_valid_dm_channel_id(auth_user_id, data_id, option)
+    # if a message is not being sent through sendlater or sendlaterdm, check if 
+    # user is still a member
+    if sendlater is False and standup is False:
+        data = check_member_of_valid_dm_channel_id(auth_user_id, data_id, option)
+    else: # sendlater is True or standup is True
+        # standups still continue even if user is not a member
+        # messages sent later will still be sent
+        data = check_valid_dm_channel_id(data_id, option, False)
 
-    if message == '':
+    if new_msg == '':
         raise InputError(description='Empty message input')
 
-    check_valid_message(message)
+    check_valid_message(new_msg)
 
     message_data = {
         'message_id': message_id, 
         'u_id': auth_user_id, 
-        'message': message, 
+        'message': new_msg, 
         'time_sent': int(time.time()),
         'reacts': [{
             'react_id': 1,
@@ -202,7 +209,7 @@ def send_message(auth_user_id, data_id, optional_msg, message, message_id,
         'is_pinned': False
     }
 
-    data_info['messages'].insert(0, message_data)
+    data['messages'].insert(0, message_data)
 
     data_store.set(store)
 
@@ -210,8 +217,7 @@ def send_message(auth_user_id, data_id, optional_msg, message, message_id,
     # if the message is being shared, only send tag notifs from the optional_msg
     # otherwise, send tag notifs from the sent message
     if standup is False:
-        tag_notification(auth_user_id, optional_msg, message, data_info, 
-                         option)
+        tag_notification(auth_user_id, old_msg, new_msg, data, option)
 
 def check_valid_message(message):
     """
@@ -373,15 +379,13 @@ def check_member_of_valid_dm_channel_id(auth_user_id, data_id, option):
 
     # check if dm_id/channel_id are valid
     if option == 'channel':
-        data_info = check_valid_dm_channel_id(data_id, 'channel', False)
-        data_id = data_info['channel_id']
+        data = check_valid_dm_channel_id(data_id, 'channel', False)
         key = 'all_members'
     else: # option == 'dm'
-        data_info = check_valid_dm_channel_id(data_id, 'dm', False)
-        data_id = data_info['dm_id']
+        data = check_valid_dm_channel_id(data_id, 'dm', False)
         key = 'members'
 
-    if check_user_is_member(auth_user_id, data_info, key) is None:
+    if check_user_is_member(auth_user_id, data, key) is None:
         raise AccessError(description=f'User is not a member of {option}')
 
-    return data_info
+    return data

@@ -38,4 +38,9 @@ standup.py
 - standups continue even if the user who started it has left the channel/dm or
     has been removed from the channel/dm or has been removed from Seams
 - standup messages cannot be empty, an input error is raised
+- standup messages are sent even if the user's token is invalidated
+
+message.py
+- messages are still sent later even if the user's token is invalidated
+- messages are still sent later even if the user has left the dm or channel
 

@@ -18,10 +18,7 @@ import time
 from src.global_vars import EXPIRED_TOKEN, UNSAVED_TOKEN, STATUS_OK, \
                             STATUS_INPUT_ERR, STATUS_ACCESS_ERR
 
-time_later = 1
-time_now = int(time.time())
-time_sent = int(time.time()) + time_later
-past_time = int(time.time()) - time_later
+TIME_LATER = 1
 
 @pytest.mark.usefixtures('clear_register_createchannel')
 def test_message_sendlater_invalid_token(clear_register_createchannel):
@@ -29,6 +26,9 @@ def test_message_sendlater_invalid_token(clear_register_createchannel):
 
     # token is int
     chan_id = clear_register_createchannel[1]
+
+    time_sent = int(time.time()) + TIME_LATER
+
     resp0 = requests.post(config.url + 'message/sendlater/v1', 
                           json = {'token': 0, 'channel_id': chan_id, 
                           'message': 'hewwo', 'time_sent': time_sent})
@@ -78,6 +78,9 @@ def test_message_sendlater_invalid_channel_id(clear_register_createchannel):
     """ test for invalid input of channel id """
 
     token = clear_register_createchannel[0]['token']
+
+    time_sent = int(time.time()) + TIME_LATER
+
     # no channel id input
     resp0 = requests.post(config.url + 'message/sendlater/v1', 
                           json = {'token': token, 'channel_id': '', 
@@ -110,6 +113,8 @@ def test_message_sendlater_invalid_message(clear_register_createchannel):
     token = clear_register_createchannel[0]['token']
     chan_id = clear_register_createchannel[1]
 
+    time_sent = int(time.time()) + TIME_LATER
+
     # message is int
     resp0 = requests.post(config.url + 'message/sendlater/v1', 
                           json = {'token': token, 'channel_id': chan_id, 
@@ -130,6 +135,9 @@ def test_message_sendlater_invalid_length(clear_register_createchannel):
 
     token = clear_register_createchannel[0]['token']
     chan_id = clear_register_createchannel[1]
+
+    time_sent = int(time.time()) + TIME_LATER
+
     # long_message is more than 1000 char
     long_message = 'MoreThanAthousandCharactersMoreThanAthousandCharactersMor\
         eThanAt housandCharactersMoreThanAthousandCharactersMoreThanAthousand\
@@ -190,6 +198,8 @@ def test_message_sendlater_invalid_time_sent(clear_register_createchannel):
  
     assert resp3.status_code == STATUS_INPUT_ERR
 
+    past_time = int(time.time()) - TIME_LATER
+
     # time_sent is time in the past
     resp4 = requests.post(config.url + 'message/sendlater/v1', 
                           json={'token': token, 'channel_id': chan_id, 
@@ -202,6 +212,8 @@ def test_user_not_belong(clear_register_createchannel):
     """ testing if user belongs to the channel """
     
     chan_id = clear_register_createchannel[1]
+
+    time_sent = int(time.time()) + TIME_LATER
 
     # create user 2
     user2 = requests.post(config.url + 'auth/register/v2', 
@@ -220,11 +232,13 @@ def test_user_not_belong(clear_register_createchannel):
     assert resp0.status_code == STATUS_ACCESS_ERR 
 
 @pytest.mark.usefixtures('clear_register_createchannel')
-def test_successful_message_sendlater(clear_register_createchannel):
+def test_successful_message_success(clear_register_createchannel):
     """ testing gor successful run of message send v1 and return """
     
     token = clear_register_createchannel[0]['token']
     chan_id = clear_register_createchannel[1]
+
+    time_sent = int(time.time()) + TIME_LATER
 
     resp = requests.post(config.url + 'message/sendlater/v1', 
                           json={'token': token, 'channel_id': chan_id, 
@@ -239,13 +253,14 @@ def test_successful_message_sendlater(clear_register_createchannel):
     info = resp1.json()
     assert(len(info['messages']) == 0)
     
-    time.sleep(1)
+    time.sleep(TIME_LATER)
     
     resp2 = requests.get(config.url + 'channel/messages/v2', 
                           params = {'token': token, 'channel_id': chan_id, 
                                     'start': 0})
     assert resp2.status_code == 200
-    info_later = resp1.json()
+    info_later = resp2.json()
+
     assert(len(info_later['messages']) == 1)
     assert info_later['messages'][0]['message'] == 'hewwo'
 
