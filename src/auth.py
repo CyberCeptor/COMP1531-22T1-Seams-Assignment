@@ -18,6 +18,7 @@ import hashlib
 
 import random
 
+import time
 from flask import url_for
 
 from src.error import InputError
@@ -29,6 +30,8 @@ from src.data_store import data_store
 from src.global_vars import Permission
 
 MAX_NUM_CODES = 10**6
+# The default image for user's when they register.
+img_url = 'https://tvtunesquiz.com/wp-content/uploads/pingu.jpg'
 
 def auth_login_v2(email, password):
     """
@@ -111,9 +114,8 @@ def auth_register_v2(email, password, name_first, name_last):
 
     handle = create_handle(store, full_name)
 
-
     '''Get a default image.'''
-
+    time_stamp = int(time.time())
     # append user data as a dictionary if everything is valid
     user_dict = {
         'id': u_id,
@@ -127,6 +129,12 @@ def auth_register_v2(email, password, name_first, name_last):
         'removed': False,
         'profile_img_url': url_for('static', filename='default.jpg', _external=True),
         'reset_code': None,
+        'user_stats': {
+            'channels_joined': [{'num_channels_joined': 0, 'time_stamp': time_stamp}],
+            'dms_joined': [{'num_dms_joined': 0, 'time_stamp': time_stamp}],
+            'messages_sent': [{'num_messages_sent': 0, 'time_stamp': time_stamp}],
+            'involvement_rate': 1.0,
+        }
     }
 
     # store the user information into the list of users

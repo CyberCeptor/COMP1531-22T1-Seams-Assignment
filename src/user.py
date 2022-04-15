@@ -17,6 +17,7 @@ Description:
             - check_valid_handle: checks the handle is authentic
 """
 
+import time
 import imgspy
 
 import urllib
@@ -324,4 +325,102 @@ def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
     data_store.set(store)
     print("function call profile_img_url = ", profile_img_url)
 
-    return {}
+
+
+
+@token_valid_check
+def user_stats_v1(token):
+    """
+    Returns a dictionary containing: {
+        channels_joined: [{num_channels_joined, time_stamp}],
+        dms_joined: [{nums_dms_joined, time_stamp}],
+        messages_sent: [{num_messages_sent, time_stamp}],
+        involvement_rate,
+    }
+    """
+
+    '''Need to iterate through the channels data, and increment for every channel the user is a member of'''
+    '''Need to iterate through the DM's and increment for every dm the user is apart of'''
+    '''Need to increment through the messages sent by the user and increment for each one.'''
+    store = data_store.get()
+    user_id = token_get_user_id(token)
+    
+    time_stamp = int(time.time())
+
+    channel_counter = 0
+    channel_message_counter = 0
+
+    dms_counter = 0
+    dms_message_counter = 0
+
+    num_msgs = 0
+
+    # Number of channels the user is a member of and the number of messages they have sent.
+    for channels in store['channels']:
+        for members in channels['all_members']:
+            if members['u_id'] == user_id:
+                channel_counter += 1
+                # Number of messages sent in the channel by the user
+                for messages in channels['messages']:
+                    if messages['u_id'] == user_id:
+                        channel_message_counter += 1
+                    num_msgs += 1
+                
+    
+    # Number of DM's the user is a member of and the number of messages they have sent.
+    # Iterates through the dms, when the user is a member, it iterates through the messages
+    # to count the number of messages they have sent. 
+    for dms in store['dms']:
+        for members in dms['members']:
+            if members['u_id'] == user_id:
+                dms_counter += 1
+                for messages in dms['messages']:
+                    if messages['u_id'] == user_id:
+                        dms_message_counter += 1
+                    num_msgs += 1
+
+
+    # sum(num_channels_joined, num_dms_joined, num_msgs_sent)/sum(num_channels, num_dms, num_msgs)
+    num_channels = len(store['channels'])
+    num_dms = len(store['dms'])
+    num_msgs_sent = channel_message_counter + dms_message_counter
+
+    total_channel_dms_messages = (num_channels + num_dms + num_msgs)
+    if (total_channel_dms_messages <= 0):
+        involvement_rate = 0.0
+    else:
+        involvement_rate = (channel_counter + dms_counter + num_msgs_sent) / total_channel_dms_messages
+
+    # get user data
+    for users in store['users']:
+        if users['id'] == user_id:
+            user_data = users
+
+    channels_joined = {
+        'num_channels_joined': num_channels,
+        'time_stamp': time_stamp
+    }
+    user_data['user_stats']['channels_joined'].append(channels_joined)
+
+    dms_joined = {
+        'num_dms_joined': num_dms,
+        'time_stamp': time_stamp}
+    user_data['user_stats']['dms_joined'].append(dms_joined)
+
+    messages_sent = {
+        'num_messages_sent': num_msgs,
+        'time_stamp': time_stamp
+    }
+    user_data['user_stats']['messages_sent'].append(messages_sent)
+
+    user_data['user_stats']['involvement_rate'] = round(involvement_rate, 1)
+
+    print(user_data['user_stats'])
+
+    data_store.set(store)
+
+    
+    return user_data['user_stats']
+
+
+  
