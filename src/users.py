@@ -43,28 +43,28 @@ def users_all_v1(token):
 
 
 
-@token_valid_check
-def users_stats_v1(token):
-    """
-    Fetches the required statistic about the use of UNSW Seams
-    Gets all the relevant information of the use of SEAMS by everyone. 
-    Dictionary contains: (workspace_stats)
-        channels_exist: [{nums_channels_exist, time_stamp}],
-        dms_exist: [{nums_dms_exist, time_stamp}],
-        messages_exist: [{num_messages_exist, time_stamp}],
-        utilization_rate, (num_users_who_have_joined_at_least_one_channel_or_dm / num_users)
+# @token_valid_check
+# def users_stats_v1(token):
+#     """
+#     Fetches the required statistic about the use of UNSW Seams
+#     Gets all the relevant information of the use of SEAMS by everyone. 
+#     Dictionary contains: (workspace_stats)
+#         channels_exist: [{nums_channels_exist, time_stamp}],
+#         dms_exist: [{nums_dms_exist, time_stamp}],
+#         messages_exist: [{num_messages_exist, time_stamp}],
+#         utilization_rate, (num_users_who_have_joined_at_least_one_channel_or_dm / num_users)
 
-    Get the length of:
-        store['channels']
-        store['dms']
-        store['message_count']
-    Get a time stamp
-    Total number of users in all channels
-    Total number of users in all DM's
-    Create the workspace_stats dict and append the information found,
-    and calculate the utilization_rate. 
-    """
+#     Get the length of:
+#         store['channels']
+#         store['dms']
+#         store['message_count']
+#     Get a time stamp
+#     Total number of users in all channels
+#     Total number of users in all DM's
+#     Create the workspace_stats dict and append the information found,
+#     and calculate the utilization_rate. 
+#     """
 
 
 
-    return {}#workspace_stats # dict
+#     return {}#workspace_stats # dict
