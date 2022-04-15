@@ -26,6 +26,12 @@ from src.data_store import data_store
 
 from src.global_vars import Permission
 
+import urllib
+from flask import url_for #https://www.educba.com/flask-url_for/
+from PIL import Image # https://pillow.readthedocs.io/en/stable/
+
+# from src.other import user_profile_picture_default
+
 MAX_NUM_CODES = 10**6
 
 def auth_login_v2(email, password):
@@ -109,6 +115,9 @@ def auth_register_v2(email, password, name_first, name_last):
 
     handle = create_handle(store, full_name)
 
+
+    '''Get a default image.'''
+
     # append user data as a dictionary if everything is valid
     user_dict = {
         'id': u_id,
@@ -120,8 +129,10 @@ def auth_register_v2(email, password, name_first, name_last):
         'notifications': [],
         'perm_id': Permission.OWNER.value if u_id == 1 else Permission.USER.value,
         'removed': False,
+        'profile_img_url': user_profile_picture_default(u_id),
         'reset_code': None,
     }
+
 
     # store the user information into the list of users
     store['users'].append(user_dict)
@@ -267,6 +278,35 @@ def create_handle(store, full_name):
 
     return handle
 
+
+def user_profile_picture_default(user_id):
+    """
+    Function to create a new jpg image for a user when they first register (default).
+    Sets the new image in src/static/<user_id>.jpg.
+
+    Arguments:
+            - user_id
+    Exceptions:
+            - Input Error, called when the URL is invalid. 
+    Returns:
+            - returns a URL for the location of the image for that user.
+    """
+    img_url = 'https://tvtunesquiz.com/wp-content/uploads/pingu.jpg'
+    file_location = f"src/static/{user_id}.jpg"
+    try:
+        # opens the image and saves at the given location
+        urllib.request.urlretrieve(img_url, file_location)
+    except:
+        raise InputError(description="URL cannot be opened.") from InputError
+
+    image = Image.open(file_location)
+    
+    '''Crop the image to fit within our requirements'''
+    cropped_image = image.crop((100, 100, 400, 400))
+    cropped_image.save(file_location)
+
+    return url_for('static', filename=f'{user_id}.jpg', _external=True)
+    
 def generate_reset_code(email):
     """
     Generates a 6 digit code string to be sent in a password reset email if the

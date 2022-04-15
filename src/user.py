@@ -1,3 +1,4 @@
+# pylint: disable=raise-missing-from
 """
 Filename: user.py
 
@@ -21,6 +22,12 @@ from src.token import token_valid_check, token_get_user_id
 from src.other import check_valid_auth_id, cast_to_int_get_requests
 from src.auth import check_invalid_email, check_invalid_name
 from src.error import InputError
+from PIL import Image # https://pillow.readthedocs.io/en/stable/
+import urllib
+from flask import url_for #https://www.educba.com/flask-url_for/
+import requests
+import imgspy
+import os
 
 @token_valid_check
 def user_profile_v1(token, u_id):
@@ -230,3 +237,124 @@ def user_profile_sethandle_v1(token, handle_str):
                 user['handle_str'] = handle_str
 
     data_store.set(store)
+
+
+
+
+
+
+def user_profile_picture_default(user_id):
+
+    img_url = 'https://static.wikia.nocookie.net/doomsday_animations/images/3/33/Pingu.jpg/revision/latest?cb=20200719151508'
+    file_location = f"src/static/{user_id}.jpg"
+
+    try:
+        # opens the image and saves at the given location
+        urllib.request.urlretrieve(img_url, file_location)
+    except:
+        # os.remove(temp_image_location)
+        raise InputError(description="URL cannot be opened.")
+
+    image = Image.open(file_location)
+    
+    '''Crop the image to fit within our requirements'''
+    cropped_image = image.crop((200, 150, 400, 450))
+    cropped_image.save(file_location)
+
+    return url_for('static', filename=f'{user_id}.jpg', _external=True)
+
+
+
+
+
+
+@token_valid_check
+def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
+    '''Check the token is valid'''
+
+    """
+    urlretrieve:
+        - url: the url to GET the JPG
+        - filename: specifies the local path (if not specified, urllib will generate a temporary file to save the data)
+        - reporthook: callback function, which will trigger when the server is connected and the corresponding 
+        data block is transferred. We can use this callback function to display the current download progress.
+        - data (data of the POST import server): returns a tuple containing two elements (filename, headers). Filename
+        represents the path saved to the local, and header represents the reponse header of the server.
+
+        We implement a temp image to store the image being uploaded, and then run all validation required. 
+        Once validated, we then open the image in the static folder to be stored for the user.
+        This allows for the user to maintain their picture, even when invalid URL's or dimensions are given.
+
+
+        The channel and DM data stores a copy of the profile picture when the user is added, 
+        So need to iterate through them and update to store the new profile pictrue.
+    """
+
+    '''Get the user ID from the token'''
+    user_id = token_get_user_id(token)
+
+    temp_image_location = f"src/temp/{user_id}.jpg"
+    file_location = f"src/static/{user_id}.jpg"
+
+    '''check that the x, y values are ints'''
+    dimensions_list = [x_start, y_start, x_end, y_end]
+    for item in dimensions_list:
+        if type(item) is not int or item is bool:
+            raise InputError("Invalid x and y value types.")
+    
+
+
+    ###### Validation Tests ###########
+    if type(img_url) != str:
+        raise InputError("Invalid URL variable type.")
+
+    ''' Test the URL can be opened '''
+    try:
+        # opens the image and saves at the given location
+        urllib.request.urlretrieve(img_url, temp_image_location)
+    except:
+        # os.remove(temp_image_location)
+        raise InputError(description="URL cannot be opened.")
+
+    # https://github.com/nkanaev/imgspy
+    """Check the URL is of a JPG."""
+    image_info = imgspy.info(img_url)
+    if image_info['type'] != 'jpg':
+        # os.remove(temp_image_location)
+        raise InputError(description="URL image is not of a JPG.")
+
+    width = image_info['width']
+    height = image_info['height']
+
+    '''Check the dimensions of the image'''
+    if x_start < 0 or y_start < 0 or x_end > width or y_end > height or x_start >= x_end or y_start >= y_end or x_end != y_end:
+        # os.remove(temp_image_location)
+        raise InputError(description="The image dimensions are too small.")
+    
+    # Once the image/url is valid, we can open in static folder for profile picture.
+    # os.remove(temp_image_location)
+
+
+    ####### Cropping the image and saving in static folder with user_id as name + .jpg
+    urllib.request.urlretrieve(img_url, file_location)
+    image = Image.open(file_location)
+    
+    '''Crop the image to fit within our requirements'''
+    cropped_image = image.crop((x_start, y_start, x_end, y_end))
+    cropped_image.save(file_location)
+
+    # https://stackoverflow.com/questions/16351826/link-to-flask-static-files-with-url-for
+    profile_img_url = url_for('static', filename=f'{user_id}.jpg', _external=True)
+
+    
+    """Set the user data profile_img_url to be the URL image"""
+    store = data_store.get()
+    # user_data = check_valid_auth_id(user_id)
+    # user_data['profile_img_url'] = profile_img_url
+    for users in store['users']:
+        if user_id == users['id']:
+            users['profile_img_url'] = profile_img_url
+    data_store.set(store)
+    print("function call profile_img_url = ", profile_img_url)
+
+    return {}

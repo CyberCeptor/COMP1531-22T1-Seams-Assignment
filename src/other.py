@@ -21,6 +21,11 @@ from src.data_store import data_store
 
 from src.global_vars import reset_id, Permission
 
+import os
+import glob
+
+
+
 def clear_v1():
     """
     clears the stored data in data_store
@@ -37,6 +42,11 @@ def clear_v1():
     store['channels'].clear()
     store['tokens'].clear()
     store['dms'].clear()
+
+    images = glob.glob('src/static/*')
+    for pic in images:
+        os.remove(pic)
+
     data_store.set(store)
     
     reset_id('session')
@@ -77,7 +87,8 @@ def check_valid_auth_id(auth_user_id):
                     'email': user['email'],
                     'name_first': user['first'],
                     'name_last': user['last'],
-                    'handle_str': user['handle']
+                    'handle_str': user['handle'],
+                    'profile_img_url': user['profile_img_url'],
                 }
             }
 
@@ -196,3 +207,5 @@ def cast_to_int_get_requests(variable, var_name):
         raise InputError(description=f'Invalid {var_name}') from InputError
 
     return variable
+
+
