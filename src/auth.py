@@ -28,11 +28,6 @@ from src.data_store import data_store
 
 from src.global_vars import Permission
 
-from src import config
-
-import urllib
-from flask import url_for #https://www.educba.com/flask-url_for/
-from PIL import Image # https://pillow.readthedocs.io/en/stable/
 
 MAX_NUM_CODES = 10**6
 # The default image for user's when they register.
@@ -118,8 +113,6 @@ def auth_register_v2(email, password, name_first, name_last):
     full_name = check_invalid_name(name_first, name_last)
 
     handle = create_handle(store, full_name)
-
-    config.url + 'src/static/default.jpg'
 
     '''Get a default image.'''
     time_stamp = int(time.time())
@@ -288,36 +281,6 @@ def create_handle(store, full_name):
         handle = handle + str(duplicate_count)
 
     return handle
-
-
-def user_profile_picture_default(user_id):
-    """
-    Function to create a new jpg image for a user when they first register (default).
-    Sets the new image in src/static/<user_id>.jpg.
-
-    Arguments:
-            - user_id
-    Exceptions:
-            - Input Error, called when the URL is invalid. 
-    Returns:
-            - returns a URL for the location of the image for that user.
-    """
-    file_location = f"src/static/{user_id}.jpg"
-    try:
-        # opens the image and saves at the given location
-        urllib.request.urlretrieve(img_url, file_location)
-    except:
-        raise InputError(description="URL cannot be opened.") from InputError
-
-    image = Image.open(file_location)
-    
-    '''Crop the image to fit within our requirements'''
-    cropped_image = image.crop((100, 100, 400, 400))
-    cropped_image.save(file_location)
-
-    return url_for('static', filename=f'{user_id}.jpg', _external=True)
-
-
 
 def generate_reset_code(email):
     """
