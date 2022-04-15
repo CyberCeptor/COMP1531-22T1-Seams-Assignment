@@ -28,6 +28,7 @@ from flask import url_for #https://www.educba.com/flask-url_for/
 import requests
 import imgspy
 import os
+import time
 
 @token_valid_check
 def user_profile_v1(token, u_id):
@@ -341,13 +342,58 @@ def user_stats_v1(token):
         involvement_rate,
     }
     """
-    # store = data_store.get()
-    # user_id = token_get_user_id(token)
+
     '''Need to iterate through the channels data, and increment for every channel the user is a member of'''
     '''Need to iterate through the DM's and increment for every dm the user is apart of'''
     '''Need to increment through the messages sent by the user and increment for each one.'''
+    store = data_store.get()
+    user_id = token_get_user_id(token)
+    
+    time_stamp = int(time.time())
 
-    return {} #user_stats #dict 
+    channel_counter = 0
+    channel_message_counter = 0
+
+    dms_counter = 0
+    dms_message_counter = 0
+
+    # Number of channels the user is a member of and the number of messages they have sent.
+    for channels in store['channels']:
+        for members in channels['all_members']:
+            if members['u_id'] == user_id:
+                channel_counter += 1
+                # Number of messages sent in the channel by the user
+                for messages in channels['messages']:
+                    if messages['u_id'] == user_id:
+                        channel_message_counter += 1
+    
+    # Number of DM's the user is a member of and the number of messages they have sent.
+    # Iterates through the dms, when the user is a member, it iterates through the messages
+    # to count the number of messages they have sent. 
+    for dms in store['dms']:
+        for members in dms['members']:
+            if members['u_id'] == user_id:
+                dms_counter += 1
+                for messages in dms['messages']:
+                    if messages['u_id'] == user_id:
+                        dms_message_counter += 1
+
+
+    # sum(num_channels_joined, num_dms_joined, num_msgs_sent)/sum(num_channels, num_dms, num_msgs)
+    num_channels = len(store['channels'])
+    num_dms = len(store['dms'])
+    num_msgs = len(store['channels']['messages']) + len(store['dms']['messages'])
+    num_msgs_sent = channel_message_counter + dms_message_counter
+    involvement_rate = sum(channel_counter, dms_counter, num_msgs_sent) / sum(num_channels, num_dms, num_msgs)
+
+    user_stats = {
+        'channels_joined': [channel_counter, time_stamp],
+        'dms_joined': [dms_counter, time_stamp],
+        'messages_sent': [num_msgs_sent, time_stamp],
+        'involvement_rate': involvement_rate,
+    }
+
+    return {user_stats}
 
 
   
