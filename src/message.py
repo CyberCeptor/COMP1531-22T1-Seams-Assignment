@@ -13,6 +13,10 @@ Description: implementation for
     - helpers for the above
 """
 
+import time
+
+from threading import Timer
+
 from src.error import AccessError, InputError
 from src.token import token_get_user_id, token_valid_check
 from src.other import check_user_is_member, check_valid_dm_channel_id
@@ -55,7 +59,8 @@ def message_send_v1(token, channel_id, message):
     
     message_id = new_id('message')
     
-    send_message(user_id, channel_id, '', message, message_id, 'channel', False)
+    send_message(user_id, channel_id, '', message, message_id, 'channel', False, 
+                 False)
 
     return {
         'message_id': message_id
@@ -87,7 +92,7 @@ def message_senddm_v1(token, dm_id, message):
 
     message_id = new_id('message')
 
-    send_message(user_id, dm_id, '', message, message_id, 'dm', False)
+    send_message(user_id, dm_id, '', message, message_id, 'dm', False, False)
 
     return {
         'message_id': message_id
@@ -379,30 +384,20 @@ def message_share_v1(token, og_message_id, message, channel_id, dm_id):
     # shared_message will look like:
     # <optional message>
     #     <message being shared>
-    if message != '':
-        shared_message = f'{message}\n\t{og_message}'
-    else:
+    if message == '':
         shared_message = og_message
+    else:
+        shared_message = f'{message}\n\t{og_message}'
 
     if dm_id == -1:
-        if message == '':
-            # only send the original message to the channel
-            send_message(auth_user_id, channel_id, message, og_message, 
-                         shared_message_id, 'channel', False)
-        else:
-            # send the shared_message to the channel
-            send_message(auth_user_id, channel_id, og_message, shared_message, 
-                         shared_message_id, 'channel', False)
+        # send the shared_message to the channel
+        send_message(auth_user_id, channel_id, '', shared_message, 
+                        shared_message_id, 'channel', False, False)
 
     if channel_id == -1:
-        if message == '':
-            # only send the original message to the channel
-            send_message(auth_user_id, dm_id, message, og_message, 
-                         shared_message_id, 'dm', False)
-        else:
-            # send the shared_message to the channel
-            send_message(auth_user_id, dm_id, og_message, shared_message, 
-                         shared_message_id, 'dm', False)
+        # send the shared_message to the channel
+        send_message(auth_user_id, dm_id, '', shared_message, 
+                        shared_message_id, 'dm', False, False)
 
     return {
         'message_id': shared_message_id
@@ -432,3 +427,162 @@ def check_channel_dm_ids(channel_id, dm_id):
         raise InputError(description='Invalid ids')
     elif dm_id != -1 and channel_id != -1:
         raise InputError(description='Invalid ids')
+
+@token_valid_check
+def message_sendlater_v1(token, channel_id, message, time_sent):
+    """
+    sends a message in a channel at a specific time in the future
+    
+    Arguments:
+        token (str)        - a user's jwt token str
+        channel_id (int)   - an int specifying a dm or channel
+        message (str)      - the message being sent
+        time_sent (int)    - specifies the time the user wants to send the msg 
+                             at
+    
+    Exceptions:
+        InputError - Raised if
+                        - the message is empty, is not a str, and is too long
+                        - the data_id is not valid
+                        - the time_sent is not valid
+        AccessError - Raised if user is not in the channel or dm
+
+    Return:
+        Returns the message id of the message being sent
+    """
+
+    message_id = sendlater_check(token, channel_id, message, time_sent, 'channel')
+
+    return message_id
+
+@token_valid_check
+def message_sendlaterdm_v1(token, dm_id, message, time_sent):
+    """
+    sends a message in a dm at a specific time in the future
+    
+    Arguments:
+        token (str)     - a user's jwt token str
+        dm_id (int)     - an int specifying a dm or channel
+        message (str)   - the message being sent
+        time_sent (int) - specifies the time the user wants to send the msg at
+    
+    Exceptions:
+        InputError - Raised if
+                        - the message is empty, is not a str, and is too long
+                        - the data_id is not valid
+                        - the time_sent is not valid
+        AccessError - Raised if user is not in the channel or dm
+
+    Return:
+        Returns the message id of the message being sent
+    """
+
+    message_id = sendlater_check(token, dm_id, message, time_sent, 'dm')
+    
+    return message_id
+
+def sendlater_check(token, data_id, message, time_sent, option):
+    """
+    sends a message later if all checks are passed
+    
+    Arguments:
+        token (str)     - a user's jwt token str
+        data_id (int)   - an int specifying a dm or channel
+        message (str)   - the message being sent
+        time_sent (int) - specifies the time the user wants to send the msg at
+        option (str)    - denotes if message is being sent in a channel or dm
+    
+    Exceptions:
+        InputError - Raised if
+                        - the message is empty, is not a str, and is too long
+                        - the data_id is not valid
+                        - the time_sent is not valid
+        AccessError - Raised if user is not in the channel or dm
+
+    Return:
+        Returns the message id of the message being sent
+    """
+
+    auth_user_id = token_get_user_id(token)
+
+    # check if data_id is valid and that user is a member
+    if option == 'channel':
+        data = check_member_of_valid_dm_channel_id(auth_user_id, data_id, option)
+    else: # option == 'dm'
+        data = check_member_of_valid_dm_channel_id(auth_user_id, data_id, option)
+
+    check_valid_message(message)
+
+    if message == '':
+        raise InputError(description='Empty message')
+    
+    length = check_valid_time_sent(time_sent)
+
+    message_id = new_id('message')
+
+    # start timer for message to be sent
+    if option == 'channel':
+        timer = Timer(length, send_message, [auth_user_id, data_id, '', 
+                      message, message_id, 'channel', False, True])
+    else: # option == 'dm'
+        timer = Timer(length, check_dm_still_exists_then_send, 
+                     [auth_user_id, data_id, message, message_id, data])
+
+    timer.start()
+
+    return {
+        'message_id': message_id
+    }
+
+def check_valid_time_sent(time_sent):
+    """
+    checks if the given time_sent is valid
+
+    Arguments:
+        time_sent (int) - a utc timestamp
+
+    Exceptions:
+        InputError - Raised if time_sent is not an int or is a time in the past
+    
+    Return:
+        Returns the difference between the current time and time_sent if 
+        time_sent is valid
+    """
+
+    # check for invalid type
+    if not isinstance(time_sent, int) or type(time_sent) is bool:
+        raise InputError(description='Invalid time')
+
+    # time_sent must be in the future
+    time_now = int(time.time())
+
+    if time_sent < time_now:
+        raise InputError(description='invalid time')
+
+    time_diff = time_sent - time_now
+
+    return time_diff
+
+def check_dm_still_exists_then_send(auth_user_id, dm_id, message, message_id, dm):
+    """
+    checks if dm has been removed before sending a message
+
+    Arguments:
+        auth_user_id (int) - an int specifying a user
+        dm_id (int)        - an int specifying a dm
+        message (str)      - the message being sent
+        message_id (int)   - the id of the message being sent
+        dm (dict)          - the dm data
+    
+    Exceptions: N/A
+
+    Return: N/A
+    """
+
+    store = data_store.get()
+    
+    # check if the dm has not been removed and send message, 
+    # no error is raised if the dm no longer exists
+    if dm in store['dms']:
+        send_message(auth_user_id, dm_id, '', message, message_id, 'dm', False, 
+                     True)

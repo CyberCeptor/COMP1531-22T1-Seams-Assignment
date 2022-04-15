@@ -17,18 +17,22 @@ Description:
             - check_valid_handle: checks the handle is authentic
 """
 
-from src.data_store import data_store
+import time
+import imgspy
+
+import urllib
+
+from flask import url_for #https://www.educba.com/flask-url_for/
+
+from PIL import Image # https://pillow.readthedocs.io/en/stable/
+
+from src.auth import check_invalid_email, check_invalid_name
+
+from src.error import InputError
 from src.token import token_valid_check, token_get_user_id
 from src.other import check_valid_auth_id, cast_to_int_get_requests
-from src.auth import check_invalid_email, check_invalid_name
-from src.error import InputError
-from PIL import Image # https://pillow.readthedocs.io/en/stable/
-import urllib
-from flask import url_for #https://www.educba.com/flask-url_for/
-import requests
-import imgspy
-import os
-import time
+
+from src.data_store import data_store
 
 @token_valid_check
 def user_profile_v1(token, u_id):
@@ -272,14 +276,11 @@ def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
     for item in dimensions_list:
         if type(item) is not int or item is bool:
             raise InputError("Invalid x and y value types.")
-    
-
 
     ###### Validation Tests ###########
     if type(img_url) != str:
         raise InputError("Invalid URL variable type.")
 
-    ''' Test the URL can be opened '''
     try:
         # opens the image and saves at the given location
         urllib.request.urlretrieve(img_url, temp_image_location)
@@ -298,14 +299,11 @@ def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
     height = image_info['height']
 
     '''Check the dimensions of the image'''
-    if x_start < 0 or y_start < 0 or x_end > width or y_end > height or x_start >= x_end or y_start >= y_end or x_end != y_end:
+    if (x_start < 0 or y_start < 0 or x_end > width or y_end > height or 
+        x_start >= x_end or y_start >= y_end or x_end != y_end):
         # os.remove(temp_image_location)
         raise InputError(description="The image dimensions are too small.")
     
-    # Once the image/url is valid, we can open in static folder for profile picture.
-    # os.remove(temp_image_location)
-
-
     ####### Cropping the image and saving in static folder with user_id as name + .jpg
     urllib.request.urlretrieve(img_url, file_location)
     image = Image.open(file_location)
@@ -317,14 +315,13 @@ def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
     # https://stackoverflow.com/questions/16351826/link-to-flask-static-files-with-url-for
     profile_img_url = url_for('static', filename=f'{user_id}.jpg', _external=True)
 
-    
     """Set the user data profile_img_url to be the URL image"""
     store = data_store.get()
-    # user_data = check_valid_auth_id(user_id)
-    # user_data['profile_img_url'] = profile_img_url
+
     for users in store['users']:
         if user_id == users['id']:
             users['profile_img_url'] = profile_img_url
+
     data_store.set(store)
     print("function call profile_img_url = ", profile_img_url)
 

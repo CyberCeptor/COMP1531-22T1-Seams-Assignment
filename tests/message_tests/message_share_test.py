@@ -1,12 +1,12 @@
-"""
-Filename: message_share_test.py
+# """
+# Filename: message_share_test.py
 
-Author: Xingjian Dong, z5221888, Aleesha Bunrith(z5371516)
-Created: 04/04/22 - 14/04/22
+# Author: Xingjian Dong, z5221888, Aleesha Bunrith(z5371516)
+# Created: 04/04/22 - 14/04/22
 
-Description: pytests for
-    - share messages
-"""
+# Description: pytests for
+#     - share messages
+# """
 
 import pytest
 
@@ -204,7 +204,7 @@ def test_message_share_invalid_dm_id(clear_register_two_createchanneldm_sendmsg)
     assert resp3.status_code == STATUS_INPUT_ERR
 
 @pytest.mark.usefixtures('clear_register_two_createchanneldm_sendmsg')
-def test_message_share_both_channel_id_and_dm_id_are_invalid(clear_register_two_createchanneldm_sendmsg):
+def test_message_share_both_ids_are_invalid(clear_register_two_createchanneldm_sendmsg):
     """ test for both channel_id and dm_id are invalid"""
 
     token = clear_register_two_createchanneldm_sendmsg[0]['token']
@@ -314,43 +314,58 @@ def test_message_share_optional_msg(clear_register_two_createchanneldm_sendmsg):
     dm_id = clear_register_two_createchanneldm_sendmsg[4]
     dm_msg_id = clear_register_two_createchanneldm_sendmsg[5]
 
+    resp0 = requests.get(config.url + 'notifications/get/v1',
+                         params={'token': token2})
+    assert resp0.status_code == STATUS_OK
+    user2_notifs = resp0.json()['notifications']
+
+    assert len(user2_notifs) == 4
+
     # dm is -1, user1 is tagged in optional message
-    resp0 = requests.post(config.url + 'message/share/v1', 
+    resp1 = requests.post(config.url + 'message/share/v1', 
                           json = {'token': token2, 'og_message_id': chan_msg_id, 
                                   'message': '@firstlast Hello World', 
                                   'channel_id': chan_id, 'dm_id': -1})
-    assert resp0.status_code == STATUS_OK
-
-    resp1 = requests.get(config.url + 'notifications/get/v1',
-                         params={'token': token1})
     assert resp1.status_code == STATUS_OK
-    notifs = resp1.json()['notifications']
 
-    assert len(notifs) == 1
+    resp2 = requests.get(config.url + 'notifications/get/v1',
+                         params={'token': token1})
+    assert resp2.status_code == STATUS_OK
+    user1_notifs = resp2.json()['notifications']
+
+    assert len(user1_notifs) == 1
 
     # tag notification should be the latest
     # can't check notif message since the shared message will be different
     # depending on the notification
-    assert notifs[0]['channel_id'] == chan_id
+    assert user1_notifs[0]['channel_id'] == chan_id
 
     # channel is -1, user1 is tagged in optional message
-    resp2 = requests.post(config.url + 'message/share/v1', 
+    resp3 = requests.post(config.url + 'message/share/v1', 
                           json = {'token': token2, 'og_message_id': dm_msg_id, 
                                   'message': '@firstlast Hello World1', 
                                   'channel_id': -1, 'dm_id': dm_id})
-    assert resp2.status_code == STATUS_OK
-
-    resp3 = requests.get(config.url + 'notifications/get/v1',
-                         params={'token': token1})
     assert resp3.status_code == STATUS_OK
-    notifs = resp3.json()['notifications']
 
-    assert len(notifs) == 2
+    resp4 = requests.get(config.url + 'notifications/get/v1',
+                         params={'token': token1})
+    assert resp4.status_code == STATUS_OK
+    user1_notifs = resp4.json()['notifications']
+
+    assert len(user1_notifs) == 2
 
     # tag notification should be the latest
     # can't check notif message since the shared message will be different
     # depending on the notification
-    assert notifs[0]['dm_id'] == dm_id
+    assert user1_notifs[0]['dm_id'] == dm_id
+
+    # user2 should receive both tag notifications for the original messages again
+    resp5 = requests.get(config.url + 'notifications/get/v1',
+                         params={'token': token2})
+    assert resp5.status_code == STATUS_OK
+    user2_notifs = resp5.json()['notifications']
+
+    assert len(user2_notifs) == 6
 
 @pytest.mark.usefixtures('clear_register_two_createchanneldm_sendmsg')
 def test_message_share_no_optional_msg(clear_register_two_createchanneldm_sendmsg):
@@ -374,6 +389,5 @@ def test_message_share_no_optional_msg(clear_register_two_createchanneldm_sendms
                                   'message': '', 
                                   'channel_id': -1, 'dm_id': dm_id})
     assert resp3.status_code == STATUS_OK
-
 
 requests.delete(config.url + 'clear/v1')

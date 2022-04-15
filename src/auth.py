@@ -19,6 +19,7 @@ import hashlib
 import random
 
 import time
+from flask import url_for
 
 from src.error import InputError
 
@@ -27,7 +28,6 @@ from src.token import token_generate, token_remove
 from src.data_store import data_store
 
 from src.global_vars import Permission
-
 
 MAX_NUM_CODES = 10**6
 # The default image for user's when they register.
@@ -127,7 +127,7 @@ def auth_register_v2(email, password, name_first, name_last):
         'notifications': [],
         'perm_id': Permission.OWNER.value if u_id == 1 else Permission.USER.value,
         'removed': False,
-        'profile_img_url': 'src/static/default.jpg',
+        'profile_img_url': url_for('static', filename='default.jpg', _external=True),
         'reset_code': None,
         'user_stats': {
             'channels_joined': [{'num_channels_joined': 0, 'time_stamp': time_stamp}],
@@ -136,7 +136,6 @@ def auth_register_v2(email, password, name_first, name_last):
             'involvement_rate': 0,
         }
     }
-
 
     # store the user information into the list of users
     store['users'].append(user_dict)
@@ -281,7 +280,7 @@ def create_handle(store, full_name):
         handle = handle + str(duplicate_count)
 
     return handle
-
+    
 def generate_reset_code(email):
     """
     Generates a 6 digit code string to be sent in a password reset email if the

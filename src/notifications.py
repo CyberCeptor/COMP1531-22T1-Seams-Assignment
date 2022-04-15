@@ -44,7 +44,7 @@ def notifications_get_v1(token):
         'notifications': user_notifs
     }
 
-def tag_notification(auth_user_id, old_msg, new_msg, data, option):
+def tag_notification(auth_user_id, old_msg, new_msg, data, option, sendlater, standup):
     """
     creates a notification for any tagged user in a message that is being sent
     or edited
@@ -62,44 +62,116 @@ def tag_notification(auth_user_id, old_msg, new_msg, data, option):
 
     Return: N/A
     """
-    print('tag:', option)
-    print('old:', old_msg)
-    print('new:', new_msg)
 
     store = data_store.get()
 
     tagger = check_valid_auth_id(auth_user_id)['all_data']['handle']
     chan_dm_name = data['name']
 
+    new_msg.lower()
+
     if option == 'channel':
         key = 'all_members'
     else: # option == 'dm'
         key = 'members'
 
-    # iterate through all user handles and check if the handle is included in 
-    # the message after an @
-    for user in store['users']:
-        handle = user['handle']
+    # find the indexes in the message where @'s are found
+    find_ats = [idx for idx, char in enumerate(new_msg) if char == '@']
+
+    handles = []
+
+    # search if any handles can be found after each @
+    for idx in find_ats:
+        handles.append(get_handle(new_msg, idx))
+    
+    # iterate through all found handles, check if it belongs to a user, and 
+    # check if the handle is included in the new_msg but not in the old_msg
+    for return_data in handles:
+        handle = return_data['handle']
+        next_idx = return_data['end_idx']
+
+        user = handle_get_user(handle[1:])
 
         # do not add the notification if the user is not in the channel or dm
-        if check_user_is_member(user['id'], data, key) is None:
+        # or the handle does not belong to a user
+        if user is None:
             pass
-        elif f'@{handle}' in new_msg.lower() and f'@{handle}' not in old_msg.lower():
-            # if the message being sent contains a tag then add a notification,
-            # if the message is being edited and the original message does not
-            # include the tag, add a notification,
-            # if a message with a tag is being shared, only send a notification
-            # if a user has been tagged in the optional message
-
-            # notifications are ordered from most recent to least recent
-            user['notifications'].insert(0, {
-                'channel_id': data['channel_id'] if option == 'channel' else -1,
-                'dm_id': data['dm_id'] if option == 'dm' else -1,
-                'notification_message': 
-                    f'{tagger} tagged you in {chan_dm_name}: {new_msg[0:20]}'
-            })
-    
+        elif (sendlater is False or standup is False) and check_user_is_member(user['id'], data, key) is None:
+            pass
+        else:
+            add_tag_notification(user, handle, new_msg, old_msg, next_idx, data, option, tagger, chan_dm_name)
+        
     data_store.set(store)
+
+def add_tag_notification(user, handle, new_msg, old_msg, next_idx, data, option, tagger, chan_dm_name):
+    """
+    adds a tag notification to the user's notifications
+    - if the message being sent contains a tag then add a notification,
+    - if the message is being edited and the original message does not
+    - include the tag, add a notification,
+    - if a message with a tag is being shared, only send a notification
+    - if a user has been tagged in the optional message
+    
+    Arguments:
+
+    Exceptions:
+
+    Return: 
+    """
+
+    if ((not new_msg[next_idx].isalnum() or new_msg[next_idx].isspace()) and 
+        handle in new_msg and handle not in old_msg.lower()):
+        # notifications are ordered from most recent to least recent
+        user['notifications'].insert(0, {
+            'channel_id': data['channel_id'] if option == 'channel' else -1,
+            'dm_id': data['dm_id'] if option == 'dm' else -1,
+            'notification_message': 
+                f'{tagger} tagged you in {chan_dm_name}: {new_msg[0:20]}'
+        })
+
+def get_handle(message, at_idx):
+    """
+    gets any possible handle str after the at_idx
+
+    Exceptions: N/A
+
+    Return:
+        Returns all chars after the index of an @ until a non-alphanumeric char 
+        is found
+    """
+
+    # https://stackoverflow.com/a/35231387
+    idx = at_idx + 1
+
+    while (idx < len(message) and 
+        (message[idx].isalnum() or not message[idx].isspace())):
+        idx += 1
+
+    return {
+        'handle': message[at_idx:idx],
+        'end_idx': idx
+    }
+
+def handle_get_user(handle):
+    """
+    get the user data if the handle belongs to them
+
+    Arguments:
+        handle (str) - a handle str of a possible user
+
+    Exceptions: N/A
+
+    Return:
+        Returns the user data if the handle belongs to them, otherwise return
+        None if there is no user with that handle
+    """
+
+    store = data_store.get()
+
+    for user in store['users']:
+        if user['handle'] == handle:
+            return user
+    return None
 
 def react_notification(auth_user_id, data, message_data, option):
     """

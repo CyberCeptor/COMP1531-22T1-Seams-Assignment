@@ -36,7 +36,7 @@ data = {
         'handle': 'firstlast',
         'perm_id': 1,
         'removed': False,
-        'profile_img_url': user_profile_picture_default(u_id),
+        'profile_img_url': 'src/static/default.jpg'
         'reset_code': None,
         'users_stats: {
             'channels_joined': [
