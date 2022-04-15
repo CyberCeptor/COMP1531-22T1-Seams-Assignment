@@ -51,16 +51,18 @@ def test_user_stats_working(clear_register_two):
                         json={'token': user1_token, 'u_ids': [user1_id,user2_id]})
     assert create.status_code == STATUS_OK
 
-    stats = requests.get(config.url + 'user/stats/v1', 
-                    json={'token': user1_token})
-    assert stats.status_code == STATUS_OK
 
     #Send a message in the DM.
     message_send = requests.post(config.url + 'message/send/v1', 
                           json = {'token': user1_token, 'channel_id': channel1['channel_id'], 
                           'message': 'helloworld'})
- 
     assert message_send.status_code == STATUS_OK
+
+
+    stats = requests.get(config.url + 'user/stats/v1', 
+                    json={'token': user1_token})
+    assert stats.status_code == STATUS_OK
+
 
     assert len(stats['channels_joined']) == 1
     assert len(stats['dms_joined']) == 1
