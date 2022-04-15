@@ -30,9 +30,9 @@ import urllib
 from flask import url_for #https://www.educba.com/flask-url_for/
 from PIL import Image # https://pillow.readthedocs.io/en/stable/
 
-# from src.other import user_profile_picture_default
-
 MAX_NUM_CODES = 10**6
+# The default image for user's when they register.
+img_url = 'https://tvtunesquiz.com/wp-content/uploads/pingu.jpg'
 
 def auth_login_v2(email, password):
     """
@@ -291,7 +291,6 @@ def user_profile_picture_default(user_id):
     Returns:
             - returns a URL for the location of the image for that user.
     """
-    img_url = 'https://tvtunesquiz.com/wp-content/uploads/pingu.jpg'
     file_location = f"src/static/{user_id}.jpg"
     try:
         # opens the image and saves at the given location
@@ -306,7 +305,9 @@ def user_profile_picture_default(user_id):
     cropped_image.save(file_location)
 
     return url_for('static', filename=f'{user_id}.jpg', _external=True)
-    
+
+
+
 def generate_reset_code(email):
     """
     Generates a 6 digit code string to be sent in a password reset email if the

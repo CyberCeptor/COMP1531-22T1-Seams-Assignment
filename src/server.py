@@ -14,12 +14,12 @@ from src.auth import auth_register_v2, auth_login_v2, generate_reset_code, \
                      passwordreset_reset_v1
 from src.user import user_profile_v1, user_profile_setemail_v1, \
                      user_profile_setname_v1, user_profile_sethandle_v1, \
-                     user_profile_uploadphoto_v1
+                     user_profile_uploadphoto_v1, user_stats_v1
 
 from src.admin import admin_userpermission_change, admin_user_remove
 from src.other import clear_v1
 from src.token import token_remove
-from src.users import users_all_v1
+from src.users import users_all_v1, users_stats_v1
 
 from src.search import search_v1
 
@@ -165,6 +165,13 @@ def get_all_users():
     save_data()
     return dumps(users)
 
+@APP.route('/users/stats/v1', methods=['GET'])
+def get_users_stats():
+    token = request.args.get('token')
+    stats = users_stats_v1(token)
+    save_data()
+    return dumps(stats)
+
 ################################################################################
 ##                              USER ROUTES                                   ##
 ################################################################################
@@ -229,6 +236,13 @@ def user_profile_image(user_id):
         raise InputError("File does not exist") from InputError
     # https://flask.palletsprojects.com/en/2.1.x/api/
     return send_file(f'static/{user_id}.jpg', mimetype='image/jpeg')
+
+@APP.route('/user/stats/v1', methods=['GET'])
+def get_user_stats():
+    token = request.args.get('token')
+    stats = user_stats_v1(token)
+    save_data()
+    return dumps(stats)
 
 
 ################################################################################

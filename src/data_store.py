@@ -36,12 +36,8 @@ data = {
         'handle': 'firstlast',
         'perm_id': 1,
         'removed': False,
-<<<<<<< HEAD
-        'profile_img_url': None, #For any given user, if they have yet to upload an image, 
-                                    there should be a site-wide default image used.
-=======
-        'reset_code': None
->>>>>>> master
+        'profile_img_url': user_profile_picture_default(u_id),
+        'reset_code': None,
     }],
     'tokens' = [{
         'user_id': user_data['id'],

@@ -238,36 +238,6 @@ def user_profile_sethandle_v1(token, handle_str):
 
     data_store.set(store)
 
-
-
-
-
-
-def user_profile_picture_default(user_id):
-
-    img_url = 'https://static.wikia.nocookie.net/doomsday_animations/images/3/33/Pingu.jpg/revision/latest?cb=20200719151508'
-    file_location = f"src/static/{user_id}.jpg"
-
-    try:
-        # opens the image and saves at the given location
-        urllib.request.urlretrieve(img_url, file_location)
-    except:
-        # os.remove(temp_image_location)
-        raise InputError(description="URL cannot be opened.")
-
-    image = Image.open(file_location)
-    
-    '''Crop the image to fit within our requirements'''
-    cropped_image = image.crop((200, 150, 400, 450))
-    cropped_image.save(file_location)
-
-    return url_for('static', filename=f'{user_id}.jpg', _external=True)
-
-
-
-
-
-
 @token_valid_check
 def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
     '''Check the token is valid'''
@@ -358,3 +328,26 @@ def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
     print("function call profile_img_url = ", profile_img_url)
 
     return {}
+
+
+
+@token_valid_check
+def user_stats_v1(token):
+    """
+    Returns a dictionary containing: {
+        channels_joined: [{num_channels_joined, time_stamp}],
+        dms_joined: [{nums_dms_joined, time_stamp}],
+        messages_sent: [{num_messages_sent, time_stamp}],
+        involvement_rate,
+    }
+    """
+    # store = data_store.get()
+    # user_id = token_get_user_id(token)
+    '''Need to iterate through the channels data, and increment for every channel the user is a member of'''
+    '''Need to iterate through the DM's and increment for every dm the user is apart of'''
+    '''Need to increment through the messages sent by the user and increment for each one.'''
+
+    return {} #user_stats #dict 
+
+
+  
