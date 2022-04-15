@@ -28,7 +28,8 @@ from src.channel import channel_details_v2, channel_invite_v2,\
                         channel_join_v2, channel_messages_v2
 from src.message import message_send_v1, message_remove_v1, message_edit_v1,\
                         message_senddm_v1, message_pin_v1, message_react_v1, \
-                        message_unreact_v1, message_unpin_v1, message_share_v1
+                        message_unreact_v1, message_unpin_v1, message_share_v1,\
+                        message_sendlater_v1, message_sendlaterdm_v1
                         
 from src.channels import channels_create_v2, channels_list_v2,\
                          channels_listall_v2
@@ -342,6 +343,35 @@ def message_send():
     save_data()
     return dumps(msg_id)
 
+@APP.route('/message/senddm/v1', methods=['POST'])
+def message_senddm():
+    data = request.get_json()
+    msg_id = message_senddm_v1(data['token'], data['dm_id'], data['message'])
+    save_data()
+    return dumps(msg_id)
+
+@APP.route('/message/sendlater/v1', methods=['POST'])
+def message_sendlater():
+    data = request.get_json()
+    token = data['token']
+    channel_id = data['channel_id']
+    message = data['message']
+    time_sent = data['time_sent']
+    msg_id = message_sendlater_v1(token, channel_id, message, time_sent)
+    save_data()
+    return dumps(msg_id)
+
+@APP.route('/message/sendlaterdm/v1', methods=['POST'])
+def message_sendlaterdm():
+    data = request.get_json()
+    token = data['token']
+    dm_id = data['dm_id']
+    message = data['message']
+    time_sent = data['time_sent']
+    msg_id = message_sendlaterdm_v1(token, dm_id, message, time_sent)
+    save_data()
+    return dumps(msg_id)
+
 @APP.route('/message/edit/v1', methods=['PUT'])
 def message_edit():
     data = request.get_json()
@@ -355,13 +385,6 @@ def message_remove():
     message_remove_v1(data['token'], data['message_id'])
     save_data()
     return dumps({})
-
-@APP.route('/message/senddm/v1', methods=['POST'])
-def message_senddm():
-    data = request.get_json()
-    msg_id = message_senddm_v1(data['token'], data['dm_id'], data['message'])
-    save_data()
-    return dumps(msg_id)
 
 @APP.route('/message/pin/v1', methods=['POST'])
 def message_pin():

@@ -140,9 +140,9 @@ def edit_remove_message(auth_user_id, data, msg_data, message, option):
         old_msg = msg_data['message']
         msg_data['message'] = message
         if 'channel_id' in data.keys():
-            tag_notification(auth_user_id, old_msg, message, data, 'channel')
+            tag_notification(auth_user_id, old_msg, message, data, 'channel', False, False)
         else:
-            tag_notification(auth_user_id, old_msg, message, data, 'dm')
+            tag_notification(auth_user_id, old_msg, message, data, 'dm', False, False)
     else: # if the new message input is empty or option == 'remove'
         data['messages'].remove(msg_data)
 

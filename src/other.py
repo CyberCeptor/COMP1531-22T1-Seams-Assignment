@@ -15,16 +15,15 @@ Description: implementation for
           GET requests
 """
 
+import os
+
+import glob
+
 from src.error import InputError
 
 from src.data_store import data_store
 
 from src.global_vars import reset_id, Permission
-
-import os
-import glob
-
-
 
 def clear_v1():
     """
@@ -45,7 +44,8 @@ def clear_v1():
 
     images = glob.glob('src/static/*')
     for pic in images:
-        os.remove(pic)
+        if pic != 'src/static/default.jpg':
+            os.remove(pic)
 
     data_store.set(store)
     
@@ -95,14 +95,14 @@ def check_valid_auth_id(auth_user_id):
     # if the auth_user_id is not found, raise an InputError
     raise InputError(description='User does not exist in users database')
 
-def check_valid_dm_channel_id(id, option, share):
+def check_valid_dm_channel_id(data_id, option, share):
     """
     checks if the given id is valid
 
     Arguments:
-        id (int)     - a int that represents a channel or dm
-        option (str) - denotes if the id channel or dm
-        share (bool) - indicates if the id is being checked from message/share
+        data_id (int) - a int that represents a channel or dm
+        option (str)  - denotes if the id channel or dm
+        share (bool)  - indicates if the id is being checked from message/share
 
     Exceptions:
         InputError - Occurs if id is not of type int, is less than 1
@@ -119,25 +119,25 @@ def check_valid_dm_channel_id(id, option, share):
         dict_key = 'dms'
         id_key = 'dm_id'
 
-    if type(id) is bool:
+    if type(data_id) is bool:
         raise InputError(f'{option} id is not of a valid type')
 
     # cast dm_id to an int since it is a GET request
-    id = cast_to_int_get_requests(id, f'{option} id')
+    data_id = cast_to_int_get_requests(data_id, f'{option} id')
 
-    if id < 1 and share is False:
+    if data_id < 1 and share is False:
         raise InputError(f'The {option} id is not valid (out of bounds)')
 
     # id -1 is only valid is share is True
-    if id == -1 and share is True:
+    if data_id == -1 and share is True:
         return
 
     store = data_store.get()
     for data in store[dict_key]:
-       if data[id_key] == id:
+       if data[id_key] == data_id:
             return data
 
-    # if the dm_id is not found, raise an AccessError
+    # if the data_id is not found, raise an AccessError
     raise InputError(f'{option} does not exist in data')
 
 def check_user_is_member(auth_user_id, data, key):

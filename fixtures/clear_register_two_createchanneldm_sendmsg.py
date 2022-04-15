@@ -39,7 +39,7 @@ def clear_register_two_createchanneldm_sendmsg(clear_register_two_createchanneld
     send_message = requests.post(config.url + 'message/senddm/v1', 
                           json={'token': user_2['token'],
                                 'dm_id': dm_id, 
-                                'message': 'hewwo'})
+                                'message': '@firstlast0 hewwo'})
     assert send_message.status_code == STATUS_OK
     dm_message = send_message.json()
 
