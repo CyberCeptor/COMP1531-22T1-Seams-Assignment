@@ -68,13 +68,8 @@ def tag_notification(auth_user_id, old_msg, new_msg, data, option):
     tagger = check_valid_auth_id(auth_user_id)['all_data']['handle']
     chan_dm_name = data['name']
 
-    if option == 'channel':
-        key = 'all_members'
-    else: # option == 'dm'
-        key = 'members'
-
     new_msg.lower()
-    
+
     # find the indexes in the message where @'s are found
     find_ats = [idx for idx, char in enumerate(new_msg) if char == '@']
 
@@ -96,25 +91,26 @@ def tag_notification(auth_user_id, old_msg, new_msg, data, option):
         # or the handle does not belong to a user
         if user is None:
             pass
-        elif check_user_is_member(user['id'], data, key) is None:
-            pass
-        elif (handle in new_msg and handle not in old_msg.lower() and 
-             (not new_msg[next_idx].isalnum() or new_msg[next_idx].isspace())):
-            # if the message being sent contains a tag then add a notification,
-            # if the message is being edited and the original message does not
-            # include the tag, add a notification,
-            # if a message with a tag is being shared, only send a notification
-            # if a user has been tagged in the optional message
-
-            # notifications are ordered from most recent to least recent
-            user['notifications'].insert(0, {
-                'channel_id': data['channel_id'] if option == 'channel' else -1,
-                'dm_id': data['dm_id'] if option == 'dm' else -1,
-                'notification_message': 
-                    f'{tagger} tagged you in {chan_dm_name}: {new_msg[0:20]}'
-            })
+        elif not new_msg[next_idx].isalnum() or new_msg[next_idx].isspace():
+            add_tag_notification(user, handle, new_msg, old_msg, data, option, tagger, chan_dm_name)
         
     data_store.set(store)
+
+def add_tag_notification(user, handle, new_msg, old_msg, data, option, tagger, chan_dm_name):
+    if handle in new_msg and handle not in old_msg.lower():
+        # if the message being sent contains a tag then add a notification,
+        # if the message is being edited and the original message does not
+        # include the tag, add a notification,
+        # if a message with a tag is being shared, only send a notification
+        # if a user has been tagged in the optional message
+
+        # notifications are ordered from most recent to least recent
+        user['notifications'].insert(0, {
+            'channel_id': data['channel_id'] if option == 'channel' else -1,
+            'dm_id': data['dm_id'] if option == 'dm' else -1,
+            'notification_message': 
+                f'{tagger} tagged you in {chan_dm_name}: {new_msg[0:20]}'
+        })
 
 def get_handle(message, at_idx):
     """
@@ -135,7 +131,6 @@ def get_handle(message, at_idx):
     while (idx < len(message) and 
         (message[idx].isalnum() or not message[idx].isspace())):
         idx += 1
-
 
     return {
         'handle': message[at_idx:idx],

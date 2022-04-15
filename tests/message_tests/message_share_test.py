@@ -390,5 +390,4 @@ def test_message_share_no_optional_msg(clear_register_two_createchanneldm_sendms
                                   'channel_id': -1, 'dm_id': dm_id})
     assert resp3.status_code == STATUS_OK
 
-
 requests.delete(config.url + 'clear/v1')

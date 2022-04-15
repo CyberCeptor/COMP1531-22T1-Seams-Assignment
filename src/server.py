@@ -29,7 +29,7 @@ from src.channel import channel_details_v2, channel_invite_v2,\
 from src.message import message_send_v1, message_remove_v1, message_edit_v1,\
                         message_senddm_v1, message_pin_v1, message_react_v1, \
                         message_unreact_v1, message_unpin_v1, message_share_v1,\
-                        message_sendlater_v1
+                        message_sendlater_v1, message_sendlaterdm_v1
                         
 from src.channels import channels_create_v2, channels_list_v2,\
                          channels_listall_v2
@@ -206,30 +206,30 @@ def user_sethandle():
     save_data()
     return dumps({})
 
-# @APP.route('/user/profile/uploadphoto/v1', methods=['POST'])
-# def user_uploadphoto():
-#     data = request.get_json()
-#     token = data['token']
-#     url = data['img_url']
-#     x_start = data['x_start']
-#     x_end = data['x_end']
-#     y_start = data['y_start']
-#     y_end = data['y_end']
-#     user_profile_uploadphoto_v1(token, url, x_start, y_start, x_end, y_end)
-#     save_data()
-#     return dumps({})
+@APP.route('/user/profile/uploadphoto/v1', methods=['POST'])
+def user_uploadphoto():
+    data = request.get_json()
+    token = data['token']
+    url = data['img_url']
+    x_start = data['x_start']
+    x_end = data['x_end']
+    y_start = data['y_start']
+    y_end = data['y_end']
+    user_profile_uploadphoto_v1(token, url, x_start, y_start, x_end, y_end)
+    save_data()
+    return dumps({})
 
 
-# @APP.route('/static/<user_id>.jpg', methods=['GET'])
-# def user_profile_image(user_id):
-#     """A Route to store the profile picture"""
-#     try:
-#         send_file(f'static/{user_id}.jpg', mimetype='image/jpeg')
-#         print("File exists.")
-#     except:
-#         raise InputError("File does not exist") from InputError
-#     # https://flask.palletsprojects.com/en/2.1.x/api/
-#     return send_file(f'static/{user_id}.jpg', mimetype='image/jpeg')
+@APP.route('/static/<user_id>.jpg', methods=['GET'])
+def user_profile_image(user_id):
+    """A Route to store the profile picture"""
+    try:
+        send_file(f'static/{user_id}.jpg', mimetype='image/jpeg')
+        print("File exists.")
+    except:
+        raise InputError("File does not exist") from InputError
+    # https://flask.palletsprojects.com/en/2.1.x/api/
+    return send_file(f'static/{user_id}.jpg', mimetype='image/jpeg')
 
 
 ################################################################################
@@ -358,6 +358,17 @@ def message_sendlater():
     message = data['message']
     time_sent = data['time_sent']
     msg_id = message_sendlater_v1(token, channel_id, message, time_sent)
+    save_data()
+    return dumps(msg_id)
+
+@APP.route('/message/sendlaterdm/v1', methods=['POST'])
+def message_sendlaterdm():
+    data = request.get_json()
+    token = data['token']
+    dm_id = data['dm_id']
+    message = data['message']
+    time_sent = data['time_sent']
+    msg_id = message_sendlaterdm_v1(token, dm_id, message, time_sent)
     save_data()
     return dumps(msg_id)
 
