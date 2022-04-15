@@ -230,4 +230,52 @@ def test_notifications_get_user_not_member(clear_register_two_createchanneldm):
     assert len(notifs) == 2
     assert REACT_NOTIF not in [k['notification_message'] for k in notifs]
 
+@pytest.mark.usefixtures('clear_register_two_createchannel')
+def test_notifications_get_invalid_handle(clear_register_two_createchannel):
+    """ test that tagging an invalid handle will work but no one will receive
+    a notification """
+
+    token1 = clear_register_two_createchannel[0]['token']
+    token2 = clear_register_two_createchannel[1]['token']
+    channel_id = clear_register_two_createchannel[2]
+
+    # user1 will have no notifications
+    resp0 = requests.get(config.url + 'notifications/get/v1',
+                         params={'token': token1})
+    assert resp0.status_code == STATUS_OK
+    user1_notifs1 = resp0.json()['notifications']
+
+    assert len(user1_notifs1) == 0
+
+    # user2 will have no notifications
+    resp1 = requests.get(config.url + 'notifications/get/v1',
+                         params={'token': token2})
+    assert resp1.status_code == STATUS_OK
+    user2_notifs1 = resp1.json()['notifications']
+
+    assert len(user2_notifs1) == 0
+
+    # user1 sends message in channel 1, tagging a non-existant user
+    resp3 = requests.post(config.url + 'message/send/v1', 
+                          json={'token': token1,
+                                'channel_id': channel_id, 
+                                'message': '@firstlast!@ hewwo'})
+    assert resp3.status_code == STATUS_OK
+
+    # user1 will still have no notifications
+    resp0 = requests.get(config.url + 'notifications/get/v1',
+                         params={'token': token1})
+    assert resp0.status_code == STATUS_OK
+    user1_notifs2 = resp0.json()['notifications']
+
+    assert user1_notifs1 == user1_notifs2
+
+    # user2 will still have no notifications
+    resp1 = requests.get(config.url + 'notifications/get/v1',
+                         params={'token': token2})
+    assert resp1.status_code == STATUS_OK
+    user2_notifs2 = resp1.json()['notifications']
+
+    assert user2_notifs1 == user2_notifs2
+
 requests.delete(config.url + 'clear/v1')

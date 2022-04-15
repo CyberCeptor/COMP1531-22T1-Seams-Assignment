@@ -44,7 +44,8 @@ def clear_v1():
 
     images = glob.glob('src/static/*')
     for pic in images:
-        os.remove(pic)
+        if pic != 'src/static/default.jpg':
+            os.remove(pic)
 
     data_store.set(store)
     

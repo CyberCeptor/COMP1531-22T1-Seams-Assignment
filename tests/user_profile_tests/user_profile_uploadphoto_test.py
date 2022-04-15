@@ -37,7 +37,7 @@ def test_user_uploadphoto_working(clear_register):
     user = clear_register
 
     # testing the user has a default profile picture.
-    profile_picture = requests.get(config.url + 'static/1.jpg')
+    profile_picture = requests.get(config.url + 'static/default.jpg')
     assert profile_picture.status_code == STATUS_OK
 
     image = requests.post(config.url + 'user/profile/uploadphoto/v1', 
@@ -56,9 +56,6 @@ def test_user_uploadphoto_working(clear_register):
     # Check that a get request to a file that doesnt exists returns input error.
     profile_picture2 = requests.get(config.url + 'static/2.jpg')
     assert profile_picture2.status_code == STATUS_INPUT_ERR
-
-
-
 
 @pytest.mark.usefixtures('clear_register')
 def test_user_uploadphoto_invalid_url(clear_register):
@@ -82,7 +79,6 @@ def test_user_uploadphoto_invalid_url(clear_register):
     image = requests.post(config.url + 'user/profile/uploadphoto/v1', 
                         json={'token': user['token'], 'img_url': -1, 'x_start': 0, 'y_start': 0, 'x_end': 300, 'y_end': 300})
     assert image.status_code == STATUS_INPUT_ERR
-
 
 @pytest.mark.usefixtures('clear_register')
 def test_user_uploadphoto_bad_dimensions(clear_register):
@@ -124,7 +120,6 @@ def test_user_uploadphoto_bad_dimensions(clear_register):
                         json={'token': user['token'], 'img_url': url, 'x_start': 'string', 'y_start': 0, 'x_end': 300, 'y_end': 300})
     assert image.status_code == STATUS_INPUT_ERR
 
-
 @pytest.mark.usefixtures('clear_register')
 def test_user_uploadphoto_non_jpg(clear_register):
     """
@@ -135,7 +130,6 @@ def test_user_uploadphoto_non_jpg(clear_register):
     image = requests.post(config.url + 'user/profile/uploadphoto/v1', 
                         json={'token': user['token'], 'img_url': non_jpg_url, 'x_start': 0, 'y_start': 0, 'x_end': 300, 'y_end': 300})
     assert image.status_code == STATUS_INPUT_ERR
-
 
 @pytest.mark.usefixtures('clear_register')
 def test_user_uploadphoto_invalid_token():

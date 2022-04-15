@@ -217,7 +217,7 @@ def send_message(auth_user_id, data_id, old_msg, new_msg, message_id,
     # if the message is being shared, only send tag notifs from the optional_msg
     # otherwise, send tag notifs from the sent message
     if standup is False:
-        tag_notification(auth_user_id, old_msg, new_msg, data, option)
+        tag_notification(auth_user_id, old_msg, new_msg, data, option, sendlater, standup)
 
 def check_valid_message(message):
     """
