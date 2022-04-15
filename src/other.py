@@ -41,6 +41,7 @@ def clear_v1():
     store['channels'].clear()
     store['tokens'].clear()
     store['dms'].clear()
+    store['workspace_stats'].clear()
 
     images = glob.glob('src/static/*')
     for pic in images:

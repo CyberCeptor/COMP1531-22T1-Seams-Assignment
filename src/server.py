@@ -109,6 +109,8 @@ def save_data():
 
 DATA_STORE = get_data()
 
+print(DATA_STORE)
+
 ################################################################################
 ##                              AUTH ROUTES                                   ##
 ################################################################################
@@ -168,9 +170,11 @@ def get_all_users():
 
 @APP.route('/users/stats/v1', methods=['GET'])
 def get_users_stats():
+    global DATA_STORE
     token = request.args.get('token')
     stats = users_stats_v1(token)
     save_data()
+    print(DATA_STORE)
     return dumps(stats)
 
 ################################################################################
@@ -240,9 +244,11 @@ def user_profile_image(user_id):
 
 @APP.route('/user/stats/v1', methods=['GET'])
 def get_user_stats():
+    global DATA_STORE
     token_data = request.args.get('token')
     stats = user_stats_v1(token_data)
     save_data()
+    print(DATA_STORE)
     return dumps(stats)
 
 

@@ -325,7 +325,6 @@ def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
     data_store.set(store)
     print("function call profile_img_url = ", profile_img_url)
 
-    return {}
 
 
 
@@ -388,7 +387,7 @@ def user_stats_v1(token):
 
     total_channel_dms_messages = (num_channels + num_dms + num_msgs)
     if (total_channel_dms_messages <= 0):
-        involvement_rate = 0
+        involvement_rate = 0.0
     else:
         involvement_rate = (channel_counter + dms_counter + num_msgs_sent) / total_channel_dms_messages
 
@@ -414,7 +413,7 @@ def user_stats_v1(token):
     }
     user_data['user_stats']['messages_sent'].append(messages_sent)
 
-    user_data['user_stats']['involvement_rate'] = involvement_rate
+    user_data['user_stats']['involvement_rate'] = round(involvement_rate, 1)
 
     print(user_data['user_stats'])
 

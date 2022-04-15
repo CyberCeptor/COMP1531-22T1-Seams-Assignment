@@ -127,5 +127,5 @@ def users_stats_v1(token):
         'channels_exist': channels_exist,
         'dms_exist': dms_exist,
         'messages_exist': messages_exist,
-        'utilization_rate': len(users_list) / users_total
+        'utilization_rate': round(len(users_list) / users_total, 1)
     }
