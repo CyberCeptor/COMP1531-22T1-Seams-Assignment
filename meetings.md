@@ -131,3 +131,11 @@ Meeting type: weekly check-in
 - finish functions by Friday 11th for last autotest
 - Jed: finish one function by tonight. if not, two functions by Wednesday
 - deployment + fixing anything over the weekend leading up to due date
+
+15.04
+Members present: Aleesha, Aisha, Jenson, Van
+Meeting type: Lab
+- Aleesha + Aisha working on message/sendlater/v1 and message/sendlaterdm/v1
+- functions finished by tonight for tomorrow's autotest
+- requirements sections have been split up (see requirements doc)
+- over the weekend, fix up style + work on requirements
