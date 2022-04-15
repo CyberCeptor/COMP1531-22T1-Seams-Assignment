@@ -23,6 +23,7 @@ DM_NAME = f'{USER1_HANDLE}, {USER2_HANDLE}'
 CHAN_NAME = 'channel_name'
 
 TAGGED_NOTIF = f'{USER1_HANDLE} tagged you in {CHAN_NAME}: @{USER2_HANDLE} hewwo'
+TAGGED_SELF_NOTIF = f'{USER2_HANDLE} tagged you in {DM_NAME}: @{USER2_HANDLE} hewwo'
 REACT_NOTIF = f'{USER1_HANDLE} reacted to your message in {DM_NAME}'
 
 @pytest.mark.usefixtures('clear_register_two_createchanneldm_sendmsg')
@@ -50,7 +51,7 @@ def test_notifications_get_works(clear_register_two_createchanneldm_sendmsg):
     assert resp1.status_code == STATUS_OK
     notifs = resp1.json()['notifications']
 
-    assert len(notifs) == 4
+    assert len(notifs) == 5
 
     # notification messages in order from least recent to most recent
     dm_add_notif = f'{USER1_HANDLE} added you to {DM_NAME}'
@@ -60,14 +61,17 @@ def test_notifications_get_works(clear_register_two_createchanneldm_sendmsg):
     assert notifs[0]['notification_message'] == REACT_NOTIF
     assert notifs[0]['dm_id'] == dm_id
 
-    assert notifs[1]['notification_message'] == TAGGED_NOTIF
-    assert notifs[1]['channel_id'] == chan_id
+    assert notifs[1]['notification_message'] == TAGGED_SELF_NOTIF
+    assert notifs[1]['dm_id'] == dm_id
 
-    assert notifs[2]['notification_message'] == chan_add_notif
+    assert notifs[2]['notification_message'] == TAGGED_NOTIF
     assert notifs[2]['channel_id'] == chan_id
 
-    assert notifs[3]['notification_message'] == dm_add_notif
-    assert notifs[3]['dm_id'] == dm_id
+    assert notifs[3]['notification_message'] == chan_add_notif
+    assert notifs[3]['channel_id'] == chan_id
+
+    assert notifs[4]['notification_message'] == dm_add_notif
+    assert notifs[4]['dm_id'] == dm_id
 
 @pytest.mark.usefixtures('clear_register_two_createchanneldm')
 def test_notifications_get_tagged_message_long(clear_register_two_createchanneldm):
@@ -122,7 +126,7 @@ def test_notifications_get_tagged_message_long(clear_register_two_createchanneld
 def test_notifications_get_more_than_20(clear_register_two_createchannel_join_send50msgs):
     """ test that only 20 notifications are returned"""
 
-    token2 = clear_register_two_createchannel_join_send50msgs
+    token2 = clear_register_two_createchannel_join_send50msgs[1]
     
     resp = requests.get(config.url + 'notifications/get/v1',
                          params={'token': token2})
