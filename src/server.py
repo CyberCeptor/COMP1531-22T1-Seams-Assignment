@@ -239,8 +239,8 @@ def user_profile_image(user_id):
 
 @APP.route('/user/stats/v1', methods=['GET'])
 def get_user_stats():
-    token = request.args.get('token')
-    stats = user_stats_v1(token)
+    token_data = request.args.get('token')
+    stats = user_stats_v1(token_data)
     save_data()
     return dumps(stats)
 

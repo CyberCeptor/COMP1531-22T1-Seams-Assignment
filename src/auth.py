@@ -18,6 +18,8 @@ import hashlib
 
 import random
 
+import time
+
 from src.error import InputError
 
 from src.token import token_generate, token_remove
@@ -25,6 +27,8 @@ from src.token import token_generate, token_remove
 from src.data_store import data_store
 
 from src.global_vars import Permission
+
+from src import config
 
 import urllib
 from flask import url_for #https://www.educba.com/flask-url_for/
@@ -115,9 +119,10 @@ def auth_register_v2(email, password, name_first, name_last):
 
     handle = create_handle(store, full_name)
 
+    config.url + 'src/static/default.jpg'
 
     '''Get a default image.'''
-
+    time_stamp = int(time.time())
     # append user data as a dictionary if everything is valid
     user_dict = {
         'id': u_id,
@@ -129,8 +134,14 @@ def auth_register_v2(email, password, name_first, name_last):
         'notifications': [],
         'perm_id': Permission.OWNER.value if u_id == 1 else Permission.USER.value,
         'removed': False,
-        'profile_img_url': user_profile_picture_default(u_id),
+        'profile_img_url': 'src/static/default.jpg',
         'reset_code': None,
+        'user_stats': {
+            'channels_joined': [{'num_channels_joined': 0, 'time_stamp': time_stamp}],
+            'dms_joined': [{'num_dms_joined': 0, 'time_stamp': time_stamp}],
+            'messages_sent': [{'num_messages_sent': 0, 'time_stamp': time_stamp}],
+            'involvement_rate': 0,
+        }
     }
 
 

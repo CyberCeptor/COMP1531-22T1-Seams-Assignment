@@ -357,6 +357,8 @@ def user_stats_v1(token):
     dms_counter = 0
     dms_message_counter = 0
 
+    num_msgs = 0
+
     # Number of channels the user is a member of and the number of messages they have sent.
     for channels in store['channels']:
         for members in channels['all_members']:
@@ -366,6 +368,8 @@ def user_stats_v1(token):
                 for messages in channels['messages']:
                     if messages['u_id'] == user_id:
                         channel_message_counter += 1
+                    num_msgs += 1
+                
     
     # Number of DM's the user is a member of and the number of messages they have sent.
     # Iterates through the dms, when the user is a member, it iterates through the messages
@@ -377,23 +381,48 @@ def user_stats_v1(token):
                 for messages in dms['messages']:
                     if messages['u_id'] == user_id:
                         dms_message_counter += 1
+                    num_msgs += 1
 
 
     # sum(num_channels_joined, num_dms_joined, num_msgs_sent)/sum(num_channels, num_dms, num_msgs)
     num_channels = len(store['channels'])
     num_dms = len(store['dms'])
-    num_msgs = len(store['channels']['messages']) + len(store['dms']['messages'])
     num_msgs_sent = channel_message_counter + dms_message_counter
-    involvement_rate = sum(channel_counter, dms_counter, num_msgs_sent) / sum(num_channels, num_dms, num_msgs)
 
-    user_stats = {
-        'channels_joined': [channel_counter, time_stamp],
-        'dms_joined': [dms_counter, time_stamp],
-        'messages_sent': [num_msgs_sent, time_stamp],
-        'involvement_rate': involvement_rate,
+    total_channel_dms_messages = (num_channels + num_dms + num_msgs)
+    if (total_channel_dms_messages <= 0):
+        involvement_rate = 0
+    else:
+        involvement_rate = (channel_counter + dms_counter + num_msgs_sent) / total_channel_dms_messages
+
+    # get user data
+    for users in store['users']:
+        if users['id'] == user_id:
+            user_data = users
+
+    channels_joined = {
+        'num_channels_joined': num_channels,
+        'time_stamp': time_stamp
     }
+    user_data['user_stats']['channels_joined'].append(channels_joined)
 
-    return {user_stats}
+    dms_joined = {
+        'num_dms_joined': num_dms,
+        'time_stamp': time_stamp}
+    user_data['user_stats']['dms_joined'].append(dms_joined)
+
+    messages_sent = {
+        'num_messages_sent': num_msgs,
+        'time_stamp': time_stamp
+    }
+    user_data['user_stats']['messages_sent'].append(messages_sent)
+
+    user_data['user_stats']['involvement_rate'] = involvement_rate
+
+    print(user_data['user_stats'])
+
+    data_store.set(store)
+    return user_data['user_stats']
 
 
   

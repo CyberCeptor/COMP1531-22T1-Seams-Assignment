@@ -32,7 +32,7 @@
 #     user1_token = user1['token']
 
 #     stats = requests.get(config.url + 'users/stats/v1', 
-#                     json={'token': user1_token})
+#                     params={'token': user1_token})
 #     assert stats.status_code == STATUS_OK
 
 #     assert len(stats['channels_joined']) == 0
@@ -53,14 +53,14 @@
 
 #     #Send a message in the DM.
 #     message_send = requests.post(config.url + 'message/send/v1', 
-#                           json = {'token': user1_token, 'channel_id': channel1['channel_id'], 
+#                           json={'token': user1_token, 'channel_id': channel1['channel_id'], 
 #                           'message': 'helloworld'})
  
 #     assert message_send.status_code == STATUS_OK
 
 #     # Get the stats again
 #     stats = requests.get(config.url + 'users/stats/v1', 
-#                     json={'token': user1_token})
+#                     params={'token': user1_token})
 #     assert stats.status_code == STATUS_OK
 
 #     assert len(stats['channels_joined']) == 1
@@ -75,45 +75,45 @@
 #     user = clear_register
 #     user1_token = user['token']
 #     stats = requests.get(config.url + 'users/stats/v1', 
-#                     json={'token': user1_token})
+#                     params={'token': user1_token})
 #     assert stats.status_code == STATUS_OK
 
 #     # Empty String
 #     stats = requests.get(config.url + 'users/stats/v1', 
-#                     json={'token': ''})
+#                     params={'token': ''})
 #     assert stats.status_code == STATUS_INPUT_ERR
 
 #     #String
 #     stats = requests.get(config.url + 'users/stats/v1', 
-#                     json={'token': 'token'})
+#                     params={'token': 'token'})
 #     assert stats.status_code == STATUS_ACCESS_ERR
 
 #     # Expired Token
 #     stats = requests.get(config.url + 'users/stats/v1', 
-#                     json={'token': EXPIRED_TOKEN})
+#                     params={'token': EXPIRED_TOKEN})
 #     assert stats.status_code == STATUS_ACCESS_ERR
 
 #     # Unsaved Token
 #     stats = requests.get(config.url + 'users/stats/v1', 
-#                     json={'token': UNSAVED_TOKEN})
+#                     params={'token': UNSAVED_TOKEN})
 #     assert stats.status_code == STATUS_ACCESS_ERR
 
 #     # INT
 #     stats = requests.get(config.url + 'users/stats/v1', 
-#                     json={'token': 100})
+#                     params={'token': 100})
 #     assert stats.status_code == STATUS_INPUT_ERR
 
 #     # Negative INT
 #     stats = requests.get(config.url + 'users/stats/v1', 
-#                     json={'token': -1})
+#                     params={'token': -1})
 #     assert stats.status_code == STATUS_INPUT_ERR
 
 #     # Bool
 #     stats = requests.get(config.url + 'users/stats/v1', 
-#                     json={'token': True})
+#                     params={'token': True})
 #     assert stats.status_code == STATUS_INPUT_ERR
 
 #     # Bool
 #     stats = requests.get(config.url + 'users/stats/v1', 
-#                     json={'token': False})
+#                     params={'token': False})
 #     assert stats.status_code == STATUS_INPUT_ERR

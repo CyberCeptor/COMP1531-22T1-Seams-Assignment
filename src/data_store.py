@@ -38,6 +38,39 @@ data = {
         'removed': False,
         'profile_img_url': user_profile_picture_default(u_id),
         'reset_code': None,
+        'users_stats: {
+            'channels_joined': [
+                {
+                    'num_channels_joined': 0,
+                    'time_stamp': 01234567
+                },
+                {
+                    'num_channels_joined': 1,
+                    'time_stamp': 12345678
+                }
+            ],
+            'dms_joined': [
+                {
+                    'num_dms_joined': 0,
+                    'time_stamp': 01234567,
+                },
+                {
+                    'num_dms_joined': 1,
+                    'time_stamp': 12345678,
+                }
+            ],
+            'involvement_rate': 1.0,
+            'messages_sent': [
+                {
+                    'num_messages_sent': 0,
+                    'time_stamp': 01234567
+                },
+                {
+                    'num_messages_sent': 1,
+                    'time_stamp': 12345678
+                }
+            ]
+        }
     }],
     'tokens' = [{
         'user_id': user_data['id'],
@@ -109,7 +142,40 @@ data = {
             }],
             'is_pinned': False
         }],
-    }]
+    }],
+    'workspace_stats': {
+        'channels_exist': [
+        {
+                'num_channels_exist': 0,
+                'time_stamp': 012345
+        },
+        {
+                'num_channels_exist': 1,
+                'time_stamp': 123456
+        }
+    ], 
+        'dms_exist': [
+        {
+                'num_dms_exist': 0,
+                'time_stamp': 01234
+        },
+        {
+                'num_dms_exist': 1,
+                'time_stamp': 12345
+        }
+    ], 
+        'messages_exist': [
+        {
+            'num_messages_exist': 0,
+            'time_stamp': 01234
+        },
+        {
+            'num_messages_exist': 1,
+            'time_stamp': 12345
+        }
+    ], 
+        'utilization_rate': 1.0,
+    }
 }
 """
 
