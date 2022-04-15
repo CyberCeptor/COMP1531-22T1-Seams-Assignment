@@ -9,7 +9,6 @@ Description: pytests for user/stats/v1
 
 """
 
-from psutil import STATUS_LOCKED
 import pytest
 
 import requests
