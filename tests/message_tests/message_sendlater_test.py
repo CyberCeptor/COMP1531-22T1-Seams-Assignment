@@ -19,9 +19,9 @@ from src.global_vars import EXPIRED_TOKEN, UNSAVED_TOKEN, STATUS_OK, \
                             STATUS_INPUT_ERR, STATUS_ACCESS_ERR
 
 time_later = 1
-time_now = time.time()
-time_sent = time.time() + time_later
-past_time = time.time() - time_later
+time_now = int(time.time())
+time_sent = int(time.time()) + time_later
+past_time = int(time.time()) - time_later
 
 @pytest.mark.usefixtures('clear_register_createchannel')
 def test_message_sendlater_invalid_token(clear_register_createchannel):
@@ -35,7 +35,7 @@ def test_message_sendlater_invalid_token(clear_register_createchannel):
  
     assert resp0.status_code == STATUS_INPUT_ERR
 
-    # token is boo
+    # token is bool
     resp1 = requests.post(config.url + 'message/sendlater/v1', 
                           json = {'token': True, 'channel_id': chan_id, 
                           'message': 'hewwo', 'time_sent': time_sent})
@@ -162,7 +162,6 @@ def test_message_sendlater_invalid_length(clear_register_createchannel):
  
     assert resp1.status_code == STATUS_INPUT_ERR
 
-
 @pytest.mark.usefixtures('clear_register_createchannel')
 def test_message_sendlater_invalid_time_sent(clear_register_createchannel):
     """ test for invalid input of message"""
@@ -198,7 +197,6 @@ def test_message_sendlater_invalid_time_sent(clear_register_createchannel):
  
     assert resp4.status_code == STATUS_INPUT_ERR
 
-
 @pytest.mark.usefixtures('clear_register_createchannel')
 def test_user_not_belong(clear_register_createchannel):
     """ testing if user belongs to the channel """
@@ -220,7 +218,6 @@ def test_user_not_belong(clear_register_createchannel):
                           'message': 'hewwo', 'time_sent': time_sent})
  
     assert resp0.status_code == STATUS_ACCESS_ERR 
-
 
 @pytest.mark.usefixtures('clear_register_createchannel')
 def test_successful_message_sendlater(clear_register_createchannel):
@@ -251,3 +248,5 @@ def test_successful_message_sendlater(clear_register_createchannel):
     info_later = resp1.json()
     assert(len(info_later['messages']) == 1)
     assert info_later['messages'][0]['message'] == 'hewwo'
+
+requests.delete(config.url + 'clear/v1')
