@@ -30,9 +30,11 @@
 #     user2_id = user2['auth_user_id']
 #     user1_token = user1['token']
 
-#     stats = requests.get(config.url + 'users/stats/v1', 
+#     stats_return = requests.get(config.url + 'users/stats/v1', 
 #                     params={'token': user1_token})
-#     assert stats.status_code == STATUS_OK
+#     assert stats_return.status_code == STATUS_OK
+    
+#       stats = stats_return.json()
 
 #     assert len(stats['channels_joined']) == 0
 #     assert len(stats['dms_joined']) == 0
