@@ -97,7 +97,7 @@ def test_search_successful(clear_register_two_createchanneldm_sendmsg):
                          params={'token': token, 'query_str': 'hewwo'})
     assert resp0.status_code == STATUS_OK
 
-    searched_message = resp0.json()
+    searched_message = resp0.json()['messages']
     assert len(searched_message) == 2
 
     # check returned first message, 'hewwo' sent by user 1 in channel 1
@@ -124,7 +124,7 @@ def test_search_user_not_in_channel(clear_register_two_createchanneldm_sendmsg):
     resp0 = requests.get(config.url + 'search/v1', 
                          params={'token': token_3, 'query_str': 'hewwo'})
     assert resp0.status_code == STATUS_OK
-    msg_return = resp0.json()
+    msg_return = resp0.json()['messages']
     assert msg_return == []
 
 requests.delete(config.url + 'clear/v1')
@@ -150,7 +150,7 @@ def test_search_case_insensitive(clear_register_two_createchannel):
     resp0 = requests.get(config.url + 'search/v1', 
                          params={'token': token, 'query_str': 'hewwo'})
     assert resp0.status_code == STATUS_OK
-    searched_message = resp0.json()
+    searched_message = resp0.json()['messages']
 
     assert (msg_id, user1_id) in [(k['message_id'], k['u_id']) 
                                     for k in searched_message]
