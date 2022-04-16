@@ -59,4 +59,6 @@ def search_v1(token, query_str):
                 check_user_is_member(user_id, dm, 'members')):
                 message_return.append(message_data)
 
-    return message_return
+    return {
+        'messages': message_return
+    }
