@@ -109,7 +109,6 @@ def save_data():
 
 DATA_STORE = get_data()
 
-print(DATA_STORE)
 
 ################################################################################
 ##                              AUTH ROUTES                                   ##
@@ -174,7 +173,6 @@ def get_users_stats():
     token = request.args.get('token')
     stats = users_stats_v1(token)
     save_data()
-    print(DATA_STORE)
     return dumps(stats)
 
 ################################################################################
@@ -248,7 +246,6 @@ def get_user_stats():
     token_data = request.args.get('token')
     stats = user_stats_v1(token_data)
     save_data()
-    print(DATA_STORE)
     return dumps(stats)
 
 
