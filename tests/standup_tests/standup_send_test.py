@@ -10,14 +10,14 @@ Description: http test for standup_send
 import pytest
 import time
 import requests
-
 from src import config
+from src.global_vars import STATUS_OK, STATUS_INPUT_ERR, STATUS_ACCESS_ERR
 
 @pytest.mark.usefixtures('clear_register_createchannel')
 def test_standup_send_valid(clear_register_createchannel):
     """
     clears any data stored in data_store and registers users with the
-    given information, test standup valid
+    given information, test standup send valid
     """
     user1 = clear_register_createchannel[0]
     token = user1['token']
@@ -30,7 +30,7 @@ def test_standup_send_valid(clear_register_createchannel):
     stand = requests.post(config.url + 'standup/send/v1',
                         json={'token': token, 'channel_id': channel_id,
                             'message': 'hello world'})
-    assert stand.status_code == 200
+    assert stand.status_code == STATUS_OK
 
     time.sleep(1)
     resp1 = requests.get(config.url + 'channel/messages/v2', 
@@ -44,7 +44,7 @@ def test_standup_send_valid(clear_register_createchannel):
 def test_standup_send_invalid_channel(clear_register):
     """
     clears any data stored in data_store and registers users with the
-    given information, test invalid channel
+    given information, a inputerror raised by invalid channel
     """
     user1 = clear_register
     token = user1['token']
@@ -52,33 +52,33 @@ def test_standup_send_invalid_channel(clear_register):
     stand = requests.post(config.url + 'standup/send/v1',
                         json={'token': token, 'channel_id': 44,
                             'message': 'hello world'})
-    assert stand.status_code == 400
+    assert stand.status_code == STATUS_INPUT_ERR
 
     stand = requests.post(config.url + 'standup/send/v1',
                         json={'token': token, 'channel_id': -44,
                             'message': 'hello world'})
-    assert stand.status_code == 400
+    assert stand.status_code == STATUS_INPUT_ERR
 
     stand = requests.post(config.url + 'standup/send/v1',
                         json={'token': token, 'channel_id': False,
                             'message': 'hello world'})
-    assert stand.status_code == 400
+    assert stand.status_code == STATUS_INPUT_ERR
 
     stand = requests.post(config.url + 'standup/send/v1',
                         json={'token': token, 'channel_id': '',
                             'message': 'hello world'})
-    assert stand.status_code == 400
+    assert stand.status_code == STATUS_INPUT_ERR
 
     stand = requests.post(config.url + 'standup/send/v1',
                         json={'token': token, 'channel_id': 'ahs',
                             'message': 'hello world'})
-    assert stand.status_code == 400
+    assert stand.status_code == STATUS_INPUT_ERR
 
 @pytest.mark.usefixtures('clear_register_createchannel')
 def test_standup_send_invalid_message(clear_register_createchannel):
     """
     clears any data stored in data_store and registers users with the
-    given information, test invalid message
+    given information, a input error raised by invalid message
     """
     user1 = clear_register_createchannel[0]
     token = user1['token']
@@ -92,13 +92,13 @@ def test_standup_send_invalid_message(clear_register_createchannel):
     stand = requests.post(config.url + 'standup/send/v1',
                         json={'token': token, 'channel_id': channel_id,
                             'message': message})
-    assert stand.status_code == 400
+    assert stand.status_code ==  STATUS_INPUT_ERR
 
 @pytest.mark.usefixtures('clear_register_createchannel')
 def test_standup_send_standup_not_running(clear_register_createchannel):
     """
     clears any data stored in data_store and registers users with the
-    given information, test a standuo is not running
+    given information, a input error raised by a standup is not running
     """
     user1 = clear_register_createchannel[0]
     token = user1['token']
@@ -107,13 +107,13 @@ def test_standup_send_standup_not_running(clear_register_createchannel):
     stand = requests.post(config.url + 'standup/send/v1',
                         json={'token': token, 'channel_id': channel_id,
                             'message': 'hello world'})
-    assert stand.status_code == 400
+    assert stand.status_code ==  STATUS_INPUT_ERR
 
 @pytest.mark.usefixtures('clear_register_two')
 def test_standup_start_is_not_in_channel(clear_register_two):
     """
     clears any data stored in data_store and registers users with the
-    given information, test user is not in channel
+    given information, a access error raised by user is not in channel
     """
     user1 = clear_register_two[0]
     user2 = clear_register_two[1]
@@ -132,7 +132,7 @@ def test_standup_start_is_not_in_channel(clear_register_two):
     stand = requests.post(config.url + 'standup/send/v1',
                         json={'token': token2, 'channel_id': channel_id,
                             'message': 'hello world'})
-    assert stand.status_code == 403
+    assert stand.status_code == STATUS_ACCESS_ERR
 
 @pytest.mark.usefixtures('clear_register_createchannel')
 def test_standup_send_invalid_messages(clear_register_createchannel):
@@ -152,13 +152,13 @@ def test_standup_send_invalid_messages(clear_register_createchannel):
     stand = requests.post(config.url + 'standup/send/v1',
                         json={'token': token, 'channel_id': channel_id,
                             'message': message})
-    assert stand.status_code == 400
+    assert stand.status_code == STATUS_INPUT_ERR
 
     message = ''
     stand = requests.post(config.url + 'standup/send/v1',
                         json={'token': token, 'channel_id': channel_id,
                             'message': message})
-    assert stand.status_code == 400
+    assert stand.status_code == STATUS_INPUT_ERR
 
 @pytest.mark.usefixtures('clear_register_createchannel')
 def test_standup_send_no_messages(clear_register_createchannel):
@@ -173,13 +173,13 @@ def test_standup_send_no_messages(clear_register_createchannel):
     resp0 = requests.post(config.url + 'standup/start/v1',
                 json={'token': token, 'channel_id': channel_id,
                     'length': 1})
-    assert resp0.status_code == 200
+    assert resp0.status_code == STATUS_OK
 
     time.sleep(1)
     resp1 = requests.get(config.url + 'channel/messages/v2', 
                           params = {'token': token, 'channel_id': channel_id, 
                                     'start': 0})
-    assert resp0.status_code == 200
+    assert resp0.status_code == STATUS_OK
     
     info = resp1.json()
     assert(len(info['messages']) == 0)

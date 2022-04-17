@@ -13,6 +13,8 @@ import requests
 
 from src import config
 
+from src.global_vars import STATUS_OK, STATUS_INPUT_ERR, STATUS_ACCESS_ERR
+
 @pytest.mark.usefixtures('clear_register_two_createdm')
 def test_dm_leave_invalid_token(clear_register_two_createdm):
     """ clears any data stored in data_store and registers a user with the
@@ -21,23 +23,23 @@ def test_dm_leave_invalid_token(clear_register_two_createdm):
     dm_id = clear_register_two_createdm[2]
     leave = requests.post(config.url + 'dm/leave/v1', 
                         json={'token': 500, 'dm_id': dm_id})
-    assert leave.status_code == 400
+    assert leave.status_code == STATUS_INPUT_ERR
 
     leave = requests.post(config.url + 'dm/leave/v1', 
                         json={'token': -500, 'dm_id': dm_id})
-    assert leave.status_code == 400
+    assert leave.status_code == STATUS_INPUT_ERR
 
     leave = requests.post(config.url + 'dm/leave/v1', 
                         json={'token': '', 'dm_id': dm_id})
-    assert leave.status_code == 400
+    assert leave.status_code == STATUS_INPUT_ERR
 
     leave = requests.post(config.url + 'dm/leave/v1', 
                         json={'token': 'd', 'dm_id': dm_id})
-    assert leave.status_code == 403
+    assert leave.status_code == STATUS_ACCESS_ERR
 
     leave = requests.post(config.url + 'dm/leave/v1', 
                         json={'token': False, 'dm_id': dm_id})
-    assert leave.status_code == 400
+    assert leave.status_code == STATUS_INPUT_ERR
 
 @pytest.mark.usefixtures('clear_register_two_createdm')
 def test_dm_leave_valid(clear_register_two_createdm):
@@ -48,7 +50,7 @@ def test_dm_leave_valid(clear_register_two_createdm):
     dm_id = clear_register_two_createdm[2]
     leave = requests.post(config.url + 'dm/leave/v1', 
                         json={'token': token1, 'dm_id': dm_id})
-    assert leave.status_code == 200
+    assert leave.status_code == STATUS_OK
 
 @pytest.mark.usefixtures('clear_register_two_createdm')
 def test_dm_leave_invalid_dm_id(clear_register_two_createdm):
@@ -59,23 +61,23 @@ def test_dm_leave_invalid_dm_id(clear_register_two_createdm):
   
     leave = requests.post(config.url + 'dm/leave/v1', 
                         json={'token': token1, 'dm_id': ''})
-    assert leave.status_code == 400
+    assert leave.status_code == STATUS_INPUT_ERR
 
     leave = requests.post(config.url + 'dm/leave/v1', 
                         json={'token': token1, 'dm_id': 900})
-    assert leave.status_code == 400
+    assert leave.status_code ==STATUS_INPUT_ERR
 
     leave = requests.post(config.url + 'dm/leave/v1', 
                         json={'token': token1, 'dm_id': -900})
-    assert leave.status_code == 400
+    assert leave.status_code == STATUS_INPUT_ERR
 
     leave = requests.post(config.url + 'dm/leave/v1', 
                         json={'token': token1, 'dm_id': 'kli'})
-    assert leave.status_code == 400
+    assert leave.status_code == STATUS_INPUT_ERR
 
     leave = requests.post(config.url + 'dm/leave/v1', 
                         json={'token': token1, 'dm_id': True})
-    assert leave.status_code == 400
+    assert leave.status_code == STATUS_INPUT_ERR
 
 @pytest.mark.usefixtures('clear_register_two_createdm')
 def test_dm_leave_not_in_dm(clear_register_two_createdm):
@@ -90,6 +92,6 @@ def test_dm_leave_not_in_dm(clear_register_two_createdm):
     dm_id = clear_register_two_createdm[2]
     leave = requests.post(config.url + 'dm/leave/v1', 
                         json={'token': token3, 'dm_id': dm_id})
-    assert leave.status_code == 403
+    assert leave.status_code == STATUS_ACCESS_ERR
 
 requests.delete(config.url + 'clear/v1')
