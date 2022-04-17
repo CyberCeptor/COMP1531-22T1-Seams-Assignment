@@ -45,8 +45,6 @@ def clear_v1():
     store['workspace_stats']['dms_exist'].clear()
     store['workspace_stats']['messages_exist'].clear()
 
-
-
     images = glob.glob('src/static/*')
     for pic in images:
         # Saves the default image for profile pictures.
