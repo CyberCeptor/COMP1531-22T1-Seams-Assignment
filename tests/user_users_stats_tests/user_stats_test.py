@@ -30,6 +30,17 @@ def test_user_stats_working(clear_register_two):
     user2_id = user2['auth_user_id']
     user1_token = user1['token']
 
+    # Initial assert to make sure the data_store is created correctly.
+    stats_return = requests.get(config.url + 'user/stats/v1', 
+                    params={'token': user1_token})
+    assert stats_return.status_code == STATUS_OK
+    stats = stats_return.json()['user_stats']
+
+    assert 0 in [k['num_channels_joined'] for k in stats['channels_joined']]
+    assert 0 in [k['num_dms_joined'] for k in stats['dms_joined']]
+    assert 0 in [k['num_messages_sent'] for k in stats['messages_sent']]
+    assert stats['involvement_rate'] == 0.0
+
     # Create a channel 
     channel1 = requests.post(config.url + 'channels/create/v2', 
                           json={'token': user1_token, 'name': 'test_channel_public',
@@ -48,20 +59,17 @@ def test_user_stats_working(clear_register_two):
                           'message': 'helloworld'})
     assert message_send.status_code == STATUS_OK
 
-
-    stats = requests.get(config.url + 'user/stats/v1', 
+    # Checking that the user_stats dictionary has the information above
+    # New channel, DM, message sent, and updated involvement_rate
+    stats_return = requests.get(config.url + 'user/stats/v1', 
                     params={'token': user1_token})
-    assert stats.status_code == STATUS_OK
-    stats_json = stats.json()
+    assert stats_return.status_code == STATUS_OK
+    stats = stats_return.json()['user_stats']
 
-    assert stats_json['channels_joined'][0]['num_channels_joined'] == 0
-    assert stats_json['dms_joined'][0]['num_dms_joined'] == 0
-    assert stats_json['messages_sent'][0]['num_messages_sent'] == 0
-
-    assert stats_json['channels_joined'][1]['num_channels_joined'] == 1
-    assert stats_json['dms_joined'][1]['num_dms_joined'] == 1
-    assert stats_json['messages_sent'][1]['num_messages_sent'] == 1
-    assert stats_json['involvement_rate'] == 1.0
+    assert 1 in [k['num_channels_joined'] for k in stats['channels_joined']]
+    assert 1 in [k['num_dms_joined'] for k in stats['dms_joined']]
+    assert 1 in [k['num_messages_sent'] for k in stats['messages_sent']]
+    assert stats['involvement_rate'] == 1.0
 
 
 @pytest.mark.usefixtures('clear_register')
