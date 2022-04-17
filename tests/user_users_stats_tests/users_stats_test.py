@@ -33,12 +33,12 @@ def test_users_stats_working(clear_register_two):
                     params={'token': user1_token})
     assert stats_return.status_code == STATUS_OK
     
-    stats = stats_return.json()
+    stats = stats_return.json()['workspace_stats']
 
-    assert stats['channels_exist']['num_channels_exist'] == 0
-    assert stats['dms_exist']['num_dms_exist'] == 0
-    assert stats['messages_exist']['num_messages_exist'] == 0
-    assert stats['utilization_rate'] == 0
+    assert 0 in [k['num_channels_exist'] for k in stats['channels_exist']]
+    assert 0 in [k['num_dms_exist'] for k in stats['dms_exist']]
+    assert 0 in [k['num_messages_exist'] for k in stats['messages_exist']]
+    assert stats['utilization_rate'] == 0.0
 
     # Create a channel 
     channel = requests.post(config.url + 'channels/create/v2', 
@@ -62,12 +62,11 @@ def test_users_stats_working(clear_register_two):
     stats_return = requests.get(config.url + 'users/stats/v1', 
                     params={'token': user1_token})
     assert stats_return.status_code == STATUS_OK
-    stats = stats_return.json()
+    stats = stats_return.json()['workspace_stats']
 
-    print(stats)
-    assert stats['channels_exist']['num_channels_exist'] == 1
-    assert stats['dms_exist']['num_dms_exist'] == 1
-    assert stats['messages_exist']['num_messages_exist'] == 1
+    assert 1 in [k['num_channels_exist'] for k in stats['channels_exist']]
+    assert 1 in [k['num_dms_exist'] for k in stats['dms_exist']]
+    assert 1 in [k['num_messages_exist'] for k in stats['messages_exist']]
     assert stats['utilization_rate'] == 1.0
 
 

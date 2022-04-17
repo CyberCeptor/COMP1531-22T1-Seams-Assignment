@@ -23,7 +23,7 @@ from src.global_vars import EXPIRED_TOKEN, UNSAVED_TOKEN, STATUS_OK, \
 @pytest.mark.usefixtures('clear_register_two')
 def test_user_stats_working(clear_register_two):
     """
-    Testing the uploadphoto works correctly, changes the users profile picture accordingly.
+    
     """
     user1 = clear_register_two[0]
     user2 = clear_register_two[1]
