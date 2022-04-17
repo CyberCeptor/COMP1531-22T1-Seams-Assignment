@@ -13,6 +13,8 @@ import requests
 
 from src import config
 
+from src.global_vars import STATUS_OK, STATUS_INPUT_ERR, STATUS_ACCESS_ERR
+
 @pytest.mark.usefixtures('clear_register_createchannel')
 def test_channel_join_successfully(clear_register_createchannel):
     """ clears any data stored in data_store and registers a invitee, a inviter
@@ -27,7 +29,7 @@ def test_channel_join_successfully(clear_register_createchannel):
     add = requests.post(config.url + 'channel/join/v2',
                         json={'token': data1['token'],
                         'channel_id': chan1_id})
-    assert add.status_code == 200
+    assert add.status_code == STATUS_OK
 
 @pytest.mark.usefixtures('clear_register_createchannel')
 def test_channel_join_invalid_token(clear_register_createchannel):
@@ -37,23 +39,23 @@ def test_channel_join_invalid_token(clear_register_createchannel):
     chan_id1 = clear_register_createchannel[1]
     add = requests.post(config.url + 'channel/join/v2',
                         json={'token': 2, 'channel_id': chan_id1})
-    assert add.status_code == 400
+    assert add.status_code == STATUS_INPUT_ERR
     
     add = requests.post(config.url + 'channel/join/v2',
                         json={'token': -2, 'channel_id': chan_id1})
-    assert add.status_code == 400
+    assert add.status_code == STATUS_INPUT_ERR
 
     add = requests.post(config.url + 'channel/join/v2',
                         json={'token': True, 'channel_id': chan_id1})
-    assert add.status_code == 400
+    assert add.status_code == STATUS_INPUT_ERR
 
     add = requests.post(config.url + 'channel/join/v2',
                         json={'token': 'goood', 'channel_id': chan_id1})
-    assert add.status_code == 403
+    assert add.status_code == STATUS_ACCESS_ERR
 
     add = requests.post(config.url + 'channel/join/v2',
                         json={'token': '', 'channel_id': chan_id1})
-    assert add.status_code == 400
+    assert add.status_code == STATUS_INPUT_ERR
 
 @pytest.mark.usefixtures('clear_register_createchannel')
 def test_channel_join_invalid_channel(clear_register_createchannel):
@@ -63,23 +65,23 @@ def test_channel_join_invalid_channel(clear_register_createchannel):
     id1 = clear_register_createchannel[0]['token']
     add = requests.post(config.url + 'channel/join/v2',
                         json={'token': id1, 'channel_id': 5})
-    assert add.status_code == 400
+    assert add.status_code == STATUS_INPUT_ERR
 
     add = requests.post(config.url + 'channel/join/v2',
                         json={'token': id1, 'channel_id': True})
-    assert add.status_code == 400
+    assert add.status_code == STATUS_INPUT_ERR
 
     add = requests.post(config.url + 'channel/join/v2',
                         json={'token': id1, 'channel_id': -5})
-    assert add.status_code == 400
+    assert add.status_code == STATUS_INPUT_ERR
 
     add = requests.post(config.url + 'channel/join/v2',
                         json={'token': id1, 'channel_id': '6'})
-    assert add.status_code == 400
+    assert add.status_code == STATUS_INPUT_ERR
 
     add = requests.post(config.url + 'channel/join/v2',
                         json={'token': id1, 'channel_id': ''})
-    assert add.status_code == 400
+    assert add.status_code == STATUS_INPUT_ERR
 
 @pytest.mark.usefixtures('clear_register_createchannel')
 def test_channel_join_user_already_in_channel(clear_register_createchannel):
@@ -90,7 +92,7 @@ def test_channel_join_user_already_in_channel(clear_register_createchannel):
     chan_id1 = clear_register_createchannel[1]
     add = requests.post(config.url + 'channel/join/v2',
                         json={'token': id1, 'channel_id': chan_id1})
-    assert add.status_code == 400
+    assert add.status_code == STATUS_INPUT_ERR
 
 @pytest.mark.usefixtures('clear_register_createchannel')
 def test_channel_join_private_channel():
@@ -115,6 +117,6 @@ def test_channel_join_private_channel():
     add = requests.post(config.url + 'channel/join/v2',
                         json={'token': data1['token'],
                         'channel_id': data2['channel_id']})
-    assert add.status_code == 403
+    assert add.status_code == STATUS_ACCESS_ERR
 
 requests.delete(config.url + 'clear/v1')

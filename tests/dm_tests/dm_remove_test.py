@@ -13,6 +13,8 @@ import requests
 
 from src import config
 
+from src.global_vars import STATUS_OK, STATUS_INPUT_ERR, STATUS_ACCESS_ERR
+
 @pytest.mark.usefixtures('clear_register_two_createdm')
 def test_dm_remove_invalid_token(clear_register_two_createdm):
     """ clears any data stored in data_store and registers a user with the
@@ -21,15 +23,15 @@ def test_dm_remove_invalid_token(clear_register_two_createdm):
     dm_id = clear_register_two_createdm[2]
     remove = requests.delete(config.url + 'dm/remove/v1', 
                         json={'token': 500, 'dm_id': dm_id})
-    assert remove.status_code == 400
+    assert remove.status_code == STATUS_INPUT_ERR
 
     remove = requests.delete(config.url + 'dm/remove/v1', 
                         json={'token': -500, 'dm_id': dm_id})
-    assert remove.status_code == 400
+    assert remove.status_code == STATUS_INPUT_ERR
 
     remove = requests.delete(config.url + 'dm/remove/v1', 
                         json={'token': '', 'dm_id': dm_id})
-    assert remove.status_code == 400
+    assert remove.status_code == STATUS_INPUT_ERR
 
     remove = requests.delete(config.url + 'dm/remove/v1', 
                         json={'token': 's', 'dm_id': dm_id})
@@ -37,7 +39,7 @@ def test_dm_remove_invalid_token(clear_register_two_createdm):
 
     remove = requests.delete(config.url + 'dm/remove/v1', 
                         json={'token': False, 'dm_id': dm_id})
-    assert remove.status_code == 400
+    assert remove.status_code == STATUS_INPUT_ERR
 
 @pytest.mark.usefixtures('clear_register_two_createdm')
 def test_dm_remove_valid(clear_register_two_createdm):
@@ -55,7 +57,7 @@ def test_dm_remove_valid(clear_register_two_createdm):
     dm_id = data2['dm_id']
     remove = requests.delete(config.url + 'dm/remove/v1', 
                         json={'token': token2, 'dm_id': dm_id})
-    assert remove.status_code == 200
+    assert remove.status_code == STATUS_OK
 
     create = requests.post(config.url + 'dm/create/v1', 
                 json={'token': token1, 'u_ids': [id2]})
@@ -63,11 +65,11 @@ def test_dm_remove_valid(clear_register_two_createdm):
     dm_id = data2['dm_id']
     remove = requests.delete(config.url + 'dm/remove/v1', 
                         json={'token': token1, 'dm_id': dm_id})
-    assert remove.status_code == 200
+    assert remove.status_code == STATUS_OK
 
     create = requests.post(config.url + 'dm/create/v1', 
                 json={'token': token1, 'u_ids': [id2, id1]})
-    assert create.status_code == 400
+    assert create.status_code == STATUS_INPUT_ERR
 
 @pytest.mark.usefixtures('clear_register_two_createdm')
 def test_dm_remove_invalid_u_id(clear_register_two_createdm):
@@ -78,23 +80,23 @@ def test_dm_remove_invalid_u_id(clear_register_two_createdm):
 
     remove = requests.delete(config.url + 'dm/remove/v1', 
                         json={'token': token2, 'dm_id': ''})
-    assert remove.status_code == 400
+    assert remove.status_code == STATUS_INPUT_ERR
 
     remove = requests.delete(config.url + 'dm/remove/v1', 
                         json={'token': token2, 'dm_id': 'dfg'})
-    assert remove.status_code == 400
+    assert remove.status_code == STATUS_INPUT_ERR
 
     remove = requests.delete(config.url + 'dm/remove/v1', 
                         json={'token': token2, 'dm_id': True})
-    assert remove.status_code == 400
+    assert remove.status_code == STATUS_INPUT_ERR
 
     remove = requests.delete(config.url + 'dm/remove/v1', 
                         json={'token': token2, 'dm_id': 900})
-    assert remove.status_code == 400
+    assert remove.status_code == STATUS_INPUT_ERR
 
     remove = requests.delete(config.url + 'dm/remove/v1', 
                         json={'token': token2, 'dm_id': -900})
-    assert remove.status_code == 400
+    assert remove.status_code == STATUS_INPUT_ERR
 
 @pytest.mark.usefixtures('clear_register_two_createdm')
 def test_dm_remove_not_creator(clear_register_two_createdm):
@@ -106,7 +108,7 @@ def test_dm_remove_not_creator(clear_register_two_createdm):
 
     remove = requests.delete(config.url + 'dm/remove/v1', 
                         json={'token': token1, 'dm_id': dm_id})
-    assert remove.status_code == 403
+    assert remove.status_code == STATUS_ACCESS_ERR
 
 @pytest.mark.usefixtures('clear_register_two_createdm')
 def test_dm_remove_not_in_dm(clear_register_two_createdm):
@@ -119,6 +121,6 @@ def test_dm_remove_not_in_dm(clear_register_two_createdm):
                 json={'token': token1, 'dm_id': dm_id})
     remove = requests.delete(config.url + 'dm/remove/v1', 
                 json={'token': token1, 'dm_id': dm_id})
-    assert remove.status_code == 403
+    assert remove.status_code == STATUS_ACCESS_ERR
 
 requests.delete(config.url + 'clear/v1')

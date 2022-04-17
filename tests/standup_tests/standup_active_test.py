@@ -13,11 +13,13 @@ import requests
 
 from src import config
 
+from src.global_vars import STATUS_OK, STATUS_INPUT_ERR, STATUS_ACCESS_ERR
+
 @pytest.mark.usefixtures('clear_register_createchannel')
 def test_standup_active_valid(clear_register_createchannel):
     """
     clears any data stored in data_store and registers users with the
-    given information, test standup active valid
+    given information, test standup active function valid
     """
     user1 = clear_register_createchannel[0]
     token = user1['token']
@@ -25,42 +27,42 @@ def test_standup_active_valid(clear_register_createchannel):
     
     stand = requests.get(config.url + 'standup/active/v1', 
                         params={'token': token, 'channel_id': channel_id})
-    assert stand.status_code == 200
+    assert stand.status_code == STATUS_OK
 
 @pytest.mark.usefixtures('clear_register')
 def test_standup_active_invalid_channel(clear_register):
     """
     clears any data stored in data_store and registers users with the
-    given information, test invalid channel
+    given information, a input error raised by invalid channel
     """
     user1 = clear_register
     token = user1['token']
     
     stand = requests.get(config.url + 'standup/active/v1', 
                         params={'token': token, 'channel_id': 44})
-    assert stand.status_code == 400
+    assert stand.status_code == STATUS_INPUT_ERR
 
     stand = requests.get(config.url + 'standup/active/v1', 
                         params={'token': token, 'channel_id': -44})
-    assert stand.status_code == 400
+    assert stand.status_code == STATUS_INPUT_ERR
 
     stand = requests.get(config.url + 'standup/active/v1', 
                         params={'token': token, 'channel_id': True})
-    assert stand.status_code == 400
+    assert stand.status_code == STATUS_INPUT_ERR
 
     stand = requests.get(config.url + 'standup/active/v1', 
                         params={'token': token, 'channel_id': ''})
-    assert stand.status_code == 400
+    assert stand.status_code == STATUS_INPUT_ERR
 
     stand = requests.get(config.url + 'standup/active/v1', 
                         params={'token': token, 'channel_id': 'sjhd'})
-    assert stand.status_code == 400
+    assert stand.status_code == STATUS_INPUT_ERR
 
 @pytest.mark.usefixtures('clear_register_two')
 def test_standup_active_is_not_in_channel(clear_register_two):
     """
     clears any data stored in data_store and registers users with the
-    given information, test user is not in channel
+    given information, a access error raised by user is not in channel
     """
     user1 = clear_register_two[0]
     user2 = clear_register_two[1]
@@ -74,6 +76,6 @@ def test_standup_active_is_not_in_channel(clear_register_two):
 
     stand = requests.get(config.url + 'standup/active/v1', 
                         params={'token': token2, 'channel_id': channel_id})
-    assert stand.status_code == 403
+    assert stand.status_code == STATUS_ACCESS_ERR
 
 requests.delete(config.url + 'clear/v1')

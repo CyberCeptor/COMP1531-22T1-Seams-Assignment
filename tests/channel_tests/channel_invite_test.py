@@ -13,6 +13,8 @@ import requests
 
 from src import config
 
+from src.global_vars import STATUS_OK, STATUS_INPUT_ERR, STATUS_ACCESS_ERR
+
 @pytest.mark.usefixtures('clear_register_createchannel')
 def test_channel_invite_invalid_channel(clear_register_createchannel):
     """
@@ -38,27 +40,27 @@ def test_channel_invite_invalid_channel(clear_register_createchannel):
     add = requests.post(config.url + 'channel/invite/v2', 
                         json={'token': token, 'channel_id': 44,
                                 'u_id': id2})
-    assert add.status_code == 400
+    assert add.status_code == STATUS_INPUT_ERR
 
     add = requests.post(config.url + 'channel/invite/v2', 
                         json={'token': token, 'channel_id': False,
                                 'u_id': id2})
-    assert add.status_code == 400
+    assert add.status_code == STATUS_INPUT_ERR
 
     add = requests.post(config.url + 'channel/invite/v2', 
                         json={'token': token, 'channel_id': -34,
                                 'u_id': id2})
-    assert add.status_code == 400
+    assert add.status_code == STATUS_INPUT_ERR
 
     add = requests.post(config.url + 'channel/invite/v2', 
                         json={'token': token, 'channel_id': '',
                                 'u_id': id2})
-    assert add.status_code == 400
+    assert add.status_code == STATUS_INPUT_ERR
 
     add = requests.post(config.url + 'channel/invite/v2', 
                         json={'token': token, 'channel_id': '5',
                                 'u_id': id2})
-    assert add.status_code == 400
+    assert add.status_code == STATUS_INPUT_ERR
 
 @pytest.mark.usefixtures('clear_register_createchannel')
 def test_channel_invite_self(clear_register_createchannel):
@@ -79,7 +81,7 @@ def test_channel_invite_self(clear_register_createchannel):
     add = requests.post(config.url + 'channel/invite/v2', 
                         json={'token': token, 'channel_id': chan_id1,
                                 'u_id': id})
-    assert add.status_code == 400
+    assert add.status_code == STATUS_INPUT_ERR
 
 @pytest.mark.usefixtures('clear_register_createchannel')
 def test_channel_invite_invalid_inviter(clear_register_createchannel):
@@ -99,27 +101,27 @@ def test_channel_invite_invalid_inviter(clear_register_createchannel):
     add = requests.post(config.url + 'channel/invite/v2', 
                         json={'token': -2, 'channel_id': chan_id1,
                                 'u_id': id1})
-    assert add.status_code == 400
+    assert add.status_code == STATUS_INPUT_ERR
 
     add = requests.post(config.url + 'channel/invite/v2', 
                         json={'token': 2, 'channel_id': chan_id1,
                                 'u_id': id1})
-    assert add.status_code == 400
+    assert add.status_code == STATUS_INPUT_ERR
 
     add = requests.post(config.url + 'channel/invite/v2', 
                         json={'token': True, 'channel_id': chan_id1,
                                 'u_id': id1})
-    assert add.status_code == 400
+    assert add.status_code == STATUS_INPUT_ERR
 
     add = requests.post(config.url + 'channel/invite/v2', 
                         json={'token': 'goood', 'channel_id': chan_id1,
                                 'u_id': id1})
-    assert add.status_code == 403
+    assert add.status_code == STATUS_ACCESS_ERR
 
     add = requests.post(config.url + 'channel/invite/v2', 
                         json={'token': '', 'channel_id': chan_id1,
                                 'u_id': id1})
-    assert add.status_code == 400
+    assert add.status_code == STATUS_INPUT_ERR
 
 
 @pytest.mark.usefixtures('clear_register_createchannel')
@@ -140,22 +142,22 @@ def test_channel_invite_invalid_invitee(clear_register_createchannel):
     add = requests.post(config.url + 'channel/invite/v2', 
                         json={'token': id1, 'channel_id': chan_id1,
                                 'u_id': -2})
-    assert add.status_code == 400
+    assert add.status_code == STATUS_INPUT_ERR
 
     add = requests.post(config.url + 'channel/invite/v2', 
                         json={'token': id1, 'channel_id': chan_id1,
                                 'u_id': 2})
-    assert add.status_code == 400
+    assert add.status_code == STATUS_INPUT_ERR
 
     add = requests.post(config.url + 'channel/invite/v2', 
                         json={'token': id1, 'channel_id': chan_id1,
                                 'u_id': True})
-    assert add.status_code == 400
+    assert add.status_code == STATUS_INPUT_ERR
 
     add = requests.post(config.url + 'channel/invite/v2', 
                         json={'token': id1, 'channel_id': chan_id1,
                                 'u_id': '3'})
-    assert add.status_code == 400
+    assert add.status_code == STATUS_INPUT_ERR
 '''
     with pytest.raises(AccessError):
         channel_invite_v2(id1, chan_id1, 2)
@@ -196,7 +198,7 @@ def test_channel_invite_invitee_already_joined(clear_register_createchannel):
     add = requests.post(config.url + 'channel/invite/v2', 
                         json={'token': id1, 'channel_id': chan_id1,
                                 'u_id': user2['auth_user_id']})
-    assert add.status_code == 400
+    assert add.status_code == STATUS_INPUT_ERR
 
 
 @pytest.mark.usefixtures('clear_register_createchannel')
@@ -227,7 +229,7 @@ def test_channel_invite_inviter_not_in_channel(clear_register_createchannel):
                         json={'token': data3['token'],
                                 'channel_id': chan1_id,
                                 'u_id': data2['auth_user_id']})
-    assert add.status_code == 403
+    assert add.status_code == STATUS_ACCESS_ERR
 
 @pytest.mark.usefixtures('clear_register_createchannel')
 def test_channel_invite_success(clear_register_createchannel):
@@ -255,6 +257,6 @@ def test_channel_invite_success(clear_register_createchannel):
     add = requests.post(config.url + 'channel/invite/v2', 
                         json={'token': id1, 'channel_id': chan_id1,
                                 'u_id': user2['auth_user_id']})
-    assert add.status_code == 200
+    assert add.status_code == STATUS_OK
 
 requests.delete(config.url + 'clear/v1')
