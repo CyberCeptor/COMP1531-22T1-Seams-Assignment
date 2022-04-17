@@ -385,11 +385,19 @@ def user_stats_v1(token):
     num_dms = len(store['dms'])
     num_msgs_sent = channel_message_counter + dms_message_counter
 
+
+
+    # If the denominator is 0, involvement should be 0. 
+    # If the involvement is greater than 1, it should be capped at 1.
     total_channel_dms_messages = (num_channels + num_dms + num_msgs)
+    
     if (total_channel_dms_messages <= 0):
         involvement_rate = 0.0
     else:
         involvement_rate = (channel_counter + dms_counter + num_msgs_sent) / total_channel_dms_messages
+    
+    if involvement_rate > 1:
+        involvement_rate = 1.0
 
     # get user data
     for users in store['users']:
@@ -420,7 +428,9 @@ def user_stats_v1(token):
     data_store.set(store)
 
     
-    return user_data['user_stats']
+    return {
+        'user_stats': user_data['user_stats'],
+    }
 
 
   
