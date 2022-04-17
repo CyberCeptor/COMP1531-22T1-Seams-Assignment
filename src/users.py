@@ -129,5 +129,8 @@ def users_stats_v1(token):
     data_store.set(store)
     
     return {
-        store['workspace_stats']
+        'channels_exist': channels_exist,
+        'dms_exist': dms_exist,
+        'messages_exist': messages_exist,
+        'utilization_rate': util_rate
     }
