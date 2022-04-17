@@ -1,8 +1,9 @@
 """
 Filename: users.py
 
-Author: Aleesha Bunrith(z5371516)
+Author: Aleesha Bunrith(z5371516), Jenson Morgan(z5360181)
 Created: 21/03/2022 - 30/03/2022
+       : 15/04/2022 - 17/04/2022
 
 Description: Implementation for getting the info of all current users
 """
@@ -68,6 +69,7 @@ def users_stats_v1(token):
     and calculate the utilization_rate. 
     """
 
+    # List containing all user id's.
     users_list = []
     time_stamp = int(time.time())
     store = data_store.get()
@@ -116,16 +118,16 @@ def users_stats_v1(token):
         'num_messages_exist': messages_total,
         'time_stamp': time_stamp
     }
-    
+
+    util_rate = round(len(users_list) / users_total, 1)
+
     store['workspace_stats']['channels_exist'].append(channels_exist)
     store['workspace_stats']['dms_exist'].append(dms_exist)
     store['workspace_stats']['messages_exist'].append(messages_exist)
+    store['workspace_stats']['utilization_rate'] = util_rate
 
     data_store.set(store)
     
     return {
-        'channels_exist': channels_exist,
-        'dms_exist': dms_exist,
-        'messages_exist': messages_exist,
-        'utilization_rate': len(users_list) / users_total
+        store['workspace_stats']
     }
