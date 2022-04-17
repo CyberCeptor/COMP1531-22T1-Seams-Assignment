@@ -397,7 +397,7 @@ def user_stats_v1(token):
         involvement_rate = (channel_counter + dms_counter + num_msgs_sent) / total_channel_dms_messages
     
     if involvement_rate > 1:
-        involvement_rate = 1
+        involvement_rate = 1.0
 
     # get user data
     for users in store['users']:
@@ -429,7 +429,7 @@ def user_stats_v1(token):
 
     
     return {
-        'users_stats': user_data['user_stats'],
+        'user_stats': user_data['user_stats'],
     }
 
 
