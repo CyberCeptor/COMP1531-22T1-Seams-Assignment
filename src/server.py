@@ -234,7 +234,6 @@ def user_profile_image(user_id):
     """A Route to store the profile picture"""
     try:
         send_file(f'static/{user_id}.jpg', mimetype='image/jpeg')
-        print("File exists.")
     except:
         raise InputError("File does not exist") from InputError
     # https://flask.palletsprojects.com/en/2.1.x/api/

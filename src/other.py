@@ -50,10 +50,6 @@ def clear_v1():
         # Saves the default image for profile pictures.
         if pic != 'src/static/default.jpg':
             os.remove(pic)
-    
-    # temp = glob.glob('src/temp/*')
-    # for file in temp:
-    #     os.remove(file)
 
     data_store.set(store)
     

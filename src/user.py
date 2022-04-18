@@ -412,30 +412,29 @@ def user_stats_v1(token):
         if user['id'] == user_id:
             user_data = user
 
-    '''Create the channels_joined dict with the information gatherd.
-    Add the dict to the user data.'''
+    '''Create the channels_joined dict with the information gatherd'''
     channels_joined = {
         'num_channels_joined': num_channels,
         'time_stamp': time_stamp
     }
-    user_data['user_stats']['channels_joined'].append(channels_joined)
+
     
-    '''Create the dms_joined dict with the information gatherd.
-    Add the dict to the user data.'''
+    '''Create the dms_joined dict with the information gathered'''
     dms_joined = {
         'num_dms_joined': num_dms,
         'time_stamp': time_stamp}
-    user_data['user_stats']['dms_joined'].append(dms_joined)
 
-    '''Create the messages_sent dict with the information gatherd.
-    Add the dict to the user data.'''
+
+    '''Create the messages_sent dict with the information gathered'''
     messages_sent = {
         'num_messages_sent': total_message_counter,
         'time_stamp': time_stamp
     }
-    user_data['user_stats']['messages_sent'].append(messages_sent)
 
-    '''Add the involvement rate to the user data'''
+    '''Append the gather information'''
+    user_data['user_stats']['channels_joined'].append(channels_joined)
+    user_data['user_stats']['dms_joined'].append(dms_joined)
+    user_data['user_stats']['messages_sent'].append(messages_sent)
     user_data['user_stats']['involvement_rate'] = round(involvement_rate, 1)
 
     data_store.set(store)
