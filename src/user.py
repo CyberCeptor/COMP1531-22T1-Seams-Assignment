@@ -306,7 +306,7 @@ def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
     image_info = imgspy.info(img_url)
     if image_info['type'] != 'jpg':
         # if the image is not jpg, raise error and delete the temp file. 
-        os.remove(temp_image_location)
+        #os.remove(temp_image_location)
         raise InputError(description="URL image is not of a JPG.")
 
     '''Retrieve the image dimensions from the imgspy return'''
