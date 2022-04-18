@@ -113,10 +113,19 @@ def add_tag_notification(user, handle, new_msg, old_msg, next_idx, data, option,
     - if a user has been tagged in the optional message
     
     Arguments:
+        user (dict)        - the data of the user being tagged
+        handle (str)       - the handle of the user being tagged
+        new_msg (str)      - the message being edited/sent
+        old_msg (str)      - empty str if message is not being edited
+        next_idx (int)     - the new_msg index after the end of the handle
+        data (dict)        - the associated channel or dm data
+        option (str)       - denotes if the message is in a channel or dm
+        tagger (str)       - the handle of the tagger
+        chan_dm_name (str) - the name of the channel or dm
 
-    Exceptions:
+    Exceptions: N/A
 
-    Return: 
+    Return: N/A
     """
 
     if ((not new_msg[next_idx].isalnum() or new_msg[next_idx].isspace()) and 
