@@ -64,7 +64,8 @@ def test_message_edit_invalid_token(clear_register_two_createchanneldm_sendmsg):
     assert resp5.status_code == STATUS_ACCESS_ERR
     
 @pytest.mark.usefixtures('clear_register_two_createchanneldm_sendmsg')
-def test_message_edit_invalid_message_id(clear_register_two_createchanneldm_sendmsg):
+def test_message_edit_invalid_message_id(
+    clear_register_two_createchanneldm_sendmsg):
     """ test for invalid input of channel id """
 
     token = clear_register_two_createchanneldm_sendmsg[0]['token']
@@ -104,7 +105,8 @@ def test_message_edit_invalid_message_id(clear_register_two_createchanneldm_send
     assert resp4.status_code == STATUS_INPUT_ERR
 
 @pytest.mark.usefixtures('clear_register_two_createchanneldm_sendmsg')
-def test_message_edit_invalid_message(clear_register_two_createchanneldm_sendmsg):
+def test_message_edit_invalid_message(
+    clear_register_two_createchanneldm_sendmsg):
     """ test for invalid input of message """
 
     token = clear_register_two_createchanneldm_sendmsg[0]['token']
@@ -125,7 +127,8 @@ def test_message_edit_invalid_message(clear_register_two_createchanneldm_sendmsg
     assert resp1.status_code == STATUS_INPUT_ERR
 
 @pytest.mark.usefixtures('clear_register_two_createchanneldm_sendmsg')
-def test_message_send_invalid_length(clear_register_two_createchanneldm_sendmsg):
+def test_message_send_invalid_length(
+    clear_register_two_createchanneldm_sendmsg):
     """ test if input message length is valid(less than 1, over 1000 char) """
 
     token = clear_register_two_createchanneldm_sendmsg[0]['token']
@@ -157,7 +160,8 @@ def test_message_send_invalid_length(clear_register_two_createchanneldm_sendmsg)
     assert resp1.status_code == STATUS_INPUT_ERR
 
 @pytest.mark.usefixtures('clear_register_two_createchanneldm_sendmsg')
-def test_message_edit_different_message(clear_register_two_createchanneldm_sendmsg):
+def test_message_edit_different_message(
+    clear_register_two_createchanneldm_sendmsg):
     """ testing if message belongs to the channel """
     
     token_1 = clear_register_two_createchanneldm_sendmsg[0]['token']
@@ -186,7 +190,8 @@ def test_message_edit_different_message(clear_register_two_createchanneldm_sendm
     assert resp.status_code == STATUS_ACCESS_ERR
 
 @pytest.mark.usefixtures('clear_register_two_createchanneldm_sendmsg')
-def test_message_sent_not_belong_to_user(clear_register_two_createchanneldm_sendmsg):
+def test_message_sent_not_belong_to_user(
+    clear_register_two_createchanneldm_sendmsg):
     """ testing if message is sent by the user who makes the editing request """
 
     token_2 = clear_register_two_createchanneldm_sendmsg[1]['token']
@@ -206,7 +211,8 @@ def test_message_sent_not_belong_to_user(clear_register_two_createchanneldm_send
     assert resp.status_code == STATUS_ACCESS_ERR # raise access error
 
 @pytest.mark.usefixtures('clear_register_two_createchanneldm_sendmsg')
-def test_successful_message_edit_owner(clear_register_two_createchanneldm_sendmsg):
+def test_successful_message_edit_owner(
+    clear_register_two_createchanneldm_sendmsg):
     """ testing if message editing is successful """
     
     # the authorised user has owner permissions in the channel/DM
@@ -322,7 +328,8 @@ def test_message_edit_empty(clear_register_two_createchanneldm_sendmsg):
     assert resp.status_code == STATUS_INPUT_ERR
 
 @pytest.mark.usefixtures('clear_register_two_createchanneldm_sendmsg')
-def test_dm_successful_message_edit_by_user(clear_register_two_createchanneldm_sendmsg):
+def test_dm_successful_message_edit_by_user(
+    clear_register_two_createchanneldm_sendmsg):
     """ testing if message removing is successful by user who sent the message 
     """
     
@@ -337,7 +344,8 @@ def test_dm_successful_message_edit_by_user(clear_register_two_createchanneldm_s
     assert resp.status_code == STATUS_OK
 
 @pytest.mark.usefixtures('clear_register_two_createchanneldm_sendmsg')
-def test_dm_successful_message_edit_by_owner(clear_register_two_createchanneldm_sendmsg):
+def test_dm_successful_message_edit_by_owner(
+    clear_register_two_createchanneldm_sendmsg):
     """ testing if message removing is successful by owner """
     
     message_id =  clear_register_two_createchanneldm_sendmsg[5]
@@ -345,7 +353,7 @@ def test_dm_successful_message_edit_by_owner(clear_register_two_createchanneldm_
 
     # successful edit when user 1 who is owner of dm tries to edit message in dm
     resp = requests.put(config.url + 'message/edit/v1', 
-                          json = {'token': token_1, 'message_id': message_id,
+                          json={'token': token_1, 'message_id': message_id,
                           'message': 'edit'})
  
     assert resp.status_code == STATUS_OK
@@ -377,15 +385,15 @@ def test_dm_fail_message_edit(clear_register_two_createchanneldm_sendmsg):
 
     # raise access error when user 2 tries to edit user 1's message
     resp = requests.put(config.url + 'message/edit/v1', 
-                          json = {'token': token_2, 'message_id': message_id,
+                          json={'token': token_2, 'message_id': message_id,
                           'message': 'edit'})
  
     assert resp.status_code == STATUS_ACCESS_ERR
 
     # raise access error when user 3 tries to edit user 1's message
     resp = requests.put(config.url + 'message/edit/v1', 
-                          json = {'token': user_3['token'], 'message_id': message_id,
-                          'message': 'edit'})
+                          json={'token': user_3['token'], 
+                          'message_id': message_id, 'message': 'edit'})
  
     assert resp.status_code == STATUS_ACCESS_ERR
 
