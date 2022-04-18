@@ -30,12 +30,10 @@ from src.auth import check_invalid_email, check_invalid_name
 
 from src.error import InputError
 from src.token import token_valid_check, token_get_user_id
-from src.other import check_valid_auth_id, cast_to_int_get_requests
+from src.other import check_valid_auth_id, cast_to_int_get_requests, \
+                      check_user_is_member
 
 from src.data_store import data_store
-
-import os
-from os.path import exists
 
 @token_valid_check
 def user_profile_v1(token, u_id):
@@ -307,8 +305,6 @@ def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
     image_info = imgspy.info(img_url)
     if image_info['type'] != 'jpg':
         # if the image is not jpg, raise error and delete the temp file.
-        # if exists(temp_image_location):
-        #     os.remove(temp_image_location)
         raise InputError(description="URL image is not of a JPG.")
 
     '''Retrieve the image dimensions from the imgspy return'''
@@ -321,8 +317,6 @@ def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
         raise InputError(description="The image cannot be uploaded with those dimensions")
     
     '''Delete the temp file, and reopen the image in the correct location'''
-    # if exists(temp_image_location):
-    #     os.remove(temp_image_location)
     urllib.request.urlretrieve(img_url, file_location)
     image = Image.open(file_location)
     
@@ -339,6 +333,22 @@ def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
     for users in store['users']:
         if user_id == users['id']:
             users['profile_img_url'] = profile_img_url
+    
+    # make sure channels and dm data is also being updated
+    for channel in store['channels']:
+        owner_data = check_user_is_member(user_id, channel, 'owner_members')
+        if owner_data:
+            owner_data['profile_img_url'] = profile_img_url
+        member_data = check_user_is_member(user_id, channel, 'all_members')
+        if member_data:
+            member_data['profile_img_url'] = profile_img_url
+
+    for dm in store['dms']:
+        if dm['creator']['u_id'] == user_id:
+            dm['creator']['profile_img_url'] = profile_img_url
+        member_data = check_user_is_member(user_id, dm, 'members')
+        if member_data:
+            member_data['profile_img_url'] = profile_img_url
 
     data_store.set(store)
 
