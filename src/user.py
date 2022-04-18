@@ -282,7 +282,7 @@ def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
     '''Get the user ID from the token'''
     user_id = token_get_user_id(token)
 
-    temp_image_location = f"src/temp/{user_id}.jpg"
+    temp_image_location = f"src/temp/temp.jpg"
     file_location = f"src/static/{user_id}.jpg"
 
     '''check that the x, y values are ints'''
