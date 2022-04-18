@@ -3,9 +3,12 @@ Filename: user_stats_test.py
 
 Author: Jenson Morgan (z5360181)
 
-Created: 15/04/2022
+Created: 15/04/2022 - 19/04/2022
 
-Description: pytests for user/stats/v1
+Description: 
+    pytests for user/stats/v1
+    Ensures the function is working correctly, 
+    and that exceptions are raised when given invalid tokens.
 
 """
 
@@ -36,6 +39,7 @@ def test_user_stats_working(clear_register_two):
     assert stats_return.status_code == STATUS_OK
     stats = stats_return.json()['user_stats']
 
+    '''assert the contents of the stats are empty, apart from the initial stat.'''
     assert 0 in [k['num_channels_joined'] for k in stats['channels_joined']]
     assert 0 in [k['num_dms_joined'] for k in stats['dms_joined']]
     assert 0 in [k['num_messages_sent'] for k in stats['messages_sent']]
@@ -66,6 +70,7 @@ def test_user_stats_working(clear_register_two):
     assert stats_return.status_code == STATUS_OK
     stats = stats_return.json()['user_stats']
 
+    '''assert the result of the functions above are in the stats'''
     assert 1 in [k['num_channels_joined'] for k in stats['channels_joined']]
     assert 1 in [k['num_dms_joined'] for k in stats['dms_joined']]
     assert 1 in [k['num_messages_sent'] for k in stats['messages_sent']]

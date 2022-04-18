@@ -3,7 +3,7 @@ import signal
 import pickle
 from src import config
 from json import dumps
-from flask import Flask, request, jsonify, send_file
+from flask import Flask, request, send_file
 from flask_cors import CORS
 from flask_mail import Mail, Message
 
@@ -234,7 +234,6 @@ def user_profile_image(user_id):
     """A Route to store the profile picture"""
     try:
         send_file(f'static/{user_id}.jpg', mimetype='image/jpeg')
-        print("File exists.")
     except:
         raise InputError("File does not exist") from InputError
     # https://flask.palletsprojects.com/en/2.1.x/api/

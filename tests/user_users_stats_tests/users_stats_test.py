@@ -6,6 +6,8 @@ Author: Jenson Morgan (z5360181)
 Created: 15/04/2022
 
 Description: pytests for users/stats/v1
+    Ensures the function works correctly,
+    and that Exceptions are raised for invalid tokens.
 
 """
 
@@ -35,6 +37,7 @@ def test_users_stats_working(clear_register_two):
     
     stats = stats_return.json()['workspace_stats']
 
+    '''assert the contents of the stats are empty, apart from the initial stat.'''
     assert 0 in [k['num_channels_exist'] for k in stats['channels_exist']]
     assert 0 in [k['num_dms_exist'] for k in stats['dms_exist']]
     assert 0 in [k['num_messages_exist'] for k in stats['messages_exist']]
@@ -64,6 +67,7 @@ def test_users_stats_working(clear_register_two):
     assert stats_return.status_code == STATUS_OK
     stats = stats_return.json()['workspace_stats']
 
+    '''assert the result of the functions above are in the stats'''
     assert 1 in [k['num_channels_exist'] for k in stats['channels_exist']]
     assert 1 in [k['num_dms_exist'] for k in stats['dms_exist']]
     assert 1 in [k['num_messages_exist'] for k in stats['messages_exist']]
