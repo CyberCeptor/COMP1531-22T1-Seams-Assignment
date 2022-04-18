@@ -316,7 +316,7 @@ def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
     '''Check the dimensions of the image are valid'''
     if (x_start < 0 or y_start < 0 or x_end > width or y_end > height or 
         x_start >= x_end or y_start >= y_end or x_end != y_end):
-        raise InputError(description="The dimensions conflict with image given.")
+        raise InputError(description="The image cannot be uploaded with those dimensions")
     
     '''Delete the temp file, and reopen the image in the correct location'''
     os.remove(temp_image_location)
