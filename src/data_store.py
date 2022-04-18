@@ -86,6 +86,7 @@ data = {
             'name_first': 'first',
             'name_last': 'last',
             'handle_str': 'firstlast',
+            'profile_img_url': 'src/static/default.jpg'
         }],
         'all_members': [{
             'u_id': 1,
@@ -93,6 +94,7 @@ data = {
             'name_first': 'first',
             'name_last': 'last',
             'handle_str': 'firstlast',
+            'profile_img_url': 'src/static/default.jpg'
         }],
         'is_public': is_public,
         'messages' = [{
@@ -122,6 +124,7 @@ data = {
             'name_first': 'first',
             'name_last': 'last',
             'handle_str': 'firstlast',
+            'profile_img_url': 'src/static/default.jpg'
         },
         'members': [{
             'u_id': 1,
@@ -129,6 +132,7 @@ data = {
             'name_first': 'first',
             'name_last': 'last',
             'handle_str': 'firstlast',
+            'profile_img_url': 'src/static/default.jpg'
         }],
         'messages' = [{
             'message_id': 1,
@@ -146,22 +150,22 @@ data = {
     'workspace_stats': {
         'channels_exist': [
         {
-                'num_channels_exist': 0,
-                'time_stamp': 012345
+            'num_channels_exist': 0,
+            'time_stamp': 012345
         },
         {
-                'num_channels_exist': 1,
-                'time_stamp': 123456
+            'num_channels_exist': 1,
+            'time_stamp': 123456
         }
     ], 
         'dms_exist': [
         {
-                'num_dms_exist': 0,
-                'time_stamp': 01234
+            'num_dms_exist': 0,
+            'time_stamp': 01234
         },
         {
-                'num_dms_exist': 1,
-                'time_stamp': 12345
+            'num_dms_exist': 1,
+            'time_stamp': 12345
         }
     ], 
         'messages_exist': [

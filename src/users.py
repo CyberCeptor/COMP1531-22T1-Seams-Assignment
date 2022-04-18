@@ -83,7 +83,8 @@ def users_stats_v1(token):
     '''Add all Channel users user_id to the users list.'''
     for channels in store['channels']:
         for members in channels['all_members']:
-            users_list.append(members['u_id'])
+            if members['u_id'] not in users_list:
+                users_list.append(members['u_id'])
 
     '''Add all DM users user_id to the users list
     Checks if the user is not already in the list from the channels'''
