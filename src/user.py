@@ -35,6 +35,7 @@ from src.other import check_valid_auth_id, cast_to_int_get_requests
 from src.data_store import data_store
 
 import os
+from os.path import exists
 
 @token_valid_check
 def user_profile_v1(token, u_id):
@@ -305,8 +306,9 @@ def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
     """Check the URL is of a JPG."""
     image_info = imgspy.info(img_url)
     if image_info['type'] != 'jpg':
-        # if the image is not jpg, raise error and delete the temp file. 
-        #os.remove(temp_image_location)
+        # if the image is not jpg, raise error and delete the temp file.
+        if exists(temp_image_location):
+            os.remove(temp_image_location)
         raise InputError(description="URL image is not of a JPG.")
 
     '''Retrieve the image dimensions from the imgspy return'''
@@ -319,7 +321,8 @@ def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
         raise InputError(description="The image cannot be uploaded with those dimensions")
     
     '''Delete the temp file, and reopen the image in the correct location'''
-   # os.remove(temp_image_location)
+    if exists(temp_image_location):
+        os.remove(temp_image_location)
     urllib.request.urlretrieve(img_url, file_location)
     image = Image.open(file_location)
     
