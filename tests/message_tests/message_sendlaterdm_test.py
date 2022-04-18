@@ -254,7 +254,7 @@ def test_successful_message_sendlater(clear_register_two_createdm):
     info = resp1.json()
     assert(len(info['messages']) == 0)
     
-    time.sleep(TIME_LATER * 2)
+    time.sleep(TIME_LATER)
     
     resp2 = requests.get(config.url + 'dm/messages/v1', 
                           params = {'token': token, 'dm_id': dm_id, 
