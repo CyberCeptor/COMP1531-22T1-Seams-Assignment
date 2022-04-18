@@ -34,6 +34,8 @@ from src.other import check_valid_auth_id, cast_to_int_get_requests
 
 from src.data_store import data_store
 
+import os
+
 @token_valid_check
 def user_profile_v1(token, u_id):
     """
@@ -245,24 +247,35 @@ def user_profile_sethandle_v1(token, handle_str):
 
 @token_valid_check
 def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
-    '''Check the token is valid'''
-
     """
-    urlretrieve:
-        - url: the url to GET the JPG
-        - filename: specifies the local path (if not specified, urllib will generate a temporary file to save the data)
-        - reporthook: callback function, which will trigger when the server is connected and the corresponding 
-        data block is transferred. We can use this callback function to display the current download progress.
-        - data (data of the POST import server): returns a tuple containing two elements (filename, headers). Filename
-        represents the path saved to the local, and header represents the reponse header of the server.
+        Set the users profile picture to a url of the image located in the src/static file. 
+        Crops the image to the dimensions given. 
 
-        We implement a temp image to store the image being uploaded, and then run all validation required. 
-        Once validated, we then open the image in the static folder to be stored for the user.
-        This allows for the user to maintain their picture, even when invalid URL's or dimensions are given.
+        We implement a temp folder to store and test the image being uploaded.
+        Once validated, we then delete the temp image,
+        open the image in the static folder to be stored for the user.
+        This allows for the user to maintain their current profile picture,
+        even when invalid URL's or dimensions are given.
+        The image is stored as {user_id}.jpg
 
+        Arguments:
+            - token: the users token of which the profile picture is set.
+            - img_url: the URL of the jpg image to be retreived and saved.
+            - x_start: the start of the x axis dimension for cropping
+            - y_start: the start of the y axis dimension for cropping
+            - x_end: the end of the x axis dimension
+            - y_end: the end of the y axis dimension
+        
+        Exceptions:
+            - InputError:
+                - the dimensions given are not integers
+                - the URL given is not a string
+                - the URL is not a valid address
+                - the URL is not of a jpg image.
+                - the dimensions given are too large for the image.
 
-        The channel and DM data stores a copy of the profile picture when the user is added, 
-        So need to iterate through them and update to store the new profile pictrue.
+        Return Value:
+            - N/A Does not return anything, sets the user data img_url.
     """
 
     '''Get the user ID from the token'''
@@ -277,34 +290,36 @@ def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
         if type(item) is not int or item is bool:
             raise InputError("Invalid x and y value types.")
 
-    ###### Validation Tests ###########
+    '''Check the given URL is a string.''' 
     if type(img_url) != str:
         raise InputError("Invalid URL variable type.")
 
+    '''Tries to open the image and saves at the temp location,'''
     try:
-        # opens the image and saves at the given location
         urllib.request.urlretrieve(img_url, temp_image_location)
     except:
-        # os.remove(temp_image_location)
+        # if not a valid URL, InputError.
         raise InputError(description="URL cannot be opened.")
 
     # https://github.com/nkanaev/imgspy
     """Check the URL is of a JPG."""
     image_info = imgspy.info(img_url)
     if image_info['type'] != 'jpg':
-        # os.remove(temp_image_location)
+        # if the image is not jpg, raise error and delete the temp file. 
+        os.remove(temp_image_location)
         raise InputError(description="URL image is not of a JPG.")
 
+    '''Retrieve the image dimensions from the imgspy return'''
     width = image_info['width']
     height = image_info['height']
 
-    '''Check the dimensions of the image'''
+    '''Check the dimensions of the image are valid'''
     if (x_start < 0 or y_start < 0 or x_end > width or y_end > height or 
         x_start >= x_end or y_start >= y_end or x_end != y_end):
-        # os.remove(temp_image_location)
-        raise InputError(description="The image dimensions are too small.")
+        raise InputError(description="The dimensions conflict with image given.")
     
-    ####### Cropping the image and saving in static folder with user_id as name + .jpg
+    '''Delete the temp file, and reopen the image in the correct location'''
+    os.remove(temp_image_location)
     urllib.request.urlretrieve(img_url, file_location)
     image = Image.open(file_location)
     
@@ -315,47 +330,45 @@ def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end, y_end):
     # https://stackoverflow.com/questions/16351826/link-to-flask-static-files-with-url-for
     profile_img_url = url_for('static', filename=f'{user_id}.jpg', _external=True)
 
-    """Set the user data profile_img_url to be the URL image"""
     store = data_store.get()
 
+    """Locate the user in the data store, and set the img_url"""
     for users in store['users']:
         if user_id == users['id']:
             users['profile_img_url'] = profile_img_url
 
     data_store.set(store)
-    print("function call profile_img_url = ", profile_img_url)
-
-
-
 
 @token_valid_check
 def user_stats_v1(token):
     """
-    Returns a dictionary containing: {
-        channels_joined: [{num_channels_joined, time_stamp}],
-        dms_joined: [{nums_dms_joined, time_stamp}],
-        messages_sent: [{num_messages_sent, time_stamp}],
-        involvement_rate,
-    }
+    Generates user information regarding the number of channels and DM's joined,
+    the number of messages sent in the channels/DM's and calculates their involvement rate.
+    involvement rate:
+        sum(num_channels_joined, num_dms_joined, num_msgs_sent)/sum(num_channels, num_dms, num_msgs)
+
+    Arguments:
+        - token: the users token which the stats are of.
+    
+    Exceptions:
+        - N/A
+
+    Return Value:
+        - 'user_stats': A dictionary containing the stats generated.
     """
 
-    '''Need to iterate through the channels data, and increment for every channel the user is a member of'''
-    '''Need to iterate through the DM's and increment for every dm the user is apart of'''
-    '''Need to increment through the messages sent by the user and increment for each one.'''
     store = data_store.get()
     user_id = token_get_user_id(token)
-    
     time_stamp = int(time.time())
 
     channel_counter = 0
     channel_message_counter = 0
-
     dms_counter = 0
     dms_message_counter = 0
+    total_message_counter = 0
 
-    num_msgs = 0
-
-    # Number of channels the user is a member of and the number of messages they have sent.
+    '''Iterates through all channels and the members if the user is a member
+    Also checks the number of messages the user has sent in those channels.'''
     for channels in store['channels']:
         for members in channels['all_members']:
             if members['u_id'] == user_id:
@@ -364,12 +377,11 @@ def user_stats_v1(token):
                 for messages in channels['messages']:
                     if messages['u_id'] == user_id:
                         channel_message_counter += 1
-                    num_msgs += 1
+                    total_message_counter += 1
                 
     
-    # Number of DM's the user is a member of and the number of messages they have sent.
-    # Iterates through the dms, when the user is a member, it iterates through the messages
-    # to count the number of messages they have sent. 
+    '''Iterates through all DM's and the members if the user is a member
+    Also checks the number of messages the user has sent in those DM's.'''
     for dms in store['dms']:
         for members in dms['members']:
             if members['u_id'] == user_id:
@@ -377,57 +389,57 @@ def user_stats_v1(token):
                 for messages in dms['messages']:
                     if messages['u_id'] == user_id:
                         dms_message_counter += 1
-                    num_msgs += 1
+                    total_message_counter += 1
 
 
-    # sum(num_channels_joined, num_dms_joined, num_msgs_sent)/sum(num_channels, num_dms, num_msgs)
+    # sum(num_channels_joined, num_dms_joined, num_msgs_sent)/sum(num_channels, num_dms, total_message_counter)
     num_channels = len(store['channels'])
     num_dms = len(store['dms'])
     num_msgs_sent = channel_message_counter + dms_message_counter
 
-
-
-    # If the denominator is 0, involvement should be 0. 
-    # If the involvement is greater than 1, it should be capped at 1.
-    total_channel_dms_messages = (num_channels + num_dms + num_msgs)
-    
+    '''If the denominator is 0, involvement should be 0. 
+    If the involvement is greater than 1, it should be capped at 1.'''
+    total_channel_dms_messages = (num_channels + num_dms + total_message_counter)
     if (total_channel_dms_messages <= 0):
         involvement_rate = 0.0
     else:
         involvement_rate = (channel_counter + dms_counter + num_msgs_sent) / total_channel_dms_messages
-    
     if involvement_rate > 1:
         involvement_rate = 1.0
 
-    # get user data
-    for users in store['users']:
-        if users['id'] == user_id:
-            user_data = users
+    # locate the user data
+    for user in store['users']:
+        if user['id'] == user_id:
+            user_data = user
 
+    '''Create the channels_joined dict with the information gatherd.
+    Add the dict to the user data.'''
     channels_joined = {
         'num_channels_joined': num_channels,
         'time_stamp': time_stamp
     }
     user_data['user_stats']['channels_joined'].append(channels_joined)
-
+    
+    '''Create the dms_joined dict with the information gatherd.
+    Add the dict to the user data.'''
     dms_joined = {
         'num_dms_joined': num_dms,
         'time_stamp': time_stamp}
     user_data['user_stats']['dms_joined'].append(dms_joined)
 
+    '''Create the messages_sent dict with the information gatherd.
+    Add the dict to the user data.'''
     messages_sent = {
-        'num_messages_sent': num_msgs,
+        'num_messages_sent': total_message_counter,
         'time_stamp': time_stamp
     }
     user_data['user_stats']['messages_sent'].append(messages_sent)
 
+    '''Add the involvement rate to the user data'''
     user_data['user_stats']['involvement_rate'] = round(involvement_rate, 1)
-
-    print(user_data['user_stats'])
 
     data_store.set(store)
 
-    
     return {
         'user_stats': user_data['user_stats'],
     }
