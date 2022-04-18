@@ -253,7 +253,7 @@ def test_successful_message_success(clear_register_createchannel):
     info = resp1.json()
     assert(len(info['messages']) == 0)
     
-    time.sleep(TIME_LATER)
+    time.sleep(TIME_LATER * 2)
     
     resp2 = requests.get(config.url + 'channel/messages/v2', 
                           params = {'token': token, 'channel_id': chan_id, 
