@@ -32,7 +32,7 @@ def test_standup_send_valid(clear_register_createchannel):
                             'message': 'hello world'})
     assert stand.status_code == STATUS_OK
 
-    time.sleep(1)
+    time.sleep(2)
     resp1 = requests.get(config.url + 'channel/messages/v2', 
                           params = {'token': token, 'channel_id': channel_id, 
                                     'start': 0})
@@ -175,7 +175,7 @@ def test_standup_send_no_messages(clear_register_createchannel):
                     'length': 1})
     assert resp0.status_code == STATUS_OK
 
-    time.sleep(1)
+    time.sleep(2)
     resp1 = requests.get(config.url + 'channel/messages/v2', 
                           params = {'token': token, 'channel_id': channel_id, 
                                     'start': 0})
