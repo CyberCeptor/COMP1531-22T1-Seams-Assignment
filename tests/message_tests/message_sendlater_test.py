@@ -19,6 +19,7 @@ from src.global_vars import EXPIRED_TOKEN, UNSAVED_TOKEN, STATUS_OK, \
                             STATUS_INPUT_ERR, STATUS_ACCESS_ERR
 
 TIME_LATER = 1
+TWO_TIME_LATER = 2
 
 @pytest.mark.usefixtures('clear_register_createchannel')
 def test_message_sendlater_invalid_token(clear_register_createchannel):
@@ -253,7 +254,7 @@ def test_successful_message_success(clear_register_createchannel):
     info = resp1.json()
     assert(len(info['messages']) == 0)
     
-    time.sleep(TIME_LATER)
+    time.sleep(TWO_TIME_LATER)
     
     resp2 = requests.get(config.url + 'channel/messages/v2', 
                           params = {'token': token, 'channel_id': chan_id, 

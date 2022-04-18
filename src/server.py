@@ -3,7 +3,7 @@ import signal
 import pickle
 from src import config
 from json import dumps
-from flask import Flask, request, jsonify, send_file
+from flask import Flask, request, send_file
 from flask_cors import CORS
 from flask_mail import Mail, Message
 
