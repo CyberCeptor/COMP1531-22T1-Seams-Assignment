@@ -19,7 +19,8 @@ def search_v1(token, query_str):
     """
     If token given is authorised user, return a collection of messages
     in all of the channels/DMs that the user has joined that contain 
-    the query (case-insensitive). There is no expected order for these messages.
+    the query (case-insensitive). 
+    There is no expected order for these messages.
 
     Arguments:
         token (str)          - unique str representation of user
