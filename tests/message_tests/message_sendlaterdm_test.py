@@ -20,7 +20,6 @@ from src.global_vars import EXPIRED_TOKEN, UNSAVED_TOKEN, STATUS_OK, \
                             STATUS_INPUT_ERR, STATUS_ACCESS_ERR
 
 TIME_LATER = 1
-TWO_TIME_LATER = 2
 
 @pytest.mark.usefixtures('clear_register_two_createdm')
 def test_message_sendlater_invalid_token(clear_register_two_createdm):
@@ -255,7 +254,7 @@ def test_successful_message_sendlater(clear_register_two_createdm):
     info = resp1.json()
     assert(len(info['messages']) == 0)
     
-    time.sleep(TWO_TIME_LATER)
+    time.sleep(TIME_LATER)
     
     resp2 = requests.get(config.url + 'dm/messages/v1', 
                           params = {'token': token, 'dm_id': dm_id, 
